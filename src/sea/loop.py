@@ -319,12 +319,17 @@ def escalations(state: State, suite: SuiteRun) -> list[Escalation]:
 
 def trace_summary(run: ControlRun, control: ControlSpec, panel: PanelSpec) -> TraceSummary:
     r, tr = run.result, run.trace
+    s = tr.sensors if tr else None
+    felt = {} if s is None else {"felt": True, "peak_wrist_acc": s.peak_acc, "stall_s": s.stall_s,
+                                 "stall_joint": s.stall_joint, "payload_held_g": s.payload_held_g,
+                                 "pad_drop_t": s.pad_drop_t}
     return TraceSummary(
         key=r.key, cls=r.cls, verdict=r.verdict, peak_force=r.peak_force, travel_reached=r.travel_reached,
         travel_required=control.travel, contact_types=list(tr.contact_types) if tr else [],
         ik_residual_mm=r.ik_residual_mm, joint_limit_hits=list(tr.joint_limit_hits) if tr else [],
         surprise_z=r.surprise_z, escalation_reason=r.escalation_reason, program_id=r.program_id,
         handle=control.handle, recess_mm=control.recess_depth_mm, tilt_deg=float(np.degrees(panel.tilt_rad)),
+        stopped_by=tr.note if tr else "", **felt,
     )
 
 

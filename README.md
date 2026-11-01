@@ -90,7 +90,7 @@ tests/              unit tests, verifier suite (tests/verifier), golden verdicts
 | M6: System 2 (Claude Code plan, Anthropic API, Mock, Scripted), escalation, ladder, baselines | Implemented |
 | M7: library promotion and pruning | Implemented |
 | M8: experiment configs and `sea report` | Implemented; experiments not yet run |
-| M9: L1 fingers, L2 kinematics | In progress: scene objects, stock capability table (V1), sensing and the sensor manifest, grasp world v0 and its battery built; plan in docs/gripper-experiment.md, goal layer in docs/goals.md |
+| M9: L1 fingers, L2 kinematics | In progress: scene objects, stock capability table (V1), sensing and the sensor manifest, grasp world v0 and its battery, sensors in the loop (reflexes, `felt:` summary) built; plan in docs/gripper-experiment.md, goal layer in docs/goals.md |
 | M10: world model | Optional, not started |
 
 Known limitations (wide doors, knob cup and the knob force-cap question, toggles, slot blade

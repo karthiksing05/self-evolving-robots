@@ -108,7 +108,7 @@ def force_cap(control: ControlSpec, panel: PanelSpec, limits: HardLimits, fracti
 
 
 def episode_config(control: ControlSpec, panel: PanelSpec, cfg: SuiteConfig, noise: np.ndarray,
-                   thermal: ServoThermal | None) -> EpisodeConfig:
+                   thermal: ServoThermal | None, sensor_seed: int = 0) -> EpisodeConfig:
     banned = frozenset(set(panel.rules.banned_contacts) | set(cfg.limits.banned_contacts))
     return EpisodeConfig(
         limits=cfg.limits,
@@ -119,6 +119,7 @@ def episode_config(control: ControlSpec, panel: PanelSpec, cfg: SuiteConfig, noi
         perception_offset=np.asarray(noise, dtype=float),
         library=cfg.library.prims,
         thermal=thermal,
+        sensor_seed=sensor_seed,
     )
 
 
@@ -152,7 +153,12 @@ def unreachable(panel: PanelSpec, control: ControlSpec) -> ControlResult:
 def _judge(control: ControlSpec, panel: PanelSpec, limits: HardLimits) -> Callable[[StepTrace], ControlResult]:
     from sea.verify.verdicts import judge
 
-    return lambda trace: judge(trace, control, panel.rules, limits)
+    def fn(trace: StepTrace) -> ControlResult:
+        r = judge(trace, control, panel.rules, limits)
+        s = trace.sensors  # what the robot felt rides along for memory and System 2, after the verdict (D-036)
+        return r if s is None else r.model_copy(update={"peak_acc": s.peak_acc, "stall_s": s.stall_s})
+
+    return fn
 
 
 def _save_trace(trace: StepTrace, path: Path) -> str:
@@ -192,7 +198,8 @@ class PanelRunner:
         self.thermal = ServoThermal() if cfg.thermal else None
 
     def config(self, control: ControlSpec) -> EpisodeConfig:
-        return episode_config(control, self.panel, self.cfg, self.noise[control.id], self.thermal)
+        return episode_config(control, self.panel, self.cfg, self.noise[control.id], self.thermal,
+                              sensor_seed=self.seed)
 
     def attempt(self, control: ControlSpec, program: Program, params: dict[str, dict[str, float]],
                 attempt: int = 0) -> StepTrace:

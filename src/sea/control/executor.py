@@ -20,6 +20,18 @@ from sea.contracts import ARM_JOINTS, HardLimits, Node, PrimitiveDef, Program, S
 from sea.control.frames import STOCK_URDF, rot_about
 from sea.control.ik import IK
 from sea.sim.build_model import Sim
+from sea.sim.sensors import (
+    LOAD_ABORT_S,
+    N_ARM,
+    PAD_GRIP_N,
+    PAD_LOST_N,
+    STALL_LAG_RAD,
+    STALL_LOAD,
+    SensorFrame,
+    SensorLog,
+    Sensors,
+    self_model_for,
+)
 
 TICK_STEPS = 10  # sim steps per joint target (50 Hz targets at 500 Hz physics)
 TICK_DT = 0.002 * TICK_STEPS
@@ -74,6 +86,8 @@ class EpisodeConfig:
     library: dict[str, PrimitiveDef] = field(default_factory=dict)
     param_overrides: dict[str, dict[str, float]] = field(default_factory=dict)  # prim -> arg -> value
     thermal: object | None = None  # spec.ledger.ServoThermal
+    sense: bool = True  # read the robot's sensors every tick and run the reflexes on them (D-036); physics unchanged
+    sensor_seed: int | None = 0
 
 
 class SimCheckEnv:
@@ -130,6 +144,7 @@ class Episode:
         self.push_phase = False
         self.held_since: float | None = None  # when the target last reached its travel (held_for)
         self.squeezing = False  # set by ``grasp`` once the jaws close on its target
+        self.carrying = False  # set by ``grasp`` once it has lifted; cleared when the program ends
         self.success = checks.parse(sim.controls[cid].spec.success)
         self.q_rest0 = {c: sim.control_q(c) for c in sim.controls}
         self.env = SimCheckEnv(self)
@@ -138,6 +153,15 @@ class Episode:
         self.tip_cmd = self.ik.fk(self.q_cmd)[:3, 3]
         self.axis_cmd = self.ik.fk(self.q_cmd)[:3, 2]
         self.contact_res_mm: float | None = None
+        self.sensors: Sensors | None = None
+        self.sense_log: SensorLog | None = None
+        self.frame: SensorFrame | None = None  # the latest reading: what System 1's guards may use
+        self._grip_prev = float(self.q_cmd[-1])
+        self._losing_ticks = 0  # consecutive ticks with a stalled arm joint behind its command
+        self._pads_gripped = False
+        if cfg.sense:
+            self.sensors = Sensors(sim, seed=cfg.sensor_seed, self_model=self_model_for(sim.design))
+            self.sense_log = SensorLog(self.sensors.mounted)
         self.max_ticks = int(np.ceil(cfg.time_limit_s / TICK_DT))
         self.ticks = 0
         self._last_contact_log: dict[tuple[str, str], float] = {}
@@ -243,12 +267,36 @@ class Episode:
         self.last_force = fmax
         self.t += TICK_DT
         self.ticks += 1
+        holding = False
+        if self.sensors is not None and self.sense_log is not None:
+            self.frame = self.sensors.read()
+            holding = self.q_cmd[-1] < GRIP_OPEN - 0.1 and not self.q_cmd[-1] > self._grip_prev + 1e-6
+            self.sense_log.add(self.t, self.frame, grip_closed=holding, carrying=self.carrying, tick_s=TICK_DT)
+        self._grip_prev = float(self.q_cmd[-1])
         self._record(fmax)
         if fmax > self.cfg.limits.max_force_n:
             raise Abort("force_limit")
+        if self.frame is not None and self.squeezing:
+            self._holding_reflexes(self.frame, holding)
         while paused and self.cfg.thermal is not None:  # servo cool-down: time passes, no motion
             self.t_offset += 1.0
             paused = self.cfg.thermal.step(np.zeros(len(ARM_JOINTS)), 1.0)  # type: ignore[attr-defined]
+
+    def _holding_reflexes(self, f: SensorFrame, holding: bool) -> None:
+        """System 1's reflexes while the jaws hold a grasp target, on what the robot feels (D-036).
+
+        ``load_limit``: an arm joint at stall falls behind its command for ``LOAD_ABORT_S``; the arm
+        cannot carry the payload.  ``slip``: the pads had a grip and lost it with the jaws still
+        commanded shut; the object left the jaws.  Slip needs the jaw pads mounted."""
+        losing = (np.abs(f.load[:N_ARM]) >= STALL_LOAD) & (np.abs(self.q_cmd[:N_ARM] - f.q[:N_ARM]) > STALL_LAG_RAD)
+        self._losing_ticks = self._losing_ticks + 1 if losing.any() else 0
+        if self._losing_ticks * TICK_DT >= LOAD_ABORT_S:
+            raise Abort("load_limit")
+        if f.jaw_force_n is not None and holding:
+            pads = float(f.jaw_force_n.sum())
+            self._pads_gripped = self._pads_gripped or pads >= PAD_GRIP_N
+            if self._pads_gripped and pads < PAD_LOST_N:
+                raise Abort("slip")
 
     def _process_contacts(self) -> tuple[float, float]:
         sim, d, m = self.sim, self.sim.data, self.sim.model
@@ -619,6 +667,7 @@ def run_program(sim: Sim, program: Program, control_id: str, cfg: EpisodeConfig,
     ep = Episode(sim, control_id, cfg, trace)
     trace.expected_samples = 0
     ok, reason = drive(ep, exec_node(ep, program.root))
+    ep.carrying = False
     if finish and reason not in ("force_limit", "sim_unstable"):
         drive(ep, motor.finish(ep))  # always back off so springs and push-latches settle
     trace.aborted = reason == "sim_unstable"
@@ -636,6 +685,8 @@ def run_program(sim: Sim, program: Program, control_id: str, cfg: EpisodeConfig,
     trace.contact_types = sorted(ep.contact_types)  # type: ignore[assignment]
     trace.q_rest = ep.q_rest0[control_id]
     trace.program_ok = ok
+    if ep.sense_log is not None:
+        trace.sensors = ep.sense_log.out
     if cfg.thermal is not None:
         trace.servo_heat_j = round(float(cfg.thermal.total_j), 4)  # type: ignore[attr-defined]
     return trace

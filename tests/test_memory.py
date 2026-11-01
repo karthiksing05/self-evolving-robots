@@ -52,7 +52,8 @@ def memory():
 
 
 def measured(force: float) -> dict[str, float]:
-    return {"peak_force": force, "travel_reached": 0.003, "detents": 1.0, "time_s": 4.0, "ik_residual_mm": 0.0}
+    return {"peak_force": force, "travel_reached": 0.003, "detents": 1.0, "time_s": 4.0, "ik_residual_mm": 0.0,
+            "peak_acc": 0.0, "stall_s": 0.0}
 
 
 def test_expectation_uses_ancestor_with_n_min(memory):

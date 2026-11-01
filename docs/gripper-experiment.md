@@ -142,12 +142,20 @@ the manifest, so a plan never relies on a sensor the body does not carry.
 | FSR jaw pads | optional | **toggleable** | yes | on |
 | Link skin | research | toggleable | sim only | off |
 
-Integration is **design**, IMU features first:
-- sensor channels stored in traces;
-- sensor features in the System 2 trace summary;
-- sensor features in memory context, with surprise triggers;
-- System 1 guards: close until a pad pressure is reached; abort a lift when current exceeds 90%
-  of stall.
+**Integration (D-036, built).** What the robot feels now reaches every consumer except the judge:
+- **Traces:** 10 Hz sensor samples plus per-attempt features: peak wrist acceleration, impacts
+  over 1 g, stall time and joint, pad peak, pad drop, payload while carrying.
+- **Memory:** peak wrist acceleration and stall time are measurements, so a sensor residual counts
+  as surprise.
+- **System 2:** the failing-controls section has a `felt:` line, including which reflex stopped the
+  attempt.
+- **System 1 reflexes while holding:** `load_limit` (a stalled joint falling behind its command)
+  and `slip` (the pads lose the grip; needs the pads).
+
+The reflexes change the diagnosis, never the verdict: both batteries are identical.
+
+Still to do: the panel primitives' guards read ground-truth contact force, which the real arm
+does not have. Moving them to felt signals is a separate, re-baselined change before V5.
 
 ## 5. The arm tool server (MCP) and the intent router (design)
 
@@ -254,8 +262,8 @@ Hardware for V5:
 | Stock gripper capability table (V1) and jaw-object friction pairs (D-032) | built |
 | Grasp world v0: objects as controls on a table, `held_for` check, aperture typecheck rule, `grasp` primitive, `configs/limits_grasp.yaml` (pinch allowed), grasp battery (D-035) | built |
 | Sensors as resources: parts manifest, toggles, System 2 prompt section (D-033) | built |
-| Sensor channels into traces, System 2 summary, memory, System 1 guards (IMU first) | next |
-| Task network contracts (`plan/network.py`); the current loop as the degenerate network, battery unchanged (D-034) | design |
+| Sensors in the loop: traces, memory measurements, System 2 `felt:` line, `load_limit` and `slip` reflexes (D-036) | built |
+| Task network contracts (`plan/network.py`); the current loop as the degenerate network, battery unchanged (D-034) | next |
 | Finger family CAD, build into the model, design-dependent pinch point (V1) | design |
 | Gold-design suite (V2), phase A→B runner, difficulty check (V3) | design |
 | `sea-arm` MCP server over the sim: sense, analyze and goal tools, call log and replay, agentic `s2_agent` over the task network | design |

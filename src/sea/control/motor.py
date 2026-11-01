@@ -534,6 +534,7 @@ def grasp(ep: Episode, cid: str, depth: float | None = None, side: float = PICK_
     yield from ep.set_gripper(close, close_s)
     yield from ep.hold(0.3)
     yield from ep.move_to(ep.tip_cmd - down * lift, down, v, roll)
+    ep.carrying = True
     yield from ep.hold(hold_s)
     return True
 

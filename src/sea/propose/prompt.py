@@ -82,6 +82,14 @@ class TraceSummary(BaseModel):
     handle: str = "none"
     recess_mm: float = 0.0
     tilt_deg: float = 0.0
+    # What the robot felt (D-036); ``felt`` is False when the attempt ran without sensors.
+    felt: bool = False
+    stopped_by: str = ""  # a System 1 reflex or limit that ended the attempt: load_limit, slip, force_limit, ...
+    peak_wrist_acc: float = 0.0
+    stall_s: float = 0.0
+    stall_joint: str = ""
+    payload_held_g: float | None = None
+    pad_drop_t: float | None = None
 
 
 def request_hash(payload: Mapping[str, Any]) -> str:
@@ -218,6 +226,13 @@ def _failing_section(failing: Sequence[TraceSummary]) -> str:
             f"ik_residual_mm={_num(s.ik_residual_mm)} joint_limit_hits={','.join(s.joint_limit_hits) or '-'} "
             f"surprise_z={_kv(s.surprise_z)}"
         )
+        if s.felt:
+            lines.append(
+                f"    felt: stopped_by={s.stopped_by or '-'} peak_wrist_acc={_num(s.peak_wrist_acc)} m/s2 "
+                f"stall_s={_num(s.stall_s)} ({s.stall_joint or '-'}) "
+                f"payload_held_g={'-' if s.payload_held_g is None else _num(s.payload_held_g)} "
+                f"pad_drop_t={'-' if s.pad_drop_t is None else _num(s.pad_drop_t)}"
+            )
     return "\n".join(lines)
 
 

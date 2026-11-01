@@ -51,7 +51,8 @@ _BASE_PRIOR_VAR = 1.0 / (2.0 * math.e * math.pi)  # Cobweb's default acuity
 _CATEGORIZE_NODES = 64  # best-first expansions before descending greedily to a leaf
 _LOGPROB_NODES = 32
 # Floors on a concept's sd when computing z (units of each measurement): docs/decisions.md M-004.
-SD_FLOOR = {"peak_force": 0.05, "travel_reached": 1e-4, "detents": 0.25, "time_s": 0.05, "ik_residual_mm": 0.1}
+SD_FLOOR = {"peak_force": 0.05, "travel_reached": 1e-4, "detents": 0.25, "time_s": 0.05, "ik_residual_mm": 0.1,
+            "peak_acc": 0.2, "stall_s": 0.04}
 
 
 @dataclass

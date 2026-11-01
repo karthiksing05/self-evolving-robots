@@ -693,3 +693,66 @@ Not yet: memory's class one-hot has no `grasp` slot (grasp results share the zer
 loop cannot yet be pointed at the grasp world (the phase A->B runner, build step 5).
 Test: `tests/test_grasp_world.py`.
 
+
+## D-036 Sensors in the loop: traces, memory, System 2's summary and two holding reflexes (judge, policy, skill)
+Change: what the robot feels now reaches every consumer except the judge.
+- **IMU model:** the accelerometer reports the mean acceleration since the last reading (the
+  difference in wrist velocity over the tick, minus gravity, in the gripper frame), as a real
+  IMU's low-pass filter does. Sampling the 500 Hz contact chatter instead read 0.8-4 m/s² of
+  "vibration" while the jaws held still at stall; the median is now 0.03 m/s².
+- **Trace:** `StepTrace.sensors` is a `SensorTrace`:
+  - 10 Hz samples: dynamic wrist acceleration, the largest arm-joint load, gripper load, pad
+    force, and payload while the arm is still;
+  - per-tick features: `peak_acc`; `impacts` (over 1 g of dynamic acceleration, 0.1 s apart);
+    `peak_load` and `stall_s` (the longest run of an arm joint at 95% of stall or more), each with
+    its joint; `peak_pads_n`; `pad_drop_t` (the pads lost a grip with the jaws commanded shut and not
+    opening); `payload_held_g` (the last still reading after the lift).
+- **Calibration (measured over both batteries):**
+
+  | World | Peak wrist acceleration p50 / p95 / max (m/s²) | `stall_s` p50 / max (s) |
+  |---|---|---|
+  | Grasp | 1.9 / 3.7 / 4.7 | 1.0 / 2.1 |
+  | Panels | 4.2 / 8.5 / 8.9, plus 16.8 on one `force_limit` drawer | 1.2 / 2.3 |
+
+  The impact threshold is therefore 1 g (10 m/s²), which no normal move reaches. Brief saturation
+  is normal servo behaviour (accelerating, or holding a squeeze), so neither peak load nor stall
+  time alone is a signal.
+- **Reflexes (System 1, `Episode._holding_reflexes`).** They read `SensorFrame`s only, and only
+  while the jaws hold a grasp target:
+  - `load_limit`: an arm joint at 95% of stall or more falls more than 0.05 rad behind its command
+    for 0.5 s. While holding, normal picks lag at most 0.003 rad, the 700 g can included; 900 g and
+    1200 g cans lag 0.17-0.27 rad at the shoulder.
+  - `slip`: the pads read 5 N or more, then under 1 N, with the jaws still commanded shut. It needs
+    the pads. Without them a ball's slip goes unnoticed, so the jaw-pad toggle has a cost the agent
+    can read in the manifest.
+  - An impact is a measurement, not a reflex. In the sim the force guard stops every contact first,
+    so an IMU reflex at 1 g would only race it.
+- **Results and memory:** after the verdict, `env._judge` copies `peak_acc` and `stall_s` into
+  `ControlResult`. `MEASUREMENTS` gains both, so memory's expectations include them and a sensor
+  residual counts as surprise, which is the phase C signal. SD floors are 0.2 m/s² and 0.04 s.
+- **System 2:** `TraceSummary` gains `felt`, `stopped_by` (the trace note), `peak_wrist_acc`,
+  `stall_s` with its joint, `payload_held_g` and `pad_drop_t`. The failing-controls section shows
+  them on a `felt:` line, and an attempt without sensors adds no line.
+- **Seeds:** sensor noise is seeded by the panel draw (`PanelRunner.seed`).
+
+Sensing never changes the physics: a test runs a pick blind and sensed and compares them tick for
+tick. The reflexes only stop an attempt early, and the verdict still comes from ground truth.
+Measured on the stock gripper with pads:
+
+| Object | Verdict | Stopped by | Felt |
+|---|---|---|---|
+| Phase A picks, 700 g can | pass | - | payload within 10 g of the true mass |
+| 900 g and 1200 g cans | `wrong_behavior`, `stuck` | `load_limit` | shoulder stalled and behind its command |
+| 50 mm can, 30 and 40 mm balls | `wrong_behavior` | `slip` | pads lost the grip |
+
+Both batteries' numbers, the golden verdicts and the V1 table are identical: the reflexes change
+the diagnosis, never the verdict. Judge key 27ac5d986ca4 -> da5003023c10 (contracts).
+Open:
+- System 1's guards in the panel primitives still read ground-truth contact force
+  (`Episode.last_force`), an ideal force sensor the real arm does not have. Before V5 they move to
+  felt signals (servo load, pads, IMU). That changes the panel world's numbers and needs its own
+  re-baseline.
+- The sensor suite is not yet part of memory's context, so concepts do not separate bodies with
+  and without pads.
+
+Test: `tests/test_reflexes.py`.

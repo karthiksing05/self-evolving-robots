@@ -30,7 +30,10 @@ D_DUP = 0.15
 RETIRE_AFTER = 10  # iterations unused before a library primitive is retired
 LAMBDA_PRINT = 0.05
 LAMBDA_MASS = 0.02
-MEASUREMENTS: tuple[str, ...] = ("peak_force", "travel_reached", "detents", "time_s", "ik_residual_mm")
+# peak_acc and stall_s come from the robot's own sensors (D-036): memory expects them too, so a
+# sensor residual counts as surprise.  The verifier never reads them.
+MEASUREMENTS: tuple[str, ...] = ("peak_force", "travel_reached", "detents", "time_s", "ik_residual_mm", "peak_acc",
+                                 "stall_s")
 
 CheckExpr = str
 
@@ -200,6 +203,31 @@ class PrimitiveDef(_Model):
 
 
 # ---------------------------------------------------------------- execution and verdicts
+class SensorTrace(BaseModel):
+    """What the robot felt during one attempt (D-036), from ``sim/sensors.py`` at 10 Hz plus features
+    taken every tick.  System 2 and memory read it, System 1's reflexes read the frames it is made
+    from, and the verifier never reads either.  Not frozen: the sensor log fills it while recording."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    parts: list[str] = []  # mounted sensor parts
+    t: list[float] = []
+    acc_dyn: list[float] = []  # | |wrist acceleration| - g |, m/s^2: impacts, jolts, drops
+    load_max: list[float] = []  # largest |load| over the arm joints, fraction of stall
+    grip_load: list[float] = []  # gripper servo |load|
+    pads_n: list[float] = []  # both jaw pads summed, N (empty when the pads are not mounted)
+    payload_g: list[float | None] = []  # None while the arm moves
+    peak_acc: float = 0.0
+    impacts: int = 0  # wrist acceleration spikes above the impact threshold
+    peak_load: float = 0.0  # brief saturation is normal servo behaviour; stall_s is the signal
+    peak_load_joint: str = ""
+    stall_s: float = 0.0  # longest time any arm joint stayed at 95% of stall or more
+    stall_joint: str = ""
+    peak_pads_n: float | None = None
+    pad_drop_t: float | None = None  # the pads lost a grip while the jaws were still commanded closed
+    payload_held_g: float | None = None  # last estimate while the arm was still, carrying what it lifted
+
+
 class StepTrace(BaseModel):
     """One control attempt.  Not frozen: the executor appends while recording."""
 
@@ -235,6 +263,7 @@ class StepTrace(BaseModel):
     q_rest: float = 0.0
     program_ok: bool = False
     failed_primitive: str = ""  # motor primitive that returned False or was running at an abort (C-001)
+    sensors: SensorTrace | None = None  # D-036
 
 
 class ControlResult(_Model):
@@ -256,6 +285,9 @@ class ControlResult(_Model):
     ik_residual_mm: float = 0.0
     program_id: str = ""
     s1_trials: int = 0
+    # From the robot's sensors, filled by the suite runner after the verdict (D-036): never judged.
+    peak_acc: float = 0.0
+    stall_s: float = 0.0
 
     @property
     def key(self) -> str:

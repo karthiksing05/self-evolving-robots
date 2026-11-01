@@ -102,7 +102,7 @@ tool-call log, it makes a session replayable.
    | `s1_exhausted`: the search ran out without passing | Re-decompose with another method, or Analyze why |
    | `structural`: no method's preconditions can hold with this body | Design, with the difference measured against the capability table |
    | `surprise`: a sensor residual or a failed prediction | Analyze before acting again; a possible fault (phase C) |
-   | Guard trip: current, force or IMU limit | Analyze; never retry blindly |
+   | Reflex stop (`stopped_by`): `load_limit`, `slip`, `force_limit` (D-036) | Analyze first; never retry blindly. `load_limit` points at the body (the payload is past the arm's stall; phase C), `slip` at the grip (another method, or the fingers) |
    | Slice exhausted | Return to the parent, which re-allocates or gives up |
 
 5. **Exit on the test.** A node closes when the judge says its test holds, when its slice runs

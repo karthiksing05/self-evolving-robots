@@ -25,13 +25,20 @@ import mujoco
 import numpy as np
 import yaml
 
-from sea.contracts import ARM_JOINTS, Design
+from sea.contracts import ARM_JOINTS, Design, SensorTrace
 from sea.control.frames import MJCF_TOOL_SITE
 from sea.sim.build_model import STALL_TORQUE, Sim, build_model
 
 CONFIG = Path(__file__).resolve().parents[3] / "configs" / "sensors.yaml"
 G = 9.81
 STATIC_QD = 0.05  # rad/s: below this on every joint the arm counts as still (payload is valid)
+IMPACT_ACC = 10.0  # m/s^2 beyond gravity (1 g): no normal move reaches it; a collision does (D-036)
+STALL_LOAD = 0.95  # fraction of stall torque: a joint this loaded is at its limit
+STALL_LAG_RAD = 0.05  # a stalled joint this far behind its command is losing, not just straining
+LOAD_ABORT_S = 0.5  # stalled and losing this long while holding something: the payload is too heavy
+LOG_EVERY = 5  # ticks between logged samples: 10 Hz at 50 Hz ticks
+SETTLE_TICKS = 5  # the first ticks after a reset are the servos settling, not the robot feeling anything
+PAD_GRIP_N, PAD_LOST_N = 5.0, 1.0  # pads summed: holding something / holding nothing
 N_ARM = len(ARM_JOINTS) - 1  # joints that carry the payload (the gripper joint carries the squeeze)
 JAW_KINDS = ("jaw_fixed", "jaw_moving")
 
@@ -122,6 +129,76 @@ class SelfModel:
         return float(w[2] / G * 1000.0)
 
 
+_SELF_MODELS: dict[str, SelfModel] = {}
+
+
+def self_model_for(design: Design) -> SelfModel:
+    """One nominal self-model per design (building one compiles a model, about 0.1 s)."""
+    key = design.model_dump_json(exclude={"id", "parent"})
+    if key not in _SELF_MODELS:
+        _SELF_MODELS[key] = SelfModel(design)
+    return _SELF_MODELS[key]
+
+
+def dynamic_acc(frame: SensorFrame) -> float:
+    """Wrist acceleration beyond gravity, orientation-free: | |a| - g |."""
+    return abs(float(np.linalg.norm(frame.wrist_acc)) - G)
+
+
+class SensorLog:
+    """Turns one ``SensorFrame`` per tick into a ``SensorTrace``: 10 Hz samples plus features that
+    every tick contributes to (peaks, impacts, a lost grip)."""
+
+    def __init__(self, parts: set[str]):
+        self.out = SensorTrace(parts=sorted(parts))
+        self.n = 0
+        self.gripping = False
+        self.last_impact = -1
+        self.stall_run = 0  # consecutive ticks with an arm joint at STALL_LOAD or more
+        self.stall_joint = ""
+
+    def add(self, t: float, f: SensorFrame, grip_closed: bool, carrying: bool = False, tick_s: float = 0.02) -> None:
+        """``grip_closed``: the jaws are commanded shut and not opening (a pad drop then means a slip).
+        ``carrying``: the program has lifted what it holds, so a still arm's payload is the object's weight."""
+        o, self.n = self.out, self.n + 1
+        if self.n <= SETTLE_TICKS:
+            return
+        acc = dynamic_acc(f)
+        arm = np.abs(f.load[:N_ARM])
+        if acc > o.peak_acc:
+            o.peak_acc = round(acc, 3)
+        if acc > IMPACT_ACC and self.n - self.last_impact > LOG_EVERY:
+            o.impacts += 1
+            self.last_impact = self.n
+        if float(arm.max()) > o.peak_load:
+            o.peak_load = round(float(arm.max()), 3)
+            o.peak_load_joint = ARM_JOINTS[int(arm.argmax())]
+        if arm.max() >= STALL_LOAD:
+            self.stall_run += 1
+            self.stall_joint = self.stall_joint or ARM_JOINTS[int(arm.argmax())]
+            if self.stall_run * tick_s > o.stall_s:
+                o.stall_s, o.stall_joint = round(self.stall_run * tick_s, 3), self.stall_joint
+        else:
+            self.stall_run, self.stall_joint = 0, ""
+        pads = None if f.jaw_force_n is None else float(f.jaw_force_n.sum())
+        if pads is not None:
+            o.peak_pads_n = round(max(o.peak_pads_n or 0.0, pads), 2)
+            if pads >= PAD_GRIP_N:
+                self.gripping = True
+            elif self.gripping and pads < PAD_LOST_N and grip_closed and o.pad_drop_t is None:
+                o.pad_drop_t = round(t, 3)
+        if f.static and carrying:
+            o.payload_held_g = round(f.payload_g, 1)
+        if self.n % LOG_EVERY == 0:
+            o.t.append(round(t, 3))
+            o.acc_dyn.append(round(acc, 3))
+            o.load_max.append(round(float(arm.max()), 3))
+            o.grip_load.append(round(abs(float(f.load[-1])), 3))
+            if pads is not None:
+                o.pads_n.append(round(pads, 2))
+            o.payload_g.append(round(f.payload_g, 1) if f.static else None)
+
+
 class Sensors:
     """Reads a ``Sim`` the way the robot would: noisy, quantized, and through its own model."""
 
@@ -139,6 +216,7 @@ class Sensors:
         self.imu_site = sim.model.site(MJCF_TOOL_SITE).id
         self.robot_bodies = {int(sim.model.geom_bodyid[g]) for g in sim.geom_kind}
         self.mounted = mounted_parts(sim.design)
+        self._prev: tuple[float, np.ndarray] | None = None  # (time, wrist velocity) at the last reading
 
     def _measure(self, name: str, x: np.ndarray) -> np.ndarray:
         spec = self.ch[name]
@@ -169,12 +247,25 @@ class Sensors:
         return jaw, links
 
     def _imu(self) -> tuple[np.ndarray, np.ndarray]:
+        """Accelerometer (specific force, reads +g up at rest) and gyro, in the gripper frame.
+
+        Between readings the accelerometer reports the mean acceleration since the last one, as an
+        IMU's low-pass filter does; sampling the 500 Hz contact chatter instead reads several m/s^2
+        of vibration while the jaws hold at stall.  A first reading, or one after a reset, is instantaneous."""
         m, d = self.sim.model, self.sim.data
-        mujoco.mj_rnePostConstraint(m, d)  # fills cacc; reads state, changes nothing
-        acc, vel = np.zeros(6), np.zeros(6)
-        mujoco.mj_objectAcceleration(m, d, mujoco.mjtObj.mjOBJ_SITE, self.imu_site, acc, 1)
-        mujoco.mj_objectVelocity(m, d, mujoco.mjtObj.mjOBJ_SITE, self.imu_site, vel, 1)
-        return acc[3:], vel[:3]
+        vel = np.zeros(6)
+        mujoco.mj_objectVelocity(m, d, mujoco.mjtObj.mjOBJ_SITE, self.imu_site, vel, 0)
+        rot = d.site_xmat[self.imu_site].reshape(3, 3)
+        t = float(d.time)
+        if self._prev is not None and t - self._prev[0] > 1e-6:
+            acc = rot.T @ ((vel[3:] - self._prev[1]) / (t - self._prev[0]) - m.opt.gravity)
+        else:
+            mujoco.mj_rnePostConstraint(m, d)  # fills cacc; reads state, changes nothing
+            acc6 = np.zeros(6)
+            mujoco.mj_objectAcceleration(m, d, mujoco.mjtObj.mjOBJ_SITE, self.imu_site, acc6, 1)
+            acc = acc6[3:]
+        self._prev = (t, vel[3:].copy())
+        return acc, rot.T @ vel[:3]
 
     def read(self) -> SensorFrame:
         sim = self.sim
