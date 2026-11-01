@@ -756,3 +756,47 @@ Open:
   and without pads.
 
 Test: `tests/test_reflexes.py`.
+
+## D-037 Task network contracts; the loop is recorded as the degenerate network (judge, policy)
+Change: the goal layer of D-034 exists as contracts, and every run writes its network.
+- **Judge (`verify/goals.py`):** goal tests above one control, read only from what the judge has
+  already decided:
+  - `pass_share(SET, x)`: at least a share x of a named set's controls pass;
+  - `still_passes(SET)`: every control of SET that passed before the change still passes;
+  - `accepted()`: the paired trial passed the acceptance rule.
+
+  Tests combine with `&`. A goal on one control keeps its check expression (`compose/checks.py`).
+  The planner composes tests from these two vocabularies and cannot add to either.
+- **Policy (`plan/network.py`):**
+  - `Goal`: test, target control, the goals it serves, rationale, slice, and the task that serves it.
+  - `Task`: skill, analyze, design or network, with the sensor parts it needs.
+  - `Method`: HTN's decomposition one level above a composite program.
+  - `GoalReport`: the judge's verdict, impasse, reflex stop, program and spend. It is not called
+    `Report`, which is already the iteration report.
+  - `IMPASSE_SUBGOAL`: structural makes a design goal; s1_exhausted and unfamiliar make a network
+    goal; surprise and reflex make an analyze goal; an exhausted slice returns to the parent.
+- **Slices:** a slice is a `CostVector` over the ledger's budgeted resources. Servo heat is priced,
+  not sliced. A goal without a slice shares its parent's. The root gets every budget less the
+  reserve, and the explicit slices of a goal's children must fit inside its own.
+- **Validation:** `validate` refuses a network before dispatch for any of these: no single root, a
+  dangling parent or served goal, a cycle, a test outside the vocabulary or naming an unknown set,
+  a root with no slice, children whose slices exceed their parent's, a skill naming a program that
+  is not in the library, or a task that needs an unmounted sensor.
+- **The degenerate network (docs/goals.md 3.6):** `evolve` records the loop as it runs.
+  - The root's test is `pass_share(train, 1)`, served by the `coverage` method.
+  - Each control System 1 serves is a leaf with that control's success check. It gets one report
+    per iteration: verdict, escalation reason as the impasse, reflex stop, program, and sim time at
+    the ledger's estimate (D-016, now `env.attempts`).
+  - Each System 2 proposal is a design node serving that iteration's targets. It closes on
+    `accepted()`, and its spend is the ledger's difference across the trial.
+  - At the end the root closes `passed` if its test holds, `exhausted` otherwise.
+
+  `goals.jsonl` holds one event per line (open, report, close), and `replay` reads it back.
+
+Recording changes nothing: a smoke run before and after has 72 byte-identical output files
+(results, reports, costs, proposals, decisions, designs, libraries, memory, traces), with
+`goals.jsonl` the only new one. Both batteries and the golden verdicts are identical. Judge key
+da5003023c10 -> b1706b1856a4 (`verify/goals.py` joins the verifier).
+Not yet: `plan/agent.py`, the agentic System 2 that writes networks deeper than one level. It
+needs the `sea-arm` tool server, because an analyze goal needs tools to answer it.
+Test: `tests/test_network.py`.

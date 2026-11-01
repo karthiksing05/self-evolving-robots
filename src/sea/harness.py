@@ -22,7 +22,8 @@ COMPONENTS: dict[str, tuple[str, tuple[str, ...]]] = {
     # contracts.py holds the HardLimits and Budgets defaults, the verdict and contact enums and the
     # coverage bins; build.py applies the hard limits to a body and prices its print (D-028).
     "contracts": ("judge", ("src/sea/contracts.py",)),
-    "verifier": ("judge", ("src/sea/verify/verdicts.py", "src/sea/compose/checks.py")),
+    # verify/goals.py is the goal-test vocabulary above one control: the planner composes, never writes it (D-037)
+    "verifier": ("judge", ("src/sea/verify/verdicts.py", "src/sea/compose/checks.py", "src/sea/verify/goals.py")),
     "reward": ("judge", ("src/sea/verify/coverage.py", "src/sea/verify/reward.py")),
     "limits": ("judge", ("configs/limits.yaml", "configs/limits_grasp.yaml")),
     "panels": ("judge", ("configs/panels.yaml", "src/sea/sim/panels.py")),
@@ -46,6 +47,7 @@ COMPONENTS: dict[str, tuple[str, tuple[str, ...]]] = {
                             "src/sea/propose/baselines.py", "src/sea/propose/llm.py")),
     "memory": ("policy", ("src/sea/memory/concepts.py", "src/sea/memory/embed.py", "src/sea/compose/library.py")),
     "loop": ("policy", ("src/sea/loop.py", "src/sea/sim/env.py")),
+    "network": ("policy", ("src/sea/plan/network.py",)),
 }
 
 # Modules that read runs but never shape one; every other module under src/sea belongs to a component.

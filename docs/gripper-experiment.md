@@ -263,7 +263,7 @@ Hardware for V5:
 | Grasp world v0: objects as controls on a table, `held_for` check, aperture typecheck rule, `grasp` primitive, `configs/limits_grasp.yaml` (pinch allowed), grasp battery (D-035) | built |
 | Sensors as resources: parts manifest, toggles, System 2 prompt section (D-033) | built |
 | Sensors in the loop: traces, memory measurements, System 2 `felt:` line, `load_limit` and `slip` reflexes (D-036) | built |
-| Task network contracts (`plan/network.py`); the current loop as the degenerate network, battery unchanged (D-034) | next |
+| Task network contracts (`plan/network.py`, `verify/goals.py`); the current loop recorded as the degenerate network in `goals.jsonl`, every number unchanged (D-034, D-037) | built |
 | Finger family CAD, build into the model, design-dependent pinch point (V1) | design |
 | Gold-design suite (V2), phase A→B runner, difficulty check (V3) | design |
 | `sea-arm` MCP server over the sim: sense, analyze and goal tools, call log and replay, agentic `s2_agent` over the task network | design |

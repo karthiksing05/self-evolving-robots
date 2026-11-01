@@ -1,6 +1,7 @@
 # Goals and sub-goals: a task network between System 2 and System 1
 
-**Status: design (D-034).** The build order is in [gripper-experiment.md](gripper-experiment.md)
+**Status:** design (D-034). The contracts and the degenerate network are built (D-037); the
+agentic System 2 is not. The build order is in [gripper-experiment.md](gripper-experiment.md)
 section 8.
 
 System 2 should not be a proposal generator that runs once per escalation. It should work like a
@@ -160,7 +161,8 @@ rewrite.
 
 | Module | Tier | Contents |
 |---|---|---|
-| `compose/checks.py` (extended) | judge | The goal vocabulary: grasp-world predicates, `still_passes` |
-| `plan/network.py` | policy | `Goal`, `Task`, `Method`, `Report`; slice arithmetic; validation (tests drawn from the vocabulary, slices that fit, leaves that are executable, sensors that are mounted); the impasse-to-sub-goal table; `goals.jsonl` |
+| `compose/checks.py` (extended) | judge | Per-control goal tests: the check atoms, with `held_for` from grasp world v0 (built) |
+| `verify/goals.py` | judge | **Built (D-037).** Goal tests above one control: `pass_share(SET, x)`, `still_passes(SET)`, `accepted()` |
+| `plan/network.py` | policy | **Built (D-037).** `Goal`, `Task`, `Method`, `GoalReport`; slice arithmetic; validation (tests drawn from the vocabulary, slices that fit, leaves that are executable, sensors that are mounted); the impasse-to-sub-goal table; `goals.jsonl`; the degenerate network |
 | `plan/agent.py` | policy | The agentic System 2 over `sea-arm`: `goal.decompose`, `goal.assign`, `goal.report`, `goal.close`, `resources.manifest` |
 | `sea-arm` server | skill / world | Sense, analyze, act and design tools (section 5 of the gripper doc), plus the goal tools above |

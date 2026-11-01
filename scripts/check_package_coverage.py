@@ -13,7 +13,7 @@ from pathlib import Path
 
 GATES: dict[str, float] = {
     "verify": 95.0, "spec": 95.0, "compose": 95.0,
-    "contracts": 90.0, "memory": 90.0, "propose": 90.0,
+    "contracts": 90.0, "memory": 90.0, "propose": 90.0, "plan": 90.0,
     "control": 80.0, "design": 80.0, "sim": 80.0,
 }
 OVERALL = 85.0

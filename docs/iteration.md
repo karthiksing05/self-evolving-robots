@@ -59,10 +59,10 @@ ruler. This document is the discipline for running it.
 
 | Tier | Fundamentals | Files | Blast radius | Minimum evidence |
 |---|---|---|---|---|
-| **judge** | verdict rules and thresholds, success checks, reward and cost terms, hard limits, panel and grasp-world task distributions and splits, acceptance rule, build checks and print pricing, contract defaults | `verify/`, `compose/checks.py`, `spec/posture.py`, `design/build.py`, `contracts.py`, `configs/panels.yaml`, `configs/grasp.yaml`, `configs/limits.yaml`, `configs/limits_grasp.yaml` | Every past number; comparability | B0–B4, and re-baseline all compared proposers |
+| **judge** | verdict rules and thresholds, success checks, goal tests above one control (`verify/goals.py`), reward and cost terms, hard limits, panel and grasp-world task distributions and splits, acceptance rule, build checks and print pricing, contract defaults | `verify/`, `compose/checks.py`, `spec/posture.py`, `design/build.py`, `contracts.py`, `configs/panels.yaml`, `configs/grasp.yaml`, `configs/limits.yaml`, `configs/limits_grasp.yaml` | Every past number; comparability | B0–B4, and re-baseline all compared proposers |
 | **world** | contact model, control dynamics, jaw and tool collision geometry, scene objects, sensor models, IK, reach | `sim/`, `configs/sensors.yaml`, `control/ik.py`, `control/reach.py`, `control/frames.py` | Which tasks are possible at all | B0–B3, golden diff explained control by control |
 | **skill** | motor primitives, seed programs, program language, executor behaviour, tool templates | `control/motor.py`, `control/executor.py`, `compose/dsl.py`, `configs/primitives.yaml`, `design/tools.py`, `design/space.py` | What the robot can do before learning | B0–B3; no reference regressions |
-| **policy** | posture table, ledger prices, escalation thresholds, target scoring, prompt, LLM client, memory encoding, library promotion | `spec/ledger.py`, `propose/`, `memory/`, `compose/library.py` | How efficiently the loop searches | B0, B4, and E1/E8 slices over 5 seeds |
+| **policy** | posture table, ledger prices, escalation thresholds, target scoring, prompt, LLM client, memory encoding, library promotion, the task network | `spec/ledger.py`, `propose/`, `memory/`, `compose/library.py`, `plan/` | How efficiently the loop searches | B0, B4, and E1/E8 slices over 5 seeds |
 
 `sea/harness.py` lists the files behind each component, and each component's hash is
 written into every run.

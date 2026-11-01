@@ -53,6 +53,7 @@ from sea.contracts import (
 )
 from sea.design.build import BuiltDesign, build
 from sea.design.space import tools_equivalent
+from sea.plan.network import DegenerateNetwork, GoalLog, cost_diff
 from sea.propose.baselines import ProposeContext, Proposer, make_proposer
 from sea.propose.prompt import TraceSummary
 from sea.propose.targets import Escalation, TargetGroup, gain_est, pick_targets
@@ -636,6 +637,7 @@ def evolve(spec: RunSpec, run_dir: str | Path, *, proposer: Proposer | None = No
     dump_json(run_dir / "harness.json", {"judge_key": judge_key(fp), "components": fp})
     train = generate("train", spec.splits.get("train", 200), spec.panel_seed)
     state = init_state(spec, train)
+    net = DegenerateNetwork(GoalLog(run_dir / "goals.jsonl"), spec.budgets, train)  # records only (D-037)
     llm = make_llm(spec, run_dir) if spec.proposer in ("s2", "s2_nomem") else None
     proposer = proposer or make_proposer(spec.proposer, llm=llm, model=spec.llm_model, levels=spec.levels,
                                          rack_slots=spec.budgets.rack_slots, limits=spec.limits, seed=spec.seed)
@@ -661,6 +663,7 @@ def evolve(spec: RunSpec, run_dir: str | Path, *, proposer: Proposer | None = No
         learn(state, suite, it)
         record_uses(state, suite, it)
         esc = escalations(state, suite)  # marks escalated results before they are logged
+        net.observe(it, suite.runs, {e.key: e.reason for e in esc}, index)
         results = suite.results
         report = make_report(state, run_dir.name, it, panels, results, state.ledger.spent, state.design)
         write_results(it_dir / "results.jsonl", results)
@@ -676,8 +679,13 @@ def evolve(spec: RunSpec, run_dir: str | Path, *, proposer: Proposer | None = No
         elif report.coverage_reward >= spec.stop.target_reward:
             stop_reason = "target reward"
         elif esc:
+            spent0 = state.ledger.spent
             decision, proposal_log, stalled = _propose_and_try(state, proposer, esc, report, suite, index, it, it_dir,
                                                                proposal_log, log)
+            chosen = proposal_log.get("chosen")
+            net.one_shot(it, [k for keys in proposal_log.get("targets", []) for k in keys],
+                         None if chosen is None else Proposal.model_validate(proposal_log["candidates"][chosen]["proposal"]),
+                         decision, cost_diff(state.ledger.spent, spent0))
             stall = stall + 1 if stalled else 0
             if stall >= spec.stop.patience:
                 stop_reason = "stalled"
@@ -697,6 +705,7 @@ def evolve(spec: RunSpec, run_dir: str | Path, *, proposer: Proposer | None = No
         dump_json(run_dir / "timing.json", timing)
         if stop_reason != "iterations":
             break
+    net.close(it, stop_reason)
     write_state(run_dir, it + 1, state)
     t0 = time.time()
     final = final_eval(state, run_dir, spec.eval_split)

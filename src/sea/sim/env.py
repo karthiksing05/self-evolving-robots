@@ -284,6 +284,11 @@ def run_panel(panel: PanelSpec, cfg: SuiteConfig, repeat: int = 0) -> list[Contr
     return out
 
 
+def attempts(run: ControlRun) -> int:
+    """Simulated attempts behind a result: the final one, earlier System 1 trials and confirmation re-runs."""
+    return 1 + max(run.result.s1_trials - 1, 0) + len(run.repeats)
+
+
 def run_suite(panels: Sequence[PanelSpec], cfg: SuiteConfig, repeat: int = 0) -> SuiteRun:
     """One pass over ``panels`` (all controls, or ``cfg.only``) under randomization draw ``repeat``."""
     runs: list[ControlRun] = []
@@ -293,8 +298,7 @@ def run_suite(panels: Sequence[PanelSpec], cfg: SuiteConfig, repeat: int = 0) ->
     heat = sum(r.trace.servo_heat_j for r in runs if r.trace is not None)
     # Confirmation re-runs and local-search trials also cost sim time; traces carry the final attempt only,
     # so charge each System 1 trial and re-run at the final attempt's duration (an estimate, D-016).
-    extra = sum((max(r.result.s1_trials - 1, 0) + len(r.repeats)) * r.trace.sim_seconds
-                for r in runs if r.trace is not None)
+    extra = sum((attempts(r) - 1) * r.trace.sim_seconds for r in runs if r.trace is not None)
     return SuiteRun(runs, round(sim_s + extra, 4), round(heat, 4))
 
 
