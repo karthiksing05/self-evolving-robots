@@ -313,14 +313,15 @@ def test_find_claude(monkeypatch, tmp_path):
 
 
 # ---------------------------------------------------------------- prompt
-def test_prompt_has_eight_sections_and_stable_hash():
+def test_prompt_has_nine_sections_and_stable_hash():
     p = _prompt()
-    assert [t for t, _ in p.sections] == list(SECTION_TITLES) and len(p.sections) == 8
+    assert [t for t, _ in p.sections] == list(SECTION_TITLES) and len(p.sections) == 9
     assert p.hash() == _prompt().hash()
     assert p.hash() != _prompt(remaining={"print_minutes": 0.5, "llm_usd": 0.75}).hash()
     assert p.target_keys == ["p003:c2"]
     text = p.render()
-    assert text.index("## 1. Hard limits") < text.index("## 8. Output schema and rules")
+    assert text.index("## 1. Hard limits") < text.index("## 9. Output schema and rules")
+    assert "jaw_pads [mounted" in text and "link_skin [NOT mounted" in text  # the sensor manifest (D-033)
     assert "banned contact types: pinch" in text and "rung<i>:" in text
     assert "push [motor] Guarded push." in text and "depth=[0.0005, 0.08]" in text
     assert "p003:c2 cls=door handle=push_latch" in text and "surprise_z=peak_force=0.4" in text

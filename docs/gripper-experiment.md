@@ -127,7 +127,22 @@ never what counts as a pass.
 | Kinetic energy, momentum (derived) | Position and speed plus the arm's own model | How hard the arm is moving; impact risk |
 
 Derived signals use the robot's own nominal model (`SelfModel`), so faults injected into the
-simulator show up as residuals (phase C). Integration is **design**:
+simulator show up as residuals (phase C).
+
+**Sensors are resources (D-033, built).** `configs/sensors.yaml` lists the mountable parts, each
+with its channels, mount, priority, whether it can be toggled, whether it exists on the bench, and
+its mass. `Design.sensors` says which toggleable parts are on this body, so the sensor suite
+evolves with the gripper. An unmounted part reads `None`, not zero. The System 2 prompt includes
+the manifest, so a plan never relies on a sensor the body does not carry.
+
+| Part | Priority | Toggle | Bench | Default |
+|---|---|---|---|---|
+| Servo telemetry | core | fixed | yes | on |
+| Wrist IMU | **high**: integrated and built first | fixed | yes | on |
+| FSR jaw pads | optional | **toggleable** | yes | on |
+| Link skin | research | toggleable | sim only | off |
+
+Integration is **design**, IMU features first:
 - sensor channels stored in traces;
 - sensor features in the System 2 trace summary;
 - sensor features in memory context, with surprise triggers;
@@ -162,9 +177,12 @@ backend behind the same tools.
 
 **System 2 as an agent.** The plan backend (D-029) already runs Claude Code, which speaks MCP
 natively. So a `s2_agent` proposer runs `claude -p --mcp-config sea-arm.json`, allowed only sense,
-analyze and design tools. It can dry-run a hypothesis, read the sensor summary, ask System 1 to
-tune a program, and then submit. This should run as an ablation next to the one-shot `s2`: does
-tool access buy better proposals per dollar and per sim-hour?
+analyze, design and goal tools. It is the target System 2 (D-034). It decomposes a goal into
+sub-goals, assigns the executable ones to System 1, reads each report and revises: it can dry-run a
+hypothesis, read the sensor summary, ask System 1 to tune a program, and submit a body change. The
+task network it works over is in [goals.md](goals.md). The one-shot `s2` stays as the fast path for
+impasses whose fix memory already knows. Comparing the two (does decomposition buy better results
+per plan call and per sim-hour?) is one of the V4 measurements.
 
 **The intent router.** Each tool call is routed by intent:
 1. **Who serves it.** System 1 serves fast local skill execution and local search; the simulator
@@ -235,10 +253,12 @@ Hardware for V5:
 | Sensing v0 (D-031) | built |
 | Stock gripper capability table (V1) and jaw-object friction pairs (D-032) | built |
 | Grasp world v0: objects as controls on a table panel, lift check, aperture typecheck rule, grasp primitive, `configs/limits_grasp.yaml` (pinch allowed), its own judge key | next |
-| Sensor channels into traces, System 2 summary, memory, System 1 guards | next |
+| Sensors as resources: parts manifest, toggles, System 2 prompt section (D-033) | built |
+| Sensor channels into traces, System 2 summary, memory, System 1 guards (IMU first) | next |
+| Task network contracts (`plan/network.py`); the current loop as the degenerate network, battery unchanged (D-034) | design |
 | Finger family CAD, build into the model, design-dependent pinch point (V1) | design |
 | Gold-design suite (V2), phase A→B runner, difficulty check (V3) | design |
-| `sea-arm` MCP server over the sim: sense and analyze tools, call log and replay, `s2_agent` | design |
+| `sea-arm` MCP server over the sim: sense, analyze and goal tools, call log and replay, agentic `s2_agent` over the task network | design |
 | `design/arm.py` (L2), actuator (L3), phase C fault injection | design |
 | Live runs (V4); real prints and the SO-101 backend (V5) | later |
 

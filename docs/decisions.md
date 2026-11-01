@@ -609,3 +609,41 @@ Consequence: spheres move from the phase-A object set to phase B (gold design: V
 pads), and the phase-A set is cylinders 25-45 mm and boxes 20-50 mm, 50-800 g.
 Test: `tests/test_grasp_table.py` (scenario claims from the table, a re-measure of three picks, the
 contact pairs).
+
+## D-033 Sensors are resources the agent is told about; IMU first, jaw pads toggleable (world, judge key)
+Decision (user, 2026-11-01): the wrist IMU is the high-priority sensor (integrated first, built
+first on the bench); the FSR jaw pads are toggleable; link skin stays a sim-only research option.
+The sensors a body carries are a resource in the same sense as print minutes and plan calls, so
+the agent is told exactly what it can feel.
+Change: `configs/sensors.yaml` gains a `parts` table (channels, mount, priority, toggle, bench,
+mass, what each part tells the robot).  `Design.sensors` (`SensorSuite`: `jaw_pads` on,
+`link_skin` off) mounts the toggleable parts, so the suite evolves with the body.  An unmounted
+part's channels read `None`, never zero, because "no reading" and "no force" are different facts.
+`sensors.manifest(design)` lists every part, and the System 2 prompt gains a "Sensors on this body"
+section rendered from it.
+Re-key: `SensorSuite` lives in `contracts.py`, so the judge key moved d9408f12e242 -> c64218777cbc.
+The battery gave identical numbers under the new key before it was re-saved (D-028 procedure).
+Not yet: part mass is listed but not added to the MJCF model (3 g IMU, 1 g pads); a `DesignDelta`
+that toggles sensors comes with the finger family, because pads mount on the finger faces.
+Also decided: on the real arm, act tools need approval once per session (the server enforces
+the hard limits on every call regardless), and the configs/exp suite E0-E11 runs after the gripper
+work.
+Test: `tests/test_sensors.py::test_unmounted_parts_read_as_absent_and_the_manifest_says_so`.
+
+## D-034 System 2 becomes a planner over a task network; one-shot stays the fast path (policy, design)
+Decision (user, 2026-11-01): System 2 should decompose goals into sub-goals, assign them to
+System 1 repeatedly, and revise from what comes back, grounded in hierarchical task networks and
+task decomposition from cognitive science.  The one-shot proposer remains for rote cases.
+Design: docs/goals.md.  The main choices:
+- Goal tests are written in a judge-tier vocabulary, so the planner cannot grade itself.
+- Retrieval comes first (Soar chunking, ICARUS skill indexing): a known method runs without an
+  LLM.  A known impasse with a known fix goes to one-shot `s2`.  Only new problems get agentic
+  decomposition.
+- The impasse type picks the sub-goal type.
+- Every node carries a budget slice and the sensor manifest.
+- Reward stays at the root; sub-goal outcomes rank methods and never enter the reward.
+- A body change is a sub-goal whose effect is to make a method's precondition true.
+Build: the current loop is expressed first as the degenerate network (one root, one leaf per
+control, one-shot System 2 at impasses), and the battery checks that nothing moved.  Agentic depth
+comes with the `sea-arm` server.
+

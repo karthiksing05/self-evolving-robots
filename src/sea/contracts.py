@@ -138,11 +138,20 @@ class BuildEstimate(_Model):
     added_mass_g: float = 0.0
 
 
+class SensorSuite(_Model):
+    """Toggleable sensor parts on this body (configs/sensors.yaml ``parts``, D-033).  Servo telemetry
+    and the wrist IMU are always mounted; what is mounted is what the agent is told it can feel."""
+
+    jaw_pads: bool = True  # FSR on each jaw face
+    link_skin: bool = False  # contact skin per link; sim-only research option
+
+
 class Design(_Model):
     id: str
     parent: str | None = None
     arm: ArmSpec = ArmSpec()
     fingers: FingerSpec = FingerSpec()
+    sensors: SensorSuite = SensorSuite()
     tool_rack: list[ToolSpec] = []  # <= rack_slots
     est: BuildEstimate = BuildEstimate()
 

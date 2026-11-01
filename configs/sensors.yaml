@@ -8,6 +8,43 @@ servo:
   # Datasheet-class values; re-measure on the bench before V5 (stall current at each supply voltage).
   stall_current_a: {7.4: 2.7, 12.0: 2.4}
   idle_current_a: 0.10
+# Parts (D-033): what can be mounted, and what the agent is told it has.  ``Design.sensors`` says
+# which toggleable parts are mounted; a channel whose part is not mounted reads as absent (None),
+# never as zero.  ``bench: false`` means the part exists only in sim.  Priority orders integration
+# and the bench build: the wrist IMU comes first.  Part mass is not yet added to the MJCF model.
+parts:
+  servo_telemetry:
+    channels: [q, qd, load, current_a]
+    mount: every STS3215 (built in)
+    priority: core
+    toggle: false
+    bench: true
+    mass_g: 0
+    tells: where the arm is and how hard each joint works; payload, torque, energy and momentum are derived from it
+  wrist_imu:
+    channels: [wrist_acc, wrist_gyro]
+    mount: gripper body
+    priority: high
+    toggle: false
+    bench: true
+    mass_g: 3
+    tells: impacts, vibration, drops and the gripper's tilt
+  jaw_pads:
+    channels: [jaw_force_n]
+    mount: each jaw face; moves with the finger design
+    priority: optional
+    toggle: true
+    bench: true
+    mass_g: 1
+    tells: contact, squeeze and slip (a pressure drop under a constant command)
+  link_skin:
+    channels: [link_force_n]
+    mount: every link
+    priority: research
+    toggle: true
+    bench: false
+    mass_g: 0
+    tells: unintended collisions and where they happen
 channels:
   q:            {unit: rad,   resolution: 0.001534, noise: 0.0,    hardware: "STS3215 present position (4096 counts/rev)"}
   qd:           {unit: rad/s, resolution: 0.0015,   noise: 0.002,  hardware: "STS3215 present speed"}

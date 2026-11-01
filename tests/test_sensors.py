@@ -8,11 +8,11 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from sea.contracts import Design
+from sea.contracts import Design, SensorSuite
 from sea.control.executor import HOME_Q, TICK_STEPS
 from sea.sim.build_model import build_model
 from sea.sim.grasp_probe import pick, scene_object
-from sea.sim.sensors import Sensors
+from sea.sim.sensors import Sensors, load_config, manifest
 
 CAN_H = 0.06
 
@@ -34,7 +34,8 @@ def test_idle_arm_feels_only_its_own_weight():
     f = Sensors(sim, seed=0).read()
     assert f.static and abs(f.payload_g) < 25
     assert np.linalg.norm(f.wrist_acc) == pytest.approx(9.81, abs=0.1)  # an IMU at rest reads gravity
-    assert f.jaw_force_n.max() < 0.5 and f.jaw_force_n.min() >= 0 and f.link_force_n == {}
+    assert f.jaw_force_n.max() < 0.5 and f.jaw_force_n.min() >= 0
+    assert f.link_force_n is None  # link skin is a sim-only option, off by default
     assert f.current_a[1] > 0.3 > f.current_a[0]  # shoulder_lift holds the arm up; the pan joint idles
     assert f.kinetic_j < 1e-4
 
@@ -44,7 +45,7 @@ def held():
     """(mass_g -> (frame, can height)) after picking a 30 mm can of each mass."""
     out = {}
     for mass in (50, 400):
-        sim = pick(scene_object("cylinder", 30.0, mass)).sim
+        sim = pick(scene_object("cylinder", 30.0, mass), Design(id="skin", sensors=SensorSuite(link_skin=True))).sim
         out[mass] = (Sensors(sim, seed=1).read(), float(sim.data.xpos[sim.objects["obj"]][2]))
     return out
 
@@ -88,3 +89,22 @@ def test_the_judges_never_read_sensors():
     judges = [*(src / "verify").glob("*.py"), src / "compose" / "checks.py", src / "spec" / "posture.py"]
     for path in judges:
         assert not re.search(r"\bsensors\b", path.read_text()), path.name
+
+
+def test_unmounted_parts_read_as_absent_and_the_manifest_says_so():
+    # D-033: the body decides which channels exist, and the agent is told exactly that.
+    bare = Design(id="bare", sensors=SensorSuite(jaw_pads=False))
+    sim = build_model(bare, objects=[scene_object("cylinder", 30.0, 50.0)], table_z=0.0)
+    sim.set_arm_q(HOME_Q)
+    _settle(sim, HOME_Q, 5)
+    f = Sensors(sim, seed=0).read()
+    assert f.jaw_force_n is None and f.link_force_n is None and f.wrist_acc is not None and f.static
+    on = {p["part"]: p["mounted"] for p in manifest(bare)}
+    assert on == {"servo_telemetry": True, "wrist_imu": True, "jaw_pads": False, "link_skin": False}
+    cfg = load_config()
+    toggles = {n for n, part in cfg["parts"].items() if part["toggle"]}
+    assert toggles == set(SensorSuite.model_fields)  # every toggleable part has a switch on the design
+    owned = [c for part in cfg["parts"].values() for c in part["channels"]]
+    assert sorted(owned) == sorted(cfg["channels"])  # every channel belongs to exactly one part
+    assert cfg["parts"]["wrist_imu"]["priority"] == "high" and not cfg["parts"]["link_skin"]["bench"]
+

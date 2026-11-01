@@ -59,6 +59,7 @@ def _samples() -> dict[type, pydantic.BaseModel]:
         C.FingerSpec(jaw_len_mm=5.0),
         C.ArmSpec(upper_scale=1.1, servo_voltage={j: 12.0 for j in C.ARM_JOINTS}),
         C.BuildEstimate(print_minutes=12.0),
+        C.SensorSuite(jaw_pads=False),
         C.Design(id="d1", parent="d0", tool_rack=[C.ToolSpec(template="probe", params={"diameter": 4, "length": 40},
                                                              contact="probe")]),
         C.PrimRef(name="push", args={"_0": "$target", "force": 3.0}),

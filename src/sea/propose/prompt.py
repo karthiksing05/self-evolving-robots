@@ -15,6 +15,7 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict
 
 from sea.contracts import Budgets, Design, FixRecord, HardLimits, PrimitiveDef
+from sea.sim.sensors import manifest
 from sea.spec.posture import EffectiveParams
 
 SECTION_TITLES: tuple[str, ...] = (
@@ -23,6 +24,7 @@ SECTION_TITLES: tuple[str, ...] = (
     "Escalation ladder",
     "Primitive library",
     "Current design",
+    "Sensors on this body",
     "Failing controls",
     "Similar past fixes",
     "Output schema and rules",
@@ -183,6 +185,24 @@ def _design_section(design: Design) -> str:
     return "\n".join(lines)
 
 
+def _sensors_section(design: Design) -> str:
+    """The sensor manifest (D-033): what this body can feel, so plans use only what exists."""
+    lines = []
+    for part in manifest(design):
+        tags = [part["priority"], "toggleable" if part["toggle"] else "fixed", "bench" if part["bench"] else "sim only"]
+        state = "mounted" if part["mounted"] else "NOT mounted"
+        lines.append(f"- {part['part']} [{state}; {', '.join(tags)}; {_num(part['mass_g'])} g; {part['mount']}]: "
+                     f"{part['tells']}")
+        lines.append("    channels: " + ", ".join(
+            f"{c} ({v['unit']}, resolution {_num(v['resolution'])}, noise {_num(v['noise'])})"
+            for c, v in part["channels"].items()))
+    lines.append("- derived from servo telemetry and the arm's own model: torque, payload_g (valid only while the "
+                 "arm is still), kinetic energy, momentum")
+    lines.append("Do not plan on a channel whose part is not mounted. Sensors inform your choices; pass and fail "
+                 "are judged from ground truth, never from sensor readings.")
+    return "\n".join(lines)
+
+
 def _failing_section(failing: Sequence[TraceSummary]) -> str:
     if not failing:
         return "(none)"
@@ -243,6 +263,7 @@ def build_prompt(*, limits: HardLimits, eff: EffectiveParams, remaining: Mapping
         LADDER_TEXT,
         _library_section(library),
         _design_section(design),
+        _sensors_section(design),
         _failing_section(failing),
         _fixes_section(fixes),
         _rules_section(max_proposals),

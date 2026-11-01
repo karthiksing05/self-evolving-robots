@@ -9,6 +9,10 @@ arm shows up as a residual the robot can notice.
 
 The verifier never reads a ``SensorFrame``: verdicts come from ground-truth sim state.  Sensor
 noise can therefore change what the robot decides, but never what counts as a pass.
+
+Which channels exist depends on the body: ``Design.sensors`` mounts the toggleable parts in the
+config's ``parts`` table, and an unmounted part's channels read ``None``.  ``manifest`` is what the
+agent is told it can feel (D-033).
 """
 
 from __future__ import annotations
@@ -44,8 +48,8 @@ class SensorFrame:
     qd: np.ndarray  # rad/s
     load: np.ndarray  # signed fraction of stall torque
     current_a: np.ndarray  # A
-    jaw_force_n: np.ndarray  # (fixed, moving) normal force on the jaw pads
-    link_force_n: dict[str, float]  # robot body -> contact normal force from anything but the robot
+    jaw_force_n: np.ndarray | None  # (fixed, moving) normal force on the jaw pads; None if not mounted
+    link_force_n: dict[str, float] | None  # robot body -> contact force from anything but the robot
     wrist_acc: np.ndarray  # m/s^2, gripper frame, includes gravity (reads +g up when still)
     wrist_gyro: np.ndarray  # rad/s, gripper frame
     torque: np.ndarray = field(default_factory=lambda: np.zeros(len(ARM_JOINTS)))  # N*m, from load
@@ -53,6 +57,23 @@ class SensorFrame:
     kinetic_j: float = 0.0
     momentum: np.ndarray = field(default_factory=lambda: np.zeros(3))  # kg*m/s, arm linear momentum
     static: bool = False
+
+
+def mounted_parts(design: Design) -> set[str]:
+    """Sensor parts on this body: every part that cannot be toggled, plus the toggled-on ones."""
+    return {name for name, part in load_config()["parts"].items()
+            if not part["toggle"] or getattr(design.sensors, name)}
+
+
+def manifest(design: Design) -> list[dict]:
+    """What the agent is told it can feel: one entry per part, mounted or not, with its channels."""
+    cfg = load_config()
+    on = mounted_parts(design)
+    return [{"part": name, "mounted": name in on, **{k: part[k] for k in ("priority", "toggle", "bench", "mass_g",
+                                                                         "mount", "tells")},
+             "channels": {c: {k: cfg["channels"][c][k] for k in ("unit", "resolution", "noise")}
+                          for c in part["channels"]}}
+            for name, part in cfg["parts"].items()]
 
 
 class SelfModel:
@@ -117,6 +138,7 @@ class Sensors:
         self.idle_current = float(servo["idle_current_a"])
         self.imu_site = sim.model.site(MJCF_TOOL_SITE).id
         self.robot_bodies = {int(sim.model.geom_bodyid[g]) for g in sim.geom_kind}
+        self.mounted = mounted_parts(sim.design)
 
     def _measure(self, name: str, x: np.ndarray) -> np.ndarray:
         spec = self.ch[name]
@@ -171,8 +193,9 @@ class Sensors:
         static = bool(np.all(np.abs(qd[:N_ARM]) < STATIC_QD))
         return SensorFrame(
             t=float(d.time), q=q, qd=qd, load=load, current_a=self._measure("current_a", current),
-            jaw_force_n=self._measure("jaw_force_n", jaw),
-            link_force_n={k: float(self._measure("link_force_n", np.array(v))) for k, v in sorted(links.items())},
+            jaw_force_n=self._measure("jaw_force_n", jaw) if "jaw_pads" in self.mounted else None,
+            link_force_n={k: float(self._measure("link_force_n", np.array(v))) for k, v in sorted(links.items())}
+            if "link_skin" in self.mounted else None,
             wrist_acc=self._measure("wrist_acc", acc), wrist_gyro=self._measure("wrist_gyro", gyro),
             torque=torque, payload_g=self.self_model.payload_g(q, torque) if static else 0.0,
             kinetic_j=kinetic, momentum=momentum, static=static,
