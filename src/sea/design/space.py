@@ -11,6 +11,7 @@ from collections.abc import Sequence
 import numpy as np
 
 from sea.contracts import ARM_JOINTS, ArmSpec, BuildEstimate, Design, FingerSpec, HardLimits, ToolSpec
+from sea.design.fingers import RANGES as FINGER_FAMILY
 
 TOOL_RANGES: dict[str, dict[str, tuple[float, float]]] = {
     "stock": {},
@@ -36,11 +37,7 @@ RACK_TEMPLATES: tuple[str, ...] = ("pad", "hook", "knob_cup", "soft_tip", "slot_
 SLOT_CHOICES: tuple[str, ...] = ("none",) + RACK_TEMPLATES  # L0 selector values
 SLOT_PARAMS = 4  # normalized parameter dims per rack slot
 
-FINGER_RANGES: dict[str, tuple[float, float]] = {
-    "jaw_len_mm": (0.0, 30.0),
-    "tip_radius_mm": (0.0, 6.0),
-    "softness": (0.0, 1.0),
-}
+FINGER_RANGES: dict[str, tuple[float, float]] = dict(FINGER_FAMILY)  # design/fingers.py RANGES
 VOLTAGES: tuple[float, float] = (7.4, 12.0)
 
 

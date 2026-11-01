@@ -80,6 +80,33 @@ def grasp_panels(split: str, n: int, seed: int = 0) -> list[PanelSpec]:
     return out
 
 
+def real_object(name: str, dx: float = 0.0, dy: float = 0.0) -> ControlSpec:
+    """A YCB object (configs/ycb_objects.yaml) as a grasp control: its scan, published mass and
+    material friction, and its grasp class from this config's ``real`` table."""
+    from sea.sim.objects import catalog
+
+    o = catalog()[name]
+    spec = object_spec(load_config()["real"][name], o["width_mm"], o["height_mm"], o["mass_g"], o["friction"], dx, dy)
+    return spec.model_copy(update={"asset": name, "size_mm": (round(o["width_mm"], 1), round(o["height_mm"], 1))})
+
+
+def real_panels(split: str, n: int, objects: list[str], seed: int = 0) -> list[PanelSpec]:
+    """``n`` tables cycling through ``objects``, each placed at a seeded offset from the table centre."""
+    cfg = load_config()
+    rng = _rng(f"real:{split}", seed)
+    out = []
+    for i in range(n):
+        name = objects[i % len(objects)]
+        obj = real_object(name, rng.uniform(*cfg["placement"]["dx"]), rng.uniform(*cfg["placement"]["dy"]))
+        out.append(table_panel(f"r{split[:2]}{i:03d}_{name}", split, seed, obj))
+    return out
+
+
+def regression_panels(objects: list[str]) -> list[PanelSpec]:
+    """One centred table per object: the set a body change must keep passing (phase A's history)."""
+    return [table_panel(f"reg_{name}", "regression", 0, real_object(name)) for name in objects]
+
+
 def phase_b_panels() -> list[PanelSpec]:
     """The incompatible objects, centred on the table at friction 0.8."""
     return [table_panel(f"gb_{o['id']}", "phase_b", 0, object_spec(o["shape"], o["width_mm"], o["height_mm"],

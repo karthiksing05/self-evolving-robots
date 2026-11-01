@@ -37,7 +37,7 @@ def _payload(kind: str) -> dict:
     if kind in ("use_tool", "new_tool"):
         return {"design_delta": DesignDelta(rack_add=[PAD])}
     if kind == "finger":
-        return {"design_delta": DesignDelta(fingers={"jaw_len_mm": 10.0})}
+        return {"design_delta": DesignDelta(fingers={"reach_mm": 10.0})}
     if kind == "arm":
         return {"design_delta": DesignDelta(arm={"fore_scale": 1.1})}
     return {"design_delta": DesignDelta(servo_voltage={"wrist_flex": 12.0})}
@@ -108,8 +108,8 @@ def test_posture_edit_count_and_param_delta():
     assert not any("max_param_delta" in e for e in L.posture_errors(big, OPT, STOCK))
     zero_base = _prop("arm", design_delta=DesignDelta(arm={"wrist_offset_mm": 5.0}))  # 0 -> 5 mm, scale 20 mm
     assert L.posture_errors(zero_base, CONS, STOCK, forced=True) == []
-    fingers = _prop("finger", design_delta=DesignDelta(fingers={"softness": 0.9}))
-    assert any("fingers.softness" in e for e in L.posture_errors(fingers, CONS, STOCK, forced=True))
+    fingers = _prop("finger", design_delta=DesignDelta(fingers={"pad_tpu_mm": 3.0}))
+    assert any("fingers.pad_tpu_mm" in e for e in L.posture_errors(fingers, CONS, STOCK, forced=True))
     bogus = _prop("arm", design_delta=DesignDelta(arm={"wingspan": 2.0}))
     assert any("unknown arm field" in e for e in L.posture_errors(bogus, OPT, STOCK))
     sv = _prop("arm", design_delta=DesignDelta(arm={"servo_voltage": 12.0}))

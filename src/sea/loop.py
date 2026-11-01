@@ -31,6 +31,7 @@ import yaml
 
 from sea.compose import dsl
 from sea.compose.library import Library
+from sea.compose.typecheck import accepted_contacts
 from sea.contracts import (
     D_DUP,
     MEASUREMENTS,
@@ -55,7 +56,7 @@ from sea.design.build import BuiltDesign, build
 from sea.design.space import tools_equivalent
 from sea.plan.network import DegenerateNetwork, GoalLog, cost_diff
 from sea.propose.baselines import ProposeContext, Proposer, make_proposer
-from sea.propose.prompt import TraceSummary
+from sea.propose.prompt import Rejection, TraceSummary
 from sea.propose.targets import Escalation, TargetGroup, gain_est, pick_targets
 from sea.sim.env import STRUCTURAL, ControlRun, SuiteConfig, SuiteRun, reward_map, run_panel, run_suite
 from sea.sim.panels import generate, reference_panel
@@ -69,7 +70,7 @@ EPISODE_EST_S = 12.0  # sim seconds per control attempt, for cost-before-action 
 AREA_FOR = {"reparam": "force", "program": "library", "promote": "library", "use_tool": "shape",
             "new_tool": "shape", "finger": "shape", "arm": "kinematics", "actuator": "kinematics"}
 LEVEL_FOR = {"use_tool": "L0", "new_tool": "L0", "finger": "L1", "arm": "L2", "actuator": "L3"}
-SUPPORTED_LEVELS = {"L0", "L3"}  # L1 fingers and L2 kinematics need design/arm.py (milestone M9)
+SUPPORTED_LEVELS = {"L0", "L1", "L3"}  # L2 kinematics needs design/arm.py (milestone M9); L1 fingers: D-038
 
 
 def load_spec(path: str | Path) -> RunSpec:
@@ -113,6 +114,7 @@ class State:
     promoted: set[str] = field(default_factory=set)
     contexts: dict[str, np.ndarray] = field(default_factory=dict)
     base_cache: dict[tuple, list[ControlRun]] = field(default_factory=dict)
+    rejected: list[Rejection] = field(default_factory=list)  # proposals screening refused, shown back to S2
 
     @property
     def design(self) -> Design:
@@ -167,6 +169,24 @@ def make_llm(spec: RunSpec, run_dir: Path) -> Any:
     else:  # pragma: no cover - live API
         live = AnthropicLLM(spec.llm_model, cache_dir=CACHE / "llm", log_path=log)
     return RecordingLLM(live, Path(spec.llm_fixtures)) if spec.llm_fixtures else live  # pragma: no cover
+
+
+def world_panels(spec: RunSpec, split: str) -> list[PanelSpec]:
+    """The run's tables or panels for ``split`` (D-038): generated panels, or real-object tables."""
+    if spec.world == "grasp":
+        from sea.sim.grasp_world import real_panels
+
+        return real_panels(split, spec.splits.get(split, 50), spec.objects, spec.panel_seed)
+    return generate(split, spec.splits.get(split, 50), spec.panel_seed) if split != "reference" else [reference_panel()]
+
+
+def regression_panels(spec: RunSpec) -> list[PanelSpec]:
+    """What a body change must keep passing: the reference panel, or phase A's objects."""
+    if spec.world == "grasp":
+        from sea.sim.grasp_world import regression_panels as tables
+
+        return tables(spec.regression_objects)
+    return [reference_panel()]
 
 
 def init_state(spec: RunSpec, train: Sequence[PanelSpec]) -> State:
@@ -330,7 +350,9 @@ def trace_summary(run: ControlRun, control: ControlSpec, panel: PanelSpec) -> Tr
         ik_residual_mm=r.ik_residual_mm, joint_limit_hits=list(tr.joint_limit_hits) if tr else [],
         surprise_z=r.surprise_z, escalation_reason=r.escalation_reason, program_id=r.program_id,
         handle=control.handle, recess_mm=control.recess_depth_mm, tilt_deg=float(np.degrees(panel.tilt_rad)),
-        stopped_by=tr.note if tr else "", **felt,
+        stopped_by=tr.note if tr else "", **felt, accepts=sorted(accepted_contacts(control)),
+        **({"object": control.asset or control.shape or "", "size_mm": tuple(control.size_mm),
+            "mass_g": control.mass_g} if control.cls == "grasp" else {}),
     )
 
 
@@ -415,6 +437,8 @@ def screen(state: State, p: Proposal, ctx: ProposeContext, index: dict[str, tupl
         errors.append(f"{p.kind} is level {level}, not enabled in this run ({spec.levels})")
     elif level is not None and level not in SUPPORTED_LEVELS:
         errors.append(f"level {level} changes need design/arm.py (milestone M9)")
+    elif p.kind == "finger" and spec.budgets.print_minutes <= 0:
+        errors.append("finger changes print parts, and this run has no print budget")
     cand = Candidate(p, errors)
     if errors:
         return cand
@@ -467,7 +491,7 @@ def screen(state: State, p: Proposal, ctx: ProposeContext, index: dict[str, tupl
                 parts += 1
                 material = t.material if t.material in ("pla", "tpu") else "pla"
     n_ctl = sum(len(index_panel(index, pid).controls) for pid in {index[k][1].id for k in keys})
-    sim_est = EPISODE_EST_S * spec.trial_repeats * 2 * (n_ctl + len(reference_panel().controls))
+    sim_est = EPISODE_EST_S * spec.trial_repeats * 2 * (n_ctl + sum(len(r.controls) for r in regression_panels(spec)))
     cand.cost = state.ledger.estimate(p, added_volume_cm3=vol, material=material, sim_seconds=sim_est,
                                       n_parts=parts, grams=grams if parts else None)
     verdicts = {r.key: r.verdict for r in ctx.report.results}
@@ -486,13 +510,13 @@ def trial_panels(state: State, targets: Sequence[TargetGroup], index: dict[str, 
     keys = {f"{p.id}:{c.id}" for p in panels for c in p.controls}
     ref_keys: set[str] = set()
     if state.spec.ablations.reference_regression:
-        ref = reference_panel()
-        all_ref = [f"{ref.id}:{c.id}" for c in ref.controls]
+        refs = regression_panels(state.spec)
+        all_ref = [f"{r.id}:{c.id}" for r in refs for c in r.controls]
         if eff.regression_panel == "sample":
             rng = np.random.default_rng(seed)
             all_ref = sorted(rng.choice(all_ref, size=min(eff.regression_sample_n, len(all_ref)), replace=False))
         ref_keys = set(all_ref)
-        panels.append(ref)
+        panels += [r for r in refs if r.id not in ids]
         keys |= ref_keys
     return panels, keys, ref_keys
 
@@ -635,7 +659,7 @@ def evolve(spec: RunSpec, run_dir: str | Path, *, proposer: Proposer | None = No
 
     fp = fingerprint()
     dump_json(run_dir / "harness.json", {"judge_key": judge_key(fp), "components": fp})
-    train = generate("train", spec.splits.get("train", 200), spec.panel_seed)
+    train = world_panels(spec, "train")
     state = init_state(spec, train)
     net = DegenerateNetwork(GoalLog(run_dir / "goals.jsonl"), spec.budgets, train)  # records only (D-037)
     llm = make_llm(spec, run_dir) if spec.proposer in ("s2", "s2_nomem") else None
@@ -745,7 +769,7 @@ def _propose_and_try(state: State, proposer: Proposer, esc: list[Escalation], re
         budgets=spec.budgets, remaining=state.ledger.remaining(), fixes=fixes, tool_library=state.tool_library,
         failed_primitive={k: (runs[k].trace.failed_primitive if runs[k].trace is not None else "")
                           for g in targets for k in g.keys},
-        seed=spec.seed + it,
+        seed=spec.seed + it, rejected=list(state.rejected),
     )
     llm = getattr(proposer, "llm", None)
     usd0 = float(getattr(llm, "total_usd", 0.0))
@@ -757,6 +781,8 @@ def _propose_and_try(state: State, proposer: Proposer, esc: list[Escalation], re
         _charge(state, CostVector(llm_usd=usd))
     s2 = spec.proposer in ("s2", "s2_nomem")
     cands = [screen(state, p, ctx, index, it, s2) for p in proposals]
+    state.rejected += [Rejection(iteration=it, kind=c.proposal.kind, hypothesis=c.proposal.hypothesis,
+                                 errors=c.errors) for c in cands if c.errors]
     proposal_log["targets"] = [g.keys for g in targets]
     proposal_log["candidates"] = [c.summary() for c in cands]
     valid = sorted((c for c in cands if not c.errors), key=lambda c: -c.vpc)
@@ -783,8 +809,7 @@ def _propose_and_try(state: State, proposer: Proposer, esc: list[Escalation], re
 def final_eval(state: State, run_dir: Path, split: str, out_name: str = "final") -> dict[str, Any]:
     """Evaluate the final design and library on ``split`` (no learning, no proposals)."""
     spec = state.spec
-    panels = generate(split, spec.splits.get(split, 50), spec.panel_seed) if split != "reference" \
-        else [reference_panel()]
+    panels = world_panels(spec, split)
     out = run_dir / out_name
     index = control_index(panels)
     suite = run_suite(panels, suite_config(state, confirm=False, trace_dir=out / "traces"))

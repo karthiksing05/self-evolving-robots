@@ -106,12 +106,15 @@ class ControlSpec(_Model):
     success: CheckExpr
     shape: ObjectShape | None = None  # grasp objects: size_mm = (width across the jaws, height)
     mass_g: float = 0.0  # grasp objects; panel controls get their mass from the geometry
+    # A real object (configs/ycb_objects.yaml): its scanned geometry, with ``shape`` the grasp class the
+    # aperture rule reads (a lying can or a fruit is round in the jaws: "sphere").
+    asset: str | None = None
 
 
 class PanelSpec(_Model):
     id: str
     seed: int
-    split: Literal["train", "val", "test", "compose", "reference", "phase_b"]
+    split: Literal["train", "val", "test", "compose", "reference", "phase_b", "regression"]
     pose_world: Pose
     tilt_rad: float
     controls: list[ControlSpec]
@@ -126,9 +129,14 @@ class ToolSpec(_Model):
 
 
 class FingerSpec(_Model):
-    jaw_len_mm: float = 0.0  # 0 = stock jaw
-    tip_radius_mm: float = 0.0
-    softness: float = 0.0
+    """Printed pads over the stock jaw tips (design/fingers.py, D-038).  All zero is the stock jaw."""
+
+    reach_mm: float = 0.0  # pads extend this far past the stock tips
+    pad_angle_deg: float = 0.0  # the moving pad's face is parallel to the fixed one at this jaw opening
+    groove_mm: float = 0.0  # V-groove depth across each pad face (0: flat)
+    lip_mm: float = 0.0  # inward hook at the bottom of each pad
+    pad_tpu_mm: float = 0.0  # TPU skin on each face (0: bare PLA)
+    width_mm: float = 0.0  # pad width across the jaw (0: the default 12 mm)
 
 
 class ArmSpec(_Model):
@@ -443,6 +451,12 @@ class RunSpec(_Model):
     llm: Literal["claude_code", "anthropic", "mock", "scripted"] = "claude_code"  # claude_code: plan billing (D-029)
     llm_fixtures: str | None = None  # mock: fixtures to replay; scripted: directory to record fixtures into
     eval_split: Literal["train", "val", "test", "compose"] = "test"
+    # The task world (D-038).  panels: generated control panels, with the reference panel as the
+    # regression set.  grasp: tables with one real object each (configs/ycb_objects.yaml), drawn from
+    # ``objects``; a body change must keep every ``regression_objects`` table passing.
+    world: Literal["panels", "grasp"] = "panels"
+    objects: list[str] = []
+    regression_objects: list[str] = []
     embedder: Literal["fake", "real"] = "real"
     s1_trials: int = S1_TRIALS  # m, System 1 local-search trials (Appendix D)
     trial_repeats: int = 3  # randomization repeats per acceptance trial (Sec 8.9)

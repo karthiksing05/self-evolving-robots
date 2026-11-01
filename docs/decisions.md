@@ -800,3 +800,93 @@ da5003023c10 -> b1706b1856a4 (`verify/goals.py` joins the verifier).
 Not yet: `plan/agent.py`, the agentic System 2 that writes networks deeper than one level. It
 needs the `sea-arm` tool server, because an analyze goal needs tools to answer it.
 Test: `tests/test_network.py`.
+
+## D-038 The finger family and 21 real objects; three faults found while measuring them (judge, world, skill, policy)
+Change: System 2 can now change the fingers (L1), and the gripper experiment runs on real objects.
+- **Finger family (skill, `design/fingers.py`):** `FingerSpec` is `reach_mm`, `pad_angle_deg`,
+  `groove_mm`, `lip_mm`, `pad_tpu_mm` and `width_mm`, all zero for the stock jaws (ranges in
+  docs/gripper-experiment.md section 3).
+  - One pad box goes on each jaw, over the bottom 10 mm of the stock face. The stock geometry
+    constants come from the SO-101 jaw meshes.
+  - The moving pad is tilted so the two faces are parallel at a jaw opening equal to the pad
+    angle. It is lengthened by its tip's rise, so both pads end level there.
+  - `build_model` adds the pads as jaw geoms, so they pinch and pair with objects. Their friction is
+    PLA 0.45 or TPU 0.9, combined with the object's by the geometric mean (D-032).
+  - `finger_estimate` prices the pad volume: print minutes, grams of PLA and TPU, added mass.
+  - The loop enables L1. Screening refuses a finger proposal when the run has no print budget.
+- **Grasping with pads (skill, `control/motor.py`; world, `sim/grasp_probe.py`):** for a pad
+  design, the grasp primitive and the V1 probe:
+  - set the fixed pad's face, not the stock face, beside the object;
+  - limit depth by the lowest pad point at the object's jaw opening;
+  - open wide enough for the pads to clear the object.
+
+  With stock jaws both reduce exactly to their old settings. The V1 table re-measures with 0
+  changes in 34 picks.
+
+  Before descending, `grasp` now rises to the approach height, but only when the jaws would pass
+  lower than the object's top. An unconditional rise moved the stock heavy pick 3 mm and reoriented
+  the wrist at home, which changed the joint that stalls. The conditional rise leaves both batteries
+  identical.
+- **Real objects (judge and world):** 21 YCB scans (Calli et al. 2015, CC BY 4.0) with their
+  published masses and material frictions.
+  - `scripts/import_ycb.py` writes `configs/ycb_objects.yaml` and `assets/ycb/*.npz`: convex
+    collision pieces, a decimated visual mesh, and the inertia at the published mass. The scan
+    meshes are processed by an agent-written script.
+  - Each object rests in a pose no taller than 85 mm. A straight-down SO-101 tool point tops out
+    near 95 mm, so a taller object cannot be lifted 30 mm. That ceiling is the arm's, not the
+    harness's.
+  - New code: `sim/objects.py`, and `real_object`, `real_panels` and `regression_panels` in
+    `grasp_world.py`.
+  - `RunSpec` gains `world: panels | grasp`, `objects` and `regression_objects`. The loop takes its
+    train, eval and regression sets from `world_panels` and `regression_panels`.
+- **Capability (skill, `design/grip.py`):** one instrument measures every design: the V1 probe.
+  - The stock jaws read its stored table. A finger design is probed on demand and cached by its
+    parameters and the probe's source.
+  - The typecheck's aperture rule now skips scanned objects. A scan's bounding width is not the
+    width the jaws close on: the stock jaws hold the banana (69.6 mm bounding width) and the cup
+    (57 mm), which the table would have called structural.
+- **System 2's prompt (policy):** each failing control now shows:
+  - the object, its size and mass;
+  - the contacts the judge accepts on it.
+
+  The design section adds the finger family with its ranges and the current design's capability. A
+  new section, "Rejected before trial", lists the last six proposals that screening refused, with
+  the reasons.
+
+  In the first live smoke run every proposal of all three iterations was screened out ("no rack
+  tool provides the contacts"), and System 2 was never told why.
+
+Measured (`scripts/measure_real.py`: `pick_up` with System 1's search and confirmation re-runs, at
+three placements):
+- **Stock jaws:** hold 5/21 objects: banana, cup, foam brick, marker, cube. These are phase A and the
+  regression set. The other 16 are phase B.
+- **Gold check (`results/gold/`):** two designs hold 9/21 and lose nothing:
+
+  | Design | Objects gained |
+  |---|---|
+  | reach 10, 20° tilt, 2 mm TPU | golf ball, lemon, plum, strawberry |
+  | reach 15, 30° tilt, 2 mm TPU | gelatin box, golf ball, plum, strawberry |
+
+  Steeper tilt holds more round objects and loses small ones: 40° with a groove holds 11/21 without
+  the cube, marker and banana. Five objects nothing holds: sugar box and mustard bottle (too wide),
+  pudding box and tuna can (stall the arm), dice (16.8 mm).
+
+Found while measuring, and fixed:
+1. **`opening_for` bisected up to 1.7 rad.** Past about 1.2 rad the moving pad swings toward
+   horizontal and the face-line gap goes negative, so the bracket check failed. It returned None,
+   and every pad grasp fell back to fixed jaw angles. It is now bounded to the openings the skills
+   use. Before the fix the best design was +4 objects and -3.
+2. **TPU had a contact time constant of 0.04 s.** That was an unmeasured guess at the skin's
+   compliance, and it made TPU pads drop small objects that bare PLA pads held: 0/5 against 3/5 on
+   the small and round set. The skin is now modelled by its friction only.
+3. **The aperture table rule** would have made two objects the stock jaws hold structural (above).
+
+Numbers unchanged:
+- both batteries (identical splits under the new key);
+- the golden verdicts;
+- the V1 stock table.
+
+Judge key b1706b1856a4 -> 4ffb19f19f33: contracts, `configs/grasp.yaml`, `grasp_world.py` and
+`sim/objects.py` changed, so the baselines are re-keyed.
+
+Tests: `tests/test_fingers.py`, plus the prompt tests in `tests/test_llm_mock.py`.

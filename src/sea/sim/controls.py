@@ -37,11 +37,14 @@ FRICTION_V0_ROT = 1e-2
 @dataclass
 class GeomSpec:
     name: str
-    type: str  # box | cylinder | capsule | sphere
+    type: str  # box | cylinder | capsule | sphere | mesh
     size: tuple[float, ...]
     pos: tuple[float, float, float] = (0.0, 0.0, 0.0)
     quat: tuple[float, float, float, float] = (1.0, 0.0, 0.0, 0.0)
     rgba: tuple[float, float, float, float] = (0.7, 0.7, 0.7, 1.0)
+    vertices: np.ndarray | None = None  # mesh: the convex part's vertices (MuJoCo collides its hull)
+    faces: np.ndarray | None = None  # mesh: triangles, for a visual-only mesh
+    visual: bool = False  # drawn, never collides
 
 
 @dataclass
@@ -56,6 +59,7 @@ class MovingPart:
     range: tuple[float, float]
     geoms: list[GeomSpec] = field(default_factory=list)
     mass: float = 0.01
+    inertia: tuple[np.ndarray, np.ndarray] | None = None  # (centre of mass, 3x3 tensor): a real object's
 
 
 @dataclass
@@ -267,6 +271,8 @@ def _grasp_geometry(spec: ControlSpec) -> ControlGeometry:
     """A free object standing on the table: width ``size_mm[0]`` across the jaws (ctl y), height
     ``size_mm[1]``.  The tool comes straight down onto its top and the jaws close along ctl y."""
     w, hgt = spec.size_mm[0] * MM, spec.size_mm[1] * MM
+    if spec.asset is not None:
+        return _asset_geometry(spec)
     if spec.shape == "sphere":
         g, hgt = GeomSpec("ball", "sphere", (w / 2,), rgba=GREEN), w
     elif spec.shape == "box":
@@ -279,6 +285,23 @@ def _grasp_geometry(spec: ControlSpec) -> ControlGeometry:
     return ControlGeometry(moving, [], contact_body=np.array([0.0, 0.0, hgt / 2]),
                            approach_ctl=np.array([0.0, 0.0, -1.0]), actuation_body=np.array([0.0, 0.0, 1.0]),
                            roll_ctl=np.array([0.0, 1.0, 0.0]), handle_body=np.zeros(3), footprint=(depth, w))
+
+
+def _asset_geometry(spec: ControlSpec) -> ControlGeometry:
+    """A real object (configs/ycb_objects.yaml): its convex parts collide, its scan is drawn, and its
+    inertia is the scan's at the published mass.  The asset frame has the object's bottom at z = 0,
+    centred, with its narrowest horizontal extent along y (across the jaws)."""
+    from sea.sim.objects import load_asset
+
+    a = load_asset(spec.asset or "")
+    w, hgt = spec.size_mm[0] * MM, spec.size_mm[1] * MM
+    geoms = [GeomSpec(f"part{k}", "mesh", (), rgba=(*a.rgba[:3], 0.0), vertices=v) for k, v in enumerate(a.parts)]
+    geoms.append(GeomSpec("scan", "mesh", (), rgba=tuple(a.rgba), vertices=a.visual_v, faces=a.visual_f, visual=True))
+    moving = MovingPart("object", (0, 0, 0), (1, 0, 0, 0), "free", (0, 0, 1), (0.0, 1.0), geoms, spec.mass_g / 1000,
+                        inertia=(a.com, a.inertia))
+    return ControlGeometry(moving, [], contact_body=np.array([0.0, 0.0, hgt]), approach_ctl=np.array([0.0, 0.0, -1.0]),
+                           actuation_body=np.array([0.0, 0.0, 1.0]), roll_ctl=np.array([0.0, 1.0, 0.0]),
+                           handle_body=np.zeros(3), footprint=(a.extents_mm[1] * MM, w))
 
 
 # ---------------------------------------------------------------- dynamics

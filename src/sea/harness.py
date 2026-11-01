@@ -28,7 +28,7 @@ COMPONENTS: dict[str, tuple[str, tuple[str, ...]]] = {
     "limits": ("judge", ("configs/limits.yaml", "configs/limits_grasp.yaml")),
     "panels": ("judge", ("configs/panels.yaml", "src/sea/sim/panels.py")),
     # the grasp world's task distribution (docs/gripper-experiment.md): the same ruler, other tasks
-    "grasp_world": ("judge", ("configs/grasp.yaml", "src/sea/sim/grasp_world.py")),
+    "grasp_world": ("judge", ("configs/grasp.yaml", "src/sea/sim/grasp_world.py", "src/sea/sim/objects.py")),
     "acceptance": ("judge", ("src/sea/spec/posture.py",)),
     "build": ("judge", ("src/sea/design/build.py",)),
     "physics": ("world", ("src/sea/sim/build_model.py", "src/sea/sim/controls.py")),
@@ -41,7 +41,8 @@ COMPONENTS: dict[str, tuple[str, tuple[str, ...]]] = {
     "primitives": ("skill", ("configs/primitives.yaml", "src/sea/control/motor.py", "src/sea/control/executor.py",
                              "src/sea/control/local_search.py", "src/sea/compose/typecheck.py",
                              "src/sea/compose/dsl.py")),
-    "tools": ("skill", ("src/sea/design/tools.py", "src/sea/design/space.py", "src/sea/design/grip.py")),
+    "tools": ("skill", ("src/sea/design/tools.py", "src/sea/design/space.py", "src/sea/design/grip.py",
+                         "src/sea/design/fingers.py")),
     "ledger": ("policy", ("src/sea/spec/ledger.py",)),
     "proposer": ("policy", ("src/sea/propose/prompt.py", "src/sea/propose/ladder.py", "src/sea/propose/targets.py",
                             "src/sea/propose/baselines.py", "src/sea/propose/llm.py")),

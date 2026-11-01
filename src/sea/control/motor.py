@@ -17,6 +17,7 @@ import numpy as np
 
 from sea.control.executor import GRIP_CLOSED, GRIP_OPEN, GRIP_WIDE, TICK_DT, Abort, Episode
 from sea.control.frames import rot_about
+from sea.design import fingers
 
 Gen = Generator[np.ndarray, None, bool]
 
@@ -499,6 +500,7 @@ def finish(ep: Episode) -> Gen:
 PICK_OPEN = 1.0  # gripper joint while descending beside an object (the V1 probe's setting)
 PICK_SIDE = 2 * MM  # fixed jaw's inner face to the object on the way down
 PICK_TABLE_CLEAR = 3 * MM  # jaw tips never go closer than this to the table
+PICK_CLEAR = 10 * MM  # extra pad-to-object clearance the opening allows for on the way down
 
 
 def pick_depth(spec, past_equator: float = 5 * MM) -> float:
@@ -520,14 +522,28 @@ def grasp(ep: Episode, cid: str, depth: float | None = None, side: float = PICK_
         return False
     w, hgt = h.spec.size_mm[0] * MM, h.spec.size_mm[1] * MM
     depth = pick_depth(h.spec) if depth is None else depth
-    depth = min(depth, hgt - STOCK_TIP_EXT - PICK_TABLE_CLEAR)
+    fing = ep.sim.design.fingers
+    if fingers.is_stock(fing):
+        depth = min(depth, hgt - STOCK_TIP_EXT - PICK_TABLE_CLEAR)
+        face, opening, below = 0.0, PICK_OPEN, STOCK_TIP_EXT
+    else:  # the pads (D-038): the fixed face sits closer to the object, and no pad may reach the table
+        q_obj = fingers.opening_for(fing, w) or PICK_OPEN
+        depth = min(depth, hgt - fingers.below_tool(fing, q_obj) - PICK_TABLE_CLEAR)
+        face = fingers.thickness(fing)
+        q_open = fingers.opening_for(fing, w + 2 * side + PICK_CLEAR)
+        opening = max(PICK_OPEN, q_open if q_open is not None else GRIP_WIDE)
+        below = fingers.below_tool(fing, opening)
     down = ep.approach_dir(cid)
     roll = ep.sim.ctl_dir_world(cid, h.geo.roll_ctl)
-    target = ep.contact_point(cid) + roll * (w / 2 + side) + down * depth
+    target = ep.contact_point(cid) + roll * (w / 2 + side + face) + down * depth
     v = min(speed, ep.cfg.limits.max_tip_speed_mps)
     ep.axis_ref, ep.roll_ref = down, roll  # type: ignore[attr-defined]
-    yield from ep.set_gripper(PICK_OPEN, 0.3)
-    yield from ep.move_to(target - down * 0.04, down, None, roll)
+    yield from ep.set_gripper(opening, 0.3)
+    above = target - down * 0.04
+    clip = float((ep.tip_cmd - ep.contact_point(cid)) @ down) + below + PICK_CLEAR
+    if clip > 0:  # the jaws would pass lower than the object's top: rise to the approach height first
+        yield from ep.move_to(ep.tip_cmd - down * max(0.0, float((ep.tip_cmd - above) @ down)), down, None, roll)
+    yield from ep.move_to(above, down, None, roll)
     if not (yield from ep.move_to(target, down, v, roll, guard_force=3.0)):
         return False
     ep.squeezing = True

@@ -56,7 +56,7 @@ def _samples() -> dict[type, pydantic.BaseModel]:
         panel.controls[0],
         panel,
         C.ToolSpec(template="pad", params={"w": 10, "h": 10, "thickness": 4, "friction": 0.8}, contact="pad"),
-        C.FingerSpec(jaw_len_mm=5.0),
+        C.FingerSpec(reach_mm=12.0, pad_angle_deg=30.0, pad_tpu_mm=2.0),
         C.ArmSpec(upper_scale=1.1, servo_voltage={j: 12.0 for j in C.ARM_JOINTS}),
         C.BuildEstimate(print_minutes=12.0),
         C.SensorSuite(jaw_pads=False),

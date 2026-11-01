@@ -80,14 +80,14 @@ def _design() -> Design:
         arm=ArmSpec(upper_scale=1.1, fore_scale=0.9, wrist_offset_mm=10.0, riser_m=0.05, base_pitch_rad=0.1,
                     servo_voltage={"shoulder_pan": 7.4, "shoulder_lift": 12.0, "elbow_flex": 12.0,
                                    "wrist_flex": 7.4, "wrist_roll": 7.4, "gripper": 7.4}),
-        fingers=FingerSpec(jaw_len_mm=12.0, tip_radius_mm=3.0, softness=0.4),
+        fingers=FingerSpec(reach_mm=12.0, pad_angle_deg=30.0, groove_mm=2.0, lip_mm=1.0, pad_tpu_mm=2.0, width_mm=16.0),
         tool_rack=[make_tool_spec("hook", depth=8, throat=5, length=35), make_tool_spec("pad", w=20, h=12)],
     )
 
 
 @pytest.mark.parametrize(
     ("levels", "dim"),
-    [(["L0"], 20), (["L1"], 3), (["L2"], 5), (["L3"], 6), (["L0", "L1", "L2", "L3"], 34)],
+    [(["L0"], 20), (["L1"], 6), (["L2"], 5), (["L3"], 6), (["L0", "L1", "L2", "L3"], 37)],
 )
 def test_dims_and_names(levels, dim):
     space = DesignSpace(levels, rack_slots=4, limits=LIMITS)
@@ -141,7 +141,7 @@ def test_arm_ranges_follow_limits():
 
 
 @settings(derandomize=True, max_examples=40, deadline=None)
-@given(st.lists(st.floats(min_value=-1.0, max_value=2.0), min_size=34, max_size=34))
+@given(st.lists(st.floats(min_value=-1.0, max_value=2.0), min_size=37, max_size=37))
 def test_decode_is_idempotent_through_encode(raw):
     space = DesignSpace(["L0", "L1", "L2", "L3"], rack_slots=4, limits=LIMITS)
     base = Design(id="base")

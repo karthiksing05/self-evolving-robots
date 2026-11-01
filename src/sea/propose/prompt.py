@@ -1,6 +1,7 @@
 """System 2 prompt construction (spec Section 8.6).
 
-``build_prompt`` renders the eight sections in the order the spec lists them.  Everything is
+``build_prompt`` renders the sections in ``SECTION_TITLES`` order (the spec's eight, plus the sensor
+manifest, D-033, and the proposals screening refused, D-038).  Everything is
 formatted deterministically (sorted keys, fixed float precision) so the prompt hash, which keys
 the response cache and the ``MockLLM`` fixtures, is stable across runs.
 """
@@ -15,6 +16,8 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict
 
 from sea.contracts import Budgets, Design, FixRecord, HardLimits, PrimitiveDef
+from sea.design.fingers import RANGES as FINGER_RANGES
+from sea.design.grip import basis, widest_mm
 from sea.sim.sensors import manifest
 from sea.spec.posture import EffectiveParams
 
@@ -27,6 +30,7 @@ SECTION_TITLES: tuple[str, ...] = (
     "Sensors on this body",
     "Failing controls",
     "Similar past fixes",
+    "Rejected before trial",
     "Output schema and rules",
 )
 
@@ -62,6 +66,17 @@ Give programs as `Program` JSON: {"id", "target_cls", "source": "s2", "root": No
 Positional primitive arguments use the keys "_0", "_1", ...; `$target` is the control the program runs on."""
 
 
+FINGER_TEXT = (
+    "  finger family (a `finger` proposal sets `design_delta.fingers`; all zero = the stock jaws): printed pads "
+    "over both jaw tips.  reach_mm extends them past the tips (deeper grasps, low objects); pad_angle_deg tilts "
+    "the moving pad so the faces are parallel at that jaw opening (the stock faces are parallel only when "
+    "closed, so wide objects are squeezed out); groove_mm is a V-groove that centres round objects; lip_mm "
+    "an inward hook at the pad bottom; pad_tpu_mm a TPU skin (friction 0.9 vs PLA 0.45, softer contact); "
+    "width_mm the pad width across the jaw.  Ranges: "
+    + ", ".join(f"{k} [{lo:g}, {hi:g}]" for k, (lo, hi) in FINGER_RANGES.items())
+)
+
+
 class TraceSummary(BaseModel):
     """What System 2 sees about one failing control."""
 
@@ -90,6 +105,22 @@ class TraceSummary(BaseModel):
     stall_joint: str = ""
     payload_held_g: float | None = None
     pad_drop_t: float | None = None
+    # What is being touched (D-038): the contacts the judge accepts on it and, for a grasp, the object.
+    accepts: list[str] = []
+    object: str = ""
+    size_mm: tuple[float, float] | None = None  # width across the jaws, height
+    mass_g: float | None = None
+
+
+class Rejection(BaseModel):
+    """A proposal screening refused before any simulation, and why (shown back to System 2)."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    iteration: int
+    kind: str
+    hypothesis: str
+    errors: list[str]
 
 
 def request_hash(payload: Mapping[str, Any]) -> str:
@@ -180,7 +211,10 @@ def _design_section(design: Design) -> str:
         f"- arm: upper_scale {_num(a.upper_scale)}, fore_scale {_num(a.fore_scale)}, wrist_offset_mm "
         f"{_num(a.wrist_offset_mm)}, riser_m {_num(a.riser_m)}, base_pitch_rad {_num(a.base_pitch_rad)}",
         f"- servo voltage: {_kv(a.servo_voltage)}",
-        f"- fingers: jaw_len_mm {_num(f.jaw_len_mm)}, tip_radius_mm {_num(f.tip_radius_mm)}, softness {_num(f.softness)}",
+        f"- fingers: {_kv(f.model_dump()) if f != type(f)() else 'stock jaws'}",
+        f"- widest grip by shape: {_kv({s: widest_mm(design, s) for s in ('box', 'cylinder', 'sphere')})} mm "
+        f"({basis(design)})",
+        FINGER_TEXT,
     ]
     if design.tool_rack:
         for i, t in enumerate(design.tool_rack):
@@ -220,6 +254,13 @@ def _failing_section(failing: Sequence[TraceSummary]) -> str:
             f"- {s.key} cls={s.cls} handle={s.handle} recess_mm={_num(s.recess_mm)} tilt_deg={_num(s.tilt_deg)} "
             f"verdict={s.verdict} escalation_reason={s.escalation_reason or '-'} program_id={s.program_id or '-'}"
         )
+        if s.accepts or s.object:
+            what = f"object={s.object} " if s.object else ""
+            if s.size_mm is not None:
+                what += f"width_mm={_num(s.size_mm[0])} height_mm={_num(s.size_mm[1])} "
+            if s.mass_g is not None:
+                what += f"mass_g={_num(s.mass_g)} "
+            lines.append(f"    {what}accepted_contacts={','.join(s.accepts) or '-'}")
         lines.append(
             f"    peak_force={_num(s.peak_force)} N travel_reached={_num(s.travel_reached)} of "
             f"travel_required={_num(s.travel_required)} contact_types={','.join(s.contact_types) or '-'} "
@@ -252,6 +293,17 @@ def _fixes_section(fixes: Sequence[FixRecord], k: int = 5) -> str:
     return "\n".join(lines)
 
 
+def _rejected_section(rejected: Sequence[Rejection], k: int = 6) -> str:
+    if not rejected:
+        return "(none yet)"
+    lines = []
+    for r in list(rejected)[-k:]:
+        lines.append(f"- iter {r.iteration} {r.kind}: {r.hypothesis[:160]}")
+        lines.extend(f"    refused: {e[:240]}" for e in r.errors[:3])
+    lines.append("These never reached the simulator.  Do not resubmit a proposal that fails the same check.")
+    return "\n".join(lines)
+
+
 def _rules_section(max_proposals: int) -> str:
     return "\n".join([
         f"Call the `propose` tool exactly once with 1 to {max_proposals} proposals (a `ProposalBatch`).",
@@ -271,7 +323,8 @@ def _rules_section(max_proposals: int) -> str:
 
 def build_prompt(*, limits: HardLimits, eff: EffectiveParams, remaining: Mapping[str, float], budgets: Budgets,
                  library: Sequence[PrimitiveDef], design: Design, failing: Sequence[TraceSummary],
-                 fixes: Sequence[FixRecord], model: str, max_proposals: int = 3) -> S2Prompt:
+                 fixes: Sequence[FixRecord], model: str, max_proposals: int = 3,
+                 rejected: Sequence[Rejection] = ()) -> S2Prompt:
     bodies = (
         _limits_section(limits),
         _posture_section(eff, remaining, budgets),
@@ -281,6 +334,7 @@ def build_prompt(*, limits: HardLimits, eff: EffectiveParams, remaining: Mapping
         _sensors_section(design),
         _failing_section(failing),
         _fixes_section(fixes),
+        _rejected_section(rejected),
         _rules_section(max_proposals),
     )
     return S2Prompt(

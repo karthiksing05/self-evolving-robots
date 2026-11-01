@@ -136,13 +136,16 @@ def test_design_estimate_and_added_mass():
 
 
 def test_finger_estimate():
-    assert B.finger_estimate(Design(id="s")) == (0.0, 0.0, 0.0)
-    pla = Design(id="f", fingers=FingerSpec(jaw_len_mm=20, tip_radius_mm=3, softness=0.2))
-    tpu = Design(id="g", fingers=FingerSpec(jaw_len_mm=20, tip_radius_mm=3, softness=0.9))
-    m1, g1, a1 = B.finger_estimate(pla)
-    m2, g2, a2 = B.finger_estimate(tpu)
-    assert m1 == pytest.approx(m2) and m1 > 0 and a1 > a2 > 0
-    assert B.build(pla, LIMITS).design.est.print_minutes == pytest.approx(m1)
+    assert B.finger_estimate(Design(id="s")) == (0.0, 0.0, 0.0, 0.0)
+    pla = Design(id="f", fingers=FingerSpec(reach_mm=20, pad_angle_deg=30))
+    tpu = Design(id="g", fingers=FingerSpec(reach_mm=20, pad_angle_deg=30, pad_tpu_mm=2))
+    longer = Design(id="h", fingers=FingerSpec(reach_mm=30, pad_angle_deg=30))
+    m1, p1, t1, a1 = B.finger_estimate(pla)
+    m2, p2, t2, a2 = B.finger_estimate(tpu)
+    assert m1 > 0 and t1 == 0 and t2 > 0 and p2 == pytest.approx(p1, rel=0.05)  # the skin adds TPU, not PLA
+    assert B.finger_estimate(longer)[0] > m1 and a1 > 0
+    est = B.build(tpu, LIMITS).design.est
+    assert est.print_minutes == pytest.approx(m2) and est.grams_tpu == pytest.approx(t2)
 
 
 def test_soft_tip_is_two_materials_and_softness_softens_contact():

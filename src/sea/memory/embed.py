@@ -17,7 +17,7 @@ from typing import Protocol
 
 import numpy as np
 
-from sea.contracts import CONTROL_CLASSES, ControlSpec, PanelSpec, recess_bin, tilt_bin
+from sea.contracts import CONTROL_CLASSES, GRASP_CLASS, ControlSpec, PanelSpec, recess_bin, tilt_bin
 
 EMB_DIM = 384
 CTX_DIM = 64
@@ -154,6 +154,10 @@ def real_embedder() -> CompositeEmbedder:  # pragma: no cover - constructs real-
 
 # ---------------------------------------------------------------- control descriptions
 def context_text(control: ControlSpec, panel: PanelSpec) -> str:
+    if control.cls == GRASP_CLASS:  # an object on a table: what it is, its grasp class, size and weight
+        w, h = control.size_mm[0], control.size_mm[1]
+        return (f"grasp {control.asset or control.shape} {control.shape} width={5 * round(w / 5):.0f} "
+                f"height={10 * round(h / 10):.0f} mass={50 * round(control.mass_g / 50):.0f}")
     return (
         f"{control.cls} {control.handle} recess={recess_bin(control.recess_depth_mm)} "
         f"tilt={tilt_bin(panel.tilt_rad)}"
@@ -166,6 +170,7 @@ _PALETTE = {
     )
     for k, cls in enumerate(CONTROL_CLASSES)
 }
+_PALETTE[GRASP_CLASS] = np.array([0.85, 0.45, 0.2], dtype=np.float32)
 _ROUND = {"push_button", "recessed_button", "knob"}
 
 
@@ -185,7 +190,7 @@ def geometry_surrogate(control: ControlSpec, panel: PanelSpec) -> np.ndarray:
     sizes = list(control.size_mm) or [10.0]
     w = max(sizes[0] * scale, 1.5)
     h = max((sizes[1] if len(sizes) > 1 else sizes[0] * (1.0 if control.cls in _ROUND else 0.35)) * scale, 1.5)
-    if control.cls in _ROUND:
+    if control.cls in _ROUND or control.shape == "sphere":
         mask = ((xx - cx) ** 2 + (yy - cy) ** 2) <= (w / 2) ** 2
     else:
         mask = (np.abs(xx - cx) <= w / 2) & (np.abs(yy - cy) <= h / 2)

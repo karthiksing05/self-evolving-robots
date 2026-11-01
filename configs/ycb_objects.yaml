@@ -1,0 +1,340 @@
+# YCB objects for the tabletop grasp world.  Written by scripts/import_ycb.py; re-run it, do not hand-edit.
+# Masses and published_dims_mm: Calli et al. 2015, "Benchmarking in Manipulation Research: The YCB Object
+# and Model Set and Benchmarking Protocols", arXiv:1502.03143, Table II.
+# Meshes: the YCB Google 16k scans (ycb-benchmarks.s3.amazonaws.com/data/google/), licensed CC BY 4.0 per
+# the YCB data page (ycb-benchmarks.s3.amazonaws.com/index.html, checked 2026-11-01); see
+# assets/ycb/LICENSE.md.  The assets are processed derivatives (convex pieces, decimated visuals).
+#
+# Object frame: bottom at z = 0, footprint bounding-box centre at the origin, the footprint's narrow side
+# along y (the jaws close along y).  width_mm = y extent (the grasp width), depth_mm = x, height_mm = z,
+# all measured on the scan, not copied from the paper; note lists differences over 10%.
+# height_ok: height_mm <= 85 (a straight-down SO-101 tool point tops out near z = 0.095 m, so a
+# taller object cannot be lifted 30 mm from above).  note "too wide": width_mm > 90.
+# Mass properties (in the npz) are a uniform solid of the scanned volume at the published mass: close for
+# filled cans and boxes, wrong for hollow objects (the tennis ball and racquetball are shells, true
+# inertia about 5/3 of this; the cup's scan is its wall, so its distribution is roughly right).
+# round: rolls when nudged (balls, round fruit, the soup can on its side).
+
+objects:
+  gelatin_box:
+    ycb_id: 009_gelatin_box
+    name: gelatin box
+    mass_g: 97
+    published_dims_mm: [28, 85, 73]
+    width_mm: 73.0
+    depth_mm: 89.2
+    height_mm: 30.0
+    height_ok: true
+    pose: stable
+    material: cardboard
+    friction: 0.5
+    round: false
+    parts: 1
+    asset: assets/ycb/gelatin_box.npz
+  pudding_box:
+    ycb_id: 008_pudding_box
+    name: pudding box
+    mass_g: 187
+    published_dims_mm: [35, 110, 89]
+    width_mm: 89.6
+    depth_mm: 113.0
+    height_mm: 38.5
+    height_ok: true
+    pose: low_narrow
+    material: cardboard
+    friction: 0.5
+    round: false
+    parts: 1
+    asset: assets/ycb/pudding_box.npz
+  sugar_box:
+    ycb_id: 004_sugar_box
+    name: sugar box
+    mass_g: 514
+    published_dims_mm: [38, 89, 175]
+    width_mm: 92.2
+    depth_mm: 176.0
+    height_mm: 45.2
+    height_ok: true
+    pose: lying
+    material: cardboard
+    friction: 0.5
+    round: false
+    parts: 1
+    asset: assets/ycb/sugar_box.npz
+    note: 'too wide: 92.2 mm > 90 mm; scan differs from published dims: 45.2 vs 38 mm (+19%)'
+  potted_meat_can:
+    ycb_id: 010_potted_meat_can
+    name: potted meat can
+    mass_g: 370
+    published_dims_mm: [50, 97, 82]
+    width_mm: 57.3
+    depth_mm: 101.5
+    height_mm: 83.5
+    height_ok: true
+    pose: upright
+    material: metal
+    friction: 0.35
+    round: false
+    parts: 4
+    asset: assets/ycb/potted_meat_can.npz
+    note: 'scan differs from published dims: 57.3 vs 50 mm (+15%)'
+  mustard_bottle:
+    ycb_id: 006_mustard_bottle
+    name: mustard bottle
+    mass_g: 431
+    published_dims_mm: [50, 85, 175]
+    width_mm: 95.9
+    depth_mm: 191.4
+    height_mm: 57.6
+    height_ok: true
+    pose: lying
+    material: plastic
+    friction: 0.4
+    round: false
+    parts: 4
+    asset: assets/ycb/mustard_bottle.npz
+    note: 'too wide: 95.9 mm > 90 mm; scan differs from published dims: 57.6 vs 50 mm (+15%), 95.9 vs 85 mm (+13%)'
+  foam_brick:
+    ycb_id: 061_foam_brick
+    name: foam brick
+    mass_g: 28
+    published_dims_mm: [50, 75, 50]
+    width_mm: 52.3
+    depth_mm: 77.4
+    height_mm: 51.4
+    height_ok: true
+    pose: stable
+    material: foam
+    friction: 0.8
+    round: false
+    parts: 16
+    asset: assets/ycb/foam_brick.npz
+  wood_block_cube:
+    ycb_id: 070-b_colored_wood_blocks
+    name: wood block (cube)
+    mass_g: 10.8
+    published_dims_mm: [26]
+    width_mm: 25.8
+    depth_mm: 25.8
+    height_mm: 25.8
+    height_ok: true
+    pose: stable
+    material: wood
+    friction: 0.5
+    round: false
+    parts: 1
+    asset: assets/ycb/wood_block_cube.npz
+    note: 070-a's scan is the whole block set (142x141x165 mm); 070-b, a single cube, is used
+  strawberry:
+    ycb_id: 012_strawberry
+    name: plastic strawberry
+    mass_g: 18
+    published_dims_mm: [43.8, 55]
+    width_mm: 46.8
+    depth_mm: 48.4
+    height_mm: 41.6
+    height_ok: true
+    pose: stable
+    material: plastic
+    friction: 0.5
+    round: true
+    parts: 1
+    asset: assets/ycb/strawberry.npz
+    note: 'scan differs from published dims: 48.4 vs 55 mm (-12%)'
+  banana:
+    ycb_id: 011_banana
+    name: plastic banana
+    mass_g: 66
+    published_dims_mm: [36, 190]
+    width_mm: 69.6
+    depth_mm: 197.8
+    height_mm: 38.3
+    height_ok: true
+    pose: stable
+    material: plastic
+    friction: 0.5
+    round: false
+    parts: 4
+    asset: assets/ycb/banana.npz
+  tomato_soup_can:
+    ycb_id: 005_tomato_soup_can
+    name: tomato soup can
+    mass_g: 349
+    published_dims_mm: [66, 101]
+    width_mm: 67.7
+    depth_mm: 102.2
+    height_mm: 67.6
+    height_ok: true
+    pose: lying
+    material: metal
+    friction: 0.35
+    round: true
+    parts: 4
+    asset: assets/ycb/tomato_soup_can.npz
+  tuna_fish_can:
+    ycb_id: 007_tuna_fish_can
+    name: tuna fish can
+    mass_g: 171
+    published_dims_mm: [85, 33]
+    width_mm: 85.3
+    depth_mm: 85.3
+    height_mm: 33.5
+    height_ok: true
+    pose: upright
+    material: metal
+    friction: 0.35
+    round: false
+    parts: 4
+    asset: assets/ycb/tuna_fish_can.npz
+  tennis_ball:
+    ycb_id: 056_tennis_ball
+    name: tennis ball
+    mass_g: 58
+    published_dims_mm: [64.7]
+    width_mm: 66.5
+    depth_mm: 66.9
+    height_mm: 66.4
+    height_ok: true
+    pose: stable
+    material: felt
+    friction: 0.7
+    round: true
+    parts: 1
+    asset: assets/ycb/tennis_ball.npz
+  racquetball:
+    ycb_id: 057_racquetball
+    name: racquetball
+    mass_g: 41
+    published_dims_mm: [55.3]
+    width_mm: 55.5
+    depth_mm: 55.8
+    height_mm: 55.8
+    height_ok: true
+    pose: stable
+    material: rubber
+    friction: 0.9
+    round: true
+    parts: 1
+    asset: assets/ycb/racquetball.npz
+  golf_ball:
+    ycb_id: 058_golf_ball
+    name: golf ball
+    mass_g: 46
+    published_dims_mm: [42.7]
+    width_mm: 42.4
+    depth_mm: 42.6
+    height_mm: 42.6
+    height_ok: true
+    pose: stable
+    material: plastic
+    friction: 0.4
+    round: true
+    parts: 1
+    asset: assets/ycb/golf_ball.npz
+  lemon:
+    ycb_id: 014_lemon
+    name: plastic lemon
+    mass_g: 29
+    published_dims_mm: [54, 68]
+    width_mm: 58.7
+    depth_mm: 60.1
+    height_mm: 52.5
+    height_ok: true
+    pose: stable
+    material: plastic
+    friction: 0.5
+    round: true
+    parts: 1
+    asset: assets/ycb/lemon.npz
+    note: 'scan differs from published dims: 60.1 vs 68 mm (-12%)'
+  plum:
+    ycb_id: 018_plum
+    name: plastic plum
+    mass_g: 25
+    published_dims_mm: [52]
+    width_mm: 52.9
+    depth_mm: 55.7
+    height_mm: 53.0
+    height_ok: true
+    pose: stable
+    material: plastic
+    friction: 0.5
+    round: true
+    parts: 1
+    asset: assets/ycb/plum.npz
+  apple:
+    ycb_id: 013_apple
+    name: plastic apple
+    mass_g: 68
+    published_dims_mm: [75]
+    width_mm: 74.6
+    depth_mm: 74.7
+    height_mm: 71.6
+    height_ok: true
+    pose: stable
+    material: plastic
+    friction: 0.5
+    round: true
+    parts: 1
+    asset: assets/ycb/apple.npz
+  large_marker:
+    ycb_id: 040_large_marker
+    name: large marker
+    mass_g: 16
+    published_dims_mm: [19, 119]
+    width_mm: 18.9
+    depth_mm: 120.9
+    height_mm: 18.8
+    height_ok: true
+    pose: stable
+    material: plastic
+    friction: 0.4
+    round: false
+    parts: 10
+    asset: assets/ycb/large_marker.npz
+  flat_screwdriver:
+    ycb_id: 044_flat_screwdriver
+    name: flat screwdriver
+    mass_g: 70
+    published_dims_mm: [23, 198]
+    width_mm: 34.5
+    depth_mm: 216.0
+    height_mm: 34.7
+    height_ok: true
+    pose: stable
+    material: plastic
+    friction: 0.4
+    round: false
+    parts: 6
+    asset: assets/ycb/flat_screwdriver.npz
+    note: 'scan differs from published dims: 34.5 vs 23 mm (+50%)'
+  cup:
+    ycb_id: 065-a_cups
+    name: stacking cup (smallest)
+    mass_g: 13
+    published_dims_mm: [55, 60]
+    width_mm: 57.0
+    depth_mm: 57.1
+    height_mm: 61.4
+    height_ok: true
+    pose: upright
+    material: plastic
+    friction: 0.4
+    round: false
+    parts: 32
+    asset: assets/ycb/cup.npz
+  dice:
+    ycb_id: 062_dice
+    name: dice
+    mass_g: 5.2
+    published_dims_mm: [16.2]
+    width_mm: 16.8
+    depth_mm: 17.6
+    height_mm: 16.6
+    height_ok: true
+    pose: stable
+    material: plastic
+    friction: 0.4
+    round: false
+    parts: 1
+    asset: assets/ycb/dice.npz

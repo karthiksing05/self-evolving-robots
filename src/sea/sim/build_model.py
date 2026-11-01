@@ -28,6 +28,7 @@ import numpy as np
 
 from sea.contracts import ARM_JOINTS, ContactType, ControlSpec, Design, PanelSpec
 from sea.control.frames import MJCF_TOOL_SITE, R_SITE_URDF, STOCK_MJCF, mat_to_quat_wxyz, quat_wxyz_to_mat
+from sea.design.fingers import pad_geoms
 from sea.sim.controls import (
     HINGE_ARMATURE,
     SLIDE_ARMATURE,
@@ -247,24 +248,45 @@ class Sim:
 
 
 # ---------------------------------------------------------------- building
-def _add_geom(body, g: GeomSpec, name: str, bits: tuple[int, int], condim: int = 4, mass: float | None = None):
+def _add_geom(body, g: GeomSpec, name: str, bits: tuple[int, int], condim: int = 4, mass: float | None = None,
+              spec: mujoco.MjSpec | None = None):
     kw = dict(name=name, type=GEOM_TYPES[g.type], size=list(g.size) + [0.0] * (3 - len(g.size)), pos=list(g.pos),
               quat=list(g.quat), rgba=list(g.rgba), contype=bits[0], conaffinity=bits[1], condim=condim)
     if mass is not None:
         kw["mass"] = mass
+    if g.type == "mesh":
+        assert spec is not None and g.vertices is not None
+        mesh = spec.add_mesh(name=f"{name}_mesh", uservert=np.asarray(g.vertices, dtype=float).ravel().tolist())
+        if g.faces is not None:
+            mesh.userface = np.asarray(g.faces, dtype=int).ravel().tolist()
+        kw.update(meshname=f"{name}_mesh", group=3)
+    if g.visual:
+        kw.update(contype=0, conaffinity=0, group=2, mass=0.0)
     return body.add_geom(**kw)
 
 
 def _add_moving(parent, part: MovingPart, prefix: str, ctl_pos: np.ndarray, ctl_rot: np.ndarray, faults: Faults,
-                friction: float = 1.0):
+                friction: float = 1.0, spec: mujoco.MjSpec | None = None):
     pos = ctl_pos + ctl_rot @ np.asarray(part.pos)
     rot = ctl_rot @ quat_wxyz_to_mat(part.quat)
     if part.joint == "free":  # a grasp object: gravity on, object bits, its own surface friction
         body = parent.add_body(name=prefix, pos=pos.tolist(), quat=mat_to_quat_wxyz(rot).tolist())
         body.add_freejoint(name=f"{prefix}_q")
+        solid = [g for g in part.geoms if not g.visual]
         for k, g in enumerate(part.geoms):
-            geom = _add_geom(body, g, f"{prefix}_{k}_{g.name}", OBJECT_BITS, mass=part.mass / max(len(part.geoms), 1))
+            each = 0.0 if part.inertia is not None or g.visual else part.mass / max(len(solid), 1)
+            geom = _add_geom(body, g, f"{prefix}_{k}_{g.name}", OBJECT_BITS, mass=each, spec=spec)
             geom.friction = [friction, 0.005, 0.0001]
+        if part.inertia is not None:  # a real object: the scan's inertia at its published mass
+            com, tensor = part.inertia
+            evals, evecs = np.linalg.eigh(np.asarray(tensor, dtype=float))
+            if np.linalg.det(evecs) < 0:
+                evecs[:, 0] = -evecs[:, 0]
+            body.explicitinertial = True
+            body.mass = part.mass
+            body.ipos = np.asarray(com, dtype=float).tolist()
+            body.iquat = mat_to_quat_wxyz(evecs).tolist()
+            body.inertia = np.maximum(evals, 1e-9).tolist()
         return body, part.range[1]
     body = parent.add_body(name=prefix, pos=pos.tolist(), quat=mat_to_quat_wxyz(rot).tolist(), gravcomp=1.0)
     axis = np.asarray(part.axis, dtype=float)
@@ -358,6 +380,13 @@ def build_model(design: Design, panel: PanelSpec | None = None, tools: list | No
                               pos=list(g.pos), quat=list(g.quat), contype=ROBOT_BITS[0], conaffinity=ROBOT_BITS[1],
                               condim=4, group=3, mass=0.0)
             counters[prefix] += 1
+    # Finger pads (design/fingers.py, D-038) are jaw geoms too: they pinch, and pair with objects.
+    jaw_mu: dict[str, float] = {}
+    for pg in pad_geoms(design.fingers):
+        spec.body(pg.body).add_geom(name=pg.name, type=GEOM_TYPES["box"], size=list(pg.half), pos=list(pg.pos),
+                                    quat=list(pg.quat), contype=ROBOT_BITS[0], conaffinity=ROBOT_BITS[1], condim=4,
+                                    group=2, mass=0.0, rgba=[0.95, 0.55, 0.15, 1.0])
+        jaw_mu[pg.name] = pg.friction
     spec.worldbody.add_light(pos=[0.2, 0.0, 1.0], dir=[0, 0, -1], type=mujoco.mjtLightType.mjLIGHT_DIRECTIONAL)
 
     site = next(s for s in spec.sites if s.name == MJCF_TOOL_SITE)
@@ -404,8 +433,8 @@ def build_model(design: Design, panel: PanelSpec | None = None, tools: list | No
             mu = c.friction * draws[c.id][0]
             if geo.moving.joint == "free":  # MuJoCo allows free joints on top-level bodies only
                 _, hi = _add_moving(spec.worldbody, geo.moving, f"ctl_{c.id}", p_pos + p_rot @ cpos, p_rot @ crot, f,
-                                    friction=mu)
-                surfaces += [(f"ctl_{c.id}_{k}_{g.name}", mu) for k, g in enumerate(geo.moving.geoms)]
+                                    friction=mu, spec=spec)
+                surfaces += [(f"ctl_{c.id}_{k}_{g.name}", mu) for k, g in enumerate(geo.moving.geoms) if not g.visual]
             else:
                 _, hi = _add_moving(pbody, geo.moving, f"ctl_{c.id}", cpos, crot, f)
             flap_hi = None
@@ -433,8 +462,8 @@ def build_model(design: Design, panel: PanelSpec | None = None, tools: list | No
             if g.contype == ROBOT_BITS[0] and not g.name.startswith(("jaw_fixed", "jaw_moving")):
                 g.conaffinity |= OBJECT_BIT
         for name, friction in surfaces:
-            mu = pair_friction(JAW_FRICTION, friction)
             for j in jaws:
+                mu = pair_friction(jaw_mu.get(j, JAW_FRICTION), friction)
                 spec.add_pair(geomname1=j, geomname2=name, condim=4, friction=[mu, mu, 0.005, 0.0001, 0.0001])
 
     model = spec.compile()

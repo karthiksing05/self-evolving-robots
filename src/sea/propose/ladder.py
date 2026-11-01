@@ -19,9 +19,12 @@ FIELD_SCALE: dict[str, float] = {
     "wrist_offset_mm": 20.0,
     "riser_m": 0.1,
     "base_pitch_rad": 0.5,
-    "jaw_len_mm": 30.0,
-    "tip_radius_mm": 5.0,
-    "softness": 1.0,
+    "reach_mm": 30.0,
+    "pad_angle_deg": 45.0,
+    "groove_mm": 6.0,
+    "lip_mm": 4.0,
+    "pad_tpu_mm": 3.0,
+    "width_mm": 24.0,
 }
 
 

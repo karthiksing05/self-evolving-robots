@@ -71,13 +71,35 @@ def object_width(obj: SceneObject) -> float:
     return 2 * obj.size[1] if obj.shape == "box" else 2 * obj.size[0]
 
 
-def site_depth(obj: SceneObject, probe: Probe = PROBE) -> float:
+def site_depth(obj: SceneObject, probe: Probe = PROBE, below: float = STOCK_TIP_EXT) -> float:
     """How far below the object top the tool site goes.  Spheres: jaw tips ``sphere_past_mm`` below
-    the equator; prisms: ``site_depth_mm``, but never so deep that the tips come within 3 mm of the table."""
+    the equator; prisms: ``site_depth_mm``, but never so deep that the tips come within 3 mm of the table.
+    ``below``: how far the jaw tips (or the finger pads, D-038) reach below the tool site."""
     top = object_top(obj)
     if obj.shape == "sphere":
-        return top / 2 + probe.sphere_past_mm * MM - STOCK_TIP_EXT
-    return min(probe.site_depth_mm * MM, top - STOCK_TIP_EXT - 3 * MM)
+        return top / 2 + probe.sphere_past_mm * MM - below
+    return min(probe.site_depth_mm * MM, top - below - 3 * MM)
+
+
+@dataclass(frozen=True)
+class Jaws:
+    """The probe's settings that follow from the fingers (D-038); for the stock jaws they are V1's."""
+
+    q_open: float
+    face: float  # fixed pad face to the stock jaw face (m)
+    below: float  # lowest jaw or pad point below the tool site with the jaws on the object (m)
+
+
+def jaws(design: Design, width: float, probe: Probe = PROBE) -> Jaws:
+    from sea.design import fingers as F
+
+    f = design.fingers
+    if F.is_stock(f):
+        return Jaws(probe.q_open, 0.0, STOCK_TIP_EXT)
+    q_open = F.opening_for(f, width + 2 * probe.side_mm * MM + 10 * MM)
+    q_obj = F.opening_for(f, width)
+    return Jaws(max(probe.q_open, q_open if q_open is not None else 1.7), F.thickness(f),
+                F.below_tool(f, q_obj if q_obj is not None else probe.q_open))
 
 
 @dataclass
@@ -118,19 +140,20 @@ def jaw_squeeze(sim: Sim, geom: int) -> float:
     return total
 
 
-def run_pick(sim: Sim, obj: SceneObject, probe: Probe = PROBE) -> dict[str, float]:
+def run_pick(sim: Sim, obj: SceneObject, probe: Probe = PROBE, jw: Jaws | None = None) -> dict[str, float]:
     """Drive ``sim`` through the scripted pick of ``obj`` (already in the scene).
 
     Returns the ground-truth marks taken between phases: sideways knock before closing, jaw angle and
     squeeze once closed, and the object's rise after the lift and after the hold (m, rad, N)."""
     ik = stock_ik()
+    jw = jw or jaws(sim.design, object_width(obj), probe)
     body, geom = sim.objects[obj.name], sim.object_geoms[obj.name]
     q = HOME_Q.copy()
     sim.set_arm_q(q)
     down, roll = np.array([0.0, 0.0, -1.0]), np.array([0.0, 1.0, 0.0])  # jaws close along world y
     top = np.array([obj.pos[0], obj.pos[1], object_top(obj)])
-    beside = np.array([0.0, object_width(obj) / 2 + probe.side_mm * MM, 0.0])  # fixed jaw on the +y side
-    grasp = top + beside - [0.0, 0.0, site_depth(obj, probe)]
+    beside = np.array([0.0, object_width(obj) / 2 + probe.side_mm * MM + jw.face, 0.0])  # fixed jaw on +y
+    grasp = top + beside - [0.0, 0.0, site_depth(obj, probe, jw.below)]
 
     def tick(target: np.ndarray, n: int = 1) -> None:
         for _ in range(n):
@@ -148,12 +171,12 @@ def run_pick(sim: Sim, obj: SceneObject, probe: Probe = PROBE) -> dict[str, floa
 
     tick(q, 10)  # let the object settle on the table
     xy0, z0 = sim.data.xpos[body][:2].copy(), float(sim.data.xpos[body][2])
-    move(grasp + [0.0, 0.0, 0.04], 2.0, probe.q_open)
-    move(grasp, 1.5, probe.q_open)
+    move(grasp + [0.0, 0.0, 0.04], 2.0, jw.q_open)
+    move(grasp, 1.5, jw.q_open)
     knocked = float(np.linalg.norm(sim.data.xpos[body][:2] - xy0))
     for k in range(1, 31):
         q = q.copy()
-        q[-1] = probe.q_open + (probe.q_close - probe.q_open) * k / 30
+        q[-1] = jw.q_open + (probe.q_close - jw.q_open) * k / 30
         tick(q)
     tick(q, 15)
     jaw_q = float(sim.data.qpos[sim.model.jnt_qposadr[sim.model.joint("gripper").id]])

@@ -1,0 +1,810 @@
+{
+ "fingers": {
+  "reach_mm": 0.0,
+  "pad_angle_deg": 40.0,
+  "groove_mm": 3.0,
+  "lip_mm": 0.0,
+  "pad_tpu_mm": 3.0,
+  "width_mm": 20.0
+ },
+ "placements": 3,
+ "objects": {
+  "gelatin_box": {
+   "held": true,
+   "verdicts": [
+    "pass",
+    "pass",
+    "pass"
+   ],
+   "notes": [
+    "",
+    "",
+    ""
+   ],
+   "attempts": 6,
+   "sim_s": 16.5,
+   "params": [
+    {
+     "grasp": {
+      "side": 0.005025,
+      "close": -0.109178,
+      "close_s": 0.559641,
+      "lift": 0.056572,
+      "hold_s": 1.016246,
+      "speed": 0.059936
+     }
+    },
+    {
+     "grasp": {
+      "side": 0.003228,
+      "close": -0.165908,
+      "close_s": 0.854172,
+      "lift": 0.043029,
+      "hold_s": 1.120554,
+      "speed": 0.059036
+     }
+    },
+    {
+     "grasp": {
+      "side": 0.000689,
+      "close": -0.065984,
+      "close_s": 0.70882,
+      "lift": 0.049424,
+      "hold_s": 1.05585,
+      "speed": 0.044116
+     }
+    }
+   ]
+  },
+  "pudding_box": {
+   "held": false,
+   "verdicts": [
+    "stuck",
+    "stuck",
+    "stuck"
+   ],
+   "notes": [
+    "slip",
+    "load_limit",
+    "slip"
+   ],
+   "attempts": 27,
+   "sim_s": 11.9,
+   "params": [
+    {
+     "grasp": {
+      "side": 0.001263,
+      "close": -0.151035,
+      "close_s": 0.285814,
+      "lift": 0.041463,
+      "hold_s": 1.001057,
+      "speed": 0.045074
+     }
+    },
+    {
+     "grasp": {
+      "side": 0.002372,
+      "close": -0.1588,
+      "close_s": 0.747733,
+      "lift": 0.041593,
+      "hold_s": 1.100725,
+      "speed": 0.036633
+     }
+    },
+    {
+     "grasp": {
+      "side": 0.002265,
+      "close": -0.169788,
+      "close_s": 0.599483,
+      "lift": 0.037752,
+      "hold_s": 1.260486,
+      "speed": 0.034577
+     }
+    }
+   ]
+  },
+  "sugar_box": {
+   "held": false,
+   "verdicts": [
+    "stuck",
+    "stuck",
+    "stuck"
+   ],
+   "notes": [
+    "slip",
+    "slip",
+    "slip"
+   ],
+   "attempts": 27,
+   "sim_s": 13.1,
+   "params": [
+    {
+     "grasp": {
+      "side": 0.004577,
+      "close": -0.169881,
+      "close_s": 0.374963,
+      "lift": 0.04952,
+      "hold_s": 1.060738,
+      "speed": 0.040914
+     }
+    },
+    {
+     "grasp": {
+      "side": 0.000709,
+      "close": -0.125947,
+      "close_s": 0.517897,
+      "lift": 0.069893,
+      "hold_s": 1.23086,
+      "speed": 0.034831
+     }
+    },
+    {}
+   ]
+  },
+  "potted_meat_can": {
+   "held": false,
+   "verdicts": [
+    "rule_violation",
+    "pass",
+    "rule_violation"
+   ],
+   "notes": [
+    "force_limit",
+    "",
+    "force_limit"
+   ],
+   "attempts": 6,
+   "sim_s": 7.8,
+   "params": [
+    {},
+    {
+     "grasp": {
+      "side": 0.001881,
+      "close": -0.075802,
+      "close_s": 0.712186,
+      "lift": 0.064781,
+      "hold_s": 1.381799,
+      "speed": 0.037727
+     }
+    },
+    {}
+   ]
+  },
+  "mustard_bottle": {
+   "held": false,
+   "verdicts": [
+    "stuck",
+    "stuck",
+    "stuck"
+   ],
+   "notes": [
+    "slip",
+    "slip",
+    "load_limit"
+   ],
+   "attempts": 27,
+   "sim_s": 20.7,
+   "params": [
+    {
+     "grasp": {
+      "side": 0.001113,
+      "close": -0.08364,
+      "close_s": 0.832933,
+      "lift": 0.051385,
+      "hold_s": 1.000284,
+      "speed": 0.021091
+     }
+    },
+    {},
+    {
+     "grasp": {
+      "side": 0.002204,
+      "close": -0.06816,
+      "close_s": 0.436408,
+      "lift": 0.052568,
+      "hold_s": 1.27284,
+      "speed": 0.014979
+     }
+    }
+   ]
+  },
+  "foam_brick": {
+   "held": true,
+   "verdicts": [
+    "pass",
+    "pass",
+    "pass"
+   ],
+   "notes": [
+    "",
+    "",
+    ""
+   ],
+   "attempts": 3,
+   "sim_s": 22.9,
+   "params": [
+    {},
+    {},
+    {}
+   ]
+  },
+  "wood_block_cube": {
+   "held": false,
+   "verdicts": [
+    "wrong_behavior",
+    "wrong_behavior",
+    "wrong_behavior"
+   ],
+   "notes": [
+    "slip",
+    "slip",
+    "slip"
+   ],
+   "attempts": 27,
+   "sim_s": 14.3,
+   "params": [
+    {
+     "grasp": {
+      "side": 0.003728,
+      "close": -0.069964,
+      "close_s": 0.779444,
+      "lift": 0.058896,
+      "hold_s": 1.222487,
+      "speed": 0.030205
+     }
+    },
+    {
+     "grasp": {
+      "side": 0.001515,
+      "close": -0.119001,
+      "close_s": 0.207042,
+      "lift": 0.054716,
+      "hold_s": 1.055336,
+      "speed": 0.046859
+     }
+    },
+    {
+     "grasp": {
+      "side": 2.3e-05,
+      "close": -0.149845,
+      "close_s": 0.323306,
+      "lift": 0.045014,
+      "hold_s": 1.200475,
+      "speed": 0.044481
+     }
+    }
+   ]
+  },
+  "strawberry": {
+   "held": false,
+   "verdicts": [
+    "wrong_behavior",
+    "wrong_behavior",
+    "wrong_behavior"
+   ],
+   "notes": [
+    "slip",
+    "slip",
+    "slip"
+   ],
+   "attempts": 27,
+   "sim_s": 17.2,
+   "params": [
+    {
+     "grasp": {
+      "side": 0.002667,
+      "close": -0.112051,
+      "close_s": 0.838955,
+      "lift": 0.052782,
+      "hold_s": 1.048047,
+      "speed": 0.041921
+     }
+    },
+    {
+     "grasp": {
+      "side": 0.002588,
+      "close": -0.128982,
+      "close_s": 0.33671,
+      "lift": 0.054322,
+      "hold_s": 1.786966,
+      "speed": 0.038637
+     }
+    },
+    {
+     "grasp": {
+      "side": 0.000225,
+      "close": -0.081872,
+      "close_s": 0.936574,
+      "lift": 0.052449,
+      "hold_s": 1.097702,
+      "speed": 0.047247
+     }
+    }
+   ]
+  },
+  "banana": {
+   "held": false,
+   "verdicts": [
+    "stuck",
+    "stuck",
+    "stuck"
+   ],
+   "notes": [
+    "force_limit",
+    "force_limit",
+    "force_limit"
+   ],
+   "attempts": 27,
+   "sim_s": 8.1,
+   "params": [
+    {},
+    {},
+    {
+     "grasp": {
+      "side": 4.2e-05,
+      "close": -0.169788,
+      "close_s": 0.940233,
+      "lift": 0.035468,
+      "hold_s": 1.656937,
+      "speed": 0.051309
+     }
+    }
+   ]
+  },
+  "tomato_soup_can": {
+   "held": false,
+   "verdicts": [
+    "pass",
+    "wrong_behavior",
+    "wrong_behavior"
+   ],
+   "notes": [
+    "",
+    "slip",
+    "slip"
+   ],
+   "attempts": 19,
+   "sim_s": 18.2,
+   "params": [
+    {
+     "grasp": {
+      "side": 0.00425,
+      "close": -0.16641,
+      "close_s": 0.599439,
+      "lift": 0.047468,
+      "hold_s": 1.432141,
+      "speed": 0.036373
+     }
+    },
+    {
+     "grasp": {
+      "side": 0.000356,
+      "close": -0.132237,
+      "close_s": 0.287916,
+      "lift": 0.054367,
+      "hold_s": 1.000019,
+      "speed": 0.05886
+     }
+    },
+    {
+     "grasp": {
+      "side": 0.002114,
+      "close": -0.13982,
+      "close_s": 0.359707,
+      "lift": 0.053678,
+      "hold_s": 1.54884,
+      "speed": 0.045499
+     }
+    }
+   ]
+  },
+  "tuna_fish_can": {
+   "held": false,
+   "verdicts": [
+    "wrong_behavior",
+    "wrong_behavior",
+    "wrong_behavior"
+   ],
+   "notes": [
+    "slip",
+    "slip",
+    "slip"
+   ],
+   "attempts": 27,
+   "sim_s": 13.1,
+   "params": [
+    {
+     "grasp": {
+      "side": 9.2e-05,
+      "close": -0.1109,
+      "close_s": 0.638579,
+      "lift": 0.048176,
+      "hold_s": 1.686483,
+      "speed": 0.041163
+     }
+    },
+    {
+     "grasp": {
+      "side": 0.003551,
+      "close": -0.16856,
+      "close_s": 0.995616,
+      "lift": 0.035074,
+      "hold_s": 1.02499,
+      "speed": 0.028033
+     }
+    },
+    {
+     "grasp": {
+      "side": 0.002359,
+      "close": -0.169974,
+      "close_s": 0.284299,
+      "lift": 0.06997,
+      "hold_s": 1.694202,
+      "speed": 0.032928
+     }
+    }
+   ]
+  },
+  "tennis_ball": {
+   "held": true,
+   "verdicts": [
+    "pass",
+    "pass",
+    "pass"
+   ],
+   "notes": [
+    "",
+    "slip",
+    "slip"
+   ],
+   "attempts": 7,
+   "sim_s": 26.3,
+   "params": [
+    {
+     "grasp": {
+      "side": 0.000719,
+      "close": -0.136363,
+      "close_s": 0.502902,
+      "lift": 0.037504,
+      "hold_s": 1.644853,
+      "speed": 0.010399
+     }
+    },
+    {
+     "grasp": {
+      "side": 0.002849,
+      "close": -0.096653,
+      "close_s": 0.606505,
+      "lift": 0.049247,
+      "hold_s": 1.31163,
+      "speed": 0.0397
+     }
+    },
+    {
+     "grasp": {
+      "side": 0.000787,
+      "close": -0.150002,
+      "close_s": 0.989936,
+      "lift": 0.057739,
+      "hold_s": 1.464875,
+      "speed": 0.04067
+     }
+    }
+   ]
+  },
+  "racquetball": {
+   "held": true,
+   "verdicts": [
+    "pass",
+    "pass",
+    "pass"
+   ],
+   "notes": [
+    "",
+    "",
+    ""
+   ],
+   "attempts": 3,
+   "sim_s": 20.1,
+   "params": [
+    {},
+    {},
+    {}
+   ]
+  },
+  "golf_ball": {
+   "held": true,
+   "verdicts": [
+    "pass",
+    "pass",
+    "pass"
+   ],
+   "notes": [
+    "",
+    "",
+    ""
+   ],
+   "attempts": 3,
+   "sim_s": 22.9,
+   "params": [
+    {},
+    {},
+    {}
+   ]
+  },
+  "lemon": {
+   "held": true,
+   "verdicts": [
+    "pass",
+    "pass",
+    "pass"
+   ],
+   "notes": [
+    "slip",
+    "",
+    ""
+   ],
+   "attempts": 6,
+   "sim_s": 18.6,
+   "params": [
+    {},
+    {
+     "grasp": {
+      "side": 0.000155,
+      "close": -0.053544,
+      "close_s": 0.740273,
+      "lift": 0.048009,
+      "hold_s": 1.470242,
+      "speed": 0.056206
+     }
+    },
+    {
+     "grasp": {
+      "side": 0.000464,
+      "close": -0.166476,
+      "close_s": 0.79426,
+      "lift": 0.062398,
+      "hold_s": 1.011411,
+      "speed": 0.059714
+     }
+    }
+   ]
+  },
+  "plum": {
+   "held": false,
+   "verdicts": [
+    "wrong_behavior",
+    "wrong_behavior",
+    "wrong_behavior"
+   ],
+   "notes": [
+    "slip",
+    "slip",
+    "slip"
+   ],
+   "attempts": 27,
+   "sim_s": 21.8,
+   "params": [
+    {
+     "grasp": {
+      "side": 0.000286,
+      "close": -0.160058,
+      "close_s": 0.955589,
+      "lift": 0.059183,
+      "hold_s": 1.354565,
+      "speed": 0.011516
+     }
+    },
+    {
+     "grasp": {
+      "side": 0.003525,
+      "close": -0.156222,
+      "close_s": 0.657699,
+      "lift": 0.069968,
+      "hold_s": 1.196536,
+      "speed": 0.034278
+     }
+    },
+    {
+     "grasp": {
+      "side": 0.001972,
+      "close": -0.154697,
+      "close_s": 0.704681,
+      "lift": 0.04452,
+      "hold_s": 1.597833,
+      "speed": 0.017854
+     }
+    }
+   ]
+  },
+  "apple": {
+   "held": false,
+   "verdicts": [
+    "wrong_behavior",
+    "wrong_behavior",
+    "wrong_behavior"
+   ],
+   "notes": [
+    "slip",
+    "slip",
+    ""
+   ],
+   "attempts": 27,
+   "sim_s": 13.4,
+   "params": [
+    {
+     "grasp": {
+      "side": 0.00148,
+      "close": -0.10498,
+      "close_s": 0.795612,
+      "lift": 0.054619,
+      "hold_s": 1.35368,
+      "speed": 0.05631
+     }
+    },
+    {
+     "grasp": {
+      "side": 0.002007,
+      "close": -0.102832,
+      "close_s": 0.384723,
+      "lift": 0.050223,
+      "hold_s": 1.185186,
+      "speed": 0.044055
+     }
+    },
+    {
+     "grasp": {
+      "side": 0.004319,
+      "close": -0.095284,
+      "close_s": 0.675827,
+      "lift": 0.066581,
+      "hold_s": 1.040313,
+      "speed": 0.044578
+     }
+    }
+   ]
+  },
+  "large_marker": {
+   "held": false,
+   "verdicts": [
+    "wrong_behavior",
+    "wrong_behavior",
+    "wrong_behavior"
+   ],
+   "notes": [
+    "slip",
+    "slip",
+    "slip"
+   ],
+   "attempts": 27,
+   "sim_s": 15.8,
+   "params": [
+    {
+     "grasp": {
+      "side": 0.002171,
+      "close": -0.149235,
+      "close_s": 0.741086,
+      "lift": 0.046263,
+      "hold_s": 1.443693,
+      "speed": 0.025779
+     }
+    },
+    {
+     "grasp": {
+      "side": 0.002938,
+      "close": -0.1027,
+      "close_s": 0.958917,
+      "lift": 0.038154,
+      "hold_s": 1.077512,
+      "speed": 0.0269
+     }
+    },
+    {}
+   ]
+  },
+  "flat_screwdriver": {
+   "held": true,
+   "verdicts": [
+    "pass",
+    "pass",
+    "pass"
+   ],
+   "notes": [
+    "",
+    "",
+    ""
+   ],
+   "attempts": 3,
+   "sim_s": 22.8,
+   "params": [
+    {},
+    {},
+    {}
+   ]
+  },
+  "cup": {
+   "held": true,
+   "verdicts": [
+    "pass",
+    "pass",
+    "pass"
+   ],
+   "notes": [
+    "",
+    "",
+    ""
+   ],
+   "attempts": 3,
+   "sim_s": 23.0,
+   "params": [
+    {},
+    {},
+    {}
+   ]
+  },
+  "dice": {
+   "held": false,
+   "verdicts": [
+    "wrong_behavior",
+    "wrong_behavior",
+    "wrong_behavior"
+   ],
+   "notes": [
+    "slip",
+    "slip",
+    "slip"
+   ],
+   "attempts": 27,
+   "sim_s": 12.8,
+   "params": [
+    {},
+    {
+     "grasp": {
+      "side": 0.002293,
+      "close": -0.155878,
+      "close_s": 0.660675,
+      "lift": 0.05579,
+      "hold_s": 1.027494,
+      "speed": 0.058948
+     }
+    },
+    {
+     "grasp": {
+      "side": 0.000844,
+      "close": -0.163439,
+      "close_s": 0.220176,
+      "lift": 0.04839,
+      "hold_s": 1.292805,
+      "speed": 0.039362
+     }
+    }
+   ]
+  }
+ },
+ "held": [
+  "cup",
+  "flat_screwdriver",
+  "foam_brick",
+  "gelatin_box",
+  "golf_ball",
+  "lemon",
+  "racquetball",
+  "tennis_ball"
+ ],
+ "not_held": [
+  "apple",
+  "banana",
+  "dice",
+  "large_marker",
+  "mustard_bottle",
+  "plum",
+  "potted_meat_can",
+  "pudding_box",
+  "strawberry",
+  "sugar_box",
+  "tomato_soup_can",
+  "tuna_fish_can",
+  "wood_block_cube"
+ ],
+ "wall_s": 76.1
+}

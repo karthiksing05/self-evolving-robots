@@ -228,18 +228,23 @@ def wrist_torque(tool: BuiltTool | None, tip_load_n: float = NOMINAL_TIP_LOAD_N)
     return tau
 
 
-def finger_estimate(design: Design) -> tuple[float, float, float]:
-    """(print_minutes, grams_pla, added_mass_g) for non-stock fingers: two jaw extensions.
+def finger_estimate(design: Design) -> tuple[float, float, float, float]:
+    """(print_minutes, grams_pla, grams_tpu, added_mass_g) for the two finger pads (design/fingers.py).
 
-    Box approximation per jaw: jaw_len x 10 x 6 mm plus a tip sphere; TPU when softness > 0.5.
+    Volume is the sum of the pad boxes the simulator collides with; the TPU skin is its share of it.
     """
+    from sea.design.fingers import is_stock, pad_geoms, thickness
+
     f = design.fingers
-    if f.jaw_len_mm <= 0 and f.tip_radius_mm <= 0:
-        return 0.0, 0.0, 0.0
-    vol = (f.jaw_len_mm * 10.0 * 6.0 + 4.0 / 3.0 * math.pi * f.tip_radius_mm**3) / 1000.0
-    material = "tpu" if f.softness > 0.5 else "pla"
-    minutes, grams = print_estimate(vol, material)
-    return 2 * minutes, 2 * grams, 2 * vol * DENSITY_G_CM3[material] * INFILL_FACTOR
+    if is_stock(f):
+        return 0.0, 0.0, 0.0, 0.0
+    vol = sum(8 * g.half[0] * g.half[1] * g.half[2] for g in pad_geoms(f)) * 1e6  # cm^3, both pads
+    tpu = vol * (f.pad_tpu_mm * 1e-3) / thickness(f)
+    pla = vol - tpu
+    m_pla, g_pla = print_estimate(pla, "pla")
+    m_tpu, g_tpu = print_estimate(tpu, "tpu") if tpu > 0 else (0.0, 0.0)
+    mass = (pla * DENSITY_G_CM3["pla"] + tpu * DENSITY_G_CM3["tpu"]) * INFILL_FACTOR
+    return m_pla + m_tpu, g_pla, g_tpu, mass
 
 
 def build(design: Design, limits: HardLimits, *, decompose: Decompose = "analytic",
@@ -277,11 +282,11 @@ def build(design: Design, limits: HardLimits, *, decompose: Decompose = "analyti
         errors.append(f"link scale above {limits.max_link_scale}")
     if not checks["wrist_torque"]:
         errors.append(f"wrist torque {worst:.2f} N*m > 0.8 x {stall} N*m")
-    f_min, f_pla, f_mass = finger_estimate(design)
+    f_min, f_pla, f_tpu, f_mass = finger_estimate(design)
     est = BuildEstimate(
         print_minutes=sum(t.print_minutes for t in tools) + f_min,
         grams_pla=sum(t.grams_pla for t in tools) + f_pla,
-        grams_tpu=sum(t.grams_tpu for t in tools),
+        grams_tpu=sum(t.grams_tpu for t in tools) + f_tpu,
         added_mass_g=max([t.mass_g for t in tools] + [0.0]) + f_mass,
     )
     built = BuiltDesign(design.model_copy(update={"est": est}), tools, checks, errors)

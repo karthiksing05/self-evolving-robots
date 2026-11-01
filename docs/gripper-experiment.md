@@ -49,6 +49,42 @@ The world has no tool rack (`rack_slots: 0`), so rungs 2–3 are ruled out as un
 first body change is a finger (rung 4). The global ladder keeps its order, so panel experiments
 E1–E11 stay comparable.
 
+### The objects: 21 real ones (D-038)
+
+The synthetic phase-B list above was the plan. The experiment now runs on real objects: 21 YCB
+scans (Calli et al. 2015) with their published masses, imported by `scripts/import_ycb.py` into
+`configs/ycb_objects.yaml` and `assets/ycb/` (convex collision pieces, a decimated visual mesh, the
+scan's inertia at the published mass). Each rests in a pose no taller than 85 mm, because a
+straight-down SO-101 tool point tops out near 95 mm and a taller object cannot be lifted 30 mm.
+
+Phase A and phase B are split by measurement, not by a table. `scripts/measure_real.py` runs
+`pick_up` with System 1's search and confirmation re-runs on each object at three placements:
+
+- **Phase A, held by the stock jaws:** banana, cup, foam brick, large marker, wood cube. These five
+  are the regression set.
+- **Phase B, not held (16 objects):**
+  - slip out, mostly round: golf ball, tennis ball, racquetball, lemon, plum, apple, strawberry,
+    soup can on its side, screwdriver, dice;
+  - stall the arm (`load_limit`): tuna can, pudding box;
+  - too wide: sugar box (92 mm), mustard bottle (96 mm);
+  - the gelatin box;
+  - the potted meat can, which trips the force limit.
+
+The stored result is `results/real_stock.json`.
+
+The gold check (V2) runs the same script on finger designs (`results/gold/`). Two designs hold
+9/21 objects and lose none of phase A:
+
+| Design | Objects gained |
+|---|---|
+| reach 10 mm, pads tilted 20°, 2 mm TPU | golf ball, lemon, plum, strawberry |
+| reach 15 mm, 30°, 2 mm TPU | gelatin box, golf ball, plum, strawberry |
+
+Tilting further holds more round objects but costs the small ones. Pads at 40° with a V-groove,
+3 mm TPU and 20 mm wide hold 11/21 but drop the cube, the marker and the banana. At a small
+opening a steep pad makes a V that squeezes a small object out. That trade-off is the
+experiment's design problem.
+
 ### Phase C: the arm itself (on the radar)
 
 Phase C injects arm faults into the simulator but not into the robot's own model:
@@ -82,18 +118,20 @@ anything until that is fixed.
 
 We want to show that, inside the architecture's limits, the loop can design a gripper with
 precise parametric control over the CAD while using space efficiently. Four rules govern the
-family. These are design rules; the family itself is not built yet.
+family. `design/fingers.py` builds it (D-038): one pad box per jaw, over the bottom 10 mm of the
+stock jaw face, plus V-groove halves and a lip when those are set. The simulator collides with
+the pads, and the ledger prices their print volume.
 
 1. **Parameters are physical and mostly independent.** Each one changes one capability:
 
    | Parameter | Range | Capability it controls |
    |---|---|---|
-   | `pad_angle_deg` | −10–25 | The opening width at which the two contact faces are parallel. Working hypothesis, to test in V2: the stock faces splay at wide openings and squeeze a 50 mm can out. |
-   | `reach_mm` | 0–30 | How far past the stock tip the fingers extend: grasp depth and thin objects. |
-   | `profile` | flat, `v_groove(angle)`, `concave(radius)` | Centering of round objects. |
-   | `lip_mm` | 0–4 | A hook under the edge of a plate. |
-   | `pad_tpu_mm` | 0–3 | Friction and compliance; adds a TPU print. |
-   | `width_mm` | 8–24 | Contact patch width across the jaw. |
+   | `pad_angle_deg` | 0–45 | The jaw opening at which the two pad faces are parallel. The moving pad is lengthened by its tip's rise, so both pads end level there. Confirmed in V2: tilt is what holds round objects, and too much loses small ones. |
+   | `reach_mm` | 0–30 | How far past the stock tip the pads extend: grasp depth and low objects. |
+   | `groove_mm` | 0–6 | Depth of a V-groove across each face: it centres round objects. (A concave profile is not built.) |
+   | `lip_mm` | 0–4 | An inward hook at the pad bottom, for an edge or a plate lying flat. |
+   | `pad_tpu_mm` | 0–3 | A TPU skin: friction 0.9 instead of 0.45 for PLA. Only the friction is modelled (D-038); it adds a TPU print. |
+   | `width_mm` | 8–24 | Pad width across the jaw (12 mm when 0). |
 
 2. **Every point in the box builds.** The ranges come from the hard limits: minimum wall, maximum
    added mass, wrist torque, clearance over the jaw sweep, printer envelope. So a sampled design
@@ -104,6 +142,15 @@ family. These are design rules; the family itself is not built yet.
    minimum stable width, squeeze at the pad (servo torque over the lever arm), contact area, added
    mass and print minutes. The typecheck's width rule and the System 2 prompt both read these
    numbers.
+   - As built, one instrument measures every design: the V1 probe, a fixed pick at 50 g and
+     friction 0.8. The stock jaws read its stored table. A pad design is probed on demand and
+     cached by its parameters and the probe's source (`design/grip.py`, about 6 s each).
+   - Example: pads tilted 40° with a V-groove hold spheres to 65 mm and cylinders to 70 mm, against
+     the stock jaws' 40 and 45.
+   - The aperture rule applies only to the analytic shapes the probe uses. A scanned object's
+     bounding width is not the width the jaws close on (a lying banana, a cup's rim), so its trial
+     decides.
+   - Added mass and print minutes come from the pad volumes.
 
 4. **Space efficiency is measured.** The finger stays within the stock jaw's swept envelope plus
    its extension. V3 plots capability (objects graspable) against added grams and print minutes.
@@ -264,8 +311,10 @@ Hardware for V5:
 | Sensors as resources: parts manifest, toggles, System 2 prompt section (D-033) | built |
 | Sensors in the loop: traces, memory measurements, System 2 `felt:` line, `load_limit` and `slip` reflexes (D-036) | built |
 | Task network contracts (`plan/network.py`, `verify/goals.py`); the current loop recorded as the degenerate network in `goals.jsonl`, every number unchanged (D-034, D-037) | built |
-| Finger family CAD, build into the model, design-dependent pinch point (V1) | design |
-| Gold-design suite (V2), phase A→B runner, difficulty check (V3) | design |
+| Finger family: pads built into the model, priced by the ledger, pad-aware grasp and probe (D-038) | built |
+| Real objects: 21 YCB scans, phase A/B split by measurement, gold check (V2) over finger designs (D-038) | built |
+| Live gripper experiment (`configs/exp/gripper_live.yaml`) and its System-1-only control | running |
+| Finger CAD export (STEP/STL for printing), difficulty check (V3) | design |
 | `sea-arm` MCP server over the sim: sense, analyze and goal tools, call log and replay, agentic `s2_agent` over the task network | design |
 | `design/arm.py` (L2), actuator (L3), phase C fault injection | design |
 | Live runs (V4); real prints and the SO-101 backend (V5) | later |

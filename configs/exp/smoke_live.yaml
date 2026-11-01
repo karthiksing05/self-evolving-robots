@@ -1,0 +1,18 @@
+# Live smoke run: System 2 on the Claude plan through the Claude Code CLI (D-029), 3 panels, 3 iterations.
+# panel_seed 32 samples three near-flat panels (5-16 deg) covering 8 classes, so the stock arm can reach
+# most controls and the loop exercises tool proposals, trials and commits.
+seed: 1
+panel_seed: 32
+limits: {max_force_n: 15, max_tip_speed_mps: 0.10,
+         workspace_box: [{x: 0.10, y: -0.20, z: -0.10}, {x: 0.40, y: 0.20, z: 0.25}],
+         banned_contacts: [pinch], max_tool_mass_g: 40, max_link_scale: 1.3, min_wall_mm: 1.2}
+posture: {beta: 1.0, anneal_with_budget: true}
+budgets: {design_iterations: 3, sim_hours: 40}
+levels: [L0]
+proposer: s2
+llm: claude_code
+embedder: fake
+iter_sample: 3
+splits: {train: 12, val: 4, test: 4, compose: 4}
+s1_trials: 2
+trial_repeats: 2

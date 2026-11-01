@@ -14,6 +14,7 @@ from sea.contracts import (
     Budgets,
     Decision,
     Design,
+    FingerSpec,
     FixRecord,
     HardLimits,
     Posture,
@@ -313,19 +314,35 @@ def test_find_claude(monkeypatch, tmp_path):
 
 
 # ---------------------------------------------------------------- prompt
-def test_prompt_has_nine_sections_and_stable_hash():
+def test_prompt_has_ten_sections_and_stable_hash():
     p = _prompt()
-    assert [t for t, _ in p.sections] == list(SECTION_TITLES) and len(p.sections) == 9
+    assert [t for t, _ in p.sections] == list(SECTION_TITLES) and len(p.sections) == 10
     assert p.hash() == _prompt().hash()
     assert p.hash() != _prompt(remaining={"print_minutes": 0.5, "llm_usd": 0.75}).hash()
     assert p.target_keys == ["p003:c2"]
     text = p.render()
-    assert text.index("## 1. Hard limits") < text.index("## 9. Output schema and rules")
+    assert text.index("## 1. Hard limits") < text.index("## 10. Output schema and rules")
     assert "jaw_pads [mounted" in text and "link_skin [NOT mounted" in text  # the sensor manifest (D-033)
     assert "banned contact types: pinch" in text and "rung<i>:" in text
     assert "push [motor] Guarded push." in text and "depth=[0.0005, 0.08]" in text
     assert "p003:c2 cls=door handle=push_latch" in text and "surprise_z=peak_force=0.4" in text
     assert "(no similar past fixes yet)" in text and "rack: empty" in text
+    assert "widest grip by shape: box=50, cylinder=45, sphere=40 mm (V1 capability table)" in text
+    assert "pad_angle_deg [0, 45]" in text and "## 9. Rejected before trial\n(none yet)" in text
+
+
+def test_prompt_shows_what_is_touched_and_what_screening_refused():
+    from sea.propose.prompt import Rejection
+
+    s = TraceSummary(key="t:obj", cls="grasp", verdict="stuck", peak_force=9.0, travel_reached=0.0,
+                     travel_required=0.03, accepts=["pinch"], object="tennis_ball", size_mm=(66.5, 66.4), mass_g=58.0)
+    no = Rejection(iteration=1, kind="new_tool", hypothesis="a hook lifts the ball",
+                   errors=["t:obj: no rack tool provides the contacts this program needs"])
+    text = _prompt(failing=[s], rejected=[no]).render()
+    assert "object=tennis_ball width_mm=66.5 height_mm=66.4 mass_g=58 accepted_contacts=pinch" in text
+    assert "- iter 1 new_tool: a hook lifts the ball\n    refused: t:obj: no rack tool" in text
+    fingers = _prompt(design=Design(id="f", fingers=FingerSpec(reach_mm=10, pad_tpu_mm=2))).render()
+    assert "(V1 probe, measured on these fingers)" in fingers and "pad_tpu_mm=2" in fingers
 
 
 def test_prompt_lists_fixes_rack_and_handles_empty_inputs():

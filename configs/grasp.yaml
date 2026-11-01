@@ -20,3 +20,30 @@ phase_b:
   - {id: wide_box_60, shape: box, width_mm: 60, height_mm: 60, mass_g: 150, why: wider than the stable opening}
   - {id: ball_30, shape: sphere, width_mm: 30, height_mm: 30, mass_g: 50, why: rolls out of a flat grip}
   - {id: ball_40, shape: sphere, width_mm: 40, height_mm: 40, mass_g: 60, why: rolls out of a flat grip}
+
+# Real objects (D-038): YCB scans from configs/ycb_objects.yaml, each resting in its natural pose
+# with its narrowest side across the jaws.  The value is the object's grasp class, which the
+# typecheck's aperture rule reads: box (flat faces), cylinder (upright, round in plan) or sphere
+# (round in the jaws' vertical plane: balls, fruit, cans and markers lying on their side).
+real:
+  gelatin_box: box
+  pudding_box: box
+  sugar_box: box
+  potted_meat_can: box
+  mustard_bottle: box
+  foam_brick: box
+  wood_block_cube: box
+  dice: box
+  cup: cylinder
+  tuna_fish_can: cylinder
+  strawberry: sphere
+  banana: sphere
+  tomato_soup_can: sphere
+  tennis_ball: sphere
+  racquetball: sphere
+  golf_ball: sphere
+  lemon: sphere
+  plum: sphere
+  apple: sphere
+  large_marker: sphere
+  flat_screwdriver: sphere

@@ -315,13 +315,15 @@ def _check_prim(ctx: _Ctx, node: Node, path: str, tool: ToolSpec | None, target_
         ctx.err("contact", path, f"{name} on {cls}[{handle}] needs one of {wanted}; {tname} offers {sorted(offered)}")
     if cls == "slot" and name == "insert" and (tool is None or tool.template != "slot_inserter"):
         ctx.err("contact", path, "insert on a slot needs the slot_inserter tool")
-    if "aperture" in defn.requires and target is not None and target.cls == "grasp":
-        from sea.design.grip import widest_mm
+    # The aperture rule reads capability measured on the analytic shapes (design/grip.py); a scanned object's
+    # bounding width is not the width the jaws close on (a banana, a cup's rim), so its trial decides (D-038).
+    if "aperture" in defn.requires and target is not None and target.cls == "grasp" and target.asset is None:
+        from sea.design.grip import basis, widest_mm
 
         widest = widest_mm(ctx.design, target.shape or "cylinder")
         if target.size_mm[0] > widest + 1e-9:
             ctx.err("aperture", path, f"{name}: a {target.size_mm[0]:g} mm {target.shape} is wider than this "
-                    f"gripper's widest stable grip ({widest:g} mm, V1 capability table)")
+                    f"gripper's widest stable grip ({widest:g} mm, {basis(ctx.design)})")
     if not on_target:
         return
     ctx.acts_on_target = True

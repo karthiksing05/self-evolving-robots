@@ -42,7 +42,7 @@ from sea.contracts import (
 )
 from sea.design.space import DesignSpace, make_tool_spec, tools_equivalent
 from sea.propose.llm import LLM, LLMCall, _CallLog, write_fixture
-from sea.propose.prompt import S2Prompt, TraceSummary, build_prompt
+from sea.propose.prompt import Rejection, S2Prompt, TraceSummary, build_prompt
 from sea.propose.targets import TargetGroup
 from sea.spec.posture import EffectiveParams
 
@@ -66,6 +66,7 @@ class ProposeContext:
     tool_library: list[ToolSpec] = field(default_factory=list)  # every tool built so far
     failed_primitive: dict[str, str] = field(default_factory=dict)  # result key -> primitive name
     seed: int = 0
+    rejected: list[Rejection] = field(default_factory=list)  # recent proposals screening refused
 
     @property
     def target_keys(self) -> list[str]:
@@ -108,7 +109,7 @@ class S2Proposer:
         return build_prompt(limits=ctx.limits, eff=ctx.eff, remaining=ctx.remaining, budgets=ctx.budgets,
                             library=list(ctx.library.prims.values()), design=ctx.design, failing=failing,
                             fixes=ctx.fixes if self.use_memory else [], model=self.model,
-                            max_proposals=self.max_proposals)
+                            max_proposals=self.max_proposals, rejected=ctx.rejected)
 
     def propose(self, ctx: ProposeContext) -> list[Proposal]:
         prompt = self.prompt(ctx)

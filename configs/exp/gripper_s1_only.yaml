@@ -1,0 +1,26 @@
+# Control arm of the gripper experiment (gripper_live.yaml): the same world, objects and budgets with no
+# System 2, so System 1 learns on the stock jaws and the body never changes.
+# Train tables cycle through all 21 YCB objects (configs/ycb_objects.yaml) at seeded placements.  The
+# stock jaws hold 5 of them with System 1's search (scripts/measure_real.py -> results/real_stock.json):
+# that is phase A, and every finger change must keep it.  The other 16 are phase B, System 2's targets.
+# Posture: optimistic about what to try (all rungs, up to 3 edits of any size), strict about what to keep
+# (mean acceptance rule, the full regression set every trial), held fixed so the run is easy to read.
+seed: 1
+panel_seed: 5
+world: grasp
+objects: [gelatin_box, pudding_box, sugar_box, potted_meat_can, mustard_bottle, foam_brick, wood_block_cube,
+          strawberry, banana, tomato_soup_can, tuna_fish_can, tennis_ball, racquetball, golf_ball, lemon, plum,
+          apple, large_marker, flat_screwdriver, cup, dice]
+regression_objects: [banana, cup, foam_brick, large_marker, wood_block_cube]
+limits: {max_force_n: 15, max_tip_speed_mps: 0.10,
+         workspace_box: [{x: 0.10, y: -0.20, z: -0.10}, {x: 0.40, y: 0.20, z: 0.25}],
+         banned_contacts: [], max_tool_mass_g: 40, max_link_scale: 1.3, min_wall_mm: 1.2}
+posture: {beta: 1.0, accept_rule: mean, regression_panel: full, anneal_with_budget: false}
+budgets: {design_iterations: 8, sim_hours: 10, print_minutes: 240, llm_usd: 20}
+levels: [L1]
+proposer: s1_only
+embedder: fake
+iter_sample: 21
+splits: {train: 21, val: 21, test: 42, compose: 0}
+trial_repeats: 2
+eval_split: test
