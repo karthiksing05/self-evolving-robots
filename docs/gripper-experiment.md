@@ -20,9 +20,9 @@ Decisions referenced as D-nnn are in [decisions.md](decisions.md).
 
 ### Phase A: the gripper learns how it is used
 
-The world is a table with rigid objects that the stock gripper can handle: cylinders, boxes and
-spheres that are 20–40 mm wide and weigh 50–400 g. The task is to pick one up, lift it 30 mm and
-hold it.
+The world is a table with rigid objects that the stock gripper can handle, as measured by the
+stock capability table (V1, D-032): cylinders 25–45 mm wide and boxes 20–50 mm wide, weighing
+50–800 g. The task is to pick one up, lift it 30 mm and hold it.
 
 - System 1 tunes the grasp: grip depth, approach offset, close speed and grip target.
 - The library promotes grasp programs that keep working.
@@ -39,9 +39,9 @@ Each phase-B object fails for one known reason and comes with a hand-made gold d
 
 | Object | Why the stock gripper fails | Expected escalation | Gold design (to be confirmed in V2) |
 |---|---|---|---|
-| 55–70 mm can | Wider than the stable opening (D-030: 50 mm slips, 60 mm never lifts) | `structural`: typecheck aperture rule | Fingers with pads angled so the faces are parallel at 60 mm |
+| 50–70 mm can | Wider than the stable opening; fails identically at friction 0.3, 0.8 and 1.5, so it is geometry (D-032) | `structural`: typecheck aperture rule | Fingers with pads angled so the faces are parallel at 60 mm |
 | 1.5 mm plate lying flat | Jaw tips cannot get under the edge | `s1_exhausted` | Fingers with a 1 mm lip |
-| 40 mm sphere, low friction | Rolls out between flat faces | `s1_exhausted` / `surprise` | V-groove or concave pads, TPU |
+| 20–40 mm sphere | Slips out of a grip at the equator at any friction; holds only with the tips 12 mm below it, and creeps upward (D-032) | `s1_exhausted` / `surprise` | V-groove or concave pads |
 | 600 g block, far edge of the table | Shoulder near stall; the arm sags (wrist current, payload) | `surprise` on current | 12 V shoulder servo (L3), or a shorter forearm (L2) |
 | Object 0.4 m out | Outside the reach grid | `structural`: reach | Longer links (L2) |
 
@@ -233,7 +233,7 @@ Hardware for V5:
 | Plan-billed System 2 backend (D-029) | built |
 | Scene objects and grasp envelope (D-030) | built |
 | Sensing v0 (D-031) | built |
-| Stock gripper fixture table (V1) | next |
+| Stock gripper capability table (V1) and jaw-object friction pairs (D-032) | built |
 | Grasp world v0: objects as controls on a table panel, lift check, aperture typecheck rule, grasp primitive, `configs/limits_grasp.yaml` (pinch allowed), its own judge key | next |
 | Sensor channels into traces, System 2 summary, memory, System 1 guards | next |
 | Finger family CAD, build into the model, design-dependent pinch point (V1) | design |

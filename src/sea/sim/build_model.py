@@ -4,8 +4,11 @@ Timestep 2 ms, ``implicitfast``, elliptic cones, condim 4 on robot and control g
 bit layout: robot geoms contype 1 / conaffinity 1; panel geoms contype 2 / conaffinity 1; control
 geoms contype 4 / conaffinity 1.  So the robot touches panels and controls, but controls never
 collide with their own panel or each other (their motion is defined by ``controls.py``).
-Scene objects (free rigid bodies for the tabletop world, or fixed fixture probes) are contype 4 /
-conaffinity 3, so they also rest on panels and the table (contype 2).
+Scene objects (free rigid bodies for the tabletop world, or fixed fixture probes) are contype 8 /
+conaffinity 10: they rest on panels and the table (contype 2) and touch each other.  When a scene has
+objects, non-jaw robot geoms add bit 8 to their conaffinity, and every jaw-object geom pair is an
+explicit contact pair whose friction combines both surfaces (``pair_friction``, D-032); MuJoCo's
+default rule would take the larger of the two and hide any surface slicker than the jaw.
 
 Rack tools are all attached to the gripper at build time; only the mounted one collides
 (``Sim.mount``), so a ``With`` swap needs no recompile.
@@ -40,7 +43,14 @@ TABLE_HALF = 0.3  # m; the table spans x in [-0.05, 0.55], y in [-0.3, 0.3]
 ROBOT_BITS = (1, 1)
 PANEL_BITS = (2, 1)
 CONTROL_BITS = (4, 1)
-OBJECT_BITS = (4, 3)
+OBJECT_BIT = 8
+OBJECT_BITS = (OBJECT_BIT, PANEL_BITS[0] | OBJECT_BIT)
+JAW_FRICTION = 0.45  # bare printed PLA jaw face (D-032)
+
+
+def pair_friction(a: float, b: float) -> float:
+    """Friction of a contact between two surfaces: the geometric mean, as Box2D mixes it (D-032)."""
+    return float(np.sqrt(a * b))
 GEOM_TYPES = {
     "box": mujoco.mjtGeom.mjGEOM_BOX,
     "cylinder": mujoco.mjtGeom.mjGEOM_CYLINDER,
@@ -154,7 +164,7 @@ class Sim:
             on = s == slot
             for g in gids:
                 self.model.geom_contype[g] = ROBOT_BITS[0] if on else 0
-                self.model.geom_conaffinity[g] = ROBOT_BITS[1] if on else 0
+                self.model.geom_conaffinity[g] = (ROBOT_BITS[1] | (OBJECT_BIT if self.objects else 0)) if on else 0
                 self.model.geom_rgba[g][3] = 1.0 if on else 0.15
         self.mounted = slot
 
@@ -391,6 +401,16 @@ def build_model(design: Design, panel: PanelSpec | None = None, tools: list | No
         obody.add_geom(name=f"obj_{ob.name}_geom", type=GEOM_TYPES[ob.shape], size=list(ob.size) + [0.0] * (3 - len(ob.size)),
                        mass=ob.mass_kg, friction=[ob.friction, 0.005, 0.0001], rgba=[0.3, 0.5, 0.8, 1.0],
                        contype=OBJECT_BITS[0], conaffinity=OBJECT_BITS[1], condim=4)
+    if objects:
+        jaws = [g.name for g in spec.geoms if g.name.startswith(("jaw_fixed", "jaw_moving"))]
+        for g in spec.geoms:
+            if g.contype == ROBOT_BITS[0] and not g.name.startswith(("jaw_fixed", "jaw_moving")):
+                g.conaffinity |= OBJECT_BIT
+        for ob in objects:
+            mu = pair_friction(JAW_FRICTION, ob.friction)
+            for j in jaws:
+                spec.add_pair(geomname1=j, geomname2=f"obj_{ob.name}_geom", condim=4,
+                              friction=[mu, mu, 0.005, 0.0001, 0.0001])
 
     model = spec.compile()
     data = mujoco.MjData(model)

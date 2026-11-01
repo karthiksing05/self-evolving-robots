@@ -9,52 +9,22 @@ import numpy as np
 import pytest
 
 from sea.contracts import Design
-from sea.control.executor import HOME_Q, TICK_STEPS, stock_ik
-from sea.sim.build_model import SceneObject, build_model
+from sea.control.executor import HOME_Q, TICK_STEPS
+from sea.sim.build_model import build_model
+from sea.sim.grasp_probe import pick, scene_object
 from sea.sim.sensors import Sensors
 
-CAN_X, CAN_H = 0.22, 0.06
+CAN_H = 0.06
 
 
 def _can_scene(mass_g: float, d_mm: float = 30.0):
-    can = SceneObject("can", "cylinder", (d_mm / 2000, CAN_H / 2), (CAN_X, 0.0, CAN_H / 2), mass_g / 1000)
-    return build_model(Design(id="stock"), objects=[can], table_z=0.0)
+    return build_model(Design(id="stock"), objects=[scene_object("cylinder", d_mm, mass_g)], table_z=0.0)
 
 
 def _settle(sim, q, ticks: int = 20) -> None:
     for _ in range(ticks):
         sim.data.ctrl[:] = q
         sim.step(TICK_STEPS)
-
-
-def _pick(sim, d_mm: float = 30.0, depth: float = 0.015) -> None:
-    """Top-down pick of the can (jaws along world y), lift 50 mm, hold 1 s."""
-    ik = stock_ik()
-    q = HOME_Q.copy()
-    sim.set_arm_q(q)
-    down, roll = np.array([0.0, 0.0, -1.0]), np.array([0.0, 1.0, 0.0])
-    rot = np.column_stack([roll, np.cross(down, roll), down])
-    pinch = np.array([-(d_mm + 4) / 2000, 0.0, -depth + 0.0065])  # opening centre in the tool frame
-    top = np.array([CAN_X, 0.0, CAN_H])
-
-    def move(goal, seconds, grip):
-        nonlocal q
-        start = ik.fk(q)[:3, 3]
-        n = int(seconds / 0.02)
-        for k in range(1, n + 1):
-            q, _, _ = ik.track(start + (goal - start) * k / n, down, q, roll_axis=roll)
-            q[-1] = grip
-            _settle(sim, q, 1)
-
-    move(top + [0, 0, 0.04] - rot @ pinch, 2.0, 1.0)
-    move(top + [0, 0, -depth + 0.0065] - rot @ pinch, 1.5, 1.0)
-    for k in range(1, 31):
-        q = q.copy()
-        q[-1] = 1.0 - 1.17 * k / 30
-        _settle(sim, q, 1)
-    _settle(sim, q, 15)
-    move(ik.fk(q)[:3, 3] + [0, 0, 0.05], 1.5, q[-1])
-    _settle(sim, q, 50)
 
 
 def test_idle_arm_feels_only_its_own_weight():
@@ -74,9 +44,8 @@ def held():
     """(mass_g -> (frame, can height)) after picking a 30 mm can of each mass."""
     out = {}
     for mass in (50, 400):
-        sim = _can_scene(mass)
-        _pick(sim)
-        out[mass] = (Sensors(sim, seed=1).read(), float(sim.data.xpos[sim.objects["can"]][2]))
+        sim = pick(scene_object("cylinder", 30.0, mass)).sim
+        out[mass] = (Sensors(sim, seed=1).read(), float(sim.data.xpos[sim.objects["obj"]][2]))
     return out
 
 

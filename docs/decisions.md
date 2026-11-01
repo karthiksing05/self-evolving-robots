@@ -568,6 +568,8 @@ cylinders of 20-40 mm hold at 50-800 g; 50 mm lifts then slips out during the ho
 never lift.  Squeeze is about 22 N per jaw at the 7.4 V stall torque.  So width, not mass, is where
 the stock gripper stops, and heavy objects fail at the arm (a rung-5 case), not at the jaws.
 Follow-up: record this as the stock gripper fixture table (docs/gripper-experiment.md V1).
+Superseded in part by D-032: these numbers were taken with the jaws at MuJoCo's default friction
+1.0, which hid the object's friction.  The width limit stands; the 20 mm result does not.
 
 ## D-031 Sensing: the robot reads sensors, the judge reads ground truth (world tier)
 Change: `sim/sensors.py` reads servo telemetry (position, speed, signed load, current), jaw pressure
@@ -579,3 +581,31 @@ but never what counts as a pass; that is why the component is world tier, not ju
 Measured: payload estimate 50 / 200 / 398 g for 50 / 200 / 400 g held cans, -2 g idle; an 80 g mass
 fault injected at the gripper reads as an 80 g phantom payload with empty jaws.
 Test: `tests/test_sensors.py`.
+
+## D-032 Jaw-object friction mixes both surfaces; the stock gripper capability table (world tier)
+Problem: the stock jaw geoms carry MuJoCo's default friction 1.0, and MuJoCo gives a contact the
+larger of its two geoms' frictions.  So every object was gripped at 1.0 whatever its own friction,
+grippier than bare printed PLA, and a TPU pad (finger family, `pad_tpu_mm`) could never have
+helped.  The probe showed it: a 30 mm can gave identical results at friction 0.3, 0.5 and 0.8.
+Change: when a scene has objects, each jaw-object geom pair is an explicit contact pair with
+friction `sqrt(jaw * object)` (the geometric mean, as Box2D mixes friction), the jaw face is bare
+PLA at 0.45 (`JAW_FRICTION`), and objects use contype 8 / conaffinity 10 with bit 8 added to the
+non-jaw robot geoms, so no jaw-object contact is generated twice.  Models without objects are
+unchanged (no pairs, robot conaffinity 1), so the panel world and the battery are untouched.
+Instrument: `sim/grasp_probe.py` is a fixed scripted pick (open, descend beside the object, close to
+-0.17 rad, lift 50 mm, hold 1 s; held = still 30 mm up).  `scripts/measure_grasp.py` runs 34 cases
+in about 10 s into `tests/golden/stock_grasp.json`.
+Measured (stock gripper, 7.4 V):
+- cylinders 25-45 mm and boxes 20-50 mm hold; cylinders of 50 mm and wider, and 60 mm boxes, do not;
+- the 50 mm failure is identical at friction 0.3, 0.8 and 1.5, so it is geometry (the splayed
+  faces squeeze the can out), not slip: support for the `pad_angle_deg` hypothesis;
+- spheres gripped at the equator all slip out; 20-40 mm spheres hold only with the tips 12 mm below
+  it, at any friction, and creep upward during the hold: a profile problem, not a material one;
+- the 30 mm can holds to 800 g even at friction 0.3; at 1200 g the shoulder stalls and the payload
+  reading saturates near 800 g (a rung-5 case, as the scenario predicts);
+- a 20 mm can now topples out of the tips at friction 0.8 (it held at the hidden 1.0);
+- squeeze is 40-60 N total (about 23 N per jaw); held objects read their mass to within 40 g.
+Consequence: spheres move from the phase-A object set to phase B (gold design: V-groove or concave
+pads), and the phase-A set is cylinders 25-45 mm and boxes 20-50 mm, 50-800 g.
+Test: `tests/test_grasp_table.py` (scenario claims from the table, a re-measure of three picks, the
+contact pairs).
