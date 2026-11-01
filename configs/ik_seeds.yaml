@@ -1,0 +1,7 @@
+# Fixed IK seeds after the zero pose (spec 8.1), ARM_JOINTS order:
+# shoulder_pan, shoulder_lift, elbow_flex, wrist_flex, wrist_roll, gripper
+seeds:
+  - [0.0, -1.0, 1.0, 1.0, 0.0, 0.0]   # folded, tool down, close in
+  - [0.0, 0.5, -0.5, 1.2, 0.0, 0.0]   # extended, tool down, far out
+  - [0.0, -0.5, 0.8, 0.5, 0.0, 0.0]   # mid reach, tool 45 deg
+  - [0.0, 0.3, 0.3, -0.6, 0.0, 0.0]   # tool horizontal, raised

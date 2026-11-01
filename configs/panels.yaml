@@ -1,0 +1,84 @@
+# Panel parameter ranges (spec Appendix D).  These are TRAIN ranges; the test split widens each
+# upper bound by 25% of the range width.  Units: size in mm, stiffness N/m or N*m/rad, travel m or
+# rad, detent_peak N or N*m, latch N, friction N or N*m, angles in degrees where noted.
+controls_per_panel: [4, 8]
+tilt_deg: [0, 60]
+placement:            # panel centre in the base frame (m); the panel yaws to face the base
+  x: [0.19, 0.25]
+  y: [-0.03, 0.03]
+  z: [-0.04, 0.02]
+row_width_m: 0.30     # controls are shelf-packed into rows of at most this width
+gap_m: 0.012
+force_caps: {push_button: 10, recessed_button: 10, toggle: 10, slider: 10, slot: 10, knob: 10, lever: 15, door: 15, drawer: 15}
+classes:
+  push_button:
+    size: [[8, 20]]
+    stiffness: [300, 1500]
+    travel_mm: [1, 4]
+    detents: [0, 1]
+    detent_peak: [0.5, 2.0]
+    friction: [0.02, 0.1]
+  recessed_button:
+    size: [[6, 12]]
+    stiffness: [300, 1500]
+    travel_mm: [1, 3]
+    detents: [0, 1]
+    detent_peak: [0.5, 2.0]
+    recess_mm: [5, 25]
+    friction: [0.02, 0.1]
+  toggle:
+    size: [[6, 15], [10, 25]]
+    stiffness: [0.01, 0.05]
+    travel_deg: [30, 50]
+    detents: [1, 1]
+    detent_peak: [0.02, 0.06]
+    friction: [0.0005, 0.002]
+  knob:
+    size: [[10, 40]]
+    stiffness: [0.005, 0.05]
+    travel_deg: [45, 270]
+    detents: [0, 12]
+    detent_peak: [0.002, 0.01]
+    friction: [0.0005, 0.003]
+  lever:
+    size: [[30, 80]]
+    stiffness: [0.05, 0.3]
+    travel_deg: [20, 60]
+    detents: [0, 0]
+    friction: [0.001, 0.005]
+  door:
+    size: [[60, 120], [60, 120]]
+    stiffness: [0.02, 0.1]
+    travel_deg: [60, 90]
+    detents: [0, 0]
+    latch: [2, 12]
+    handles: [tab, pull, push_latch]
+    friction: [0.001, 0.005]
+  drawer:
+    size: [[60, 120], [30, 60]]
+    stiffness: [20, 100]
+    travel_mm: [30, 80]
+    detents: [0, 0]
+    latch: [2, 10]
+    handles: [tab, pull, push_latch]
+    friction: [0.05, 0.3]
+  slider:
+    size: [[20, 60]]
+    stiffness: [50, 300]
+    travel_mm: [10, 40]
+    detents: [0, 4]
+    detent_peak: [0.2, 1.0]
+    friction: [0.05, 0.3]
+  slot:
+    size: [[20, 40], [1, 3]]
+    stiffness: [100, 400]   # spec leaves slot stiffness open ("-"); a light plunger spring
+    travel_mm: [10, 25]
+    detents: [0, 0]
+    friction: [0.02, 0.1]
+
+# Compose split (spec 7.4): (class, handle, recess bin, tilt bin) combinations held out of
+# train/val/test.  Every component appears in train; the combination never does.
+compose_holdouts:
+  - {cls: door, handle: push_latch, recess: ">10", tilt: "*", note: "push-latch door in a deep recess: probe + push"}
+  - {cls: knob, handle: none, recess: "*", tilt: ">45", note: "knob on a steep face: cup + wrist re-orientation"}
+  - {cls: slot, handle: tab, recess: "*", tilt: "*", note: "slot behind a hinged flap: hook_pull then insert"}

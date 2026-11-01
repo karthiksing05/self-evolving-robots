@@ -1,0 +1,87 @@
+# Seed primitive library (spec 8.7): 9 motor primitives, 5 checks, 6 seed programs.
+#
+# requires.contact : '|'-separated contact types the mounted tool must provide ("any" = no constraint)
+# requires.min_force / min_reach : N / m
+# provides         : effect -> '|'-separated control classes, optional [handle/handle] filter
+# params           : name -> [lo, hi] in SI units.  Omitted extents default to the control's travel.
+motor:
+  - name: approach
+    doc: Move the tool tip to a standoff point on the control normal, tool axis along the approach direction.
+    requires: {contact: any}
+    params: {offset: [0.01, 0.06], speed: [0.01, 0.10]}
+  - name: contact
+    doc: Advance along the approach axis until tip force exceeds `force` (guarded), half speed near contact.
+    requires: {contact: any}
+    params: {force: [0.2, 3.0], speed: [0.005, 0.05]}
+  - name: push
+    doc: Guarded push along the control's actuation direction by `depth` (default travel + margin), stopping at the force cap.
+    requires: {contact: pad|probe|edge, min_force: 0.5}
+    provides: {actuates: "push_button|recessed_button|toggle|lever|door[push_latch]|drawer[push_latch]"}
+    params: {depth: [0.0005, 0.08], force: [0.5, 15.0], speed: [0.005, 0.05], offset_u: [-0.01, 0.01], offset_v: [-0.01, 0.01]}
+  - name: rotate
+    doc: Turn the tool about the approach axis by `angle` (one wrist stroke) while holding light normal force.
+    requires: {contact: cup|pinch, min_force: 0.5}
+    provides: {actuates: "knob"}
+    params: {angle: [-2.8, 2.8], force: [0.5, 8.0], speed: [0.1, 1.5]}
+  - name: hook_pull
+    doc: Engage the handle (hook behind it, or pinch a tab) and pull along the opening direction by `distance`.
+    requires: {contact: hook|pinch, min_force: 1.0}
+    provides: {opens: "door[tab/pull]|drawer[tab/pull]|lever"}
+    params: {distance: [0.005, 0.12], force: [1.0, 15.0], speed: [0.005, 0.05]}
+  - name: slide
+    doc: Hold light normal force and move in the panel plane along the control's slide axis by `distance`.
+    requires: {contact: pad|edge, min_force: 0.5}
+    provides: {actuates: "slider"}
+    params: {distance: [0.002, 0.06], normal_force: [0.5, 5.0], speed: [0.005, 0.05]}
+  - name: insert
+    doc: Align an edge tool with the slot gap and insert by `depth`, guarded by force.
+    requires: {contact: edge, min_force: 0.5}
+    provides: {actuates: "slot"}
+    params: {depth: [0.005, 0.04], force: [0.5, 10.0], speed: [0.005, 0.03]}
+  - name: release
+    doc: Open the jaws (stock gripper) or back off 5 mm from contact and restore the wrist roll.
+    requires: {contact: any}
+    params: {}
+  - name: retreat
+    doc: Move back along the approach axis by `distance` at full speed.
+    requires: {contact: any}
+    params: {distance: [0.01, 0.10]}
+
+checks:
+  - {name: moved_at_least, doc: "True when the control moved at least d (m or rad) from rest; d may be `travel`."}
+  - {name: latched, doc: "True while a door or drawer latch is engaged."}
+  - {name: detent_crossed, doc: "True once at least n detents were crossed (with hysteresis)."}
+  - {name: force_below, doc: "True while tip force is below N newtons."}
+  - {name: no_banned_contact, doc: "True while no banned contact type has touched the control."}
+
+programs:
+  - name: press_button
+    target_cls: push_button
+    doc: Approach, find the surface, push until travel under a 9.5 N cap, retreat.
+    provides: {actuates: "push_button|recessed_button"}
+    text: Seq(approach($target), contact($target), Guard(push($target), until=moved_at_least($target, travel), cap=force_below(9.5)), retreat())
+  - name: flip_toggle
+    target_cls: toggle
+    doc: Press the raised end of a rocker toggle until it flips.
+    provides: {actuates: "toggle"}
+    text: Seq(approach($target), contact($target), Guard(push($target), until=moved_at_least($target, travel), cap=force_below(9.5)), retreat())
+  - name: turn_knob
+    target_cls: knob
+    doc: Engage the knob and turn it in wrist strokes until travel is reached.
+    provides: {actuates: "knob"}
+    text: Seq(approach($target), contact($target), Repeat(Seq(rotate($target), release(), contact($target)), until=moved_at_least($target, travel)), retreat())
+  - name: pull_lever
+    target_cls: lever
+    doc: Push the lever tip through its arc under a 14 N cap.
+    provides: {actuates: "lever"}
+    text: Seq(approach($target), contact($target), Guard(push($target), until=moved_at_least($target, travel), cap=force_below(14.0)), retreat())
+  - name: open_door_pull
+    target_cls: door
+    doc: Engage a tab or pull handle and swing the door open.
+    provides: {opens: "door[tab/pull]|drawer[tab/pull]"}
+    text: Seq(approach($target), hook_pull($target), retreat())
+  - name: slide_slider
+    target_cls: slider
+    doc: Touch the slider knob and slide it along its track.
+    provides: {actuates: "slider"}
+    text: Seq(approach($target), contact($target), slide($target), retreat())

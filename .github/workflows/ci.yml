@@ -1,0 +1,50 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 6 * * *"  # nightly: slow tests (real embeddings, CoACD, long sim runs)
+  workflow_dispatch:
+
+env:
+  MUJOCO_GL: egl
+  PYOPENGL_PLATFORM: egl
+
+jobs:
+  test:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+      - name: System libraries for MuJoCo offscreen rendering
+        run: sudo apt-get update && sudo apt-get install -y libegl1 libgl1 libosmesa6
+      - run: uv sync --all-groups
+      - run: uv run ruff check src tests scripts
+      - name: Tests with coverage (fast)
+        run: >
+          uv run pytest -m "not slow and not llm"
+          --cov=sea --cov-branch --cov-report=term-missing --cov-report=json --cov-fail-under=85
+      - name: Per-package coverage gates
+        run: uv run python scripts/check_package_coverage.py coverage.json
+
+  nightly:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+      - run: sudo apt-get update && sudo apt-get install -y libegl1 libgl1 libosmesa6
+      - run: uv sync --all-groups
+      - name: Slow tests (never live LLM calls)
+        run: uv run pytest -m "slow and not llm" --timeout=3600

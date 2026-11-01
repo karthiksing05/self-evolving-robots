@@ -1,0 +1,49 @@
+{
+ "verdicts": {
+  "c0": {
+   "cls": "push_button",
+   "program": "press_button",
+   "verdict": "pass"
+  },
+  "c1": {
+   "cls": "toggle",
+   "program": "flip_toggle",
+   "verdict": "rule_violation"
+  },
+  "c2": {
+   "cls": "knob",
+   "program": "turn_knob",
+   "verdict": "rule_violation"
+  },
+  "c3": {
+   "cls": "lever",
+   "program": "",
+   "verdict": "no_applicable_primitive"
+  },
+  "c4": {
+   "cls": "door",
+   "program": "",
+   "verdict": "no_applicable_primitive"
+  },
+  "c5": {
+   "cls": "drawer",
+   "program": "open_door_pull",
+   "verdict": "inconclusive"
+  },
+  "c6": {
+   "cls": "slider",
+   "program": "slide_slider",
+   "verdict": "pass"
+  },
+  "c7": {
+   "cls": "slot",
+   "program": "",
+   "verdict": "no_applicable_primitive"
+  },
+  "c8": {
+   "cls": "recessed_button",
+   "program": "press_button",
+   "verdict": "pass"
+  }
+ }
+}

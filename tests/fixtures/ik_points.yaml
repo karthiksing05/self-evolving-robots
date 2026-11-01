@@ -1,0 +1,19 @@
+# Appendix C: stock arm, from the base_link origin, measured Oct 31 with placo 0.10.2.
+# Non-vertical approaches point radially away from the base.
+points:
+  - {x: 0.14, z: 0.05, approach: down, expected: reachable}
+  - {x: 0.22, z: 0.00, approach: down, expected: reachable}
+  - {x: 0.30, z: -0.05, approach: down, expected: reachable}
+  - {x: 0.34, z: 0.00, approach: down, expected: unreachable}
+  - {x: 0.22, z: 0.10, approach: down, expected: unreachable}
+  - {x: 0.26, z: 0.15, approach: horizontal, expected: reachable}
+  - {x: 0.30, z: 0.10, approach: horizontal, expected: reachable}
+  - {x: 0.34, z: 0.00, approach: horizontal, expected: reachable}
+  - {x: 0.22, z: 0.15, approach: horizontal, expected: unreachable}
+  - {x: 0.26, z: 0.05, approach: horizontal, expected: unreachable}
+  - {x: 0.22, z: 0.00, approach: "45", expected: reachable}
+  - {x: 0.30, z: 0.15, approach: "45", expected: reachable}
+  - {x: 0.14, z: 0.10, approach: "45", expected: unreachable}
+  - {x: 0.18, z: 0.05, approach: "45", expected: unreachable}
+  - {x: 0.22, y: 0.06, z: 0.00, approach: down, expected: reachable}
+  - {x: 0.22, y: -0.06, z: 0.00, approach: down, expected: reachable}

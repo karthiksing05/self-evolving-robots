@@ -1,0 +1,532 @@
+# Decisions log
+
+Every deviation from `PLAN.md` (spec v2.1), every dependency beyond Section 5, and every API that
+differed from the spec is recorded here with the fix chosen (spec Section 0, rule 8).  Entries are
+append-only; supersede an entry by adding a new one that names it.
+
+## D-001 Toolchain versions (Oct 31, 2026)
+Python 3.12.15 via `uv` (pinned in `.python-version`).  Resolved: mujoco 3.17.0, placo 0.10.2,
+cadquery 2.8.0, torch 2.15.0, transformers 5.22.1, cobweb-language-embedding @ 2f80775.  All import
+on macOS arm64.  `uv.lock` pins the rest.
+
+## D-002 Claude API surface differs from Section 8.6
+- **Temperature 0.2 dropped.** `claude-opus-5-5` (and every model under API version 2026-10-21)
+  rejects `temperature`/`top_p`/`top_k` with a 400.  Determinism for System 2 comes from the request
+  hash cache (Section 0, rule 4), not sampling settings.
+- **No forced tool choice.** `tool_choice: {type: "tool"}` / `"any"` return a 400 on Opus 5.5 and
+  Sonnet 5.5.  `AnthropicLLM` sends `tool_choice: auto`, names the `propose` tool in the instruction,
+  validates the tool input with `ProposalBatch.model_validate`, and retries once with the validation
+  error (the spec's retry rule) when the call is missing or invalid.
+- **Thinking.** Opus 5.5 always thinks; effort is set explicitly (`output_config.effort`).
+- **Refusal fallbacks.** Server-side fallbacks are on by default (`betas=["server-side-fallback-2026-07-01"]`,
+  `fallbacks="default"`), so a policy decline is re-run on a fallback model inside the same call.
+- **Pricing for the ledger** (USD per MTok in/out): opus-5-5 4/20, sonnet-5-5 2/10, haiku-5-5 0.1/0.5.
+
+## D-003 Cobweb API at 2f80775 matches Section 8.5
+Checked `CPPCobwebTree.__init__/ifit/categorize/log_prob/dump_json/load_json` and
+`PCAICAWhiteningModel.fit/transform`.  One fact the wrapper relies on that the spec does not state:
+on insert, a leaf that receives a non-matching instance is *kept* as an object and becomes a child
+of a new internal node (`cobweb()` clones it upward).  Leaf objects therefore stay leaves, so
+payloads are attached to the leaf object returned by `ifit` and never need to be moved.
+`PCAICAWhiteningModel` needs scikit-learn (already a transitive dependency; 1.9.1).
+
+## D-004 `ControlResult` gains `ik_residual_mm`, `program_id`, `s1_trials`
+The full tree's measurement vector (Section 8.5) includes the IK residual, which `ControlResult`
+did not carry.  The fields are additive with defaults, so old JSON still validates.
+
+## D-005 `StepTrace` gains executor bookkeeping
+`aborted`, `expected_samples`, `detents_crossed`, `latched_final`, `push_phase`, `in_contact`,
+`success_time_s`, `tool_swaps`, `sim_seconds`, `servo_heat_j`, `note`.  `judge()` (Section 8.2)
+needs them to decide `inconclusive` and to read the success check without re-simulating.
+
+## D-006 Defaults on `Design`, `ArmSpec`, `FingerSpec`, `BuildEstimate`
+Stock values are the defaults (finger fields 0 = stock jaw), so `Design(id="d000")` is the stock arm.
+
+## D-007 Positional primitive arguments
+`PrimRef.args` is a dict, but Appendix A allows positional arguments.  The DSL stores positional
+arguments under `_0`, `_1`, ... and prints them first, so text and JSON round-trip exactly.
+
+## D-008 Contact typing
+Typecheck enforces `requires.contact` of each motor primitive intersected with the Appendix B
+"contacts each class accepts" table, against the mounted tool's contact type (stock gripper
+provides `edge` and `pinch`).  Banned contacts are *not* rejected by typecheck: the verifier flags
+them at runtime.  This is what the M4 acceptance requires (stock gripper on a tab door with no-pinch
+must give `rule_violation`, not `no_applicable_primitive`).  Slots additionally require the
+`slot_inserter` template.
+
+## D-009 Primitive extents default to the control
+`push`, `rotate`, `hook_pull`, `slide`, `insert` take their extent (depth, angle, distance) from the
+target's `ControlSpec.travel` plus a margin when the argument is omitted, so seed programs need no
+per-control constants.
+
+## D-010 Harness fields on `RunSpec`
+`llm` (anthropic | mock), `llm_fixtures`, `eval_split`, `embedder` (fake | real).  They select
+harness plumbing, not science, and default to the spec's behaviour.
+
+## D-011 Force cap per control (Section 9 table)
+`force_cap_fraction` interpolates 0.6 (beta=-1) to 1.0 (beta=+1) of the *class* cap from `Rules`,
+and the result is always clamped to `HardLimits.max_force_n`.  Reading "up to the hard limit" as
+"above the class cap" would make the optimist guarantee `rule_violation` on stuck buttons.
+
+## M-001 `ConceptMemory.learn` takes the context vectors
+Spec 8.5 lists `learn(results, confirmed_failures)`, but a `ControlResult` carries no context vector.
+The wrapper is `learn(results, confirmed_failures, contexts, iteration=0)`, where `contexts` maps
+`ControlResult.key` ("panel:control") to the 64-d context vector and `iteration` prefixes payload ids.
+A newer result for a key replaces its pending (unconfirmed) entry; a pass drops it.
+
+## M-002 Acuity (prior variance) of the text trees
+Cobweb's default prior variance 1/(2e*pi) suits the whitened context (per-dimension variance ~1) but
+swamps L2-normalized 384-d text vectors (per-dimension variance ~1/384), which would make the fix
+and program trees unable to split.  Those two trees use prior_var = 1/(2e*pi) / dim.  Vector spaces
+and the d_dup = 0.15 Euclidean threshold are unchanged.
+
+## M-003 Rank-limited whitening
+`ContextEncoder.fit` requires >= 64 rows and calls `PCAICAWhiteningModel.fit`.  When the raw
+matrix has numerical rank r < 64 (identical descriptions, e.g. under `FakeEmbedder`), PCA with 64
+components would divide noise by ~0 variance; the encoder fits with pca_dim = r and zero-pads the
+output to 64 dims (constant dims carry no information for Cobweb).  Before fitting, `encode` uses a
+fixed seeded Gaussian projection 768 -> 64.  Without a renderer, the image half of the context uses
+`geometry_surrogate` (a procedural 32x32 crop from class, size, recess, handle and tilt).
+
+## M-004 Surprise details
+z = (measured - concept mean) / max(concept sd, floor) with floors peak_force 0.05 N,
+travel_reached 1e-4, detents 0.25, time_s 0.05 s, ik_residual_mm 0.1 mm (a concept whose results
+are all identical would otherwise give infinite z).  With no learned results, z = 0 and nll = 0.
+The full-tree NLL uses `CPPCobwebTree.log_prob(x, zeros, 32, greedy=False)`; its running log-sum-exp
+underflows to a non-finite value for points far from every concept, in which case the wrapper
+falls back to the best single-node log-likelihood.
+
+## M-005 Retrieval and categorization in the wrapper
+- Categorize-to-leaf: `categorize(x, use_best=True, max_nodes=64)` (bounded best-first search, no
+  `retrieve_k`), then greedy descent by `log_prob_class_given_instance` to a leaf.
+- `similar_fixes` / `similar_programs` rank payload vectors under the leaf's parent by Euclidean
+  distance (spec), widening to further ancestors only when that subtree holds fewer than k payloads.
+  `similar_programs(program, outcome=None)` uses an all-zero outcome signature.
+- RNG for Cobweb tie-breaks is seeded per call from (memory seed, tree, tree insert count), and
+  queries use a fixed seed, so reads never change later inserts.  `load(path)` is an instance method
+  that replaces the memory's state and returns `self`.
+
+## P-001 Posture edit counting and relative change (spec 9 "Edit size")
+`ladder.count_edits` counts each reparam range, each `design_delta.arm/fingers/servo_voltage` entry,
+and each `rack_add` tool once (a tool is one template instantiation; counting its 3-4 params would
+make every tool proposal illegal under the conservative max_edits = 1).  The `max_param_delta` bound
+is `|new - old| / max(|old|, scale)` with per-field scales (`ladder.FIELD_SCALE`, e.g. 20 mm for
+`wrist_offset_mm`, 0.1 m for `riser_m`) because several stock values are 0.
+
+## P-002 Approvals are a rate, not a reserve
+`Ledger` treats approvals as `approvals_per_hour` per *sim*-hour (sim clock = cumulative charged
+`sim_seconds`); `would_break_reserve` fails a body change when the trailing hour is full.  The
+reserve fraction is not applied to approvals.  `remaining()["approvals"]` is measured against the
+implied total `approvals_per_hour * sim_hours` so annealing and scarcity weights can see it.
+Every body-change kind (`use_tool`, `new_tool`, `finger`, `arm`, `actuator`) costs one approval;
+print time and grams are charged only when parts are printed.  `remaining()` also reports
+`design_iterations` (via `tick_iteration`) so `anneal` uses the scarcest budget including iterations;
+scarcity weights cover only the cost-bearing `RESOURCES`.
+
+## P-003 Posture details
+- Integer rows round half-up, so beta = 0 gives max_rung 4 (3.5), max_edits 2, repeats 2, k_promote 3.
+- `anneal` changes only the global beta; `per_area` overrides stay fixed (spec Sec 17 default:
+  force conservative, others annealed).
+- `accept` pairs per-control deltas by randomization repeat when trial and base have the same number
+  of repeats, else compares with the per-key base mean; keys present on one side only are ignored;
+  no overlapping keys means reject.  Any regression vetoes acceptance.  `prediction_score` is the
+  fraction of `flips_to_pass` that actually flipped (0 when none were predicted).
+
+## P-004 AnthropicLLM request shape (extends D-002)
+`client.beta.messages.create(model, max_tokens=16000, system, messages, tools=[propose],
+tool_choice={"type": "auto"}, output_config={"effort": "medium"}, cache_control={"type": "ephemeral"},
+betas=["server-side-fallback-2026-07-01"], fallbacks="default")`, anthropic SDK 2.3.0.  The tool is
+not `strict` (the `Node` schema is recursive); the input is validated with `ProposalBatch`.  Haiku
+requests omit `fallbacks` (no server-side fallback for Haiku 5.5).  Retries append the assistant turn
+unchanged (thinking blocks included) and a user turn with an `is_error` tool_result per tool call
+(or a text note when no tool was called).  Cost is priced by the model that served the response and
+includes cache writes (x1.25) and reads (x0.1).  Only the live client constructor is excluded from coverage.
+
+## P-005 Target selection details (spec 8.4)
+`pick_targets` ranks escalated controls by score (ties by control key), keeps the top
+`max_targets` controls, then groups them by concept; a group's score is its best member's.
+`cost_est` is a documented heuristic table of expected fix cost per verdict as fractions of the
+default budgets (structural verdicts expect a ~30 min tool and one approval; stuck and
+wrong_behavior expect an LLM call and sim retries).
+
+## B-001 Tool geometry conventions (design/tools.py)
+Every template has a 20 x 20 x 12 mm dovetail block at z in [0, 12] mm of the tool frame
+(`gripper_frame_link`, +z = approach); working geometry starts at its top face.  `length`
+parameters (hook, slot_inserter, probe) are measured from the jaw tip, so Appendix B tip
+transforms hold unchanged.  Choices the spec leaves open: the hook is a 20 mm wide extruded J
+(shaft on the z axis, foot to x = -depth at z = length, barb of height `throat` rising from the
+foot end; material thickness clip(0.3 depth, 1.5, 3) mm, barb clipped to keep 2 mm clear of the
+mount), so the throat gap depth - 1.5 x thickness is open for every parameter in range.  The
+knob_cup wall is a 16-gon annulus (inner apothem = inner_diameter/2, wall 2 mm) on a base cylinder
+over z in [0, 12]; ribs are 1.5 x 1.5 mm bars.  slot_inserter's base widens to max(20, width) so
+the blade never overhangs.  soft_tip prints as two pieces: PLA mount, TPU stalk + sphere.
+
+## B-002 Analytic collision decomposition is the default
+Templates are unions of convex pieces, so `build(decompose="analytic")` returns those pieces as
+MuJoCo-ready parts (exact, fast, keeps the hook throat open).  `"hull"` (one convex hull) is the
+fast-test stub Section 12.1 mentions; `"coacd"` runs CoACD on the STL and is exercised only in
+`@pytest.mark.slow` tests.
+
+## B-003 Print orientation, overhang and support
+Per template: pad printed face-down (needs support when w or h < 20 mm, the mount ledge
+overhangs), hook on its side, knob_cup / probe / slot_inserter upright, soft_tip upright with
+support (sphere underside).  Overhang = down-facing area steeper than 50 deg from vertical, off the
+bed; tolerance 1 mm^2.  Supported prints add 25% to printed volume for time and material.
+
+## B-004 Mass and added mass
+Mass = exact CAD volume x density (PLA 1.24, TPU 1.21 g/cm^3) x infill factor 0.5 (walls dominate
+parts this small).  `BuildEstimate.added_mass_g` = heaviest rack tool (only one is mounted at a
+time) + finger extensions.  Finger print estimates are a box approximation (jaw_len x 10 x 6 mm per
+jaw + tip sphere); L2/L3 part estimates belong to `design/arm.py`.
+
+## B-005 Wrist torque check constants
+Measured once with MuJoCo on the stock MJCF at zero pose: wrist_flex axis to `gripperframe`
+0.1594 m; wrist subtree (wrist + gripper + jaw) 0.178 kg with its COM 0.067 m from the axis.
+Worst case = arm horizontal, tool mounted, nominal 5 N tip load (half the 10 N class cap) at the
+tool tip; must be <= 0.8 x stall (1.62 N*m at 7.4 V, 2.94 at 12 V).  Consequence: probes longer
+than ~74 mm fail at 7.4 V and pass at 12 V, which couples rung 3 tools to rung 5 actuators.
+
+## B-006 Minimum-wall check without rtree/embree
+trimesh's ray intersector needs rtree, which is not a dependency.  `build.wall_thickness` uses a
+vectorized Moller-Trumbore caster instead (2,000 seeded area-weighted samples, inward rays).  A
+tool fails when more than 0.5% of samples are thinner than `min_wall_mm`.  OCC tessellations of
+curved faces leave duplicate seam vertices; meshes are welded (6 decimals) before checks.
+`build()` also checks link scale (Section 9 lists build.py among the hard-limit checkers).
+
+## D-012 Latches are joint limits
+A latched door or drawer is modelled as the control joint's upper limit at rest; the force the
+robot applies along the joint axis is read from the `efc_force` of the `LIMIT_JOINT` constraint
+row, and the limit is lifted when it exceeds `latch_threshold`.  Penalty springs at 500 Hz were
+unstable at the stiffness needed to hold 12 N.  Push-latches release at 2 mm of inward travel and
+then pop out on a spring.
+
+## D-013 Physics status and known limitations (Oct 31)
+Seed library on the reference panel, stock gripper or a fixed rack (hook 14/6/45, knob_cup,
+pad, slot_inserter):
+- push button, slider, lever (pad): pass.
+- recessed button (stock): `stuck` as expected; first contact can spike above the class cap.
+- tab door / tab drawer with a hook: the hook catches the lip only when foot + barb fit the 11 mm
+  pocket under it (throat <= 6 mm at 3 mm material); throat 8 fails.  This is a real design
+  dependency, left for the loop (rung 3 `hook.throat`).
+- doors over ~75 deg: a fixed-orientation hook binds against the fin near 77 deg (reaches
+  1.25-1.35 rad of 1.386).  Rotating the hook with the door and adding a radial pull component
+  both made it worse; left open as a rung-1 problem (re-grip / push from inside).
+- knob cup turns knobs only slightly; toggle reaches about 2/3 of its throw.
+- slot insertion: in the smoke run (panel_seed 32) the scripted slot_inserter + insert program
+  never seated the blade on train slots (lateral misalignment at the slot mouth), so every such
+  trial was rejected.  Left open as a skill-tier problem (compliant search at the mouth).
+- High-tilt train panels (> ~45 deg) put many controls outside the stock reach.
+Engage-point fix for tabs: the hook foot sits 1 mm above the plate with the barb centred in the
+pocket (`motor._hook_geometry`).  Tool swaps happen at a raised swap pose (`executor.SWAP_TIP`)
+because a tool mounted at the home pose can intersect neighbouring controls.
+
+## D-014 Tool geoms compile with collisions on
+MuJoCo computes body-level broad-phase filters at compile time; tool geoms compiled with
+`contype=0` never collide after being enabled.  All rack tool geoms compile with collisions on and
+`Sim.mount()` toggles `contype`/`conaffinity` (and alpha) per geom.
+
+## D-015 Knob cup torsional friction
+The cup's torsional friction is `(0.02 + 0.01 x ribs) x inner_diameter / 20 mm` m (MuJoCo condim 4
+torsion), standing in for rib engagement that a convex-part decomposition cannot represent; it
+scales with the bore like a contact radius.
+
+Open judge-tier question: the cup turns a knob by pushing on its pointer at a few mm radius, so
+the lateral contact force needed for even 0.05 N*m exceeds the 10 N knob class cap, and the
+verifier (which caps total tip contact force) calls it `rule_violation`.  Whether the class cap
+should bound only the axial push for rotary controls is a verifier change (docs/iteration.md 4.1),
+not a physics tweak, and is left for an explicit decision.
+
+## D-016 Suite runner (sim/env.py)
+- Candidates are `applicable_programs` (C-005 order).  The first gets the whole System 1 budget
+  (attempt, fixed retry, CMA-ES); the others get one attempt each if System 1 did not pass.
+- Each repeat rebuilds the panel model with its own domain-randomization draw seeded from
+  `(run seed, panel id, repeat)`; trial and base runs use the same draws.
+- A failure is confirmed when `repeats_before_fail - 1` re-runs on fresh draws (repeat indices
+  1000+) repeat its verdict; unconfirmed failures are neither learned nor escalated.
+- Traces keep the final attempt only, so System 1 trials and confirmation re-runs are charged at
+  the final attempt's duration (an estimate).
+- `trace_path` is relative to the run directory so two runs of the same spec are byte-comparable.
+
+## D-017 Offline System 2 and fixture recording (extends D-010)
+`RunSpec.llm` gains `scripted`: `propose/baselines.ScriptedLLM`, a rule-based System 2 that follows
+the ladder (missing contact -> reuse a known tool at rung 2 or a template tool at rung 3;
+stuck / wrong behaviour -> rung 0 range widening of the failing primitive).  With `llm_fixtures`
+set it writes `MockLLM` fixtures; `RecordingLLM` does the same around the live model.
+`RunSpec` also gains `s1_trials` (m) and `trial_repeats` (3) so tests and smoke runs can shrink
+them; defaults are the spec's.
+
+## D-018 Baselines and the ladder
+The ladder and posture checks guard against an LLM that jumps rungs; the body-search baselines
+(`random`, `cma`, `bo`) only pass structure checks and fill `ruled_out` mechanically.  They
+propose a whole rack (DesignSpace vector -> rack) as one `new_tool` proposal; CMA-ES and TPE are
+told the trial's `delta_mean`.  `s1_only` proposes rung-0 range widening only.
+
+## D-019 Design levels in this build
+L0 (tools) and L3 (servo voltage, applied as actuator force range in `build_model`) are
+supported.  L1 (fingers) and L2 (kinematics) proposals are rejected at screening with a reason
+until `design/arm.py` lands (milestone M9); `test_model_consistency.py` skips its L2 half.
+
+## D-020 Loop details the spec leaves open (loop.py)
+- Surprise and familiarity are scored against memory *before* the iteration's results are learned.
+- Only confirmed failures escalate; passes never do.  Without memory (`s2_nomem`) each class is one
+  concept with uncertainty 1.
+- `report.json` uses the cumulative cost at report time (before this iteration's proposal);
+  `cost.json` stores it as `cumulative` (plus `iteration`, `end`, `remaining`), so `sea reward`
+  reproduces it exactly.
+- A suite run whose actual sim time crosses the reserve is charged as spent (the simulation already
+  ran) and stops the loop with `stop_reason = "sim budget reserve"`.
+- Trial = target panels (all controls) + reference panel (full, or `regression_sample_n` controls
+  when the posture says `sample`), `trial_repeats` (+1 for `ucb`) paired draws.  Base runs are cached
+  per (state version, panel, repeat, keys).  A regression is a reference control with base pass
+  share >= 0.5 and trial share < 0.5.
+- `value = confidence x sum(gain_est(verdict))` over predicted flips;
+  `cost_delta = lambda_print x print_min / budget + lambda_mass x d(added mass) / max mass`.
+- Promotion names are `<target_cls>_<hash6>` with the originating proposal's hypothesis as the
+  docstring (the mock and scripted proposers do not write names); the promoted primitive keeps the
+  originating program's `provides` (handle filters included).
+- The context encoder is whitened on the train split's controls at start-up; seed trees from E0
+  logs (`ConceptMemory.build_seed`) are not loaded by default.
+
+## D-021 Harness fingerprint
+`sea/harness.py` hashes the files behind each component (verifier, reward, limits, panels,
+acceptance, physics, kinematics, primitives, tools, ledger, proposer, memory, loop) and tags
+each with a tier (judge / world / skill / policy).  Runs write `harness.json`; `sea report`
+refuses to pool runs with different judge keys unless `--allow-mixed`.  See docs/iteration.md.
+
+## V-001 Verdict thresholds and measurements (verify/verdicts.py)
+Section 8.2 order, with these readings.  Rule 1: banned = `Rules.banned_contacts` and
+`HardLimits.banned_contacts`, counted only for contacts with the target control (`contact_types`
+plus the `contacts` log); "force exceeded the class cap" compares max(tip force, peak force on the
+control) with `Rules.force_cap_by_class` (hard limit when the class is missing).  Rule 4 "force
+reached the cap" means peak tip force >= `trace.force_cap` - 0.5 N (guarded moves stop within
+0.5 N, test_motor), using the class cap when no guard cap was recorded.  Rule 6 "moved" means
+max |q - q_rest| >= 30% of travel in either direction, mirroring rule 4, so force-at-cap traces
+split cleanly into stuck (< 30%) and wrong_behavior (>= 30%).  Rule 7 counts samples with
+`push_phase` true and `in_contact` false.  Measurements: `peak_force` is the peak force on the
+control (not the summed tip force), `travel_reached` = max |q - q_rest| / travel (unclipped),
+`time_s` = first success time for a pass, else the episode's sim seconds.
+
+## V-002 Verdict fallback
+When no rule applies (control pushed with >= 0.2 N, moved < 30%, force below the cap, contact
+kept), the verdict is `stuck` (the program stopped short), unless the control was pushed
+backwards by more than 5% of travel and further than forwards, which is `wrong_behavior`.
+
+## V-003 Abort semantics in the executor
+`trace.aborted` (verdict 0, inconclusive) now means a simulation failure only: `Episode.tick`
+raises `Abort("sim_unstable")` when MuJoCo counts a BADQACC/BADQVEL/BADQPOS warning during the
+episode (MuJoCo silently resets the state) or qpos/qvel go non-finite; `run_program` sets
+`aborted` and skips the back-off.  `force_limit` and `time_limit` aborts are evidence, judged
+normally.  A `workspace` refusal (target outside the box) is `unreachable` only if the control was
+never touched (peak control force < 0.2 N); after contact the trace is judged on what happened.
+`ik_residual_mm` in the trace and result stays the measured value (no sentinel).
+
+## V-004 Planted-fault suite (tests/verifier/)
+Ten single-control panels at the reference pose, beta = 0 guard cap (0.8 x class cap), seed
+library programs, declared verdicts:
+
+| Case | Fault | Tool | Declared |
+|---|---|---|---|
+| stiff_button | stiffness x5 (k 1800 N/m, travel 3.3 mm) | stock | stuck |
+| no_detent | detent removed (success needs a detent) | stock | wrong_behavior |
+| latch_above_cap | pull-handle door, latch 6 N x2.5 = 15 N > 12 N guard cap | hook | stuck |
+| deep_recess | 10 mm button in a 22 mm recess | stock | rule_violation |
+| tab_door_no_pinch | tab door (62 deg) under no-pinch | stock | rule_violation |
+| knob_over_torque | knob stiffness x200 | knob_cup | stuck |
+| reversed_slider | joint axis reversed | stock | wrong_behavior |
+| jammed_lever (extra) | joint range collapsed | pad | stuck |
+| out_of_reach (extra) | panel at x = 0.42 m, past the workspace box | stock | unreachable |
+| mislocalized (extra) | perceived surface 15 mm proud of the real one | stock | no_actuation |
+
+Fault-free twins remove the fault (deep_recess: 5 mm recess; tab door: the rack hook, depth 14,
+throat 6, length 45, which is also the M4 acceptance case; the hook passes 62 deg doors reliably
+and stalls near 77 deg, so the door travel is 62 deg).  The deep recess is declared
+`rule_violation` because the stock jaw jams in the 14 mm opening and the summed contact force
+jumps past the 10 N class cap in one tick, which is what the physics does.  Each case runs two
+ways: a fast synthetic 1-D guarded actuator against the real `ControlDynamics` with the same
+faults (M2 acceptance), and the seed library on the compiled model (`@slow`, M3 acceptance).
+Twins run over DR seeds 0-4.  Real sim, Oct 31: 9/10 faults give the declared verdict, 45/45 twin
+runs pass (knob excluded, V-005).
+
+## V-005 Physics shortfalls found by the verifier suite
+- Knob: `rotate` with the knob cup presses the knob above its 10 N class cap (peak 12 N) even
+  fault-free, so every knob is `rule_violation`; the real-sim knob case is `xfail`.
+- Unreachable targets inside the workspace box: the executor keeps moving with the best-effort IK
+  solution and the arm crashes into the panel (20-70 N, `rule_violation` before `unreachable` in
+  the precedence).  The approach should stop when the contact-waypoint residual exceeds 5 mm.
+- Tip force is the sum of contact normal magnitudes; wedging (a jaw in a recess opening) inflates
+  it well above the net force a wrist sensor would read.
+- Tab drawer + hook: after the latch releases, the drawer snaps to its end stop while the hook is
+  still engaged, and the force exceeds the hard limit (`force_limit`, `rule_violation`) even though
+  success was reached first.
+
+## V-006 Button caps stand proud of the board
+The panel board is a solid box, so a cap that starts 1 mm (recessed) or 4 mm (push button) above it
+could not be pressed further than that: every recessed button with travel > 1 mm was impossible,
+and so were test-split push buttons with long travel.  Cap top is now max(1 or 4 mm, 1.3 x travel +
+2 mm), the joint's full range plus 1 mm, and recess walls grow by the same amount, so the cap
+still sits (recess - 1 mm) below the rim.  Buttons with travel <= 1.54 mm are unchanged.  The
+reference recessed button (8 mm recess) now passes with the stock gripper.
+
+## V-007 Reward audit layout
+`verify/reward.py` reads `spec.yaml`, `design_<k>.json` (iteration k uses the newest design with
+index <= k, so the loop writes a design file only when the design changes), `iter_<k>/results.jsonl`
+and `iter_<k>/cost.json["cumulative"]`, plus optional `final/`.  `coverage_reward` is computed as
+passes / N, which equals control_coverage x pass_rate without float drift, so the loop and the audit
+agree bit for bit when both call `coverage.reward`.
+
+## D-022 Pre-simulation `unreachable`
+When no library program type-checks for a control *only* because of the reach check, the suite
+runner emits `unreachable` (with the stock IK's best residual at the contact point) instead of
+`no_applicable_primitive`.  Both are structural and escalate the same way, but System 2 needs to
+know whether the gap is reach (tool length, kinematics) or a missing contact/primitive.
+`no_applicable_primitive` is still emitted when programs fail typecheck for any other reason.
+
+## D-023 `approach` refuses unreachable contact waypoints
+`approach` aborts (`note = "unreachable"`) when the multi-seed IK residual at the contact waypoint
+exceeds 5 mm.  The trace keeps that residual, so the verdict is `unreachable` (rule 2) instead of
+the `rule_violation` produced when the best-effort pose was driven into the panel (V-005).
+
+## D-024 matplotlib for `sea report`
+Section 5 lists no plotting library, but `sea report` must produce plots.  matplotlib (already a
+transitive dependency) is declared explicitly; plots are static PNGs with a fixed categorical
+order per verdict so a verdict keeps its colour across runs.
+
+## C-001 `StepTrace.failed_primitive` (contract change, extends D-005)
+System 1 searches "the failing primitive" (spec 8.1), which the trace did not record.  The executor
+sets `failed_primitive` to the first motor primitive that returned False, to the primitive running
+when a guard's `cap` check failed, or to the one running at an abort (force, workspace, time limit).
+Empty when no primitive failed (the program ran to the end but the success check did not hold); then
+System 1 searches the first actuating primitive (one with `provides`) that has parameters.
+
+## C-002 Typecheck rules (spec 8.7, Section 9)
+`typecheck` returns `TypeCheckError(code, message, path)` with codes `structure`, `unknown`, `arg`,
+`range`, `hard_limit`, `tool`, `contact`, `provides`, `ref`, `reach`.  Beyond D-008:
+- Force arguments (`force`, `normal_force`) above `max_force_n`, `speed` above `max_tip_speed_mps` and
+  `force_below(x)` caps above `max_force_n` are `hard_limit` errors, also when they fall inside the
+  primitive's declared range (limits can be tighter than the seed ranges).  Promoted composites are
+  checked over their whole argument range (both ends of `$p<i>`), and `reparam_errors` checks System 2
+  `reparam` ranges the same way.
+- Some actuating primitive acting on the target must `provide` its class and handle (`provides`).
+- Without a `control`, contact typing uses the program's `target_cls` (any handle for doors/drawers).
+- Primitive targets other than `$target` are STRING arguments (`push("c3")`, Appendix A); check
+  atoms use bare control ids.  Unknown ids are `ref` errors when a panel is given.
+- Guard caps are not required to bound force: `cap` is any check (e.g. `~latched(c1)`).
+
+## C-003 Reach check in typecheck
+The target point is the control's contact point (the handle point for tab/pull handles) at rest,
+computed from `PanelSpec`/`ControlSpec` with the same frames as `build_model` (tested against the
+sim).  With a plain `ReachGrid` (stock tool frame), a mounted tool is handled by moving the query back
+along the approach axis by the tip's z offset: exact for z-only tips (pad, cup, probe, blade,
+soft_tip); a hook's lateral `depth` offset (<= 20 mm) is ignored.  `ReachProvider(limits)` gives exact
+per-tip grids (`control/reach.reach_for`, ~6 s each, cached in `.cache/reach`) and can be passed
+instead.
+
+## C-004 Tool choice for seed programs (`wrap_with_tool`)
+Candidates: the stock gripper, then rack slots in order; the first whose contact satisfies the
+program's requirements on the control wins.  A candidate whose only usable contacts are banned (stock
+`pinch` on a tab or knob under no-pinch) is kept as a fallback and used only when nothing else fits,
+so the verifier still reports `rule_violation` when it is the only option (M4: stock gripper on the
+tab door gives `rule_violation`; with a rack hook the hook is chosen).  Programs that already contain
+`With` are returned unchanged when they type-check.
+
+## C-005 Program order in `applicable_programs`
+Programs are ranked by the smoothed pass rate `(passes + 1) / (uses + 2)`, then name, so an untried
+program ranks above one that keeps failing.  Each returned `PrimitiveDef` carries the runnable,
+tool-wrapped program in `body`.
+
+## C-006 System 1 details (`control/local_search.py`)
+- The fixed retry is not counted toward `m`; `s1_trials` counts local-search trials only.  Escalation
+  rule 2 is `S1Outcome.escalate == "s1_exhausted"` (trials used up, or nothing left to search: no free
+  parameters, `max_param_delta` = 0, or `m` = 0).
+- Retry offset: a fresh N(0, 1 mm) perception draw in the panel plane (only when the attempt had
+  perception noise; noise-free runs stay deterministic) plus 1 mm toward the control centre (projected
+  on the panel plane; none when the contact point is the centre).
+- Free parameters: the failing primitive's declared parameters not fixed by the program (named,
+  positional numeric or `Bind`).  x0 is the value the primitive actually used: an existing override,
+  the motor function's numeric default, or the control-derived default (D-009; force = the episode's
+  cap).  Parameters with a control-dependent budget and no fixed default (`hook_pull.distance`) are not
+  searched.  Bounds: declared range (or a `reparam` range: keys `prim.param`, or bare `param` for the
+  searched primitive) intersected with x0 +/- `max_param_delta` x the declared width; force bounds stop
+  at the episode cap (`motor._cap` clamps to it anyway), speed at the hard limit.
+- CMA-ES (`cma` 4.5) on the normalized box, sigma0 0.3, popsize min(m, 4 + 3 ln n), seed `seed + 1`.
+  Objective: pass first, then the largest travel fraction; structural verdicts in a trial are
+  penalized.  The returned trace/result is the best attempt.
+
+## C-007 `reset_episode` resets control state
+`ControlDynamics.reset()` restores detent sides and count, latch and travel extremes; `reset_episode`
+calls it for every control.  Before this, a second attempt on the same sim inherited detent crossings
+and latch state (an immediate false `pass` on detented buttons).
+
+## C-008 Guarded motion and speed limits (test_motor acceptance)
+Measured fixes so the 12.2 motor checks hold; reference-panel outcomes are unchanged (c0, c3, c6, c8
+pass with the same tools; door/drawer/knob/toggle travel within run-to-run noise):
+- `guarded_step`: the first step into an unmeasured contact is a 20 um probe; the measured contact
+  stiffness is remembered (decay 0.9 per tick, so a bounce or stiction does not erase it); a step may
+  add at most half the remaining margin; in contact steps grow at most 1.5x per tick.  The guard
+  stops within 0.5 N of the cap for buttons up to ~12 kN/m (20x the reference button); at 30 kN/m
+  the `contact` primitive itself (0.01 m/s, 0.5 N threshold) overshoots by ~4 N.
+- `move_to`: trapezoidal speed (1 m/s^2) and the wrist roll turned toward its target at <= 2 rad/s
+  (a one-tick 83 deg roll jump whipped the tool point to 2.8x the speed limit); per-tick IK tolerance
+  0.05 mm (0.2 mm alternated and jittered the tip speed by +/-30%).
+- `Episode.unload()` ramps the command back to the measured tip before `retreat`/`finish`; `retreat`
+  leaves a still-loaded contact at 0.01 m/s for its first 5 mm; `finish` backs off only when the tip
+  is within the approach offset of the control (a second 5 cm back-off ran the slider retreat out of
+  reach).  Measured tip speed now stays under 1.15x the limit on the stock press, slide and toggle.
+- Known: toggle and knob contact events still produce tip-force spikes (13.9 N toggle, 11.4 N knob)
+  above their 10 N class cap.
+
+## C-009 Test plumbing
+Hypothesis tests use `derandomize=True` (12.1).  `scripts/check_package_coverage.py` measures each
+package as coverage.py does with branches on: (covered lines + covered branches) / (statements +
+branches); top-level modules other than `contracts.py` (`loop.py`, `cli.py`, ...) count only toward
+the overall gate.  `test_model_consistency` skips the L2 half until `design/arm.py` exists (M9).
+
+## D-025 IK position weight 30 (world tier; extends Section 8.1)
+Observed: the smoke run on train panels gave almost only `unreachable`; on 40 train panels the
+stock arm reached 30% of controls on panels tilted < 15 deg, although the down-approach envelope
+covers that whole region.  Localized: placo position (m) and axis-align (rad) tasks at equal
+weights; when the requested approach axis has a small out-of-plane component (a 5-DOF arm cannot
+yaw the tool), the solver gives up 8-25 mm of position for ~1 deg of axis.
+Change: `POS_WEIGHT = 30` on the position task (axis task stays 1.0).
+Result (40 train panels, residual < 5 mm): tilt 0-15 deg 0.30 -> 1.00, 15-30 0.12 -> 0.48,
+30-45 0.15 -> 0.31, 45-60 0.04 -> 0.07; Appendix C: 16/16 unchanged (weight 300 broke 2 points,
+so it was rejected).  Reach grids are now keyed on the weight.
+Two latent skill-tier errors surfaced once positions were accurate, both fixed:
+- Stock pinch engage points (knob, tab fin) put the fixed-jaw tip 0.2 mm *below* the plate;
+  `motor.PINCH_HEIGHT` now keeps the jaw tips 2 mm above it.
+- Actual tip speed reached 1.25x the limit while commanded speed sat exactly at it (servo lag and
+  catch-up); `move_to` now cruises at `CRUISE_FRACTION = 0.85` of the hard limit.
+- With position dominant, warm-started tracking could spin the wrist roll (0 -> 2.8 rad in 0.14 s)
+  when wrist flex sat at its limit, because the tool point is off the roll axis; the planted
+  lever twin then stopped on a wrist-roll limit hit.  `track` now adds a soft joints task holding
+  the current wrist roll (`ROLL_HOLD_WEIGHT = 0.05`) whenever no roll target is given; `solve`
+  (reach, waypoint residuals) is unaffected.  A split weight (30 for solve, 1-3 for track) was
+  tried first and rejected: tracking at weight 3 still spun the roll.
+Reference panel before -> after: unchanged verdict classes (button, lever, slider, recessed button
+pass; toggle partial; knob over the cap; door 1.14 rad; tab drawer near travel); verifier suite
+10/10 cases as before (knob xfail), twins 45/45; golden verdicts unchanged.
+
+## D-026 Seed the encoder's whitening fit (judge-adjacent determinism)
+Observed: two `evolve` runs with the same spec in one process wrote different System 2 prompts,
+so MockLLM replay raised `FixtureMissing`.  Results, confirmations and ledger matched; escalation
+uncertainty did not (train_p008:c0 1.378 vs 1.447).  Localized by refitting the context encoder
+three times on identical rows: the context vectors differed, the Cobweb trees did not.
+Cause: `PCAICAWhiteningModel.fit` builds `PCA(n_components=k)` without `random_state`.  For a wide
+matrix (72 x 768, k = 45 < 0.8 * 72) sklearn's `auto` solver takes randomized SVD and draws from
+numpy's global RNG, which earlier sim code had advanced.
+Change: `ContextEncoder.fit` seeds numpy's global RNG from the encoder seed for the duration of the
+fit and restores the previous state afterwards (same pattern as `memory.concepts._seeded`).
+Test: `test_encoder_fit_ignores_global_rng` (wide, rank-40 input, two different global seeds, equal
+encodings, global state restored); `test_loop_integration` record/replay now passes.
+
+## D-027 One-parameter CMA-ES searches get a padding coordinate (skill tier)
+Observed: `scripts/battery.py --n 16` crashed in System 1: pycma 4.5 `tell` raised
+`ValueError: not yet initialized (dimension needed)`.  The search had one free parameter and both
+candidates scored the same objective.
+Cause: on flat fitness pycma grows sigma; once a coordinate's std exceeds `maxstd` it calls
+`sigma_vec._init_(N).set_i(...)`, and `DiagonalDecoding.set_i` treats any size-1 scaling vector as
+uninitialized, so N = 1 always raises there.  pycma documents 1-D search as unsupported.
+Change: `run_system1` appends one ignored coordinate (x0 = 0.5) when only one parameter is free and
+reads back only the real coordinates.  Searches with two or more parameters are unchanged; 1-D
+searches draw different samples than before for the same seed.
+Test: `test_one_free_parameter_on_a_flat_objective` (six seeds, previously raised).

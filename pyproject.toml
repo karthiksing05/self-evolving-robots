@@ -1,0 +1,84 @@
+[project]
+name = "sea"
+version = "0.1.0"
+description = "Self-evolving arm (sim): System 1 / System 2 loop over a simulated SO-101"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "anthropic>=2.3.0",
+    "cadquery>=2.8,<2.9",
+    "cma>=4.5.0",
+    "coacd>=1.0.14",
+    "matplotlib>=3.10",
+    "cobweb-language-embedding",
+    "mujoco>=3.2",
+    "numpy>=2.3.5",
+    "optuna>=5.0.0",
+    "placo==0.10.2",
+    "pydantic>=2.14.2",
+    "pyyaml>=6.0.3",
+    "rich>=15.0.0",
+    "scipy>=1.18.1",
+    "sentence-transformers>=2.5",
+    "torch>=2.0",
+    "transformers>=5.22.1",
+    "trimesh>=5.2.0",
+    "typer>=0.27.3",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sea"]
+
+[tool.uv.sources]
+cobweb-language-embedding = { git = "https://github.com/Teachable-AI-Lab/cobweb-language-embedding", rev = "2f807757ad607b55e1f5ac258ca2ce5dda2f34fa" }
+
+[dependency-groups]
+dev = [
+    "hypothesis>=6.170.14",
+    "mypy>=2.4.1",
+    "pytest>=9.2.0",
+    "pytest-cov>=7.1.0",
+    "pytest-timeout>=2.4.0",
+    "ruff>=0.17.3",
+]
+
+[project.scripts]
+sea = "sea.cli:app"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "slow: more than 10 s; runs nightly",
+    "llm: live API; manual only",
+]
+timeout = 300
+addopts = "-ra"
+
+[tool.coverage.run]
+branch = true
+source = ["sea"]
+omit = ["*/sea/propose/world_model.py"]
+
+[tool.coverage.report]
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "@overload",
+    "if __name__ == .__main__.:",
+]
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501", "B008"]
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
