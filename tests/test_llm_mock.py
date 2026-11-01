@@ -188,6 +188,130 @@ def test_pricing():
     assert L.request_hash({"b": 1, "a": 2}) == request_hash({"a": 2, "b": 1})
 
 
+# ---------------------------------------------------------------- ClaudeCodeLLM
+PLAN_STATUS = {"loggedIn": True, "authMethod": "claude.ai", "subscriptionType": "max"}
+
+
+def _cli_result(structured=None, **kw) -> dict:
+    """The JSON ``claude -p --output-format json`` prints, trimmed to the fields the client reads."""
+    out = {"type": "result", "subtype": "success", "is_error": False, "num_turns": 2, "total_cost_usd": 0.0612,
+           "usage": {"input_tokens": 3, "cache_creation_input_tokens": 6100, "cache_read_input_tokens": 0,
+                     "output_tokens": 840},
+           "result": json.dumps(structured) if structured is not None else "", "structured_output": structured}
+    out.update(kw)
+    return out
+
+
+class FakeCLI:
+    """Stands in for ``subprocess.run``: answers ``auth status`` and then each ``-p`` call in order."""
+
+    def __init__(self, *results, status=PLAN_STATUS):
+        self.results = list(results)
+        self.status = status
+        self.calls: list[dict] = []
+
+    def __call__(self, args, **kw):
+        self.calls.append({"args": list(args), **kw})
+        body = self.status if args[1:3] == ["auth", "status"] else self.results.pop(0)
+        stdout = body if isinstance(body, str) else json.dumps(body)
+        return SimpleNamespace(stdout=stdout, stderr="", returncode=0)
+
+
+def _batch() -> dict:
+    return _recorded()["content"][2]["input"]
+
+
+def test_claude_code_llm_checks_the_plan_and_reads_structured_output(tmp_path, monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-should-not-reach-the-cli")
+    cli = FakeCLI(_cli_result(_batch()))
+    llm = L.ClaudeCodeLLM("claude-opus-5-5", cache_dir=tmp_path / "cache", log_path=tmp_path / "calls.jsonl",
+                          binary="/bin/claude", run=cli)
+    out = llm.propose(_prompt())
+    assert len(out) == 1 and out[0].kind == "program"
+    status, ask = cli.calls
+    assert status["args"] == ["/bin/claude", "auth", "status"]
+    args = ask["args"]
+    assert args[:2] == ["/bin/claude", "-p"] and args[args.index("--tools") + 1] == ""
+    assert "--safe-mode" in args and "--no-session-persistence" in args and "--bare" not in args
+    assert args[args.index("--model") + 1] == "claude-opus-5-5" and args[args.index("--effort") + 1] == "medium"
+    assert json.loads(args[args.index("--json-schema") + 1])["properties"]["proposals"]["maxItems"] == 3
+    assert args[args.index("--system-prompt") + 1] == _prompt().system
+    assert ask["input"].startswith("## 1.") and "1 to 3 proposals" in ask["input"]
+    assert "ANTHROPIC_API_KEY" not in ask["env"] and "CLAUDECODE" not in ask["env"]
+    assert ask["cwd"] == status["cwd"] and not any(Path(ask["cwd"]).iterdir())
+    call = llm.calls[0]
+    assert (call.input_tokens, call.output_tokens, call.attempts, call.billing) == (6103, 840, 1, "plan")
+    assert call.usd == pytest.approx(0.0612)  # list price, so the ledger charges it like an API call
+    assert llm.propose(_prompt()) == out and len(cli.calls) == 2  # cached: no second CLI call
+    assert llm.calls[1].cached and llm.calls[1].billing is None
+
+
+def test_claude_code_llm_refuses_api_billing():
+    cli = FakeCLI(status={"loggedIn": True, "authMethod": "api_key"})
+    llm = L.ClaudeCodeLLM("claude-opus-5-5", binary="claude", run=cli)
+    with pytest.raises(L.PlanBillingError, match="api_key"):
+        llm.propose(_prompt())
+    with pytest.raises(L.PlanBillingError, match="no JSON"):
+        L.ClaudeCodeLLM("claude-opus-5-5", binary="claude", run=FakeCLI(status="not json")).check_plan()
+    opted_in = L.ClaudeCodeLLM("claude-opus-5-5", binary="claude", require_plan=False,
+                               run=FakeCLI(_cli_result(_batch()), status={"authMethod": "api_key"}))
+    assert len(opted_in.propose(_prompt())) == 1 and len(opted_in._run.calls) == 1  # no status check
+
+
+def test_claude_code_llm_retries_a_bad_batch_then_falls_back_to_result_text(tmp_path):
+    bad = _cli_result({"proposals": [{"kind": "program"}]})
+    text_only = _cli_result(None, result=json.dumps(_batch()), total_cost_usd=None)
+    cli = FakeCLI(bad, text_only)
+    llm = L.ClaudeCodeLLM("claude-sonnet-5-5", cache_dir=tmp_path, binary="claude", run=cli)
+    out = llm.propose(_prompt(model="claude-sonnet-5-5"))
+    assert len(out) == 1 and llm.calls[0].attempts == 2 and llm.calls[0].error is None
+    assert "not a valid ProposalBatch" in cli.calls[2]["input"]
+    assert llm.calls[0].usd == pytest.approx(0.0612 + L.call_usd("claude-sonnet-5-5", 3, 840, 6100, 0))
+
+
+def test_claude_code_llm_errors_and_limits(tmp_path):
+    failed = _cli_result(None, is_error=True, subtype="error_max_structured_output_retries", result="gave up")
+    llm = L.ClaudeCodeLLM("claude-opus-5-5", cache_dir=tmp_path, binary="claude", run=FakeCLI(failed, failed))
+    assert llm.propose(_prompt()) == []
+    assert llm.calls[0].attempts == 2 and "error_max_structured_output_retries" in llm.calls[0].error
+    assert not list(tmp_path.iterdir())  # failures are not cached
+    limited = _cli_result(None, is_error=True, result="Claude AI usage limit reached|1793500000")
+    with pytest.raises(L.PlanLimitReached):
+        L.ClaudeCodeLLM("claude-opus-5-5", binary="claude", run=FakeCLI(limited)).propose(_prompt())
+    with pytest.raises(L.PlanLimitReached):
+        L.ClaudeCodeLLM("claude-opus-5-5", binary="claude",
+                        run=FakeCLI(_cli_result(None, is_error=True, api_error_status=429))).propose(_prompt())
+    with pytest.raises(RuntimeError, match="without JSON"):
+        L.ClaudeCodeLLM("claude-opus-5-5", binary="claude", run=FakeCLI("Error: crashed")).propose(_prompt())
+
+
+def test_cli_schema_folds_tuples():
+    tup = {"type": "array", "minItems": 2, "maxItems": 2, "prefixItems": [{"type": "number"}, {"type": "number"}]}
+    assert L.cli_schema({"a": [tup]}) == {"a": [{"type": "array", "minItems": 2, "maxItems": 2,
+                                                  "items": {"type": "number"}}]}
+    mixed = {"prefixItems": [{"type": "number"}, {"type": "string"}]}
+    assert L.cli_schema(mixed) == {"items": {"anyOf": [{"type": "number"}, {"type": "string"}]}}
+    assert "prefixItems" not in json.dumps(L.cli_schema(L.ProposalBatch.model_json_schema()))
+
+
+def test_find_claude(monkeypatch, tmp_path):
+    monkeypatch.setenv("SEA_CLAUDE_BIN", "/opt/claude")
+    assert L.find_claude() == "/opt/claude"
+    monkeypatch.delenv("SEA_CLAUDE_BIN")
+    monkeypatch.setattr(L.shutil, "which", lambda name: None)
+    monkeypatch.setattr(L.Path, "home", lambda: tmp_path)
+    assert L.find_claude() is None
+    with pytest.raises(FileNotFoundError, match="SEA_CLAUDE_BIN"):
+        L.ClaudeCodeLLM("claude-opus-5-5", require_plan=False).propose(_prompt())
+    for v in ("2.1.9", "2.1.314"):
+        b = tmp_path / f".vscode/extensions/anthropic.claude-code-{v}-darwin-arm64/resources/native-binary/claude"
+        b.parent.mkdir(parents=True)
+        b.touch()
+    assert L.find_claude().endswith("claude-code-2.1.314-darwin-arm64/resources/native-binary/claude")  # not by name
+    monkeypatch.setattr(L.shutil, "which", lambda name: "/usr/local/bin/claude")
+    assert L.find_claude() == "/usr/local/bin/claude"
+
+
 # ---------------------------------------------------------------- prompt
 def test_prompt_has_eight_sections_and_stable_hash():
     p = _prompt()

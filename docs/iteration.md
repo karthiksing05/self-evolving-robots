@@ -59,10 +59,10 @@ ruler. This document is the discipline for running it.
 
 | Tier | Fundamentals | Files | Blast radius | Minimum evidence |
 |---|---|---|---|---|
-| **judge** | verdict rules and thresholds, success checks, reward and cost terms, hard limits, panel distributions and splits, acceptance rule | `verify/`, `compose/checks.py`, `spec/posture.py`, `configs/panels.yaml`, `configs/limits.yaml` | Every past number; comparability | B0–B4, and re-baseline all compared proposers |
-| **world** | contact model, control dynamics, jaw and tool collision geometry, IK, reach | `sim/`, `control/ik.py`, `control/reach.py`, `control/frames.py` | Which tasks are possible at all | B0–B3, golden diff explained control by control |
-| **skill** | motor primitives, seed programs, executor behaviour, tool templates, build checks | `control/motor.py`, `control/executor.py`, `configs/primitives.yaml`, `design/` | What the robot can do before learning | B0–B3; no reference regressions |
-| **policy** | posture table, ledger prices, escalation thresholds, target scoring, prompt, memory encoding | `spec/`, `propose/`, `memory/` | How efficiently the loop searches | B0, B4, and E1/E8 slices over 5 seeds |
+| **judge** | verdict rules and thresholds, success checks, reward and cost terms, hard limits, panel distributions and splits, acceptance rule, build checks and print pricing, contract defaults | `verify/`, `compose/checks.py`, `spec/posture.py`, `design/build.py`, `contracts.py`, `configs/panels.yaml`, `configs/limits.yaml` | Every past number; comparability | B0–B4, and re-baseline all compared proposers |
+| **world** | contact model, control dynamics, jaw and tool collision geometry, scene objects, sensor models, IK, reach | `sim/`, `configs/sensors.yaml`, `control/ik.py`, `control/reach.py`, `control/frames.py` | Which tasks are possible at all | B0–B3, golden diff explained control by control |
+| **skill** | motor primitives, seed programs, program language, executor behaviour, tool templates | `control/motor.py`, `control/executor.py`, `compose/dsl.py`, `configs/primitives.yaml`, `design/tools.py`, `design/space.py` | What the robot can do before learning | B0–B3; no reference regressions |
+| **policy** | posture table, ledger prices, escalation thresholds, target scoring, prompt, LLM client, memory encoding, library promotion | `spec/ledger.py`, `propose/`, `memory/`, `compose/library.py` | How efficiently the loop searches | B0, B4, and E1/E8 slices over 5 seeds |
 
 `sea/harness.py` lists the files behind each component, and each component's hash is
 written into every run.
@@ -175,7 +175,7 @@ be regenerated afterwards.
 - **Regenerate.** Golden verdicts. Integration fixtures if the prompt's library section changed
   (§4.10).
 
-### 4.5 Tool templates and build checks (skill)
+### 4.5 Tool templates (skill) and build checks (judge)
 - **When.** System 2 asks for a geometry no template can express, or build checks reject
   physically fine tools (or accept bad ones).
 - **Do.**
@@ -184,7 +184,8 @@ be regenerated afterwards.
   3. Keep collision parts convex and analytic (B-002), so hooks keep their throats open.
 - **Evidence.** `test_build.py` at min, mid and max of every template. Build a tool that
   should fail (thin wall, over mass) and see it rejected.
-- **Regenerate.** Nothing. Tool builds are cached by spec hash.
+- **Regenerate.** Nothing. Tool builds are cached by spec hash. A change to `design/build.py` is
+  judge tier (D-028): it re-keys runs, so re-run B3 and re-baseline.
 
 ### 4.6 Panel distributions and splits (judge)
 - **When.** The train distribution misses a real appliance pattern, or a split leaks

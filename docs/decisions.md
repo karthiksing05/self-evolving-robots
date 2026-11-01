@@ -530,3 +530,52 @@ Change: `run_system1` appends one ignored coordinate (x0 = 0.5) when only one pa
 reads back only the real coordinates.  Searches with two or more parameters are unchanged; 1-D
 searches draw different samples than before for the same seed.
 Test: `test_one_free_parameter_on_a_flat_objective` (six seeds, previously raised).
+
+## D-028 Every module is fingerprinted; contracts and build checks are judge tier
+Observed: `contracts.py`, `compose/dsl.py`, `compose/library.py` and `propose/llm.py` were in no
+harness component, so editing them left `harness.json` unchanged.  `design/build.py` was skill tier
+in `harness.py` but listed as judge ("Screening") in harness.md.
+Cause: components were listed by hand when M1-M8 landed.
+Change: new judge components `contracts` (HardLimits and Budgets defaults, verdict and contact enums,
+coverage bins) and `build` (`design/build.py` applies the hard limits to a body and prices its print,
+and the judge decides what counts as cost).  `dsl.py` joins `primitives`, `library.py` joins `memory`,
+`llm.py` joins `proposer`.  `harness.TOOLING` names the three modules that only read runs.
+The judge key moved, so the B3 baseline was re-recorded; every number in it is unchanged.
+Test: `test_every_module_is_fingerprinted` fails when a new module under `src/sea` has no component.
+
+## D-029 System 2 through the Claude Code CLI, billed to the claude.ai plan
+Context: live runs should use the Claude subscription, not API credits.
+Change: `ClaudeCodeLLM` runs `claude -p --output-format json --json-schema <ProposalBatch>` with
+`--tools ""`, `--safe-mode`, `--strict-mcp-config` and `--no-session-persistence`, from an empty
+directory, with `ANTHROPIC_API_KEY` removed from the child environment (a key outranks the plan
+login).  Before the first call it reads `claude auth status` and raises `PlanBillingError` unless
+`authMethod` is `claude.ai`.  `--bare` is not used: it accepts only an API key.  The CLI's strict
+schema check rejects `prefixItems`, so `cli_schema` folds tuple ranges into `items`; the answer is
+still validated against the pydantic model.  A usage-limit error raises `PlanLimitReached` instead of
+recording an empty batch.  `RunSpec.llm` now defaults to `claude_code`; `anthropic` stays available.
+Calls log `billing: plan` and the CLI's list-price `total_cost_usd`, so the ledger charges a proposer
+the same whichever way it was billed and proposer comparisons stay fair.
+Measured (2026-11-01, Max plan, Opus 5.5, effort medium): one full System 2 prompt took 25 s,
+6.1k input and 2.3k output tokens, $0.095 at list price, two valid proposals.
+Test: `test_llm_mock.py` ClaudeCodeLLM cases (fake CLI runner; no live calls in tests).
+
+## D-030 Scene objects and the stock gripper's grasp envelope (world tier)
+Change: `build_model(objects=[SceneObject...], table_z=...)` adds free rigid bodies (or fixed probes)
+and a table.  Objects use contype 4 / conaffinity 3 so they rest on the table (contype 2) and touch
+the robot; reusing the control bits made them fall through the table.
+Measured (top-down pick, jaws along world y, close to -0.17 rad, lift 50 mm, hold 1 s, friction 0.8):
+cylinders of 20-40 mm hold at 50-800 g; 50 mm lifts then slips out during the hold; 60 and 70 mm
+never lift.  Squeeze is about 22 N per jaw at the 7.4 V stall torque.  So width, not mass, is where
+the stock gripper stops, and heavy objects fail at the arm (a rung-5 case), not at the jaws.
+Follow-up: record this as the stock gripper fixture table (docs/gripper-experiment.md V1).
+
+## D-031 Sensing: the robot reads sensors, the judge reads ground truth (world tier)
+Change: `sim/sensors.py` reads servo telemetry (position, speed, signed load, current), jaw pressure
+pads, per-link contact force and a wrist IMU, with noise and quantization from `configs/sensors.yaml`,
+where every channel names the part that would measure it on a real SO-101.  Torque, payload, kinetic
+energy and momentum are derived from those channels and the robot's own nominal model (`SelfModel`),
+never from ground truth.  The verifier does not read sensors, so sensor noise can change decisions
+but never what counts as a pass; that is why the component is world tier, not judge.
+Measured: payload estimate 50 / 200 / 398 g for 50 / 200 / 400 g held cans, -2 g idle; an 80 g mass
+fault injected at the gripper reads as an 80 g phantom payload with empty jaws.
+Test: `tests/test_sensors.py`.

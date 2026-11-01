@@ -78,6 +78,13 @@ def test_bootstrap_ci_edges() -> None:
     assert lo <= m <= hi
 
 
+def test_every_module_is_fingerprinted() -> None:
+    covered = {f for _, files in harness.COMPONENTS.values() for f in files}
+    modules = {str(p.relative_to(harness.ROOT)) for p in harness.SRC.rglob("*.py") if p.name != "__init__.py"}
+    assert modules - covered - set(harness.TOOLING) == set()  # a new module needs a component and a tier
+    assert all((harness.ROOT / f).exists() for f in covered)
+
+
 def test_fingerprint_tiers_and_diff() -> None:
     fp = harness.fingerprint()
     assert {v["tier"] for v in fp.values()} == {"judge", "world", "skill", "policy"}

@@ -1,19 +1,27 @@
-"""System 2 LLM clients (spec Section 8.6, deviations in docs/decisions.md D-002).
+"""System 2 LLM clients (spec Section 8.6, deviations in docs/decisions.md D-002, D-029).
 
 ``AnthropicLLM`` asks Claude for a ``ProposalBatch`` through a tool named ``propose``.  Forced
 tool choice and sampling parameters are rejected by the current models, so the request uses
 ``tool_choice: auto`` with an instruction naming the tool, and the tool input is validated
 client-side; a missing or invalid call is retried once with the error appended (history stays
-append-only).  Responses are cached by prompt hash, and every call is logged with tokens and USD.
+append-only).  ``ClaudeCodeLLM`` asks the same question through the Claude Code CLI
+(``claude -p --json-schema``), billed to the claude.ai plan it is logged into instead of API
+credits.  Both cache responses by prompt hash and log every call with tokens and list-price USD,
+so the ledger charges a proposer the same whichever way it was billed.
 ``MockLLM`` replays fixtures and is the only LLM tests may use.
 """
 
 from __future__ import annotations
 
 import json
-from collections.abc import Sequence
+import os
+import re
+import shutil
+import subprocess
+import tempfile
+from collections.abc import Callable, Sequence
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any, Literal, Protocol
 
 from pydantic import BaseModel, ConfigDict, ValidationError
 
@@ -24,12 +32,17 @@ __all__ = [
     "PRICES",
     "TOOL_NAME",
     "AnthropicLLM",
+    "ClaudeCodeLLM",
     "FixtureMissing",
     "LLM",
     "LLMCall",
     "MockLLM",
+    "PlanBillingError",
+    "PlanLimitReached",
     "ProposalSchemaError",
     "call_usd",
+    "cli_schema",
+    "find_claude",
     "parse_tool_response",
     "request_hash",
     "write_fixture",
@@ -55,6 +68,14 @@ class FixtureMissing(KeyError):
     """``MockLLM`` has no fixture for a prompt hash."""
 
 
+class PlanBillingError(RuntimeError):
+    """The Claude Code CLI is not logged into a claude.ai plan, so a call would bill API credits."""
+
+
+class PlanLimitReached(RuntimeError):
+    """The plan's usage window is spent; the run should stop, not record an empty proposal batch."""
+
+
 class LLM(Protocol):
     def propose(self, prompt: S2Prompt) -> list[Proposal]: ...
 
@@ -71,6 +92,7 @@ class LLMCall(BaseModel):
     attempts: int = 0
     n_proposals: int = 0
     error: str | None = None
+    billing: Literal["api", "plan"] | None = None  # None: cached or replayed, nothing was billed
 
 
 class _CallLog:
@@ -138,14 +160,39 @@ def _retry_turn(content_blocks: Sequence[Any], error: str) -> list[dict[str, Any
     return [{"type": "text", "text": note}]
 
 
-class AnthropicLLM(_CallLog):
+class _Cached(_CallLog):
+    """A live client's response cache: ``cache_dir/<prompt hash>.json`` holds the validated batch."""
+
+    def __init__(self, cache_dir: Path | None, log_path: Path | None):
+        super().__init__(log_path)
+        self.cache_dir = Path(cache_dir) if cache_dir is not None else None
+
+    def _cache_path(self, h: str) -> Path | None:
+        return None if self.cache_dir is None else self.cache_dir / f"{h}.json"
+
+    def _cache_get(self, h: str) -> list[Proposal] | None:
+        path = self._cache_path(h)
+        if path is None or not path.exists():
+            return None
+        data = json.loads(path.read_text())
+        return list(ProposalBatch.model_validate(data["tool_input"]).proposals)
+
+    def _cache_put(self, h: str, model: str, proposals: list[Proposal]) -> None:
+        path = self._cache_path(h)
+        if path is None:
+            return
+        path.parent.mkdir(parents=True, exist_ok=True)
+        batch = {"proposals": [p.model_dump(mode="json") for p in proposals]}
+        path.write_text(json.dumps({"model": model, "tool_input": batch}, sort_keys=True, indent=1))
+
+
+class AnthropicLLM(_Cached):
     """Claude as System 2.  Pass ``client`` to inject a fake in tests."""
 
     def __init__(self, model: str, cache_dir: Path | None = None, log_path: Path | None = None, client: Any = None,
                  effort: str = "medium", max_tokens: int = 16000):
-        super().__init__(log_path)
+        super().__init__(cache_dir, log_path)
         self.model = model
-        self.cache_dir = Path(cache_dir) if cache_dir is not None else None
         self.effort = effort
         self.max_tokens = max_tokens
         self._client = client
@@ -180,25 +227,6 @@ class AnthropicLLM(_CallLog):
             kwargs["betas"] = [FALLBACK_BETA]
             kwargs["fallbacks"] = "default"
         return kwargs
-
-    # ------------------------------------------------------------ cache
-    def _cache_path(self, h: str) -> Path | None:
-        return None if self.cache_dir is None else self.cache_dir / f"{h}.json"
-
-    def _cache_get(self, h: str) -> list[Proposal] | None:
-        path = self._cache_path(h)
-        if path is None or not path.exists():
-            return None
-        data = json.loads(path.read_text())
-        return list(ProposalBatch.model_validate(data["tool_input"]).proposals)
-
-    def _cache_put(self, h: str, model: str, proposals: list[Proposal]) -> None:
-        path = self._cache_path(h)
-        if path is None:
-            return
-        path.parent.mkdir(parents=True, exist_ok=True)
-        batch = {"proposals": [p.model_dump(mode="json") for p in proposals]}
-        path.write_text(json.dumps({"model": model, "tool_input": batch}, sort_keys=True, indent=1))
 
     # ------------------------------------------------------------ call
     def propose(self, prompt: S2Prompt) -> list[Proposal]:
@@ -243,7 +271,166 @@ class AnthropicLLM(_CallLog):
         if error is None:
             self._cache_put(h, model, proposals)
         self._log(LLMCall(prompt_hash=h, model=model, input_tokens=tokens_in, output_tokens=tokens_out, usd=usd,
-                          attempts=attempts, n_proposals=len(proposals), error=error))
+                          attempts=attempts, n_proposals=len(proposals), error=error, billing="api"))
+        return proposals
+
+
+# ---------------------------------------------------------------- Claude Code CLI (plan billing)
+PLAN_AUTH = "claude.ai"
+# Read the proposal from the arguments alone: no tools, no CLAUDE.md, hooks, skills or MCP servers,
+# no transcript.  ``--bare`` would also do this but accepts only an API key, never the plan login.
+CLAUDE_FLAGS = ("-p", "--output-format", "json", "--tools", "", "--safe-mode", "--strict-mcp-config",
+                "--no-session-persistence")
+# Unset in the child: an API key outranks the plan login, and CLAUDECODE marks a nested session.
+SCRUBBED_ENV = ("ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "CLAUDECODE")
+Runner = Callable[..., subprocess.CompletedProcess]
+
+
+def find_claude() -> str | None:
+    """``$SEA_CLAUDE_BIN``, else ``claude`` on PATH, else the newest VS Code extension's bundled CLI."""
+    if os.environ.get("SEA_CLAUDE_BIN"):
+        return os.environ["SEA_CLAUDE_BIN"]
+    on_path = shutil.which("claude")
+    if on_path:
+        return on_path
+    bundled = Path.home().glob(".vscode/extensions/anthropic.claude-code-*/resources/native-binary/claude")
+    newest = max(bundled, key=_extension_version, default=None)
+    return str(newest) if newest is not None else None
+
+
+def cli_schema(schema: Any) -> Any:
+    """``schema`` with tuple ``prefixItems`` folded into ``items``: the CLI's strict validator rejects it.
+
+    The answer is validated against the pydantic model anyway, so the looser array costs nothing.
+    """
+    if isinstance(schema, list):
+        return [cli_schema(v) for v in schema]
+    if not isinstance(schema, dict):
+        return schema
+    out = {k: cli_schema(v) for k, v in schema.items() if k != "prefixItems"}
+    if "prefixItems" in schema:
+        items = [cli_schema(v) for v in schema["prefixItems"]]
+        out["items"] = items[0] if all(i == items[0] for i in items) else {"anyOf": items}
+    return out
+
+
+def _extension_version(binary: Path) -> tuple[int, ...]:
+    m = re.search(r"claude-code-(\d+(?:\.\d+)*)", str(binary))
+    return tuple(int(x) for x in m.group(1).split(".")) if m else ()
+
+
+class ClaudeCodeLLM(_Cached):
+    """Claude as System 2 through ``claude -p``.  Pass ``run`` (a ``subprocess.run`` stand-in) in tests.
+
+    ``require_plan`` makes the first call check ``claude auth status`` and refuse anything but a
+    claude.ai login, so a run can never fall back to API billing unnoticed.
+    """
+
+    def __init__(self, model: str, cache_dir: Path | None = None, log_path: Path | None = None,
+                 binary: str | None = None, effort: str = "medium", require_plan: bool = True,
+                 timeout_s: float = 900.0, run: Runner = subprocess.run):
+        super().__init__(cache_dir, log_path)
+        self.model = model
+        self.binary = binary
+        self.effort = effort
+        self.require_plan = require_plan
+        self.timeout_s = timeout_s
+        self._run = run
+        self._plan_checked = False
+        self._cwd: str | None = None
+
+    def _bin(self) -> str:
+        found = self.binary or find_claude()
+        if not found:
+            raise FileNotFoundError("no Claude Code CLI: install it, or set SEA_CLAUDE_BIN to its path")
+        return found
+
+    def _env(self) -> dict[str, str]:
+        return {k: v for k, v in os.environ.items() if k not in SCRUBBED_ENV}
+
+    def _exec(self, args: list[str], stdin: str | None = None) -> subprocess.CompletedProcess:
+        if self._cwd is None:  # an empty directory, so nothing in the repo is read as context
+            self._cwd = tempfile.mkdtemp(prefix="sea-claude-")
+        return self._run([self._bin(), *args], input=stdin, capture_output=True, text=True,
+                         timeout=self.timeout_s, env=self._env(), cwd=self._cwd)
+
+    def check_plan(self) -> dict[str, Any]:
+        """``claude auth status`` as a dict; raises ``PlanBillingError`` unless it is a claude.ai login."""
+        out = self._exec(["auth", "status"])
+        try:
+            status = json.loads(out.stdout)
+        except json.JSONDecodeError as exc:
+            raise PlanBillingError(f"`claude auth status` printed no JSON: {out.stderr.strip()[:200]}") from exc
+        if not status.get("loggedIn") or status.get("authMethod") != PLAN_AUTH:
+            raise PlanBillingError(f"Claude Code is logged in via {status.get('authMethod')!r}, not a claude.ai "
+                                   "plan; run `claude auth login`, or pass require_plan=False to bill the API")
+        self._plan_checked = True
+        return status
+
+    def command(self, prompt: S2Prompt) -> list[str]:
+        return [*CLAUDE_FLAGS, "--model", prompt.model or self.model, "--effort", self.effort,
+                "--system-prompt", prompt.system,
+                "--json-schema", json.dumps(cli_schema(ProposalBatch.model_json_schema()), sort_keys=True)]
+
+    def _ask(self, prompt: S2Prompt, text: str) -> tuple[dict[str, Any], Any]:
+        """One CLI call: (result JSON, the structured output or None)."""
+        out = self._exec(self.command(prompt), stdin=text)
+        try:
+            result = json.loads(out.stdout)
+        except json.JSONDecodeError as exc:
+            raise RuntimeError(f"`claude -p` exited {out.returncode} without JSON: {out.stderr.strip()[:300]}") from exc
+        if result.get("is_error"):
+            message = str(result.get("result", ""))
+            if result.get("api_error_status") == 429 or "usage limit" in message.lower():
+                raise PlanLimitReached(message[:300])
+            return result, None
+        structured = result.get("structured_output")
+        if structured is None:
+            try:
+                structured = json.loads(result.get("result") or "null")
+            except json.JSONDecodeError:
+                structured = None
+        return result, structured
+
+    def propose(self, prompt: S2Prompt) -> list[Proposal]:
+        h = prompt.hash()
+        model = prompt.model or self.model
+        cached = self._cache_get(h)
+        if cached is not None:
+            self._log(LLMCall(prompt_hash=h, model=model, cached=True, n_proposals=len(cached)))
+            return cached
+        if self.require_plan and not self._plan_checked:
+            self.check_plan()
+        text = prompt.render() + f"\n\nAnswer with a ProposalBatch of 1 to {prompt.max_proposals} proposals."
+        tokens_in = tokens_out = attempts = 0
+        usd = 0.0
+        proposals: list[Proposal] = []
+        error: str | None = None
+        for _ in range(2):  # first try + one retry on a schema error
+            attempts += 1
+            result, structured = self._ask(prompt, text)
+            usage = result.get("usage") or {}
+            t_in, t_out = int(usage.get("input_tokens") or 0), int(usage.get("output_tokens") or 0)
+            c_w = int(usage.get("cache_creation_input_tokens") or 0)
+            c_r = int(usage.get("cache_read_input_tokens") or 0)
+            tokens_in += t_in + c_w + c_r
+            tokens_out += t_out
+            listed = result.get("total_cost_usd")
+            usd += float(listed) if listed is not None else call_usd(model, t_in, t_out, c_w, c_r)
+            try:
+                if structured is None:
+                    raise ProposalSchemaError(f"{result.get('subtype')}: {str(result.get('result', ''))[:200]}")
+                proposals = list(ProposalBatch.model_validate(structured).proposals)
+                error = None
+                break
+            except (ProposalSchemaError, ValidationError) as exc:
+                error = str(exc)
+                text = (prompt.render() + f"\n\nYour previous answer was not a valid ProposalBatch: {error}\n"
+                        f"Answer again with a corrected ProposalBatch of 1 to {prompt.max_proposals} proposals.")
+        if error is None:
+            self._cache_put(h, model, proposals)
+        self._log(LLMCall(prompt_hash=h, model=model, input_tokens=tokens_in, output_tokens=tokens_out, usd=usd,
+                          attempts=attempts, n_proposals=len(proposals), error=error, billing="plan"))
         return proposals
 
 

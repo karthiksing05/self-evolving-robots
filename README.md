@@ -30,6 +30,9 @@ change how it is judged.
   - a change-record template.
 - [docs/decisions.md](docs/decisions.md) records every place the code departs from or fills in
   the spec.
+- [docs/gripper-experiment.md](docs/gripper-experiment.md) is the headline experiment for rungs 4
+  and 5: a stock gripper learns, meets objects it cannot handle, and is changed through CAD. It
+  also covers the validation ladder, sensing, the planned arm tool server (MCP) and plan billing.
 
 ## Quick start
 
@@ -81,10 +84,10 @@ tests/              unit tests, verifier suite (tests/verifier), golden verdicts
 | M1–M3: contracts, sim, panels, verdicts, coverage, reward, primitives, executor, DSL, typecheck, System 1 | Implemented |
 | M4: tools, build, ledger, posture | Implemented |
 | M5: Cobweb memory, embeddings, targets | Implemented |
-| M6: System 2 (Anthropic, Mock, Scripted), escalation, ladder, baselines | Implemented |
+| M6: System 2 (Claude Code plan, Anthropic API, Mock, Scripted), escalation, ladder, baselines | Implemented |
 | M7: library promotion and pruning | Implemented |
 | M8: experiment configs and `sea report` | Implemented; experiments not yet run |
-| M9: L1 fingers, L2 kinematics | Not started (proposals are rejected with a reason) |
+| M9: L1 fingers, L2 kinematics | In progress: scene objects, grasp envelope and sensing built; plan in docs/gripper-experiment.md |
 | M10: world model | Optional, not started |
 
 Known limitations (wide doors, knob cup and the knob force-cap question, toggles, slot blade

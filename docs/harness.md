@@ -28,6 +28,7 @@ So the harness is built so that its numbers can be trusted without trusting any 
 |---|---|---|---|
 | Panel generation | `sim/panels.py` | judge | Seeded; splits and holdouts are fixed per `panel_seed` |
 | Physics | `sim/build_model.py`, `sim/controls.py` | world | Domain randomization seeded from (seed, panel, repeat) |
+| Sensing | `sim/sensors.py`, `configs/sensors.yaml` | world | What the robot feels (servo telemetry, pads, IMU, payload); the judges never read it (D-031) |
 | Primitive execution | `control/executor.py`, `control/motor.py` | enforces limits | Force, speed and workspace limits are checked every tick |
 | Verdicts | `verify/verdicts.py` | judge | Section 8.2 precedence; tested as a product (`tests/verifier/`) |
 | Reward | `verify/coverage.py`, `verify/reward.py` | judge | `reward.py` imports only `contracts` and `coverage` |

@@ -1,0 +1,23 @@
+# Sensor models (docs/gripper-experiment.md "Sensing").  World tier: what the robot can feel.
+# Every channel names the part that measures it on a real SO-101, so a channel we cannot build
+# never becomes something the loop depends on.  The verifier never reads these channels.
+#
+# resolution: quantization step of the reported value; noise: Gaussian sigma added before quantizing.
+servo:
+  hardware: Feetech STS3215 bus telemetry (position, speed, load, current registers)
+  # Datasheet-class values; re-measure on the bench before V5 (stall current at each supply voltage).
+  stall_current_a: {7.4: 2.7, 12.0: 2.4}
+  idle_current_a: 0.10
+channels:
+  q:            {unit: rad,   resolution: 0.001534, noise: 0.0,    hardware: "STS3215 present position (4096 counts/rev)"}
+  qd:           {unit: rad/s, resolution: 0.0015,   noise: 0.002,  hardware: "STS3215 present speed"}
+  load:         {unit: frac,  resolution: 0.001,    noise: 0.005,  hardware: "STS3215 present load (0.1 % of stall)"}
+  current_a:    {unit: A,     resolution: 0.0065,   noise: 0.01,   hardware: "STS3215 present current (6.5 mA units)"}
+  jaw_force_n:  {unit: N,     resolution: 0.05,     noise: 0.1,    hardware: "FSR pad on each jaw face (added part)"}
+  link_force_n: {unit: N,     resolution: 0.1,      noise: 0.2,    hardware: "contact skin per link (research option; off on the bench arm)"}
+  wrist_acc:    {unit: m/s^2, resolution: 0.006,    noise: 0.03,   hardware: "6-axis IMU on the gripper (MPU-6050 class, added part)"}
+  wrist_gyro:   {unit: rad/s, resolution: 0.001,    noise: 0.002,  hardware: "6-axis IMU on the gripper (MPU-6050 class, added part)"}
+# Derived signals are computed from the channels above, never from ground truth:
+#   torque    = load x stall torque (signed by the commanded direction of effort)
+#   payload_g = least-squares tool-point force from (torque - the arm's own gravity model)
+#   kinetic_j, momentum = from q, qd and the arm's own mass model

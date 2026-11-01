@@ -4,6 +4,8 @@ Timestep 2 ms, ``implicitfast``, elliptic cones, condim 4 on robot and control g
 bit layout: robot geoms contype 1 / conaffinity 1; panel geoms contype 2 / conaffinity 1; control
 geoms contype 4 / conaffinity 1.  So the robot touches panels and controls, but controls never
 collide with their own panel or each other (their motion is defined by ``controls.py``).
+Scene objects (free rigid bodies for the tabletop world, or fixed fixture probes) are contype 4 /
+conaffinity 3, so they also rest on panels and the table (contype 2).
 
 Rack tools are all attached to the gripper at build time; only the mounted one collides
 (``Sim.mount``), so a ``With`` swap needs no recompile.
@@ -11,9 +13,10 @@ Rack tools are all attached to the gripper at build time; only the mounted one c
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import mujoco
 import numpy as np
@@ -33,9 +36,11 @@ from sea.sim.controls import (
 
 TIMESTEP = 0.002
 STALL_TORQUE = {7.4: 1.62, 12.0: 2.94}
+TABLE_HALF = 0.3  # m; the table spans x in [-0.05, 0.55], y in [-0.3, 0.3]
 ROBOT_BITS = (1, 1)
 PANEL_BITS = (2, 1)
 CONTROL_BITS = (4, 1)
+OBJECT_BITS = (4, 3)
 GEOM_TYPES = {
     "box": mujoco.mjtGeom.mjGEOM_BOX,
     "cylinder": mujoco.mjtGeom.mjGEOM_CYLINDER,
@@ -100,6 +105,23 @@ class ControlHandle:
     _q: float = 0.0
 
 
+@dataclass(frozen=True)
+class SceneObject:
+    """A rigid body in the scene: free (a tabletop object) or ``fixed`` to the world (a probe).
+
+    ``size`` follows MuJoCo half-sizes: box (hx, hy, hz), cylinder (radius, half-height), sphere (radius,).
+    """
+
+    name: str
+    shape: Literal["box", "cylinder", "sphere"]
+    size: tuple[float, ...]
+    pos: tuple[float, float, float]
+    mass_kg: float
+    friction: float = 0.8
+    quat_wxyz: tuple[float, float, float, float] = (1.0, 0.0, 0.0, 0.0)
+    fixed: bool = False
+
+
 @dataclass
 class Sim:
     model: Any
@@ -121,6 +143,8 @@ class Sim:
     mounted: int | None = None
     body_to_control: dict[int, str] = field(default_factory=dict)
     panel_body: int = -1
+    objects: dict[str, int] = field(default_factory=dict)  # scene object name -> body id
+    object_geoms: dict[str, int] = field(default_factory=dict)  # scene object name -> geom id
     _limit_type: int = int(mujoco.mjtConstraint.mjCNSTR_LIMIT_JOINT)
 
     # ---------------------------------------------------------------- tools
@@ -275,9 +299,11 @@ def _tool_body(gripper, site_pos, site_quat, slot: int, tool, gidx: list[int], s
 
 def build_model(design: Design, panel: PanelSpec | None = None, tools: list | None = None,
                 faults: dict[str, Faults] | None = None, dr: DomainRandomization | None = None,
-                mjcf_path: Path = STOCK_MJCF) -> Sim:
+                mjcf_path: Path = STOCK_MJCF, objects: Sequence[SceneObject] = (),
+                table_z: float | None = None) -> Sim:
     """Compile one episode model.  ``tools`` are ``design.build.BuiltTool``-like objects with
-    ``contact, parts, mass_g, tip`` (and optional ``friction, solref, solimp``), one per rack slot."""
+    ``contact, parts, mass_g, tip`` (and optional ``friction, solref, solimp``), one per rack slot.
+    ``table_z`` adds a table whose top is at that height under the workspace."""
     spec = mujoco.MjSpec.from_file(str(mjcf_path))
     spec.option.timestep = TIMESTEP
     spec.option.integrator = mujoco.mjtIntegrator.mjINT_IMPLICITFAST
@@ -354,6 +380,18 @@ def build_model(design: Design, panel: PanelSpec | None = None, tools: list | No
             T[:3, 3] = p_pos + p_rot @ cpos
             handles_pre[c.id] = (c, geo, f, T, hi, flap_hi)
 
+    if table_z is not None:
+        spec.worldbody.add_geom(name="table", type=GEOM_TYPES["box"], size=[TABLE_HALF, TABLE_HALF, 0.01],
+                                pos=[TABLE_HALF - 0.05, 0.0, table_z - 0.01], rgba=[0.75, 0.7, 0.6, 1.0],
+                                contype=PANEL_BITS[0], conaffinity=PANEL_BITS[1], condim=4)
+    for ob in objects:
+        obody = spec.worldbody.add_body(name=f"obj_{ob.name}", pos=list(ob.pos), quat=list(ob.quat_wxyz))
+        if not ob.fixed:
+            obody.add_freejoint(name=f"obj_{ob.name}_free")
+        obody.add_geom(name=f"obj_{ob.name}_geom", type=GEOM_TYPES[ob.shape], size=list(ob.size) + [0.0] * (3 - len(ob.size)),
+                       mass=ob.mass_kg, friction=[ob.friction, 0.005, 0.0001], rgba=[0.3, 0.5, 0.8, 1.0],
+                       contype=OBJECT_BITS[0], conaffinity=OBJECT_BITS[1], condim=4)
+
     model = spec.compile()
     data = mujoco.MjData(model)
     arm_qadr = np.array([model.jnt_qposadr[model.joint(j).id] for j in ARM_JOINTS])
@@ -396,7 +434,9 @@ def build_model(design: Design, panel: PanelSpec | None = None, tools: list | No
                                       gids, T, noise, float(model.jnt_range[jid][1]), flap)
     sim = Sim(model, data, panel, design, controls, arm_qadr, arm_dadr, model.site(MJCF_TOOL_SITE).id,
               geom_kind, geom_contact, body_to_control=body_to_control,
-              panel_body=model.body("panel").id if panel is not None else -1)
+              panel_body=model.body("panel").id if panel is not None else -1,
+              objects={ob.name: model.body(f"obj_{ob.name}").id for ob in objects},
+              object_geoms={ob.name: model.geom(f"obj_{ob.name}_geom").id for ob in objects})
     for slot, names in tool_names.items():
         sim.tool_geoms[slot] = [model.geom(n).id for n in names]
         sim.tool_bodies[slot] = model.body(f"tool_slot{slot}").id

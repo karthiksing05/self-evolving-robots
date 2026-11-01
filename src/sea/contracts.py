@@ -393,7 +393,7 @@ class RunSpec(_Model):
     stop: StopRule = StopRule()
     ablations: Ablations = Ablations()
     # Harness knobs that are not part of the science (docs/decisions.md D-010).
-    llm: Literal["anthropic", "mock", "scripted"] = "anthropic"
+    llm: Literal["claude_code", "anthropic", "mock", "scripted"] = "claude_code"  # claude_code: plan billing (D-029)
     llm_fixtures: str | None = None  # mock: fixtures to replay; scripted: directory to record fixtures into
     eval_split: Literal["train", "val", "test", "compose"] = "test"
     embedder: Literal["fake", "real"] = "real"

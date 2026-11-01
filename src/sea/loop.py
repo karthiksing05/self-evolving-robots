@@ -153,7 +153,7 @@ def suite_config(state: State, built: BuiltDesign | None = None, library: Librar
 
 def make_llm(spec: RunSpec, run_dir: Path) -> Any:
     from sea.propose.baselines import RecordingLLM, ScriptedLLM
-    from sea.propose.llm import AnthropicLLM, MockLLM
+    from sea.propose.llm import AnthropicLLM, ClaudeCodeLLM, MockLLM
 
     log = run_dir / "llm_calls.jsonl"
     if spec.llm == "mock":
@@ -161,7 +161,10 @@ def make_llm(spec: RunSpec, run_dir: Path) -> Any:
         return MockLLM(Path(spec.llm_fixtures), log_path=log)
     if spec.llm == "scripted":
         return ScriptedLLM(Path(spec.llm_fixtures) if spec.llm_fixtures else None, log_path=log)
-    live = AnthropicLLM(spec.llm_model, cache_dir=CACHE / "llm", log_path=log)  # pragma: no cover - live API
+    if spec.llm == "claude_code":  # pragma: no cover - live CLI
+        live: Any = ClaudeCodeLLM(spec.llm_model, cache_dir=CACHE / "llm", log_path=log)
+    else:  # pragma: no cover - live API
+        live = AnthropicLLM(spec.llm_model, cache_dir=CACHE / "llm", log_path=log)
     return RecordingLLM(live, Path(spec.llm_fixtures)) if spec.llm_fixtures else live  # pragma: no cover
 
 
