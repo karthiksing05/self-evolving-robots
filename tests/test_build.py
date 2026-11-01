@@ -146,6 +146,9 @@ def test_finger_estimate():
     assert B.finger_estimate(longer)[0] > m1 and a1 > 0
     est = B.build(tpu, LIMITS).design.est
     assert est.print_minutes == pytest.approx(m2) and est.grams_tpu == pytest.approx(t2)
+    assert B.finger_print(tpu, tpu) == (0.0, 0.0, 0.0) and B.finger_print(tpu, Design(id="s")) == (0.0, 0.0, 0.0)
+    vol, pla, tpu_g = B.finger_print(Design(id="s"), tpu)  # a changed pad is a new part: priced whole (D-039)
+    assert vol > 0 and (pla, tpu_g) == pytest.approx((p2, t2))
 
 
 def test_soft_tip_is_two_materials_and_softness_softens_contact():

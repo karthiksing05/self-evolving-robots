@@ -1,0 +1,137 @@
+{
+ "candidates": [
+  {
+   "cost": {
+    "approvals": 0,
+    "grams_pla": 0,
+    "grams_tpu": 0,
+    "llm_usd": 0,
+    "print_minutes": 0,
+    "servo_heat_j": 0,
+    "sim_seconds": 0
+   },
+   "errors": [
+    "5 parameter edits exceed the posture's max_edits 3"
+   ],
+   "proposal": {
+    "design_delta": null,
+    "hypothesis": "The pudding box is actually grasped and lifted (travel_reached 0.04567 \u2265 travel_required 0.03), but it slips out during the hold (stopped_by=slip, pad_drop_t=3.02). A 187 g box held by a shallow grip at full lift speed puts too much inertial and gravity load on the friction contact. A deeper grasp nearer mid-height, a firmer close, a slower lift and a shorter hold should keep it from slipping.",
+    "kind": "reparam",
+    "prediction": {
+     "confidence": 0.3,
+     "flips_to_pass": [
+      "rtr001_pudding_box:obj"
+     ],
+     "may_regress": []
+    },
+    "program": null,
+    "promote": null,
+    "rationale": "For rtr001_pudding_box, travel_reached=0.04567 exceeds travel_required=0.03, so the lift happens. The failure is retention (verdict=stuck, stopped_by=slip, pad_drop_t=3.02, payload_held_g=-), not aperture. Its peak_force surprise_z is -1.209 and stall_s is -0.5314, so the jaws squeezed less than usual. A firmer close (close toward the -0.17 bound) and deeper contact (depth up to 0.035) address that directly. Lowering the speed limits lift acceleration (peak_wrist_acc=2.914 m/s2). This is cheap and only narrows ranges inside the primitive bounds. It probably will not fix the gelatin box or the cup: their peak_force is 45.51 and 74.82 N and their travel_reached is 0.525 and 1.63, which means they were shoved by a jaw edge (contact_types=edge,pinch), and it003 shows a cup reparam gave delta 0.",
+    "reparam": {
+     "grasp.close": [
+      -0.17,
+      0.0
+     ],
+     "grasp.depth": [
+      0.015,
+      0.035
+     ],
+     "grasp.hold_s": [
+      1.0,
+      1.5
+     ],
+     "grasp.lift": [
+      0.035,
+      0.05
+     ],
+     "grasp.speed": [
+      0.01,
+      0.03
+     ]
+    },
+    "ruled_out": [],
+    "rung": 0
+   },
+   "value": 0.0,
+   "vpc": 0.0
+  },
+  {
+   "cost": {
+    "approvals": 0,
+    "grams_pla": 0,
+    "grams_tpu": 0,
+    "llm_usd": 0,
+    "print_minutes": 0,
+    "servo_heat_j": 0,
+    "sim_seconds": 0
+   },
+   "errors": [
+    "5 parameter edits exceed the posture's max_edits 3"
+   ],
+   "proposal": {
+    "design_delta": {
+     "arm": {},
+     "fingers": {
+      "groove_mm": 2.0,
+      "lip_mm": 0.0,
+      "pad_angle_deg": 32.0,
+      "pad_tpu_mm": 2.0,
+      "reach_mm": 12.0
+     },
+     "rack_add": [],
+     "rack_remove": [],
+     "servo_voltage": {}
+    },
+    "hypothesis": "The gelatin box (73 mm) and the cup (57 mm) are wider than the widest grip these fingers can take (box=65, cylinder=50 mm). So the closing jaw meets them with an edge, not a face, and shoves them away (contact_types include edge, peak_force 45\u201375 N, large travel_reached of 0.525 and 1.63 = pushed, not lifted). The SO-101 jaw rotates, so extending the pads past the jaw tips (reach_mm) widens the tip opening at the same jaw angle. A slightly larger pad_angle_deg then keeps the faces parallel at that wider opening. TPU friction 0.9 stays, because the pudding box needs it.",
+    "kind": "finger",
+    "prediction": {
+     "confidence": 0.3,
+     "flips_to_pass": [
+      "rtr000_gelatin_box:obj",
+      "rtr019_cup:obj"
+     ],
+     "may_regress": [
+      "rtr001_pudding_box:obj"
+     ]
+    },
+    "program": null,
+    "promote": null,
+    "rationale": "Evidence: width_mm 73 > box widest 65 and cup 57 > cylinder widest 50. peak_force=45.51/74.82 N is far above the 15 N tip cap, which is what an edge wedging against an object looks like. travel_reached=0.525 and 1.63 against travel_required=0.03 means the object was displaced, not held (payload_held_g=0.6 for the cup). Past finger edits it001 and it002 changed pad angle, TPU thickness and width; both regressed twice, partly because thinning the TPU cost friction. This proposal uses reach_mm, a lever no past edit tried, and leaves pad_tpu_mm=2 and width unchanged to limit regressions. Lowering the groove from 3 to 2 mm keeps cup centring and gives back a little aperture. pad_angle goes 25\u219232 (relative change 0.28), within the 1.0 limit.",
+    "reparam": null,
+    "ruled_out": [
+     "rung0: the gelatin box and cup are wider than the measured widest grip (65/50 mm). No grasp parameter changes the jaw aperture, and it003's cup reparam gave delta 0.",
+     "rung1: every grasp program has to go through grasp/pick_up with the same stock jaws, so recombining primitives cannot widen the opening or change face splay.",
+     "rung2: the rack is empty, so there is no existing tool to use or adapt, and pinch contact only comes from the stock jaws.",
+     "rung3: the tool templates (pad, hook, knob_cup, soft_tip, slot_inserter, probe) give single-point contacts, not a two-jaw pinch, and these controls accept only pinch."
+    ],
+    "rung": 4
+   },
+   "value": 0.0,
+   "vpc": 0.0
+  }
+ ],
+ "chosen": null,
+ "escalations": [
+  "rtr000_gelatin_box:obj",
+  "rtr001_pudding_box:obj",
+  "rtr002_sugar_box:obj",
+  "rtr004_mustard_bottle:obj",
+  "rtr007_strawberry:obj",
+  "rtr010_tuna_fish_can:obj",
+  "rtr011_tennis_ball:obj",
+  "rtr012_racquetball:obj",
+  "rtr015_plum:obj",
+  "rtr016_apple:obj",
+  "rtr019_cup:obj",
+  "rtr020_dice:obj"
+ ],
+ "promoted": [],
+ "pruned": [],
+ "targets": [
+  [
+   "rtr000_gelatin_box:obj",
+   "rtr019_cup:obj",
+   "rtr001_pudding_box:obj"
+  ]
+ ]
+}

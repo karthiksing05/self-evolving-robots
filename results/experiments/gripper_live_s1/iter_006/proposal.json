@@ -1,0 +1,144 @@
+{
+ "candidates": [
+  {
+   "cost": {
+    "approvals": 0,
+    "grams_pla": 0.0,
+    "grams_tpu": 0.0,
+    "llm_usd": 0.0,
+    "print_minutes": 0.0,
+    "servo_heat_j": 0,
+    "sim_seconds": 288.0
+   },
+   "errors": [],
+   "proposal": {
+    "design_delta": null,
+    "hypothesis": "The jaws close above each ball's equator (depth too shallow) and touch it with the jaw edge. The ball is lifted, but the inward-and-upward contact force pushes it out during the hold, so it slips.",
+    "kind": "reparam",
+    "prediction": {
+     "confidence": 0.25,
+     "flips_to_pass": [
+      "rtr012_racquetball:obj"
+     ],
+     "may_regress": []
+    },
+    "program": null,
+    "promote": null,
+    "rationale": "All three balls are lifted before they are lost. travel_reached is 0.68, 1.065 and 0.944 against travel_required 0.03. felt.stopped_by=slip, and pad_drop_t is 4.0\u20134.76 s, during the hold. contact_types includes edge, so the jaw edge touches the ball above its equator. That squeezing geometry pushes a sphere up and out. peak_force is 44\u201353 N, well above what a centred pinch needs. ik_residual_mm=0 and joint_limit_hits=- show reach is not the problem. The radii are 28\u201337 mm, so a deeper tool point (depth near 0.035 m) puts the contact at or near the equator. A slower descent and a longer close_s let the stall settle on a centred contact.",
+    "reparam": {
+     "grasp.close_s": [
+      0.6,
+      1.0
+     ],
+     "grasp.depth": [
+      0.025,
+      0.035
+     ],
+     "grasp.speed": [
+      0.01,
+      0.03
+     ]
+    },
+    "ruled_out": [],
+    "rung": 0
+   },
+   "value": 0.175,
+   "vpc": 87.49999999999999
+  },
+  {
+   "cost": {
+    "approvals": 1,
+    "grams_pla": 0.0,
+    "grams_tpu": 0.0,
+    "llm_usd": 0.0,
+    "print_minutes": 0.0,
+    "servo_heat_j": 0,
+    "sim_seconds": 384.0
+   },
+   "errors": [],
+   "proposal": {
+    "design_delta": {
+     "arm": {},
+     "fingers": {
+      "pad_angle_deg": 40.0,
+      "pad_tpu_mm": 1.5
+     },
+     "rack_add": [],
+     "rack_remove": [],
+     "servo_voltage": {}
+    },
+    "hypothesis": "At pad_angle 25\u00b0 the faces are parallel only at a moderate opening. At the 55\u201375 mm openings these balls need, the faces splay, so a jaw edge pinches the ball off-axis and squeezes it out.",
+    "kind": "finger",
+    "prediction": {
+     "confidence": 0.35,
+     "flips_to_pass": [
+      "rtr011_tennis_ball:obj",
+      "rtr012_racquetball:obj",
+      "rtr016_apple:obj"
+     ],
+     "may_regress": []
+    },
+    "program": null,
+    "promote": null,
+    "rationale": "All three objects are wider than the measured widest sphere grip of 45 mm: 55.5, 66.5 and 74.6 mm. contact_types=edge,pinch together with stopped_by=slip and pad_drop_t of 4\u20134.8 s means the splayed faces meet each ball at an edge and it slides out. The 44\u201353 N peak_force shows the squeeze is wasted on a bad contact angle, not lacking in strength. Raising pad_angle_deg from 25 to 40 makes the faces parallel at the wide opening these balls need. Thinning the TPU skin from 2 to 1.5 mm gives back aperture while keeping the 0.9 friction. That is 2 edits, within max_edits 3.",
+    "reparam": null,
+    "ruled_out": [
+     "rung0: the balls (55\u201375 mm) are wider than the 45 mm widest sphere grip, and grasp parameters cannot change the jaw face angle (contact_types=edge). The similar reparam it003 gave delta 0.",
+     "rung1: pick_up/grasp is the only primitive that provides lifts=grasp, so recomposing primitives cannot change the contact geometry.",
+     "rung2: the rack is empty, so there is no existing tool to use or adapt.",
+     "rung3: the rack tool templates (pad, hook, cup, probe, slot_inserter) are not two-jaw pinch tools, and accepted_contacts=pinch requires the jaws."
+    ],
+    "rung": 4
+   },
+   "value": 0.7349999999999999,
+   "vpc": 154.04469577979526
+  }
+ ],
+ "chosen": 1,
+ "escalations": [
+  "rtr000_gelatin_box:obj",
+  "rtr001_pudding_box:obj",
+  "rtr002_sugar_box:obj",
+  "rtr004_mustard_bottle:obj",
+  "rtr007_strawberry:obj",
+  "rtr010_tuna_fish_can:obj",
+  "rtr011_tennis_ball:obj",
+  "rtr012_racquetball:obj",
+  "rtr015_plum:obj",
+  "rtr016_apple:obj",
+  "rtr019_cup:obj",
+  "rtr020_dice:obj"
+ ],
+ "promoted": [],
+ "pruned": [],
+ "targets": [
+  [
+   "rtr011_tennis_ball:obj",
+   "rtr016_apple:obj",
+   "rtr012_racquetball:obj"
+  ]
+ ],
+ "trial": {
+  "base": {
+   "reg_banana:obj": 1.0,
+   "reg_cup:obj": 1.0,
+   "reg_foam_brick:obj": 1.0,
+   "reg_large_marker:obj": 1.0,
+   "reg_wood_block_cube:obj": 1.0,
+   "rtr011_tennis_ball:obj": 0.0,
+   "rtr012_racquetball:obj": 0.0,
+   "rtr016_apple:obj": 0.0
+  },
+  "repeats": 2,
+  "trial": {
+   "reg_banana:obj": 0.0,
+   "reg_cup:obj": 1.0,
+   "reg_foam_brick:obj": 1.0,
+   "reg_large_marker:obj": 0.0,
+   "reg_wood_block_cube:obj": 0.0,
+   "rtr011_tennis_ball:obj": 1.0,
+   "rtr012_racquetball:obj": 1.0,
+   "rtr016_apple:obj": 0.0
+  }
+ }
+}

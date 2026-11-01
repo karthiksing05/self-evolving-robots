@@ -1,0 +1,81 @@
+{
+ "components": {
+  "acceptance": {
+   "hash": "f29c811f0948",
+   "tier": "judge"
+  },
+  "build": {
+   "hash": "c28d9423e179",
+   "tier": "judge"
+  },
+  "contracts": {
+   "hash": "987393496402",
+   "tier": "judge"
+  },
+  "grasp_probe": {
+   "hash": "d32f48dfc560",
+   "tier": "world"
+  },
+  "grasp_world": {
+   "hash": "02b091740537",
+   "tier": "judge"
+  },
+  "kinematics": {
+   "hash": "0fd57f3370f6",
+   "tier": "world"
+  },
+  "ledger": {
+   "hash": "ec969f218d72",
+   "tier": "policy"
+  },
+  "limits": {
+   "hash": "ddbbcbc741a5",
+   "tier": "judge"
+  },
+  "loop": {
+   "hash": "8611fa3ab9dd",
+   "tier": "policy"
+  },
+  "memory": {
+   "hash": "89c516308ab9",
+   "tier": "policy"
+  },
+  "network": {
+   "hash": "db8da1a156ed",
+   "tier": "policy"
+  },
+  "panels": {
+   "hash": "61959cf6f649",
+   "tier": "judge"
+  },
+  "physics": {
+   "hash": "564e08d9e049",
+   "tier": "world"
+  },
+  "primitives": {
+   "hash": "b264e828e810",
+   "tier": "skill"
+  },
+  "proposer": {
+   "hash": "f2915264cb74",
+   "tier": "policy"
+  },
+  "reward": {
+   "hash": "6eac51a3839a",
+   "tier": "judge"
+  },
+  "sensors": {
+   "hash": "dfc8a6d8e50c",
+   "tier": "world"
+  },
+  "tools": {
+   "hash": "296ea6add453",
+   "tier": "skill"
+  },
+  "verifier": {
+   "hash": "dc3def8d6188",
+   "tier": "judge"
+  }
+ },
+ "judge_key": "4ffb19f19f33"
+}

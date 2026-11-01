@@ -1,0 +1,101 @@
+{
+ "candidates": [
+  {
+   "cost": {
+    "approvals": 1,
+    "grams_pla": 0.0,
+    "grams_tpu": 0.0,
+    "llm_usd": 0.0,
+    "print_minutes": 0.0,
+    "servo_heat_j": 0,
+    "sim_seconds": 384.0
+   },
+   "errors": [],
+   "proposal": {
+    "design_delta": {
+     "arm": {},
+     "fingers": {
+      "pad_angle_deg": 40.0,
+      "pad_tpu_mm": 1.0
+     },
+     "rack_add": [],
+     "rack_remove": [],
+     "servo_voltage": {}
+    },
+    "hypothesis": "All three balls are wider than the widest sphere grip these fingers can take (sphere=45 mm, V1 probe), and the widths are tennis_ball 66.5, racquetball 55.5 and apple 74.6 mm. At pad_angle_deg=25 the faces are only parallel at a moderate opening. At 55-75 mm they splay, so a jaw edge touches first (contact_types=edge,pinch) and squeezes the round object out of the jaws as the servo stalls. The 2 mm TPU skin on each pad also takes up opening width. If the moving pad is tilted to 40\u00b0 the faces become parallel near a 60-75 mm opening. Thinning the TPU to 1 mm gives back about 2 mm of aperture and keeps the 0.9 friction.",
+    "kind": "finger",
+    "prediction": {
+     "confidence": 0.4,
+     "flips_to_pass": [
+      "rtr011_tennis_ball:obj",
+      "rtr012_racquetball:obj",
+      "rtr016_apple:obj"
+     ],
+     "may_regress": [
+      "narrow grasp objects (<40 mm) whose faces will now be non-parallel when nearly closed"
+     ]
+    },
+    "program": null,
+    "promote": null,
+    "rationale": "Evidence that the failure is geometric and not a matter of parameters. On every control the verdict is wrong_behavior with felt.stopped_by=slip. contact_types includes edge on all three, which is the splayed-face signature. peak_force is 52.67 / 43.84 / 44.59 N, far above the 15 N hard limit and the ball weights (41-68 g). That shows the jaws are squeezing a ball they cannot hold, not grasping weakly. The ball is ejected sideways, which loads the wrist: felt.stall_s is 2.28, 1.74 and 1.8 s, all on wrist_roll. felt.pad_drop_t is 4.0-4.76 s, so contact is lost during the lift and hold. travel_reached (0.68-1.07) is not a held lift, and payload_held_g is '-'. ik_residual_mm=0 and there are no joint_limit_hits, so reach is fine. I am changing only 2 fields, within max_edits 3. The relative changes are 0.6 and 0.5, within the limit of 1. groove_mm stays at 3 so the V-groove still centres the spheres. it006 and it002 regressed with similar ideas, so this change is more conservative: it keeps the groove and reduces the TPU skin rather than removing it.",
+    "reparam": null,
+    "ruled_out": [
+     "rung0: every object is wider than the widest sphere grip (45 mm). Contact_types=edge and peak_force of 44-53 N, already past the 15 N limit, mean that no depth, close or speed range removes the face splay. S1 has already exhausted the grasp ranges (escalation_reason=s1_exhausted), and the similar reparams it003 and it005 gave delta mean 0",
+     "rung1: pick_up already runs the grasp primitive, the only one that provides lifts=grasp. Recomposing approach, grasp and release cannot change jaw geometry, and the failure is slip from edge contact, not a sequencing problem",
+     "rung2: the rack is empty, so there is no library tool to use or adapt",
+     "rung3: no tool template gives a wider parallel pinch (the templates are stock, pad, hook, knob_cup, soft_tip, slot_inserter and probe). The objects accept only pinch, and a single-contact rack tool cannot provide pinch, so only the finger pads can fix the aperture and face angle"
+    ],
+    "rung": 4
+   },
+   "value": 0.8399999999999999,
+   "vpc": 174.0367696849009
+  }
+ ],
+ "chosen": 0,
+ "escalations": [
+  "rtr000_gelatin_box:obj",
+  "rtr001_pudding_box:obj",
+  "rtr002_sugar_box:obj",
+  "rtr004_mustard_bottle:obj",
+  "rtr007_strawberry:obj",
+  "rtr010_tuna_fish_can:obj",
+  "rtr011_tennis_ball:obj",
+  "rtr012_racquetball:obj",
+  "rtr015_plum:obj",
+  "rtr016_apple:obj",
+  "rtr019_cup:obj",
+  "rtr020_dice:obj"
+ ],
+ "promoted": [],
+ "pruned": [],
+ "targets": [
+  [
+   "rtr011_tennis_ball:obj",
+   "rtr016_apple:obj",
+   "rtr012_racquetball:obj"
+  ]
+ ],
+ "trial": {
+  "base": {
+   "reg_banana:obj": 1.0,
+   "reg_cup:obj": 1.0,
+   "reg_foam_brick:obj": 1.0,
+   "reg_large_marker:obj": 1.0,
+   "reg_wood_block_cube:obj": 1.0,
+   "rtr011_tennis_ball:obj": 0.0,
+   "rtr012_racquetball:obj": 0.0,
+   "rtr016_apple:obj": 0.0
+  },
+  "repeats": 2,
+  "trial": {
+   "reg_banana:obj": 0.0,
+   "reg_cup:obj": 1.0,
+   "reg_foam_brick:obj": 1.0,
+   "reg_large_marker:obj": 0.0,
+   "reg_wood_block_cube:obj": 0.0,
+   "rtr011_tennis_ball:obj": 1.0,
+   "rtr012_racquetball:obj": 1.0,
+   "rtr016_apple:obj": 0.0
+  }
+ }
+}

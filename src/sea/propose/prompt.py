@@ -288,6 +288,7 @@ def _fixes_section(fixes: Sequence[FixRecord], k: int = 5) -> str:
             f"- {fx.id} (iter {fx.iteration}, distance {_num(fx.distance)}): {p.kind} rung {p.rung} -> {outcome} "
             f"by {d.rule} (delta mean {_num(d.delta_mean)}, interval [{_num(d.delta_lo)}, {_num(d.delta_hi)}], "
             f"regressions {len(d.regressions)}, prediction score {_num(d.prediction_score)})"
+            + (f"\n    broke: {', '.join(sorted(d.regressions)[:6])}" if d.regressions else "")
         )
         lines.append(f"    hypothesis: {p.hypothesis}")
     return "\n".join(lines)

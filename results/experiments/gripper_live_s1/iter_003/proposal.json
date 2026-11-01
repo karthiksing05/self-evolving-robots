@@ -1,0 +1,144 @@
+{
+ "candidates": [
+  {
+   "cost": {
+    "approvals": 0,
+    "grams_pla": 0.0,
+    "grams_tpu": 0.0,
+    "llm_usd": 0.0,
+    "print_minutes": 0.0,
+    "servo_heat_j": 0,
+    "sim_seconds": 288.0
+   },
+   "errors": [],
+   "proposal": {
+    "design_delta": null,
+    "hypothesis": "The cup is gripped near its widest rim (57 mm, wider than the 50 mm widest cylinder grip). The splayed faces touch it with a jaw edge, so it is lifted and then slips out. A deeper, slower grasp with a firmer close should catch a narrower part of the cup.",
+    "kind": "reparam",
+    "prediction": {
+     "confidence": 0.3,
+     "flips_to_pass": [
+      "rtr019_cup:obj"
+     ],
+     "may_regress": []
+    },
+    "program": null,
+    "promote": null,
+    "rationale": "rtr019_cup was lifted: travel_reached is 1.63 against a travel_required of 0.03, and payload_held_g is 0.6. So the cup was gripped and raised, then lost during the hold (stopped_by=slip, pad_drop_t=4.22). The contact_types were edge and pinch, and the peak_force of 74.82 N is far above what a clean pad squeeze should produce. That points to a jaw edge hitting the 57 mm rim, which is wider than the 50 mm widest cylinder grip, and the cup then being squeezed out. Going deeper puts the jaws lower on the cup, where it should be narrower if it tapers like most cups. A slower descent and lift should lower the impact load (peak_wrist_acc 1.578). Closing more firmly should give a full pinch rather than an edge contact.",
+    "reparam": {
+     "grasp.close": [
+      0.05,
+      0.2
+     ],
+     "grasp.depth": [
+      0.018,
+      0.035
+     ],
+     "grasp.speed": [
+      0.01,
+      0.03
+     ]
+    },
+    "ruled_out": [],
+    "rung": 0
+   },
+   "value": 0.21,
+   "vpc": 105.0
+  },
+  {
+   "cost": {
+    "approvals": 1,
+    "grams_pla": 0.0,
+    "grams_tpu": 0.0,
+    "llm_usd": 0.0,
+    "print_minutes": 0.0,
+    "servo_heat_j": 0,
+    "sim_seconds": 288.0
+   },
+   "errors": [],
+   "proposal": {
+    "design_delta": {
+     "arm": {},
+     "fingers": {
+      "pad_angle_deg": 35.0,
+      "pad_tpu_mm": 1.5
+     },
+     "rack_add": [],
+     "rack_remove": [],
+     "servo_voltage": {}
+    },
+    "hypothesis": "The gelatin box is wider than the widest grip these fingers can make. At 25\u00b0 the pad faces are only parallel at a moderate opening, so at a 73 mm opening a jaw edge contacts the box and it is squeezed out. A modestly larger pad tilt and a slightly thinner TPU skin should allow a flat pinch on the box.",
+    "kind": "finger",
+    "prediction": {
+     "confidence": 0.25,
+     "flips_to_pass": [
+      "rtr000_gelatin_box:obj"
+     ],
+     "may_regress": [
+      "rtr019_cup:obj"
+     ]
+    },
+    "program": null,
+    "promote": null,
+    "rationale": "rtr000_gelatin_box is 73 mm wide and rtr001_pudding_box is 89.6 mm wide. The widest box grip measured on these fingers is 65 mm. Both runs show edge contact in contact_types, peak_force far above the 15 N tip limit (45.51 N and 26.69 N), and stopped_by=slip. That pattern means the jaw edges hit the box instead of the faces closing flat on it. Raising pad_angle_deg from 25 to 35 makes the faces parallel at a wider opening. Thinning pad_tpu_mm from 2 to 1.5 gains about 1 mm of opening while keeping the 0.9 TPU friction. it001 failed by combining a tilt, thinner TPU and wider pads, and it regressed 2 controls, so this proposal leaves width and groove unchanged to protect controls that already pass.",
+    "reparam": null,
+    "ruled_out": [
+     "rung0: the box widths (73 and 89.6 mm) are larger than the 65 mm widest box grip, and no grasp parameter (close, depth, side, speed, lift, hold_s) changes the jaw aperture or the pad face angle",
+     "rung1: pick_up/grasp is the only primitive that provides lifts=grasp, and no recomposition of approach, contact, grasp and release widens the jaws",
+     "rung2: the rack is empty, so there is no existing tool to use or adapt",
+     "rung3: none of the tool templates (pad, hook, knob_cup, soft_tip, slot_inserter, probe) gives a wider two-jaw pinch, and pinch is the only accepted contact for these grasp objects"
+    ],
+    "rung": 4
+   },
+   "value": 0.175,
+   "vpc": 41.12065300143065
+  }
+ ],
+ "chosen": 0,
+ "escalations": [
+  "rtr000_gelatin_box:obj",
+  "rtr001_pudding_box:obj",
+  "rtr002_sugar_box:obj",
+  "rtr004_mustard_bottle:obj",
+  "rtr007_strawberry:obj",
+  "rtr010_tuna_fish_can:obj",
+  "rtr011_tennis_ball:obj",
+  "rtr012_racquetball:obj",
+  "rtr015_plum:obj",
+  "rtr016_apple:obj",
+  "rtr019_cup:obj",
+  "rtr020_dice:obj"
+ ],
+ "promoted": [],
+ "pruned": [],
+ "targets": [
+  [
+   "rtr000_gelatin_box:obj",
+   "rtr019_cup:obj",
+   "rtr001_pudding_box:obj"
+  ]
+ ],
+ "trial": {
+  "base": {
+   "reg_banana:obj": 1.0,
+   "reg_cup:obj": 1.0,
+   "reg_foam_brick:obj": 1.0,
+   "reg_large_marker:obj": 1.0,
+   "reg_wood_block_cube:obj": 1.0,
+   "rtr000_gelatin_box:obj": 0.0,
+   "rtr001_pudding_box:obj": 0.0,
+   "rtr019_cup:obj": 1.0
+  },
+  "repeats": 2,
+  "trial": {
+   "reg_banana:obj": 1.0,
+   "reg_cup:obj": 1.0,
+   "reg_foam_brick:obj": 1.0,
+   "reg_large_marker:obj": 1.0,
+   "reg_wood_block_cube:obj": 1.0,
+   "rtr000_gelatin_box:obj": 0.0,
+   "rtr001_pudding_box:obj": 0.0,
+   "rtr019_cup:obj": 1.0
+  }
+ }
+}

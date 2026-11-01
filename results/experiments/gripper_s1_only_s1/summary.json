@@ -1,0 +1,56 @@
+{
+ "control_coverage": 1.0,
+ "cost": {
+  "approvals": 0,
+  "grams_pla": 0.0,
+  "grams_tpu": 0.0,
+  "llm_usd": 0.0,
+  "print_minutes": 0.0,
+  "servo_heat_j": 35106.017900000006,
+  "sim_seconds": 7385.619999999999
+ },
+ "coverage_reward": 0.2857142857142857,
+ "design": "d000",
+ "efficiency": {
+  "per_approval": null,
+  "per_gram": null,
+  "per_llm_usd": null,
+  "per_print_hour": null,
+  "per_sim_hour": 0.13926676820245676
+ },
+ "iterations": 8,
+ "library_size": 23,
+ "pass_rate": 0.2857142857142857,
+ "reward": 0.2857142857142857,
+ "split": "test",
+ "stop_reason": "iterations",
+ "summary": {
+  "by_class": {
+   "grasp": {
+    "by_verdict": {
+     "pass": 12,
+     "stuck": 14,
+     "wrong_behavior": 16
+    },
+    "n": 42,
+    "passes": 12
+   }
+  },
+  "by_verdict": {
+   "inconclusive": 0,
+   "no_actuation": 0,
+   "no_applicable_primitive": 0,
+   "pass": 12,
+   "rule_violation": 0,
+   "stuck": 14,
+   "unreachable": 0,
+   "wrong_behavior": 16
+  },
+  "control_coverage": 1.0,
+  "coverage_reward": 0.2857142857142857,
+  "covered": 42,
+  "n": 42,
+  "pass_rate": 0.2857142857142857,
+  "passes": 12
+ }
+}

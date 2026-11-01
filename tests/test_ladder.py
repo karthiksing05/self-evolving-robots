@@ -12,6 +12,7 @@ from sea.contracts import (
     ArmSpec,
     Design,
     DesignDelta,
+    FingerSpec,
     Posture,
     Prediction,
     PrimitiveDef,
@@ -103,6 +104,11 @@ def test_posture_edit_count_and_param_delta():
     assert L.count_edits(many) == 2
     assert L.count_edits(_prop("reparam")) == 1
     assert L.count_edits(_prop("new_tool")) == 1
+    pads = Design(id="p", fingers=FingerSpec(pad_angle_deg=25, groove_mm=3, pad_tpu_mm=2))
+    restated = _prop("finger", design_delta=DesignDelta(fingers={"pad_angle_deg": 32.0, "groove_mm": 2.0, "reach_mm": 12.0,
+                                                                 "lip_mm": 0.0, "pad_tpu_mm": 2.0}))
+    assert L.count_edits(restated) == 5 and L.count_edits(restated, pads) == 3  # live run, iteration 4
+    assert not any("max_edits" in e for e in L.posture_errors(restated, OPT, pads))
     big = _prop("arm", design_delta=DesignDelta(arm={"upper_scale": 1.5}))
     assert any("max_param_delta" in e for e in L.posture_errors(big, CONS, STOCK, forced=True))
     assert not any("max_param_delta" in e for e in L.posture_errors(big, OPT, STOCK))

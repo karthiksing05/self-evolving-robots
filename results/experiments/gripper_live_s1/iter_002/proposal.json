@@ -1,0 +1,197 @@
+{
+ "candidates": [
+  {
+   "cost": {
+    "approvals": 0,
+    "grams_pla": 0.0,
+    "grams_tpu": 0.0,
+    "llm_usd": 0.0,
+    "print_minutes": 0.0,
+    "servo_heat_j": 0,
+    "sim_seconds": 288.0
+   },
+   "errors": [],
+   "proposal": {
+    "design_delta": null,
+    "hypothesis": "The pudding box is pinched near its top edge with little pad area, and the fast lift adds inertial load, so it slips out during the hold. A deeper, slower grasp keeps more contact area and less dynamic load.",
+    "kind": "reparam",
+    "prediction": {
+     "confidence": 0.25,
+     "flips_to_pass": [
+      "rtr001_pudding_box:obj"
+     ],
+     "may_regress": []
+    },
+    "program": null,
+    "promote": null,
+    "rationale": "rtr001_pudding_box reached travel_reached=0.04567 against travel_required=0.03. So the box was lifted and then lost: felt.stopped_by=slip, pad_drop_t=3.02, and payload_held_g is empty. That is a hold failure, not an approach failure. peak_force=26.69 N is the lowest of the three, and its surprise_z travel_reached=-1.353 says it lifted less than expected. A deeper grasp gives more pad contact on the 38.5 mm-tall box. A slower close and lift lowers the inertial load (peak_wrist_acc=2.914 m/s2) on the 187 g box while the jaws hold it.",
+    "reparam": {
+     "grasp.close_s": [
+      0.6,
+      1.0
+     ],
+     "grasp.depth": [
+      0.018,
+      0.035
+     ],
+     "grasp.speed": [
+      0.01,
+      0.025
+     ]
+    },
+    "ruled_out": [],
+    "rung": 0
+   },
+   "value": 0.175,
+   "vpc": 87.49999999999999
+  },
+  {
+   "cost": {
+    "approvals": 1,
+    "grams_pla": 0.0,
+    "grams_tpu": 0.0,
+    "llm_usd": 0.0,
+    "print_minutes": 0.0,
+    "servo_heat_j": 0,
+    "sim_seconds": 336.0
+   },
+   "errors": [],
+   "proposal": {
+    "design_delta": {
+     "arm": {},
+     "fingers": {
+      "groove_mm": 1.0,
+      "pad_angle_deg": 38.0,
+      "pad_tpu_mm": 1.0
+     },
+     "rack_add": [],
+     "rack_remove": [],
+     "servo_voltage": {}
+    },
+    "hypothesis": "The wide objects fail on aperture and face splay. At 25\u00b0 the faces are only parallel at a moderate opening, and the 2 mm TPU plus the 3 mm groove use up opening width, so 57\u201390 mm objects are hit by the jaw edge and squeezed out.",
+    "kind": "finger",
+    "prediction": {
+     "confidence": 0.35,
+     "flips_to_pass": [
+      "rtr000_gelatin_box:obj",
+      "rtr019_cup:obj"
+     ],
+     "may_regress": [
+      "rtr001_pudding_box:obj"
+     ]
+    },
+    "program": null,
+    "promote": null,
+    "rationale": "Each object is wider than the measured widest grip on these fingers. gelatin_box width_mm=73 and pudding_box width_mm=89.6 are both over box=65, and cup width_mm=57 is over cylinder=50. contact_types=edge,pinch on all three shows a jaw edge landing on the object instead of a clean pinch. That matches the high peak_force (45.51, 26.69, 74.82 N) and the cup being knocked away (travel_reached=1.63, payload_held_g=0.6). it001 changed the pads more broadly (tilt, TPU and width together) and caused 2 regressions. This proposal leaves width_mm alone and changes three parameters. Each stays inside the allowed relative change. Tilting the pads further makes the faces parallel at a wider opening. A thinner TPU skin (still 0.9 friction) and a shallower groove give back aperture on each jaw.",
+    "reparam": null,
+    "ruled_out": [
+     "rung0: widest grip (box=65, cylinder=50 mm) is below width_mm 73 and 57, and no grasp parameter widens the jaw opening",
+     "rung1: every recomposition still uses the same grasp motor, and contact_types=edge shows the jaws cannot get around the object at all",
+     "rung2: the rack is empty, so there is no existing tool to use or adapt",
+     "rung3: the tool templates (pad, hook, knob_cup, soft_tip, slot_inserter, probe) give single-point contacts, but these objects accept only pinch, which needs both jaws"
+    ],
+    "rung": 4
+   },
+   "value": 0.48999999999999994,
+   "vpc": 110.30034835509711
+  },
+  {
+   "cost": {
+    "approvals": 0,
+    "grams_pla": 0,
+    "grams_tpu": 0,
+    "llm_usd": 0,
+    "print_minutes": 0,
+    "servo_heat_j": 0,
+    "sim_seconds": 0
+   },
+   "errors": [
+    "actuator is level L3, not enabled in this run (['L1'])"
+   ],
+   "proposal": {
+    "design_delta": {
+     "arm": {},
+     "fingers": {},
+     "rack_add": [],
+     "rack_remove": [],
+     "servo_voltage": {
+      "gripper": 12.0
+     }
+    },
+    "hypothesis": "At 7.4 V the gripper's stall torque gives too little normal force to hold heavier boxes against gravity and lift acceleration, so they slip during the hold.",
+    "kind": "actuator",
+    "prediction": {
+     "confidence": 0.3,
+     "flips_to_pass": [
+      "rtr001_pudding_box:obj",
+      "rtr000_gelatin_box:obj"
+     ],
+     "may_regress": [
+      "rtr019_cup:obj"
+     ]
+    },
+    "program": null,
+    "promote": null,
+    "rationale": "All three failures end with felt.stopped_by=slip and a pad pressure drop (pad_drop_t 3.14, 3.02, 4.22 s). The gripper runs at 7.4 V. The 187 g pudding box lifted past travel (0.04567 > 0.03) and then slipped, so squeeze force is too low even though the TPU friction is 0.9. Moving only the gripper servo to 12 V raises its stall torque and so the squeeze when the servo stalls on the object. The other joints stay as they are, which keeps the risk of regressions low.",
+    "reparam": null,
+    "ruled_out": [
+     "rung0: grasp has no grip-force parameter, because the squeeze is set by where the servo stalls, and slip continued across the depth and speed ranges System 1 already searched (s1_exhausted)",
+     "rung1: no composition of existing primitives raises jaw normal force",
+     "rung2: the rack is empty, so there is no tool to use",
+     "rung3: tool templates do not add pinch squeeze for the stock jaws",
+     "rung4: the fingers already have a 0.9-friction TPU skin, and it001's finger change still regressed, so finger geometry alone does not fix the low squeeze on heavier objects"
+    ],
+    "rung": 5
+   },
+   "value": 0.0,
+   "vpc": 0.0
+  }
+ ],
+ "chosen": 1,
+ "escalations": [
+  "rtr000_gelatin_box:obj",
+  "rtr001_pudding_box:obj",
+  "rtr002_sugar_box:obj",
+  "rtr004_mustard_bottle:obj",
+  "rtr007_strawberry:obj",
+  "rtr010_tuna_fish_can:obj",
+  "rtr011_tennis_ball:obj",
+  "rtr012_racquetball:obj",
+  "rtr015_plum:obj",
+  "rtr016_apple:obj",
+  "rtr019_cup:obj",
+  "rtr020_dice:obj"
+ ],
+ "promoted": [],
+ "pruned": [],
+ "targets": [
+  [
+   "rtr000_gelatin_box:obj",
+   "rtr019_cup:obj",
+   "rtr001_pudding_box:obj"
+  ]
+ ],
+ "trial": {
+  "base": {
+   "reg_banana:obj": 1.0,
+   "reg_cup:obj": 1.0,
+   "reg_foam_brick:obj": 1.0,
+   "reg_large_marker:obj": 1.0,
+   "reg_wood_block_cube:obj": 1.0,
+   "rtr000_gelatin_box:obj": 0.0,
+   "rtr001_pudding_box:obj": 0.0,
+   "rtr019_cup:obj": 1.0
+  },
+  "repeats": 2,
+  "trial": {
+   "reg_banana:obj": 0.0,
+   "reg_cup:obj": 1.0,
+   "reg_foam_brick:obj": 1.0,
+   "reg_large_marker:obj": 1.0,
+   "reg_wood_block_cube:obj": 0.0,
+   "rtr000_gelatin_box:obj": 1.0,
+   "rtr001_pudding_box:obj": 0.0,
+   "rtr019_cup:obj": 1.0
+  }
+ }
+}

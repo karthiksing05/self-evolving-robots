@@ -1,0 +1,150 @@
+{
+ "candidates": [
+  {
+   "cost": {
+    "approvals": 1,
+    "grams_pla": 0.0,
+    "grams_tpu": 0.0,
+    "llm_usd": 0.0,
+    "print_minutes": 0.0,
+    "servo_heat_j": 0,
+    "sim_seconds": 384.0
+   },
+   "errors": [],
+   "proposal": {
+    "design_delta": {
+     "arm": {},
+     "fingers": {
+      "groove_mm": 3.0,
+      "pad_angle_deg": 25.0,
+      "pad_tpu_mm": 2.0
+     },
+     "rack_add": [],
+     "rack_remove": [],
+     "servo_voltage": {}
+    },
+    "hypothesis": "The stock PLA jaw faces are not parallel at wide openings and have low friction. Round objects wider than 40 mm get pushed out of the jaws, and the 514 g box slips during the last few mm of the lift.",
+    "kind": "finger",
+    "prediction": {
+     "confidence": 0.5,
+     "flips_to_pass": [
+      "rtr007_strawberry:obj",
+      "rtr012_racquetball:obj",
+      "rtr002_sugar_box:obj"
+     ],
+     "may_regress": []
+    },
+    "program": null,
+    "promote": null,
+    "rationale": "All three failures stop the same way: stopped_by=slip, with pad_drop_t (3.46-4.46 s) showing the jaw pressure dropping under a constant command. They differ only in geometry. strawberry (width_mm=46.8) and racquetball (width_mm=55.5) are round and wider than the sphere grip limit of 40 mm. Their travel_reached (0.8435 and 0.5435 m against travel_required=0.03), contact_types=edge,pinch and peak_force of about 64-66 N mean the object was squeezed out between non-parallel faces and thrown, not lifted. The design notes say the stock faces are parallel only when closed, so wide objects are squeezed out. Tilting the pad (pad_angle_deg) makes the faces parallel at a wide opening, and a V-groove (groove_mm) centres the round objects. sugar_box (514 g) got to travel_reached=0.02447 of 0.03 before slipping, so the lift almost worked and failed on friction. A TPU skin raises friction from 0.45 to 0.9, which halves the squeeze needed to hold 5 N of weight. That is 3 edits, within the limit of max edits 3.",
+    "reparam": null,
+    "ruled_out": [
+     "rung0: stopped_by=slip and pad_drop_t on every control, plus round objects wider than the 40 mm sphere grip (46.8 and 55.5 mm), point to a jaw geometry and friction limit. The grasp ranges (close, depth, side) that S1 already exhausted cannot change face angle or friction.",
+     "rung1: the only primitive that can lift (provides lifts=grasp) is grasp, alone or inside pick_up, so recomposing it keeps the same jaw contact that slips.",
+     "rung2: the rack is empty, so there is no existing tool to use or adapt.",
+     "rung3: accepted_contacts=pinch only, and none of the tool templates (pad, hook, knob_cup, soft_tip, slot_inserter, probe) gives a two-jaw pinch, so only the fingers can change the pinch surfaces."
+    ],
+    "rung": 4
+   },
+   "value": 1.0499999999999998,
+   "vpc": 229.80017276481712
+  },
+  {
+   "cost": {
+    "approvals": 1,
+    "grams_pla": 0.0,
+    "grams_tpu": 0.0,
+    "llm_usd": 0.0,
+    "print_minutes": 0.0,
+    "servo_heat_j": 0,
+    "sim_seconds": 384.0
+   },
+   "errors": [],
+   "proposal": {
+    "design_delta": {
+     "arm": {},
+     "fingers": {
+      "pad_angle_deg": 30.0,
+      "pad_tpu_mm": 2.5
+     },
+     "rack_add": [],
+     "rack_remove": [],
+     "servo_voltage": {}
+    },
+    "hypothesis": "Non-parallel stock faces at wide openings plus PLA friction of 0.45 cause the slip. Parallel TPU pads alone should hold all three objects without a groove.",
+    "kind": "finger",
+    "prediction": {
+     "confidence": 0.4,
+     "flips_to_pass": [
+      "rtr002_sugar_box:obj",
+      "rtr012_racquetball:obj",
+      "rtr007_strawberry:obj"
+     ],
+     "may_regress": []
+    },
+    "program": null,
+    "promote": null,
+    "rationale": "This is a fallback in case the V-groove reduces flat-face contact on sugar_box (width_mm=92.2, a box face). It keeps the two changes the evidence supports most strongly. pad_angle_deg addresses the squeeze-out seen in strawberry and racquetball: travel_reached far beyond 0.03, peak_force of about 64-66 N, contact_types including edge. pad_tpu_mm addresses the friction-limited slip of the 514 g box, which reached travel_reached=0.02447 of 0.03 before stopped_by=slip at pad_drop_t=3.46.",
+    "reparam": null,
+    "ruled_out": [
+     "rung0: every control fails by stopped_by=slip with a pad pressure drop (pad_drop_t), which is a face-angle and friction limit that the grasp parameter ranges cannot reach.",
+     "rung1: grasp is the only lifting primitive, so any recomposed program uses the same slipping jaw contact.",
+     "rung2: the rack is empty, so there is no library tool to use.",
+     "rung3: accepted_contacts=pinch, and no tool template provides a two-jaw pinch."
+    ],
+    "rung": 4
+   },
+   "value": 0.8399999999999999,
+   "vpc": 183.84013821185368
+  }
+ ],
+ "chosen": 0,
+ "escalations": [
+  "rtr001_pudding_box:obj",
+  "rtr011_tennis_ball:obj",
+  "rtr015_plum:obj",
+  "rtr007_strawberry:obj",
+  "rtr012_racquetball:obj",
+  "rtr018_flat_screwdriver:obj",
+  "rtr016_apple:obj",
+  "rtr002_sugar_box:obj",
+  "rtr010_tuna_fish_can:obj",
+  "rtr004_mustard_bottle:obj",
+  "rtr000_gelatin_box:obj",
+  "rtr009_tomato_soup_can:obj",
+  "rtr014_lemon:obj",
+  "rtr013_golf_ball:obj"
+ ],
+ "promoted": [],
+ "pruned": [],
+ "targets": [
+  [
+   "rtr002_sugar_box:obj",
+   "rtr007_strawberry:obj",
+   "rtr012_racquetball:obj"
+  ]
+ ],
+ "trial": {
+  "base": {
+   "reg_banana:obj": 1.0,
+   "reg_cup:obj": 1.0,
+   "reg_foam_brick:obj": 1.0,
+   "reg_large_marker:obj": 1.0,
+   "reg_wood_block_cube:obj": 1.0,
+   "rtr002_sugar_box:obj": 0.0,
+   "rtr007_strawberry:obj": 0.0,
+   "rtr012_racquetball:obj": 0.0
+  },
+  "repeats": 2,
+  "trial": {
+   "reg_banana:obj": 1.0,
+   "reg_cup:obj": 1.0,
+   "reg_foam_brick:obj": 1.0,
+   "reg_large_marker:obj": 1.0,
+   "reg_wood_block_cube:obj": 1.0,
+   "rtr002_sugar_box:obj": 0.0,
+   "rtr007_strawberry:obj": 0.5,
+   "rtr012_racquetball:obj": 0.0
+  }
+ }
+}

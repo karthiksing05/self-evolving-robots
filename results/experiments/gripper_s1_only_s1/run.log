@@ -1,0 +1,17 @@
+iter 0: coverage_reward=0.333 reward=0.333 escalated=14
+  tried reparam (vpc=315.00): accepted=False delta=+0.000 [+0.000, +0.000]
+iter 1: coverage_reward=0.333 reward=0.333 escalated=14
+  tried reparam (vpc=315.00): accepted=False delta=+0.000 [+0.000, +0.000]
+iter 2: coverage_reward=0.333 reward=0.333 escalated=14
+  tried reparam (vpc=315.00): accepted=False delta=+0.000 [+0.000, +0.000]
+iter 3: coverage_reward=0.333 reward=0.333 escalated=14
+  tried reparam (vpc=315.00): accepted=False delta=+0.000 [+0.000, +0.000]
+iter 4: coverage_reward=0.333 reward=0.333 escalated=14
+  tried reparam (vpc=315.00): accepted=False delta=+0.000 [+0.000, +0.000]
+iter 5: coverage_reward=0.333 reward=0.333 escalated=14
+  tried reparam (vpc=315.00): accepted=False delta=+0.000 [+0.000, +0.000]
+iter 6: coverage_reward=0.333 reward=0.333 escalated=14
+  tried reparam (vpc=312.07): accepted=False delta=+0.000 [+0.000, +0.000]
+iter 7: coverage_reward=0.333 reward=0.333 escalated=14
+  tried reparam (vpc=306.10): accepted=False delta=+0.000 [+0.000, +0.000]
+{"coverage_reward": 0.2857142857142857, "reward": 0.2857142857142857, "stop_reason": "iterations", "iterations": 8}

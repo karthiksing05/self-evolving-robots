@@ -85,6 +85,21 @@ Tilting further holds more round objects but costs the small ones. Pads at 40° 
 opening a steep pad makes a V that squeezes a small object out. That trade-off is the
 experiment's design problem.
 
+**First live run (D-039, `results/experiments/`):** 8 iterations, System 2 on the Claude plan
+through the Claude Code CLI, fingers only.
+
+- **Result:** on the 42 held-out test tables, coverage went from 0.286 for the System-1-only control
+  to 0.429. The arm holds 8 objects at both placements against the control's 5, with no phase-A
+  loss.
+- **The accepted design** came from System 2's first proposal: 25° tilt, 3 mm V-groove, 2 mm TPU,
+  costing about 14 print minutes. Measured like the stock jaws, it holds 8/21. It gains the golf
+  ball, the soup can on its side and the screwdriver.
+- **Every later finger proposal was rejected.** Four of them tilted the pads 38–40°. Two of those
+  flipped the gelatin box, two flipped the tennis ball and racquetball, and all four broke the banana
+  and the cube: the gold-check trade-off, found against the judge.
+- **The run exposed three harness gaps**, fixed in D-039: edits counted by key, past fixes that did
+  not name what they broke, and finger changes left unpriced.
+
 ### Phase C: the arm itself (on the radar)
 
 Phase C injects arm faults into the simulator but not into the robot's own model:
@@ -313,7 +328,7 @@ Hardware for V5:
 | Task network contracts (`plan/network.py`, `verify/goals.py`); the current loop recorded as the degenerate network in `goals.jsonl`, every number unchanged (D-034, D-037) | built |
 | Finger family: pads built into the model, priced by the ledger, pad-aware grasp and probe (D-038) | built |
 | Real objects: 21 YCB scans, phase A/B split by measurement, gold check (V2) over finger designs (D-038) | built |
-| Live gripper experiment (`configs/exp/gripper_live.yaml`) and its System-1-only control | running |
+| Live gripper experiment (`configs/exp/gripper_live.yaml`) and its System-1-only control | first run done (D-039) |
 | Finger CAD export (STEP/STL for printing), difficulty check (V3) | design |
 | `sea-arm` MCP server over the sim: sense, analyze and goal tools, call log and replay, agentic `s2_agent` over the task network | design |
 | `design/arm.py` (L2), actuator (L3), phase C fault injection | design |

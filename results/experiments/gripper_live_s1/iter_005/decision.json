@@ -1,0 +1,9 @@
+{
+ "accepted": false,
+ "delta_hi": 0.0,
+ "delta_lo": 0.0,
+ "delta_mean": 0.0,
+ "prediction_score": 0.0,
+ "regressions": [],
+ "rule": "mean"
+}

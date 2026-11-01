@@ -6,6 +6,8 @@ proceed to costing.  These run before any simulation and before the ledger sees 
 
 from __future__ import annotations
 
+from typing import Any
+
 from sea.contracts import PROPOSAL_RUNG, Design, Proposal
 from sea.spec.posture import EffectiveParams
 
@@ -43,13 +45,23 @@ def ladder_errors(proposal: Proposal) -> list[str]:
     return errs
 
 
-def count_edits(proposal: Proposal) -> int:
-    """Parameters a proposal edits.  Each added tool counts once (one template instantiation)."""
+def count_edits(proposal: Proposal, design: Design | None = None) -> int:
+    """Parameters a proposal edits.  Each added tool counts once (one template instantiation).  Given the
+    current ``design``, a field restated at its current value is not an edit (D-039)."""
     n = len(proposal.reparam or {})
     d = proposal.design_delta
-    if d is not None:
-        n += len(d.arm) + len(d.fingers) + len(d.servo_voltage) + len(d.rack_add)
-    return n
+    if d is None:
+        return n
+
+    def changed(new: dict[str, float], current: Any) -> int:
+        if design is None:
+            return len(new)
+        fields = current if isinstance(current, dict) else current.model_dump()
+        same = {k for k, v in new.items() if isinstance(fields.get(k), int | float) and float(fields[k]) == float(v)}
+        return len(new) - len(same)
+
+    return (n + changed(d.arm, design and design.arm) + changed(d.fingers, design and design.fingers)
+            + changed(d.servo_voltage, design and design.arm.servo_voltage) + len(d.rack_add))
 
 
 def _relative_change(field: str, old: float, new: float) -> float:
@@ -61,7 +73,7 @@ def posture_errors(proposal: Proposal, eff: EffectiveParams, design: Design, for
     rung = PROPOSAL_RUNG[proposal.kind]
     if rung is not None and rung > eff.max_rung and not forced:
         errs.append(f"rung {rung} exceeds the posture's max rung {eff.max_rung}")
-    n = count_edits(proposal)
+    n = count_edits(proposal, design)
     if n > eff.max_edits:
         errs.append(f"{n} parameter edits exceed the posture's max_edits {eff.max_edits}")
     d = proposal.design_delta

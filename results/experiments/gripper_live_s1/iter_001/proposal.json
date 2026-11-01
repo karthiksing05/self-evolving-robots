@@ -1,0 +1,146 @@
+{
+ "candidates": [
+  {
+   "cost": {
+    "approvals": 0,
+    "grams_pla": 0.0,
+    "grams_tpu": 0.0,
+    "llm_usd": 0.0,
+    "print_minutes": 0.0,
+    "servo_heat_j": 0,
+    "sim_seconds": 288.0
+   },
+   "errors": [],
+   "proposal": {
+    "design_delta": null,
+    "hypothesis": "The dice (16.8 mm, 5.2 g) is narrower than the jaws can open, so aperture is not the problem. A shallow, fast pinch near the top edge, closed with the 25\u00b0 tilted pads, lets the cube rotate and pop out. Gripping lower and slower at mid-height should keep it seated.",
+    "kind": "reparam",
+    "prediction": {
+     "confidence": 0.35,
+     "flips_to_pass": [
+      "rtr020_dice:obj"
+     ],
+     "may_regress": []
+    },
+    "program": null,
+    "promote": null,
+    "rationale": "For rtr020_dice the felt evidence is stopped_by=slip with pad_drop_t=5.08: pressure was there and then dropped under a constant command, so the dice was held and then lost. peak_wrist_acc=5.903 m/s2 is the highest of the three and surprise_z peak_acc=2.742, which points to a jerky lift. peak_force=17.96 N is high for a 5.2 g part, so the jaws are squeezing it out, not gripping too weakly. The dice is well inside the widest grip (box=65 mm), ik_residual_mm=0 and joint_limit_hits=-, so reach is fine. A cheap search over depth, close timing and lift speed is the right first step.",
+    "reparam": {
+     "grasp.close_s": [
+      0.5,
+      1.0
+     ],
+     "grasp.depth": [
+      0.006,
+      0.012
+     ],
+     "grasp.speed": [
+      0.01,
+      0.03
+     ]
+    },
+    "ruled_out": [],
+    "rung": 0
+   },
+   "value": 0.24499999999999997,
+   "vpc": 122.49999999999999
+  },
+  {
+   "cost": {
+    "approvals": 1,
+    "grams_pla": 0.0,
+    "grams_tpu": 0.0,
+    "llm_usd": 0.0,
+    "print_minutes": 0.0,
+    "servo_heat_j": 0,
+    "sim_seconds": 336.0
+   },
+   "errors": [],
+   "proposal": {
+    "design_delta": {
+     "arm": {},
+     "fingers": {
+      "pad_angle_deg": 38.0,
+      "pad_tpu_mm": 1.5,
+      "width_mm": 20.0
+     },
+     "rack_add": [],
+     "rack_remove": [],
+     "servo_voltage": {}
+    },
+    "hypothesis": "The gelatin box (73 mm) and the cup (57 mm) are wider than the measured widest grip on these fingers (box=65 mm, cylinder=50 mm). The pads are only parallel near 25\u00b0 of jaw opening, so at full opening the faces splay and squeeze both objects out. Tilting the pads further makes them parallel at a wider opening. A thinner TPU skin adds aperture while keeping 0.9 friction, and wider pads add contact area.",
+    "kind": "finger",
+    "prediction": {
+     "confidence": 0.4,
+     "flips_to_pass": [
+      "rtr000_gelatin_box:obj",
+      "rtr019_cup:obj"
+     ],
+     "may_regress": [
+      "rtr020_dice:obj"
+     ]
+    },
+    "program": null,
+    "promote": null,
+    "rationale": "rtr000_gelatin_box has width_mm=73 against a widest box grip of 65, and rtr019_cup has width_mm=57 against a widest cylinder grip of 50. Both stopped_by=slip, with large peak_force (45.51 N and 74.82 N) and contact_types=edge,pinch. That means the jaws touched the object edge-on and pushed it out, not that they lacked squeeze. The cup lifted only payload_held_g=0.6 of its 13 g. ik_residual_mm=0 and joint_limit_hits=- rule out reach and kinematics. Past fix it000 found the same cause, non-parallel PLA faces at wide openings, and a finger change at rung 4 was accepted by mean.",
+    "reparam": null,
+    "ruled_out": [
+     "rung0: the objects are 73 mm and 57 mm wide but the widest grips are 65 mm (box) and 50 mm (cylinder); no grasp parameter (depth, side, close) widens the jaw opening",
+     "rung1: pick_up and grasp are the only primitives that provide lifts=grasp, and both need aperture=width, so recomposing them cannot get around the aperture limit",
+     "rung2: the rack is empty, so there is no library tool to use or adapt",
+     "rung3: rack tools give push, hook or edge contacts, but these objects accept only pinch, which needs both jaws, so the fix has to be the jaw pads"
+    ],
+    "rung": 4
+   },
+   "value": 0.5599999999999999,
+   "vpc": 127.4871885807021
+  }
+ ],
+ "chosen": 1,
+ "escalations": [
+  "rtr000_gelatin_box:obj",
+  "rtr001_pudding_box:obj",
+  "rtr002_sugar_box:obj",
+  "rtr004_mustard_bottle:obj",
+  "rtr007_strawberry:obj",
+  "rtr010_tuna_fish_can:obj",
+  "rtr011_tennis_ball:obj",
+  "rtr012_racquetball:obj",
+  "rtr015_plum:obj",
+  "rtr016_apple:obj",
+  "rtr019_cup:obj",
+  "rtr020_dice:obj"
+ ],
+ "promoted": [],
+ "pruned": [],
+ "targets": [
+  [
+   "rtr000_gelatin_box:obj",
+   "rtr019_cup:obj",
+   "rtr020_dice:obj"
+  ]
+ ],
+ "trial": {
+  "base": {
+   "reg_banana:obj": 1.0,
+   "reg_cup:obj": 1.0,
+   "reg_foam_brick:obj": 1.0,
+   "reg_large_marker:obj": 1.0,
+   "reg_wood_block_cube:obj": 1.0,
+   "rtr000_gelatin_box:obj": 0.0,
+   "rtr019_cup:obj": 1.0,
+   "rtr020_dice:obj": 0.5
+  },
+  "repeats": 2,
+  "trial": {
+   "reg_banana:obj": 0.0,
+   "reg_cup:obj": 1.0,
+   "reg_foam_brick:obj": 1.0,
+   "reg_large_marker:obj": 0.5,
+   "reg_wood_block_cube:obj": 0.0,
+   "rtr000_gelatin_box:obj": 1.0,
+   "rtr019_cup:obj": 1.0,
+   "rtr020_dice:obj": 0.0
+  }
+ }
+}

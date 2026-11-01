@@ -247,6 +247,18 @@ def finger_estimate(design: Design) -> tuple[float, float, float, float]:
     return m_pla + m_tpu, g_pla, g_tpu, mass
 
 
+def finger_print(old: Design, new: Design) -> tuple[float, float, float]:
+    """(volume_cm3, grams_pla, grams_tpu) to print when ``new`` changes ``old``'s fingers: both pads,
+    whole, since a changed pad is a new part.  Zero when the fingers are unchanged or go back to stock."""
+    from sea.design.fingers import pad_geoms
+
+    if new.fingers == old.fingers:
+        return 0.0, 0.0, 0.0
+    vol = sum(8 * g.half[0] * g.half[1] * g.half[2] for g in pad_geoms(new.fingers)) * 1e6
+    _, pla, tpu, _ = finger_estimate(new)
+    return vol, pla, tpu
+
+
 def build(design: Design, limits: HardLimits, *, decompose: Decompose = "analytic",
           collision_check: Callable[[BuiltDesign], list[str]] | None = None,
           cache_dir: Path | None = None) -> BuiltDesign:

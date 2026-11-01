@@ -52,7 +52,7 @@ from sea.contracts import (
     recess_bin,
     tilt_bin,
 )
-from sea.design.build import BuiltDesign, build
+from sea.design.build import BuiltDesign, build, finger_print
 from sea.design.space import tools_equivalent
 from sea.plan.network import DegenerateNetwork, GoalLog, cost_diff
 from sea.propose.baselines import ProposeContext, Proposer, make_proposer
@@ -483,6 +483,7 @@ def screen(state: State, p: Proposal, ctx: ProposeContext, index: dict[str, tupl
             cand.library = lib
     printed = [t for t in cand.new_tools if not any(tools_equivalent(t, k) for k in state.tool_library)]
     vol, grams, parts, material = 0.0, 0.0, 0, "pla"
+    pads = (0.0, 0.0, 0.0)  # finger pads to print: volume, PLA and TPU grams (D-039)
     if cand.built is not None:
         for t in cand.built.tools:
             if any(t.spec == s for s in printed):
@@ -490,10 +491,17 @@ def screen(state: State, p: Proposal, ctx: ProposeContext, index: dict[str, tupl
                 grams += t.grams_pla + t.grams_tpu
                 parts += 1
                 material = t.material if t.material in ("pla", "tpu") else "pla"
+        pads = finger_print(state.design, cand.built.design)
+        if pads[0] > 0:
+            vol += pads[0]
+            parts += 2
     n_ctl = sum(len(index_panel(index, pid).controls) for pid in {index[k][1].id for k in keys})
     sim_est = EPISODE_EST_S * spec.trial_repeats * 2 * (n_ctl + sum(len(r.controls) for r in regression_panels(spec)))
     cand.cost = state.ledger.estimate(p, added_volume_cm3=vol, material=material, sim_seconds=sim_est,
                                       n_parts=parts, grams=grams if parts else None)
+    if pads[0] > 0:  # the pads' two materials, beside whatever the rack tools charged
+        cand.cost = cand.cost.model_copy(update={"grams_pla": cand.cost.grams_pla + pads[1],
+                                                 "grams_tpu": cand.cost.grams_tpu + pads[2]})
     verdicts = {r.key: r.verdict for r in ctx.report.results}
     cand.value = p.prediction.confidence * sum(gain_est(verdicts[k]) for k in p.prediction.flips_to_pass
                                                if k in verdicts)

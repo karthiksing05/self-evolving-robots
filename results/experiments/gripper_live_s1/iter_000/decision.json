@@ -1,0 +1,9 @@
+{
+ "accepted": true,
+ "delta_hi": 0.1870398431249004,
+ "delta_lo": -0.0004601568750996086,
+ "delta_mean": 0.06203984312490039,
+ "prediction_score": 0.3333333333333333,
+ "regressions": [],
+ "rule": "mean"
+}

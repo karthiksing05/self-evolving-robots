@@ -351,7 +351,8 @@ def test_prompt_lists_fixes_rack_and_handles_empty_inputs():
     dec = Decision(accepted=True, rule="mean", delta_mean=0.2, delta_lo=0.05, delta_hi=0.3, prediction_score=1.0)
     fixes = [FixRecord(id=f"fix{i}", iteration=i, proposal=prop, decision=dec, distance=0.1 * (7 - i))
              for i in range(7)]
-    rejected = FixRecord(id="fixr", iteration=2, proposal=prop, decision=dec.model_copy(update={"accepted": False}),
+    rejected = FixRecord(id="fixr", iteration=2, proposal=prop,
+                         decision=dec.model_copy(update={"accepted": False, "regressions": ["reg_banana:obj"]}),
                          distance=0.0)
     design = Design(id="d004", parent="d003",
                     tool_rack=[ToolSpec(template="hook", params={"depth": 8.0}, contact="hook")])
@@ -359,6 +360,7 @@ def test_prompt_lists_fixes_rack_and_handles_empty_inputs():
     body = dict(p.sections)
     assert body["Similar past fixes"].count("- fix") == 5
     assert "fixr" in body["Similar past fixes"] and "-> rejected" in body["Similar past fixes"]
+    assert "regressions 1, prediction score 1)\n    broke: reg_banana:obj" in body["Similar past fixes"]
     assert "fix0" not in body["Similar past fixes"]  # farthest dropped
     assert "rack[0]: hook contact=hook depth=8" in body["Current design"]
     assert "parent d003" in body["Current design"]

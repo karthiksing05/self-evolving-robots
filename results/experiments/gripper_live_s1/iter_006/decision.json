@@ -1,0 +1,13 @@
+{
+ "accepted": false,
+ "delta_hi": 0.18738599602963846,
+ "delta_lo": -0.43761400397036154,
+ "delta_mean": -0.12511400397036154,
+ "prediction_score": 0.6666666666666666,
+ "regressions": [
+  "reg_banana:obj",
+  "reg_large_marker:obj",
+  "reg_wood_block_cube:obj"
+ ],
+ "rule": "mean"
+}

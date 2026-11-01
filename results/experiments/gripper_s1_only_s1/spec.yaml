@@ -1,0 +1,97 @@
+seed: 1
+limits:
+  max_force_n: 15.0
+  max_tip_speed_mps: 0.1
+  workspace_box:
+  - x: 0.1
+    y: -0.2
+    z: -0.1
+  - x: 0.4
+    y: 0.2
+    z: 0.25
+  banned_contacts: []
+  max_tool_mass_g: 40.0
+  max_link_scale: 1.3
+  min_wall_mm: 1.2
+posture:
+  beta: 1.0
+  max_param_delta: null
+  max_edits: null
+  repeats_before_fail: null
+  accept_rule: mean
+  surprise_tau: null
+  regression_panel: full
+  force_cap_fraction: null
+  k_promote: null
+  anneal_with_budget: false
+  per_area: {}
+budgets:
+  print_minutes: 240.0
+  grams_pla: 300.0
+  grams_tpu: 50.0
+  design_iterations: 8
+  llm_usd: 20.0
+  approvals_per_hour: 6
+  rack_slots: 4
+  library_size: 40
+  sim_hours: 10.0
+  reserve_fraction: 0.2
+levels:
+- L1
+proposer: s1_only
+world_model: false
+llm_model: claude-opus-5-5
+llm_cheap_model: claude-sonnet-5-5
+splits:
+  train: 21
+  val: 21
+  test: 42
+  compose: 0
+panel_seed: 5
+iter_sample: 21
+stop:
+  target_reward: 0.95
+  min_value_per_cost: 0.01
+  patience: 3
+ablations:
+  target_mode: gap_uncertainty
+  use_fix_tree: true
+  library_learning: true
+  cost_terms: true
+  reference_regression: true
+  zero_shot: false
+llm: claude_code
+llm_fixtures: null
+eval_split: test
+world: grasp
+objects:
+- gelatin_box
+- pudding_box
+- sugar_box
+- potted_meat_can
+- mustard_bottle
+- foam_brick
+- wood_block_cube
+- strawberry
+- banana
+- tomato_soup_can
+- tuna_fish_can
+- tennis_ball
+- racquetball
+- golf_ball
+- lemon
+- plum
+- apple
+- large_marker
+- flat_screwdriver
+- cup
+- dice
+regression_objects:
+- banana
+- cup
+- foam_brick
+- large_marker
+- wood_block_cube
+embedder: fake
+s1_trials: 8
+trial_repeats: 2

@@ -1,0 +1,146 @@
+{
+ "candidates": [
+  {
+   "cost": {
+    "approvals": 0,
+    "grams_pla": 0.0,
+    "grams_tpu": 0.0,
+    "llm_usd": 0.0,
+    "print_minutes": 0.0,
+    "servo_heat_j": 0,
+    "sim_seconds": 288.0
+   },
+   "errors": [],
+   "proposal": {
+    "design_delta": null,
+    "hypothesis": "The pudding box is grasped and lifted, but it slips out during the hold. It is 187 g and held in a shallow PLA-edge pinch, and the lift acceleration overcomes the friction. A deeper grasp, a firmer close and a slower lift should give more contact area and normal force and less inertial load.",
+    "kind": "reparam",
+    "prediction": {
+     "confidence": 0.35,
+     "flips_to_pass": [
+      "rtr001_pudding_box:obj"
+     ],
+     "may_regress": []
+    },
+    "program": null,
+    "promote": null,
+    "rationale": "For rtr001_pudding_box, travel_reached is 0.04567, which is at least travel_required 0.03, so the lift happens. felt.stopped_by=slip and pad_drop_t=3.02 show the jaw pressure dropping during the hold. contact_types=edge,pinch shows part of the contact is on a jaw edge. peak_force 26.69 N with surprise_z peak_force -1.223 means the squeeze was lower than expected, and peak_wrist_acc is 2.914 m/s2. The iter-4 version of this idea was refused only for using 5 edits, so this proposal uses 3. ik_residual_mm=0 and joint_limit_hits=- show no reach problem.",
+    "reparam": {
+     "grasp.close": [
+      -0.17,
+      -0.05
+     ],
+     "grasp.depth": [
+      0.02,
+      0.035
+     ],
+     "grasp.speed": [
+      0.01,
+      0.025
+     ]
+    },
+    "ruled_out": [],
+    "rung": 0
+   },
+   "value": 0.24499999999999997,
+   "vpc": 122.49999999999999
+  },
+  {
+   "cost": {
+    "approvals": 1,
+    "grams_pla": 0.0,
+    "grams_tpu": 0.0,
+    "llm_usd": 0.0,
+    "print_minutes": 0.0,
+    "servo_heat_j": 0,
+    "sim_seconds": 336.0
+   },
+   "errors": [],
+   "proposal": {
+    "design_delta": {
+     "arm": {},
+     "fingers": {
+      "groove_mm": 4.5,
+      "pad_angle_deg": 35.0,
+      "reach_mm": 12.0
+     },
+     "rack_add": [],
+     "rack_remove": [],
+     "servo_voltage": {}
+    },
+    "hypothesis": "The cup (57 mm at the rim) and the gelatin box (73 mm) are wider than these fingers' widest grip (cylinder 50 mm, box 65 mm). The jaws therefore catch them high up with an edge and squeeze them out. Longer pads (reach) let the grasp close lower on the tapering cup and lower on the 30 mm-tall box. A deeper V-groove centres the round cup, and more pad tilt keeps the faces parallel at the wider opening.",
+    "kind": "finger",
+    "prediction": {
+     "confidence": 0.25,
+     "flips_to_pass": [
+      "rtr019_cup:obj",
+      "rtr000_gelatin_box:obj"
+     ],
+     "may_regress": [
+      "rtr001_pudding_box:obj"
+     ]
+    },
+    "program": null,
+    "promote": null,
+    "rationale": "rtr019_cup: peak_force 74.82 N (surprise_z +1.61), payload_held_g 0.6, stopped_by=slip and contact_types=edge,pinch together point to an edge contact that squeezes the cup out instead of a face pinch. rtr000_gelatin_box: stopped_by=slip, pad_drop_t=3.14, and a wrist_roll stall_s of 1.56 point to the same squeeze-out. it003 showed that reparam depth alone gave delta 0, because the stock tips cannot go lower. it001 and it002 changed TPU thickness and width and regressed 2 controls, so this proposal leaves TPU (friction 0.9) and width alone. It uses 3 edits to stay within max_edits.",
+    "reparam": null,
+    "ruled_out": [
+     "rung0: it003's deeper, slower, firmer grasp reparam on the cup gave delta mean 0. The objects are wider than the measured widest grip (57 > 50 mm, 73 > 65 mm), and no parameter range adds aperture or changes face splay.",
+     "rung1: no recomposition of approach, grasp, release and retreat changes the jaw geometry. pick_up already sequences grasp-lift-hold, and the failure is slip at the contact (stopped_by=slip).",
+     "rung2: the rack is empty, so there is no existing tool to use or adapt.",
+     "rung3: these grasp controls accept only pinch (accepted_contacts=pinch), which needs both jaws. The single-contact L0 templates (pad, hook, cup, probe, edge) cannot change the jaw pads, so only a finger change helps."
+    ],
+    "rung": 4
+   },
+   "value": 0.35,
+   "vpc": 77.57858506746189
+  }
+ ],
+ "chosen": 0,
+ "escalations": [
+  "rtr000_gelatin_box:obj",
+  "rtr001_pudding_box:obj",
+  "rtr002_sugar_box:obj",
+  "rtr004_mustard_bottle:obj",
+  "rtr007_strawberry:obj",
+  "rtr010_tuna_fish_can:obj",
+  "rtr011_tennis_ball:obj",
+  "rtr012_racquetball:obj",
+  "rtr015_plum:obj",
+  "rtr016_apple:obj",
+  "rtr019_cup:obj",
+  "rtr020_dice:obj"
+ ],
+ "promoted": [],
+ "pruned": [],
+ "targets": [
+  [
+   "rtr000_gelatin_box:obj",
+   "rtr019_cup:obj",
+   "rtr001_pudding_box:obj"
+  ]
+ ],
+ "trial": {
+  "base": {
+   "reg_banana:obj": 1.0,
+   "reg_cup:obj": 1.0,
+   "reg_foam_brick:obj": 1.0,
+   "reg_large_marker:obj": 1.0,
+   "reg_wood_block_cube:obj": 1.0,
+   "rtr000_gelatin_box:obj": 0.0,
+   "rtr001_pudding_box:obj": 0.0,
+   "rtr019_cup:obj": 1.0
+  },
+  "repeats": 2,
+  "trial": {
+   "reg_banana:obj": 1.0,
+   "reg_cup:obj": 1.0,
+   "reg_foam_brick:obj": 1.0,
+   "reg_large_marker:obj": 1.0,
+   "reg_wood_block_cube:obj": 1.0,
+   "rtr000_gelatin_box:obj": 0.0,
+   "rtr001_pudding_box:obj": 0.0,
+   "rtr019_cup:obj": 1.0
+  }
+ }
+}

@@ -890,3 +890,27 @@ Judge key b1706b1856a4 -> 4ffb19f19f33: contracts, `configs/grasp.yaml`, `grasp_
 `sim/objects.py` changed, so the baselines are re-keyed.
 
 Tests: `tests/test_fingers.py`, plus the prompt tests in `tests/test_llm_mock.py`.
+
+## D-039 Three gaps the first live gripper run exposed in the harness (policy)
+The first live gripper run (`configs/exp/gripper_live.yaml`, results in `results/experiments/`) showed three
+places where the harness, not System 2, was the problem.
+- **Edits are changes, not keys.** In iteration 4, a finger proposal restated two fields at their
+  current values (`lip_mm: 0`, `pad_tpu_mm: 2`). Screening counted 5 edits against the posture's 3
+  and refused it, though only 3 values changed. `ladder.count_edits` now takes the current design
+  and does not count a field restated at its current value. Without a design it counts keys as
+  before.
+- **A past fix names what it broke.** In iterations 1, 2 and 6, System 2 steepened the pad tilt to
+  reach the 73 mm gelatin box. Each time, the banana and the wood cube regressed and the trial was
+  rejected. Its "Similar past fixes" section showed only `regressions 2`. A rejected fix now adds a
+  `broke:` line naming up to six regressed controls.
+
+- **Finger changes are priced.** The live run's ledger shows 0 print minutes, although it accepted
+  a finger change: screening added print volume only for new rack tools, and the trial charged
+  screening's estimate. Screening now adds both pads whenever the fingers change. `build.finger_print`
+  gives the volume, PLA and TPU of the new pads: a changed pad is a new part. The accepted design
+  (25° tilt, 3 mm groove, 2 mm TPU) costs about 14 print minutes, 0.6 g PLA and 0.4 g TPU. D-038's
+  "priced by the ledger" held for a design's estimate, not for the charge.
+
+None of these changes touches the judge or the world. The batteries do not use System 2 and are
+unchanged. The live run they come from used the harness before this entry (its `harness.json`).
+Tests: `tests/test_ladder.py`, `tests/test_llm_mock.py`.

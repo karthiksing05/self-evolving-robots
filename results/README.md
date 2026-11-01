@@ -11,3 +11,12 @@ Small, tracked outputs that decisions cite. Run directories (`runs/`) stay untra
   before-and-after numbers in the decision log can be checked:
   - `opening_bug`: `fingers.opening_for` fell back to fixed jaw angles;
   - `soft_tpu`: the TPU skin had a guessed 0.04 s contact time constant.
+- `experiments/`: the first live gripper experiment (D-038, D-039), one directory per arm:
+  - `gripper_live_s1`: System 2 on the Claude plan may change the fingers;
+  - `gripper_s1_only_s1`: the control, System 1 only.
+
+  Each holds its spec, harness fingerprint, final summary, final design and console log. The live
+  arm also keeps every iteration's proposals, decision and LLM call record. `<run>.json` gathers
+  all of it per iteration (coverage, escalations, proposals with hypotheses, screening errors,
+  trial shares, decisions, token counts) together with the final per-table verdicts. The full run
+  directories, with traces and memory, stay in the untracked `runs/`.

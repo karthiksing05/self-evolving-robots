@@ -1,0 +1,17 @@
+iter 0: coverage_reward=0.333 reward=0.333 escalated=14
+  tried finger (vpc=229.80): accepted=True delta=+0.062 [-0.000, +0.187]
+iter 1: coverage_reward=0.429 reward=0.428 escalated=12
+  tried finger (vpc=127.49): accepted=False delta=-0.250 [-0.500, -0.000]
+iter 2: coverage_reward=0.429 reward=0.428 escalated=12
+  tried finger (vpc=110.30): accepted=False delta=-0.125 [-0.375, +0.125]
+iter 3: coverage_reward=0.429 reward=0.428 escalated=12
+  tried reparam (vpc=105.00): accepted=False delta=+0.000 [+0.000, +0.000]
+iter 4: coverage_reward=0.429 reward=0.428 escalated=12
+  no proposal tried (2 candidates, 0 valid)
+iter 5: coverage_reward=0.429 reward=0.428 escalated=12
+  tried reparam (vpc=122.50): accepted=False delta=+0.000 [+0.000, +0.000]
+iter 6: coverage_reward=0.429 reward=0.428 escalated=12
+  tried finger (vpc=154.04): accepted=False delta=-0.125 [-0.438, +0.187]
+iter 7: coverage_reward=0.429 reward=0.428 escalated=12
+  tried finger (vpc=174.04): accepted=False delta=-0.125 [-0.438, +0.187]
+{"coverage_reward": 0.42857142857142855, "reward": 0.42811127169632895, "stop_reason": "iterations", "iterations": 8}

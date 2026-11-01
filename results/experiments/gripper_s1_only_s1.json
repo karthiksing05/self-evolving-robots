@@ -1,0 +1,6281 @@
+{
+ "run": "gripper_s1_only_s1",
+ "iterations": [
+  {
+   "iteration": 0,
+   "coverage_reward": 0.3333333333333333,
+   "reward": 0.3333333333333333,
+   "design": "d000",
+   "verdicts": {
+    "rtr001_pudding_box": "wrong_behavior",
+    "rtr011_tennis_ball": "wrong_behavior",
+    "rtr020_dice": "pass",
+    "rtr015_plum": "wrong_behavior",
+    "rtr007_strawberry": "wrong_behavior",
+    "rtr012_racquetball": "wrong_behavior",
+    "rtr018_flat_screwdriver": "wrong_behavior",
+    "rtr017_large_marker": "pass",
+    "rtr016_apple": "wrong_behavior",
+    "rtr002_sugar_box": "stuck",
+    "rtr010_tuna_fish_can": "stuck",
+    "rtr003_potted_meat_can": "pass",
+    "rtr004_mustard_bottle": "stuck",
+    "rtr005_foam_brick": "pass",
+    "rtr008_banana": "pass",
+    "rtr000_gelatin_box": "stuck",
+    "rtr009_tomato_soup_can": "wrong_behavior",
+    "rtr014_lemon": "wrong_behavior",
+    "rtr013_golf_ball": "wrong_behavior",
+    "rtr006_wood_block_cube": "pass",
+    "rtr019_cup": "pass"
+   },
+   "escalations": [
+    "rtr001_pudding_box:obj",
+    "rtr011_tennis_ball:obj",
+    "rtr015_plum:obj",
+    "rtr007_strawberry:obj",
+    "rtr012_racquetball:obj",
+    "rtr018_flat_screwdriver:obj",
+    "rtr016_apple:obj",
+    "rtr002_sugar_box:obj",
+    "rtr010_tuna_fish_can:obj",
+    "rtr004_mustard_bottle:obj",
+    "rtr000_gelatin_box:obj",
+    "rtr009_tomato_soup_can:obj",
+    "rtr014_lemon:obj",
+    "rtr013_golf_ball:obj"
+   ],
+   "targets": [
+    [
+     "rtr002_sugar_box:obj",
+     "rtr007_strawberry:obj",
+     "rtr012_racquetball:obj"
+    ]
+   ],
+   "candidates": [
+    {
+     "i": 0,
+     "kind": "reparam",
+     "rung": 0,
+     "fingers": {},
+     "reparam": {
+      "grasp.close": [
+       -0.17,
+       0.2
+      ],
+      "grasp.close_s": [
+       0.2,
+       1.0
+      ],
+      "grasp.depth": [
+       0.002,
+       0.035
+      ]
+     },
+     "hypothesis": "grasp needs parameters outside the neighbourhood System 1 searched",
+     "rationale": "System 1 only (grasp)",
+     "ruled_out": [],
+     "prediction": {
+      "confidence": 0.3,
+      "flips_to_pass": [
+       "rtr002_sugar_box:obj",
+       "rtr007_strawberry:obj",
+       "rtr012_racquetball:obj"
+      ],
+      "may_regress": []
+     },
+     "errors": [],
+     "vpc": 314.99999999999994,
+     "cost": {
+      "approvals": 0,
+      "grams_pla": 0.0,
+      "grams_tpu": 0.0,
+      "llm_usd": 0.0,
+      "print_minutes": 0.0,
+      "servo_heat_j": 0,
+      "sim_seconds": 384.0
+     }
+    }
+   ],
+   "chosen": 0,
+   "trial": {
+    "base": {
+     "reg_banana:obj": 1.0,
+     "reg_cup:obj": 1.0,
+     "reg_foam_brick:obj": 1.0,
+     "reg_large_marker:obj": 1.0,
+     "reg_wood_block_cube:obj": 1.0,
+     "rtr002_sugar_box:obj": 0.0,
+     "rtr007_strawberry:obj": 0.0,
+     "rtr012_racquetball:obj": 0.0
+    },
+    "repeats": 2,
+    "trial": {
+     "reg_banana:obj": 1.0,
+     "reg_cup:obj": 1.0,
+     "reg_foam_brick:obj": 1.0,
+     "reg_large_marker:obj": 1.0,
+     "reg_wood_block_cube:obj": 1.0,
+     "rtr002_sugar_box:obj": 0.0,
+     "rtr007_strawberry:obj": 0.0,
+     "rtr012_racquetball:obj": 0.0
+    }
+   },
+   "decision": {
+    "accepted": false,
+    "delta_hi": 0.0,
+    "delta_lo": 0.0,
+    "delta_mean": 0.0,
+    "prediction_score": 0.0,
+    "regressions": [],
+    "rule": "mean"
+   },
+   "llm": [],
+   "cost": {
+    "cumulative": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 2486.4428,
+     "sim_seconds": 628.4
+    },
+    "end": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 4208.7508,
+     "sim_seconds": 818.68
+    },
+    "iteration": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 2486.4428,
+     "sim_seconds": 628.4
+    },
+    "remaining": {
+     "approvals": 1.0,
+     "design_iterations": 0.875,
+     "grams_pla": 1.0,
+     "grams_tpu": 1.0,
+     "llm_usd": 1.0,
+     "print_minutes": 1.0,
+     "sim_seconds": 0.9772588888888889
+    }
+   },
+   "promoted": []
+  },
+  {
+   "iteration": 1,
+   "coverage_reward": 0.3333333333333333,
+   "reward": 0.3333333333333333,
+   "design": "d000",
+   "verdicts": {
+    "rtr000_gelatin_box": "stuck",
+    "rtr001_pudding_box": "wrong_behavior",
+    "rtr002_sugar_box": "stuck",
+    "rtr004_mustard_bottle": "stuck",
+    "rtr007_strawberry": "wrong_behavior",
+    "rtr009_tomato_soup_can": "wrong_behavior",
+    "rtr010_tuna_fish_can": "stuck",
+    "rtr011_tennis_ball": "wrong_behavior",
+    "rtr012_racquetball": "wrong_behavior",
+    "rtr013_golf_ball": "wrong_behavior",
+    "rtr014_lemon": "wrong_behavior",
+    "rtr015_plum": "wrong_behavior",
+    "rtr016_apple": "wrong_behavior",
+    "rtr018_flat_screwdriver": "wrong_behavior",
+    "rtr019_cup": "pass",
+    "rtr003_potted_meat_can": "pass",
+    "rtr005_foam_brick": "pass",
+    "rtr017_large_marker": "pass",
+    "rtr006_wood_block_cube": "pass",
+    "rtr020_dice": "pass",
+    "rtr008_banana": "pass"
+   },
+   "escalations": [
+    "rtr000_gelatin_box:obj",
+    "rtr001_pudding_box:obj",
+    "rtr002_sugar_box:obj",
+    "rtr004_mustard_bottle:obj",
+    "rtr007_strawberry:obj",
+    "rtr009_tomato_soup_can:obj",
+    "rtr010_tuna_fish_can:obj",
+    "rtr011_tennis_ball:obj",
+    "rtr012_racquetball:obj",
+    "rtr013_golf_ball:obj",
+    "rtr014_lemon:obj",
+    "rtr015_plum:obj",
+    "rtr016_apple:obj",
+    "rtr018_flat_screwdriver:obj"
+   ],
+   "targets": [
+    [
+     "rtr011_tennis_ball:obj",
+     "rtr013_golf_ball:obj",
+     "rtr016_apple:obj"
+    ]
+   ],
+   "candidates": [
+    {
+     "i": 0,
+     "kind": "reparam",
+     "rung": 0,
+     "fingers": {},
+     "reparam": {
+      "grasp.close": [
+       -0.17,
+       0.2
+      ],
+      "grasp.close_s": [
+       0.2,
+       1.0
+      ],
+      "grasp.depth": [
+       0.002,
+       0.035
+      ]
+     },
+     "hypothesis": "grasp needs parameters outside the neighbourhood System 1 searched",
+     "rationale": "System 1 only (grasp)",
+     "ruled_out": [],
+     "prediction": {
+      "confidence": 0.3,
+      "flips_to_pass": [
+       "rtr011_tennis_ball:obj",
+       "rtr013_golf_ball:obj",
+       "rtr016_apple:obj"
+      ],
+      "may_regress": []
+     },
+     "errors": [],
+     "vpc": 314.99999999999994,
+     "cost": {
+      "approvals": 0,
+      "grams_pla": 0.0,
+      "grams_tpu": 0.0,
+      "llm_usd": 0.0,
+      "print_minutes": 0.0,
+      "servo_heat_j": 0,
+      "sim_seconds": 384.0
+     }
+    }
+   ],
+   "chosen": 0,
+   "trial": {
+    "base": {
+     "reg_banana:obj": 1.0,
+     "reg_cup:obj": 1.0,
+     "reg_foam_brick:obj": 1.0,
+     "reg_large_marker:obj": 1.0,
+     "reg_wood_block_cube:obj": 1.0,
+     "rtr011_tennis_ball:obj": 0.0,
+     "rtr013_golf_ball:obj": 0.0,
+     "rtr016_apple:obj": 0.0
+    },
+    "repeats": 2,
+    "trial": {
+     "reg_banana:obj": 1.0,
+     "reg_cup:obj": 1.0,
+     "reg_foam_brick:obj": 1.0,
+     "reg_large_marker:obj": 1.0,
+     "reg_wood_block_cube:obj": 1.0,
+     "rtr011_tennis_ball:obj": 0.0,
+     "rtr013_golf_ball:obj": 0.0,
+     "rtr016_apple:obj": 0.0
+    }
+   },
+   "decision": {
+    "accepted": false,
+    "delta_hi": 0.0,
+    "delta_lo": 0.0,
+    "delta_mean": 0.0,
+    "prediction_score": 0.0,
+    "regressions": [],
+    "rule": "mean"
+   },
+   "llm": [],
+   "cost": {
+    "cumulative": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 6695.1936,
+     "sim_seconds": 1447.08
+    },
+    "end": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 8666.1113,
+     "sim_seconds": 1585.1799999999998
+    },
+    "iteration": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 2486.4428,
+     "sim_seconds": 628.4
+    },
+    "remaining": {
+     "approvals": 1.0,
+     "design_iterations": 0.75,
+     "grams_pla": 1.0,
+     "grams_tpu": 1.0,
+     "llm_usd": 1.0,
+     "print_minutes": 1.0,
+     "sim_seconds": 0.9559672222222222
+    }
+   },
+   "promoted": []
+  },
+  {
+   "iteration": 2,
+   "coverage_reward": 0.3333333333333333,
+   "reward": 0.3333333333333333,
+   "design": "d000",
+   "verdicts": {
+    "rtr000_gelatin_box": "stuck",
+    "rtr001_pudding_box": "wrong_behavior",
+    "rtr002_sugar_box": "stuck",
+    "rtr004_mustard_bottle": "stuck",
+    "rtr007_strawberry": "wrong_behavior",
+    "rtr009_tomato_soup_can": "wrong_behavior",
+    "rtr010_tuna_fish_can": "stuck",
+    "rtr011_tennis_ball": "wrong_behavior",
+    "rtr012_racquetball": "wrong_behavior",
+    "rtr013_golf_ball": "wrong_behavior",
+    "rtr014_lemon": "wrong_behavior",
+    "rtr015_plum": "wrong_behavior",
+    "rtr016_apple": "wrong_behavior",
+    "rtr018_flat_screwdriver": "wrong_behavior",
+    "rtr019_cup": "pass",
+    "rtr003_potted_meat_can": "pass",
+    "rtr005_foam_brick": "pass",
+    "rtr017_large_marker": "pass",
+    "rtr006_wood_block_cube": "pass",
+    "rtr020_dice": "pass",
+    "rtr008_banana": "pass"
+   },
+   "escalations": [
+    "rtr000_gelatin_box:obj",
+    "rtr001_pudding_box:obj",
+    "rtr002_sugar_box:obj",
+    "rtr004_mustard_bottle:obj",
+    "rtr007_strawberry:obj",
+    "rtr009_tomato_soup_can:obj",
+    "rtr010_tuna_fish_can:obj",
+    "rtr011_tennis_ball:obj",
+    "rtr012_racquetball:obj",
+    "rtr013_golf_ball:obj",
+    "rtr014_lemon:obj",
+    "rtr015_plum:obj",
+    "rtr016_apple:obj",
+    "rtr018_flat_screwdriver:obj"
+   ],
+   "targets": [
+    [
+     "rtr002_sugar_box:obj",
+     "rtr009_tomato_soup_can:obj",
+     "rtr013_golf_ball:obj"
+    ]
+   ],
+   "candidates": [
+    {
+     "i": 0,
+     "kind": "reparam",
+     "rung": 0,
+     "fingers": {},
+     "reparam": {
+      "grasp.close": [
+       -0.17,
+       0.2
+      ],
+      "grasp.close_s": [
+       0.2,
+       1.0
+      ],
+      "grasp.depth": [
+       0.002,
+       0.035
+      ]
+     },
+     "hypothesis": "grasp needs parameters outside the neighbourhood System 1 searched",
+     "rationale": "System 1 only (grasp)",
+     "ruled_out": [],
+     "prediction": {
+      "confidence": 0.3,
+      "flips_to_pass": [
+       "rtr002_sugar_box:obj",
+       "rtr009_tomato_soup_can:obj",
+       "rtr013_golf_ball:obj"
+      ],
+      "may_regress": []
+     },
+     "errors": [],
+     "vpc": 314.99999999999994,
+     "cost": {
+      "approvals": 0,
+      "grams_pla": 0.0,
+      "grams_tpu": 0.0,
+      "llm_usd": 0.0,
+      "print_minutes": 0.0,
+      "servo_heat_j": 0,
+      "sim_seconds": 384.0
+     }
+    }
+   ],
+   "chosen": 0,
+   "trial": {
+    "base": {
+     "reg_banana:obj": 1.0,
+     "reg_cup:obj": 1.0,
+     "reg_foam_brick:obj": 1.0,
+     "reg_large_marker:obj": 1.0,
+     "reg_wood_block_cube:obj": 1.0,
+     "rtr002_sugar_box:obj": 0.0,
+     "rtr009_tomato_soup_can:obj": 0.0,
+     "rtr013_golf_ball:obj": 0.0
+    },
+    "repeats": 2,
+    "trial": {
+     "reg_banana:obj": 1.0,
+     "reg_cup:obj": 1.0,
+     "reg_foam_brick:obj": 1.0,
+     "reg_large_marker:obj": 1.0,
+     "reg_wood_block_cube:obj": 1.0,
+     "rtr002_sugar_box:obj": 0.0,
+     "rtr009_tomato_soup_can:obj": 0.0,
+     "rtr013_golf_ball:obj": 0.0
+    }
+   },
+   "decision": {
+    "accepted": false,
+    "delta_hi": 0.0,
+    "delta_lo": 0.0,
+    "delta_mean": 0.0,
+    "prediction_score": 0.0,
+    "regressions": [],
+    "rule": "mean"
+   },
+   "llm": [],
+   "cost": {
+    "cumulative": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 11152.554100000001,
+     "sim_seconds": 2213.58
+    },
+    "end": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 12496.668800000001,
+     "sim_seconds": 2319.7599999999998
+    },
+    "iteration": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 2486.4428,
+     "sim_seconds": 628.4
+    },
+    "remaining": {
+     "approvals": 1.0,
+     "design_iterations": 0.625,
+     "grams_pla": 1.0,
+     "grams_tpu": 1.0,
+     "llm_usd": 1.0,
+     "print_minutes": 1.0,
+     "sim_seconds": 0.9355622222222222
+    }
+   },
+   "promoted": []
+  },
+  {
+   "iteration": 3,
+   "coverage_reward": 0.3333333333333333,
+   "reward": 0.3333333333333333,
+   "design": "d000",
+   "verdicts": {
+    "rtr000_gelatin_box": "stuck",
+    "rtr001_pudding_box": "wrong_behavior",
+    "rtr002_sugar_box": "stuck",
+    "rtr004_mustard_bottle": "stuck",
+    "rtr007_strawberry": "wrong_behavior",
+    "rtr009_tomato_soup_can": "wrong_behavior",
+    "rtr010_tuna_fish_can": "stuck",
+    "rtr011_tennis_ball": "wrong_behavior",
+    "rtr012_racquetball": "wrong_behavior",
+    "rtr013_golf_ball": "wrong_behavior",
+    "rtr014_lemon": "wrong_behavior",
+    "rtr015_plum": "wrong_behavior",
+    "rtr016_apple": "wrong_behavior",
+    "rtr018_flat_screwdriver": "wrong_behavior",
+    "rtr019_cup": "pass",
+    "rtr003_potted_meat_can": "pass",
+    "rtr005_foam_brick": "pass",
+    "rtr017_large_marker": "pass",
+    "rtr006_wood_block_cube": "pass",
+    "rtr020_dice": "pass",
+    "rtr008_banana": "pass"
+   },
+   "escalations": [
+    "rtr000_gelatin_box:obj",
+    "rtr001_pudding_box:obj",
+    "rtr002_sugar_box:obj",
+    "rtr004_mustard_bottle:obj",
+    "rtr007_strawberry:obj",
+    "rtr009_tomato_soup_can:obj",
+    "rtr010_tuna_fish_can:obj",
+    "rtr011_tennis_ball:obj",
+    "rtr012_racquetball:obj",
+    "rtr013_golf_ball:obj",
+    "rtr014_lemon:obj",
+    "rtr015_plum:obj",
+    "rtr016_apple:obj",
+    "rtr018_flat_screwdriver:obj"
+   ],
+   "targets": [
+    [
+     "rtr011_tennis_ball:obj",
+     "rtr018_flat_screwdriver:obj",
+     "rtr009_tomato_soup_can:obj"
+    ]
+   ],
+   "candidates": [
+    {
+     "i": 0,
+     "kind": "reparam",
+     "rung": 0,
+     "fingers": {},
+     "reparam": {
+      "grasp.close": [
+       -0.17,
+       0.2
+      ],
+      "grasp.close_s": [
+       0.2,
+       1.0
+      ],
+      "grasp.depth": [
+       0.002,
+       0.035
+      ]
+     },
+     "hypothesis": "grasp needs parameters outside the neighbourhood System 1 searched",
+     "rationale": "System 1 only (grasp)",
+     "ruled_out": [],
+     "prediction": {
+      "confidence": 0.3,
+      "flips_to_pass": [
+       "rtr011_tennis_ball:obj",
+       "rtr018_flat_screwdriver:obj",
+       "rtr009_tomato_soup_can:obj"
+      ],
+      "may_regress": []
+     },
+     "errors": [],
+     "vpc": 314.99999999999994,
+     "cost": {
+      "approvals": 0,
+      "grams_pla": 0.0,
+      "grams_tpu": 0.0,
+      "llm_usd": 0.0,
+      "print_minutes": 0.0,
+      "servo_heat_j": 0,
+      "sim_seconds": 384.0
+     }
+    }
+   ],
+   "chosen": 0,
+   "trial": {
+    "base": {
+     "reg_banana:obj": 1.0,
+     "reg_cup:obj": 1.0,
+     "reg_foam_brick:obj": 1.0,
+     "reg_large_marker:obj": 1.0,
+     "reg_wood_block_cube:obj": 1.0,
+     "rtr009_tomato_soup_can:obj": 0.0,
+     "rtr011_tennis_ball:obj": 0.0,
+     "rtr018_flat_screwdriver:obj": 0.0
+    },
+    "repeats": 2,
+    "trial": {
+     "reg_banana:obj": 1.0,
+     "reg_cup:obj": 1.0,
+     "reg_foam_brick:obj": 1.0,
+     "reg_large_marker:obj": 1.0,
+     "reg_wood_block_cube:obj": 1.0,
+     "rtr009_tomato_soup_can:obj": 0.0,
+     "rtr011_tennis_ball:obj": 0.0,
+     "rtr018_flat_screwdriver:obj": 0.0
+    }
+   },
+   "decision": {
+    "accepted": false,
+    "delta_hi": 0.0,
+    "delta_lo": 0.0,
+    "delta_mean": 0.0,
+    "prediction_score": 0.0,
+    "regressions": [],
+    "rule": "mean"
+   },
+   "llm": [],
+   "cost": {
+    "cumulative": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 14983.1116,
+     "sim_seconds": 2948.16
+    },
+    "end": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 16066.6866,
+     "sim_seconds": 3060.66
+    },
+    "iteration": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 2486.4428,
+     "sim_seconds": 628.4
+    },
+    "remaining": {
+     "approvals": 1.0,
+     "design_iterations": 0.5,
+     "grams_pla": 1.0,
+     "grams_tpu": 1.0,
+     "llm_usd": 1.0,
+     "print_minutes": 1.0,
+     "sim_seconds": 0.9149816666666667
+    }
+   },
+   "promoted": []
+  },
+  {
+   "iteration": 4,
+   "coverage_reward": 0.3333333333333333,
+   "reward": 0.3333333333333333,
+   "design": "d000",
+   "verdicts": {
+    "rtr000_gelatin_box": "stuck",
+    "rtr001_pudding_box": "wrong_behavior",
+    "rtr002_sugar_box": "stuck",
+    "rtr004_mustard_bottle": "stuck",
+    "rtr007_strawberry": "wrong_behavior",
+    "rtr009_tomato_soup_can": "wrong_behavior",
+    "rtr010_tuna_fish_can": "stuck",
+    "rtr011_tennis_ball": "wrong_behavior",
+    "rtr012_racquetball": "wrong_behavior",
+    "rtr013_golf_ball": "wrong_behavior",
+    "rtr014_lemon": "wrong_behavior",
+    "rtr015_plum": "wrong_behavior",
+    "rtr016_apple": "wrong_behavior",
+    "rtr018_flat_screwdriver": "wrong_behavior",
+    "rtr019_cup": "pass",
+    "rtr003_potted_meat_can": "pass",
+    "rtr005_foam_brick": "pass",
+    "rtr017_large_marker": "pass",
+    "rtr006_wood_block_cube": "pass",
+    "rtr020_dice": "pass",
+    "rtr008_banana": "pass"
+   },
+   "escalations": [
+    "rtr000_gelatin_box:obj",
+    "rtr001_pudding_box:obj",
+    "rtr002_sugar_box:obj",
+    "rtr004_mustard_bottle:obj",
+    "rtr007_strawberry:obj",
+    "rtr009_tomato_soup_can:obj",
+    "rtr010_tuna_fish_can:obj",
+    "rtr011_tennis_ball:obj",
+    "rtr012_racquetball:obj",
+    "rtr013_golf_ball:obj",
+    "rtr014_lemon:obj",
+    "rtr015_plum:obj",
+    "rtr016_apple:obj",
+    "rtr018_flat_screwdriver:obj"
+   ],
+   "targets": [
+    [
+     "rtr011_tennis_ball:obj",
+     "rtr016_apple:obj",
+     "rtr018_flat_screwdriver:obj"
+    ]
+   ],
+   "candidates": [
+    {
+     "i": 0,
+     "kind": "reparam",
+     "rung": 0,
+     "fingers": {},
+     "reparam": {
+      "grasp.close": [
+       -0.17,
+       0.2
+      ],
+      "grasp.close_s": [
+       0.2,
+       1.0
+      ],
+      "grasp.depth": [
+       0.002,
+       0.035
+      ]
+     },
+     "hypothesis": "grasp needs parameters outside the neighbourhood System 1 searched",
+     "rationale": "System 1 only (grasp)",
+     "ruled_out": [],
+     "prediction": {
+      "confidence": 0.3,
+      "flips_to_pass": [
+       "rtr011_tennis_ball:obj",
+       "rtr016_apple:obj",
+       "rtr018_flat_screwdriver:obj"
+      ],
+      "may_regress": []
+     },
+     "errors": [],
+     "vpc": 314.99999999999994,
+     "cost": {
+      "approvals": 0,
+      "grams_pla": 0.0,
+      "grams_tpu": 0.0,
+      "llm_usd": 0.0,
+      "print_minutes": 0.0,
+      "servo_heat_j": 0,
+      "sim_seconds": 384.0
+     }
+    }
+   ],
+   "chosen": 0,
+   "trial": {
+    "base": {
+     "reg_banana:obj": 1.0,
+     "reg_cup:obj": 1.0,
+     "reg_foam_brick:obj": 1.0,
+     "reg_large_marker:obj": 1.0,
+     "reg_wood_block_cube:obj": 1.0,
+     "rtr011_tennis_ball:obj": 0.0,
+     "rtr016_apple:obj": 0.0,
+     "rtr018_flat_screwdriver:obj": 0.0
+    },
+    "repeats": 2,
+    "trial": {
+     "reg_banana:obj": 1.0,
+     "reg_cup:obj": 1.0,
+     "reg_foam_brick:obj": 1.0,
+     "reg_large_marker:obj": 1.0,
+     "reg_wood_block_cube:obj": 1.0,
+     "rtr011_tennis_ball:obj": 0.0,
+     "rtr016_apple:obj": 0.0,
+     "rtr018_flat_screwdriver:obj": 0.0
+    }
+   },
+   "decision": {
+    "accepted": false,
+    "delta_hi": 0.0,
+    "delta_lo": 0.0,
+    "delta_mean": 0.0,
+    "prediction_score": 0.0,
+    "regressions": [],
+    "rule": "mean"
+   },
+   "llm": [],
+   "cost": {
+    "cumulative": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 18553.1294,
+     "sim_seconds": 3689.06
+    },
+    "end": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 19559.4795,
+     "sim_seconds": 3794.96
+    },
+    "iteration": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 2486.4428,
+     "sim_seconds": 628.4
+    },
+    "remaining": {
+     "approvals": 1.0,
+     "design_iterations": 0.375,
+     "grams_pla": 1.0,
+     "grams_tpu": 1.0,
+     "llm_usd": 1.0,
+     "print_minutes": 1.0,
+     "sim_seconds": 0.8945844444444444
+    }
+   },
+   "promoted": []
+  },
+  {
+   "iteration": 5,
+   "coverage_reward": 0.3333333333333333,
+   "reward": 0.3333333333333333,
+   "design": "d000",
+   "verdicts": {
+    "rtr000_gelatin_box": "stuck",
+    "rtr001_pudding_box": "wrong_behavior",
+    "rtr002_sugar_box": "stuck",
+    "rtr004_mustard_bottle": "stuck",
+    "rtr007_strawberry": "wrong_behavior",
+    "rtr009_tomato_soup_can": "wrong_behavior",
+    "rtr010_tuna_fish_can": "stuck",
+    "rtr011_tennis_ball": "wrong_behavior",
+    "rtr012_racquetball": "wrong_behavior",
+    "rtr013_golf_ball": "wrong_behavior",
+    "rtr014_lemon": "wrong_behavior",
+    "rtr015_plum": "wrong_behavior",
+    "rtr016_apple": "wrong_behavior",
+    "rtr018_flat_screwdriver": "wrong_behavior",
+    "rtr019_cup": "pass",
+    "rtr003_potted_meat_can": "pass",
+    "rtr005_foam_brick": "pass",
+    "rtr017_large_marker": "pass",
+    "rtr006_wood_block_cube": "pass",
+    "rtr020_dice": "pass",
+    "rtr008_banana": "pass"
+   },
+   "escalations": [
+    "rtr000_gelatin_box:obj",
+    "rtr001_pudding_box:obj",
+    "rtr002_sugar_box:obj",
+    "rtr004_mustard_bottle:obj",
+    "rtr007_strawberry:obj",
+    "rtr009_tomato_soup_can:obj",
+    "rtr010_tuna_fish_can:obj",
+    "rtr011_tennis_ball:obj",
+    "rtr012_racquetball:obj",
+    "rtr013_golf_ball:obj",
+    "rtr014_lemon:obj",
+    "rtr015_plum:obj",
+    "rtr016_apple:obj",
+    "rtr018_flat_screwdriver:obj"
+   ],
+   "targets": [
+    [
+     "rtr011_tennis_ball:obj",
+     "rtr016_apple:obj",
+     "rtr018_flat_screwdriver:obj"
+    ]
+   ],
+   "candidates": [
+    {
+     "i": 0,
+     "kind": "reparam",
+     "rung": 0,
+     "fingers": {},
+     "reparam": {
+      "grasp.close": [
+       -0.17,
+       0.2
+      ],
+      "grasp.close_s": [
+       0.2,
+       1.0
+      ],
+      "grasp.depth": [
+       0.002,
+       0.035
+      ]
+     },
+     "hypothesis": "grasp needs parameters outside the neighbourhood System 1 searched",
+     "rationale": "System 1 only (grasp)",
+     "ruled_out": [],
+     "prediction": {
+      "confidence": 0.3,
+      "flips_to_pass": [
+       "rtr011_tennis_ball:obj",
+       "rtr016_apple:obj",
+       "rtr018_flat_screwdriver:obj"
+      ],
+      "may_regress": []
+     },
+     "errors": [],
+     "vpc": 314.99999999999994,
+     "cost": {
+      "approvals": 0,
+      "grams_pla": 0.0,
+      "grams_tpu": 0.0,
+      "llm_usd": 0.0,
+      "print_minutes": 0.0,
+      "servo_heat_j": 0,
+      "sim_seconds": 384.0
+     }
+    }
+   ],
+   "chosen": 0,
+   "trial": {
+    "base": {
+     "reg_banana:obj": 1.0,
+     "reg_cup:obj": 1.0,
+     "reg_foam_brick:obj": 1.0,
+     "reg_large_marker:obj": 1.0,
+     "reg_wood_block_cube:obj": 1.0,
+     "rtr011_tennis_ball:obj": 0.0,
+     "rtr016_apple:obj": 0.0,
+     "rtr018_flat_screwdriver:obj": 0.0
+    },
+    "repeats": 2,
+    "trial": {
+     "reg_banana:obj": 1.0,
+     "reg_cup:obj": 1.0,
+     "reg_foam_brick:obj": 1.0,
+     "reg_large_marker:obj": 1.0,
+     "reg_wood_block_cube:obj": 1.0,
+     "rtr011_tennis_ball:obj": 0.0,
+     "rtr016_apple:obj": 0.0,
+     "rtr018_flat_screwdriver:obj": 0.0
+    }
+   },
+   "decision": {
+    "accepted": false,
+    "delta_hi": 0.0,
+    "delta_lo": 0.0,
+    "delta_mean": 0.0,
+    "prediction_score": 0.0,
+    "regressions": [],
+    "rule": "mean"
+   },
+   "llm": [],
+   "cost": {
+    "cumulative": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 22045.922300000002,
+     "sim_seconds": 4423.36
+    },
+    "end": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 23052.2724,
+     "sim_seconds": 4529.259999999999
+    },
+    "iteration": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 2486.4428,
+     "sim_seconds": 628.4
+    },
+    "remaining": {
+     "approvals": 1.0,
+     "design_iterations": 0.25,
+     "grams_pla": 1.0,
+     "grams_tpu": 1.0,
+     "llm_usd": 1.0,
+     "print_minutes": 1.0,
+     "sim_seconds": 0.8741872222222222
+    }
+   },
+   "promoted": []
+  },
+  {
+   "iteration": 6,
+   "coverage_reward": 0.3333333333333333,
+   "reward": 0.3333333333333333,
+   "design": "d000",
+   "verdicts": {
+    "rtr000_gelatin_box": "stuck",
+    "rtr001_pudding_box": "wrong_behavior",
+    "rtr002_sugar_box": "stuck",
+    "rtr004_mustard_bottle": "stuck",
+    "rtr007_strawberry": "wrong_behavior",
+    "rtr009_tomato_soup_can": "wrong_behavior",
+    "rtr010_tuna_fish_can": "stuck",
+    "rtr011_tennis_ball": "wrong_behavior",
+    "rtr012_racquetball": "wrong_behavior",
+    "rtr013_golf_ball": "wrong_behavior",
+    "rtr014_lemon": "wrong_behavior",
+    "rtr015_plum": "wrong_behavior",
+    "rtr016_apple": "wrong_behavior",
+    "rtr018_flat_screwdriver": "wrong_behavior",
+    "rtr019_cup": "pass",
+    "rtr003_potted_meat_can": "pass",
+    "rtr005_foam_brick": "pass",
+    "rtr017_large_marker": "pass",
+    "rtr006_wood_block_cube": "pass",
+    "rtr020_dice": "pass",
+    "rtr008_banana": "pass"
+   },
+   "escalations": [
+    "rtr000_gelatin_box:obj",
+    "rtr001_pudding_box:obj",
+    "rtr002_sugar_box:obj",
+    "rtr004_mustard_bottle:obj",
+    "rtr007_strawberry:obj",
+    "rtr009_tomato_soup_can:obj",
+    "rtr010_tuna_fish_can:obj",
+    "rtr011_tennis_ball:obj",
+    "rtr012_racquetball:obj",
+    "rtr013_golf_ball:obj",
+    "rtr014_lemon:obj",
+    "rtr015_plum:obj",
+    "rtr016_apple:obj",
+    "rtr018_flat_screwdriver:obj"
+   ],
+   "targets": [
+    [
+     "rtr009_tomato_soup_can:obj",
+     "rtr012_racquetball:obj",
+     "rtr013_golf_ball:obj"
+    ]
+   ],
+   "candidates": [
+    {
+     "i": 0,
+     "kind": "reparam",
+     "rung": 0,
+     "fingers": {},
+     "reparam": {
+      "grasp.close": [
+       -0.17,
+       0.2
+      ],
+      "grasp.close_s": [
+       0.2,
+       1.0
+      ],
+      "grasp.depth": [
+       0.002,
+       0.035
+      ]
+     },
+     "hypothesis": "grasp needs parameters outside the neighbourhood System 1 searched",
+     "rationale": "System 1 only (grasp)",
+     "ruled_out": [],
+     "prediction": {
+      "confidence": 0.3,
+      "flips_to_pass": [
+       "rtr009_tomato_soup_can:obj",
+       "rtr012_racquetball:obj",
+       "rtr013_golf_ball:obj"
+      ],
+      "may_regress": []
+     },
+     "errors": [],
+     "vpc": 312.06607031249996,
+     "cost": {
+      "approvals": 0,
+      "grams_pla": 0.0,
+      "grams_tpu": 0.0,
+      "llm_usd": 0.0,
+      "print_minutes": 0.0,
+      "servo_heat_j": 0,
+      "sim_seconds": 384.0
+     }
+    }
+   ],
+   "chosen": 0,
+   "trial": {
+    "base": {
+     "reg_banana:obj": 1.0,
+     "reg_cup:obj": 1.0,
+     "reg_foam_brick:obj": 1.0,
+     "reg_large_marker:obj": 1.0,
+     "reg_wood_block_cube:obj": 1.0,
+     "rtr009_tomato_soup_can:obj": 0.0,
+     "rtr012_racquetball:obj": 0.0,
+     "rtr013_golf_ball:obj": 0.0
+    },
+    "repeats": 2,
+    "trial": {
+     "reg_banana:obj": 1.0,
+     "reg_cup:obj": 1.0,
+     "reg_foam_brick:obj": 1.0,
+     "reg_large_marker:obj": 1.0,
+     "reg_wood_block_cube:obj": 1.0,
+     "rtr009_tomato_soup_can:obj": 0.0,
+     "rtr012_racquetball:obj": 0.0,
+     "rtr013_golf_ball:obj": 0.0
+    }
+   },
+   "decision": {
+    "accepted": false,
+    "delta_hi": 0.0,
+    "delta_lo": 0.0,
+    "delta_mean": 0.0,
+    "prediction_score": 0.0,
+    "regressions": [],
+    "rule": "mean"
+   },
+   "llm": [],
+   "cost": {
+    "cumulative": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 25538.715200000002,
+     "sim_seconds": 5157.659999999999
+    },
+    "end": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 26616.635000000002,
+     "sim_seconds": 5256.339999999999
+    },
+    "iteration": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 2486.4428,
+     "sim_seconds": 628.4
+    },
+    "remaining": {
+     "approvals": 1.0,
+     "design_iterations": 0.125,
+     "grams_pla": 1.0,
+     "grams_tpu": 1.0,
+     "llm_usd": 1.0,
+     "print_minutes": 1.0,
+     "sim_seconds": 0.8539905555555556
+    }
+   },
+   "promoted": []
+  },
+  {
+   "iteration": 7,
+   "coverage_reward": 0.3333333333333333,
+   "reward": 0.3333333333333333,
+   "design": "d000",
+   "verdicts": {
+    "rtr000_gelatin_box": "stuck",
+    "rtr001_pudding_box": "wrong_behavior",
+    "rtr002_sugar_box": "stuck",
+    "rtr004_mustard_bottle": "stuck",
+    "rtr007_strawberry": "wrong_behavior",
+    "rtr009_tomato_soup_can": "wrong_behavior",
+    "rtr010_tuna_fish_can": "stuck",
+    "rtr011_tennis_ball": "wrong_behavior",
+    "rtr012_racquetball": "wrong_behavior",
+    "rtr013_golf_ball": "wrong_behavior",
+    "rtr014_lemon": "wrong_behavior",
+    "rtr015_plum": "wrong_behavior",
+    "rtr016_apple": "wrong_behavior",
+    "rtr018_flat_screwdriver": "wrong_behavior",
+    "rtr019_cup": "pass",
+    "rtr003_potted_meat_can": "pass",
+    "rtr005_foam_brick": "pass",
+    "rtr017_large_marker": "pass",
+    "rtr006_wood_block_cube": "pass",
+    "rtr020_dice": "pass",
+    "rtr008_banana": "pass"
+   },
+   "escalations": [
+    "rtr000_gelatin_box:obj",
+    "rtr001_pudding_box:obj",
+    "rtr002_sugar_box:obj",
+    "rtr004_mustard_bottle:obj",
+    "rtr007_strawberry:obj",
+    "rtr009_tomato_soup_can:obj",
+    "rtr010_tuna_fish_can:obj",
+    "rtr011_tennis_ball:obj",
+    "rtr012_racquetball:obj",
+    "rtr013_golf_ball:obj",
+    "rtr014_lemon:obj",
+    "rtr015_plum:obj",
+    "rtr016_apple:obj",
+    "rtr018_flat_screwdriver:obj"
+   ],
+   "targets": [
+    [
+     "rtr009_tomato_soup_can:obj",
+     "rtr012_racquetball:obj",
+     "rtr013_golf_ball:obj"
+    ]
+   ],
+   "candidates": [
+    {
+     "i": 0,
+     "kind": "reparam",
+     "rung": 0,
+     "fingers": {},
+     "reparam": {
+      "grasp.close": [
+       -0.17,
+       0.2
+      ],
+      "grasp.close_s": [
+       0.2,
+       1.0
+      ],
+      "grasp.depth": [
+       0.002,
+       0.035
+      ]
+     },
+     "hypothesis": "grasp needs parameters outside the neighbourhood System 1 searched",
+     "rationale": "System 1 only (grasp)",
+     "ruled_out": [],
+     "prediction": {
+      "confidence": 0.3,
+      "flips_to_pass": [
+       "rtr009_tomato_soup_can:obj",
+       "rtr012_racquetball:obj",
+       "rtr013_golf_ball:obj"
+      ],
+      "may_regress": []
+     },
+     "errors": [],
+     "vpc": 306.1017421875,
+     "cost": {
+      "approvals": 0,
+      "grams_pla": 0.0,
+      "grams_tpu": 0.0,
+      "llm_usd": 0.0,
+      "print_minutes": 0.0,
+      "servo_heat_j": 0,
+      "sim_seconds": 384.0
+     }
+    }
+   ],
+   "chosen": 0,
+   "trial": {
+    "base": {
+     "reg_banana:obj": 1.0,
+     "reg_cup:obj": 1.0,
+     "reg_foam_brick:obj": 1.0,
+     "reg_large_marker:obj": 1.0,
+     "reg_wood_block_cube:obj": 1.0,
+     "rtr009_tomato_soup_can:obj": 0.0,
+     "rtr012_racquetball:obj": 0.0,
+     "rtr013_golf_ball:obj": 0.0
+    },
+    "repeats": 2,
+    "trial": {
+     "reg_banana:obj": 1.0,
+     "reg_cup:obj": 1.0,
+     "reg_foam_brick:obj": 1.0,
+     "reg_large_marker:obj": 1.0,
+     "reg_wood_block_cube:obj": 1.0,
+     "rtr009_tomato_soup_can:obj": 0.0,
+     "rtr012_racquetball:obj": 0.0,
+     "rtr013_golf_ball:obj": 0.0
+    }
+   },
+   "decision": {
+    "accepted": false,
+    "delta_hi": 0.0,
+    "delta_lo": 0.0,
+    "delta_mean": 0.0,
+    "prediction_score": 0.0,
+    "regressions": [],
+    "rule": "mean"
+   },
+   "llm": [],
+   "cost": {
+    "cumulative": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 29103.077800000003,
+     "sim_seconds": 5884.739999999999
+    },
+    "end": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 30180.997600000002,
+     "sim_seconds": 5983.419999999999
+    },
+    "iteration": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 2486.4428,
+     "sim_seconds": 628.4
+    },
+    "remaining": {
+     "approvals": 1.0,
+     "design_iterations": 0.0,
+     "grams_pla": 1.0,
+     "grams_tpu": 1.0,
+     "llm_usd": 1.0,
+     "print_minutes": 1.0,
+     "sim_seconds": 0.833793888888889
+    }
+   },
+   "promoted": []
+  }
+ ],
+ "designs": {
+  "design_000": {
+   "arm": {
+    "base_pitch_rad": 0.0,
+    "fore_scale": 1.0,
+    "riser_m": 0.0,
+    "servo_voltage": {
+     "elbow_flex": 7.4,
+     "gripper": 7.4,
+     "shoulder_lift": 7.4,
+     "shoulder_pan": 7.4,
+     "wrist_flex": 7.4,
+     "wrist_roll": 7.4
+    },
+    "upper_scale": 1.0,
+    "wrist_offset_mm": 0.0
+   },
+   "est": {
+    "added_mass_g": 0.0,
+    "grams_pla": 0.0,
+    "grams_tpu": 0.0,
+    "print_minutes": 0.0
+   },
+   "fingers": {
+    "groove_mm": 0.0,
+    "lip_mm": 0.0,
+    "pad_angle_deg": 0.0,
+    "pad_tpu_mm": 0.0,
+    "reach_mm": 0.0,
+    "width_mm": 0.0
+   },
+   "id": "d000",
+   "parent": null,
+   "sensors": {
+    "jaw_pads": true,
+    "link_skin": false
+   },
+   "tool_rack": []
+  },
+  "design_001": {
+   "arm": {
+    "base_pitch_rad": 0.0,
+    "fore_scale": 1.0,
+    "riser_m": 0.0,
+    "servo_voltage": {
+     "elbow_flex": 7.4,
+     "gripper": 7.4,
+     "shoulder_lift": 7.4,
+     "shoulder_pan": 7.4,
+     "wrist_flex": 7.4,
+     "wrist_roll": 7.4
+    },
+    "upper_scale": 1.0,
+    "wrist_offset_mm": 0.0
+   },
+   "est": {
+    "added_mass_g": 0.0,
+    "grams_pla": 0.0,
+    "grams_tpu": 0.0,
+    "print_minutes": 0.0
+   },
+   "fingers": {
+    "groove_mm": 0.0,
+    "lip_mm": 0.0,
+    "pad_angle_deg": 0.0,
+    "pad_tpu_mm": 0.0,
+    "reach_mm": 0.0,
+    "width_mm": 0.0
+   },
+   "id": "d000",
+   "parent": null,
+   "sensors": {
+    "jaw_pads": true,
+    "link_skin": false
+   },
+   "tool_rack": []
+  },
+  "design_002": {
+   "arm": {
+    "base_pitch_rad": 0.0,
+    "fore_scale": 1.0,
+    "riser_m": 0.0,
+    "servo_voltage": {
+     "elbow_flex": 7.4,
+     "gripper": 7.4,
+     "shoulder_lift": 7.4,
+     "shoulder_pan": 7.4,
+     "wrist_flex": 7.4,
+     "wrist_roll": 7.4
+    },
+    "upper_scale": 1.0,
+    "wrist_offset_mm": 0.0
+   },
+   "est": {
+    "added_mass_g": 0.0,
+    "grams_pla": 0.0,
+    "grams_tpu": 0.0,
+    "print_minutes": 0.0
+   },
+   "fingers": {
+    "groove_mm": 0.0,
+    "lip_mm": 0.0,
+    "pad_angle_deg": 0.0,
+    "pad_tpu_mm": 0.0,
+    "reach_mm": 0.0,
+    "width_mm": 0.0
+   },
+   "id": "d000",
+   "parent": null,
+   "sensors": {
+    "jaw_pads": true,
+    "link_skin": false
+   },
+   "tool_rack": []
+  },
+  "design_003": {
+   "arm": {
+    "base_pitch_rad": 0.0,
+    "fore_scale": 1.0,
+    "riser_m": 0.0,
+    "servo_voltage": {
+     "elbow_flex": 7.4,
+     "gripper": 7.4,
+     "shoulder_lift": 7.4,
+     "shoulder_pan": 7.4,
+     "wrist_flex": 7.4,
+     "wrist_roll": 7.4
+    },
+    "upper_scale": 1.0,
+    "wrist_offset_mm": 0.0
+   },
+   "est": {
+    "added_mass_g": 0.0,
+    "grams_pla": 0.0,
+    "grams_tpu": 0.0,
+    "print_minutes": 0.0
+   },
+   "fingers": {
+    "groove_mm": 0.0,
+    "lip_mm": 0.0,
+    "pad_angle_deg": 0.0,
+    "pad_tpu_mm": 0.0,
+    "reach_mm": 0.0,
+    "width_mm": 0.0
+   },
+   "id": "d000",
+   "parent": null,
+   "sensors": {
+    "jaw_pads": true,
+    "link_skin": false
+   },
+   "tool_rack": []
+  },
+  "design_004": {
+   "arm": {
+    "base_pitch_rad": 0.0,
+    "fore_scale": 1.0,
+    "riser_m": 0.0,
+    "servo_voltage": {
+     "elbow_flex": 7.4,
+     "gripper": 7.4,
+     "shoulder_lift": 7.4,
+     "shoulder_pan": 7.4,
+     "wrist_flex": 7.4,
+     "wrist_roll": 7.4
+    },
+    "upper_scale": 1.0,
+    "wrist_offset_mm": 0.0
+   },
+   "est": {
+    "added_mass_g": 0.0,
+    "grams_pla": 0.0,
+    "grams_tpu": 0.0,
+    "print_minutes": 0.0
+   },
+   "fingers": {
+    "groove_mm": 0.0,
+    "lip_mm": 0.0,
+    "pad_angle_deg": 0.0,
+    "pad_tpu_mm": 0.0,
+    "reach_mm": 0.0,
+    "width_mm": 0.0
+   },
+   "id": "d000",
+   "parent": null,
+   "sensors": {
+    "jaw_pads": true,
+    "link_skin": false
+   },
+   "tool_rack": []
+  },
+  "design_005": {
+   "arm": {
+    "base_pitch_rad": 0.0,
+    "fore_scale": 1.0,
+    "riser_m": 0.0,
+    "servo_voltage": {
+     "elbow_flex": 7.4,
+     "gripper": 7.4,
+     "shoulder_lift": 7.4,
+     "shoulder_pan": 7.4,
+     "wrist_flex": 7.4,
+     "wrist_roll": 7.4
+    },
+    "upper_scale": 1.0,
+    "wrist_offset_mm": 0.0
+   },
+   "est": {
+    "added_mass_g": 0.0,
+    "grams_pla": 0.0,
+    "grams_tpu": 0.0,
+    "print_minutes": 0.0
+   },
+   "fingers": {
+    "groove_mm": 0.0,
+    "lip_mm": 0.0,
+    "pad_angle_deg": 0.0,
+    "pad_tpu_mm": 0.0,
+    "reach_mm": 0.0,
+    "width_mm": 0.0
+   },
+   "id": "d000",
+   "parent": null,
+   "sensors": {
+    "jaw_pads": true,
+    "link_skin": false
+   },
+   "tool_rack": []
+  },
+  "design_006": {
+   "arm": {
+    "base_pitch_rad": 0.0,
+    "fore_scale": 1.0,
+    "riser_m": 0.0,
+    "servo_voltage": {
+     "elbow_flex": 7.4,
+     "gripper": 7.4,
+     "shoulder_lift": 7.4,
+     "shoulder_pan": 7.4,
+     "wrist_flex": 7.4,
+     "wrist_roll": 7.4
+    },
+    "upper_scale": 1.0,
+    "wrist_offset_mm": 0.0
+   },
+   "est": {
+    "added_mass_g": 0.0,
+    "grams_pla": 0.0,
+    "grams_tpu": 0.0,
+    "print_minutes": 0.0
+   },
+   "fingers": {
+    "groove_mm": 0.0,
+    "lip_mm": 0.0,
+    "pad_angle_deg": 0.0,
+    "pad_tpu_mm": 0.0,
+    "reach_mm": 0.0,
+    "width_mm": 0.0
+   },
+   "id": "d000",
+   "parent": null,
+   "sensors": {
+    "jaw_pads": true,
+    "link_skin": false
+   },
+   "tool_rack": []
+  },
+  "design_007": {
+   "arm": {
+    "base_pitch_rad": 0.0,
+    "fore_scale": 1.0,
+    "riser_m": 0.0,
+    "servo_voltage": {
+     "elbow_flex": 7.4,
+     "gripper": 7.4,
+     "shoulder_lift": 7.4,
+     "shoulder_pan": 7.4,
+     "wrist_flex": 7.4,
+     "wrist_roll": 7.4
+    },
+    "upper_scale": 1.0,
+    "wrist_offset_mm": 0.0
+   },
+   "est": {
+    "added_mass_g": 0.0,
+    "grams_pla": 0.0,
+    "grams_tpu": 0.0,
+    "print_minutes": 0.0
+   },
+   "fingers": {
+    "groove_mm": 0.0,
+    "lip_mm": 0.0,
+    "pad_angle_deg": 0.0,
+    "pad_tpu_mm": 0.0,
+    "reach_mm": 0.0,
+    "width_mm": 0.0
+   },
+   "id": "d000",
+   "parent": null,
+   "sensors": {
+    "jaw_pads": true,
+    "link_skin": false
+   },
+   "tool_rack": []
+  },
+  "design_008": {
+   "arm": {
+    "base_pitch_rad": 0.0,
+    "fore_scale": 1.0,
+    "riser_m": 0.0,
+    "servo_voltage": {
+     "elbow_flex": 7.4,
+     "gripper": 7.4,
+     "shoulder_lift": 7.4,
+     "shoulder_pan": 7.4,
+     "wrist_flex": 7.4,
+     "wrist_roll": 7.4
+    },
+    "upper_scale": 1.0,
+    "wrist_offset_mm": 0.0
+   },
+   "est": {
+    "added_mass_g": 0.0,
+    "grams_pla": 0.0,
+    "grams_tpu": 0.0,
+    "print_minutes": 0.0
+   },
+   "fingers": {
+    "groove_mm": 0.0,
+    "lip_mm": 0.0,
+    "pad_angle_deg": 0.0,
+    "pad_tpu_mm": 0.0,
+    "reach_mm": 0.0,
+    "width_mm": 0.0
+   },
+   "id": "d000",
+   "parent": null,
+   "sensors": {
+    "jaw_pads": true,
+    "link_skin": false
+   },
+   "tool_rack": []
+  }
+ },
+ "final": {
+  "control_coverage": 1.0,
+  "cost": {
+   "approvals": 0,
+   "grams_pla": 0.0,
+   "grams_tpu": 0.0,
+   "llm_usd": 0.0,
+   "print_minutes": 0.0,
+   "servo_heat_j": 35106.017900000006,
+   "sim_seconds": 7385.619999999999
+  },
+  "coverage_reward": 0.2857142857142857,
+  "design": "d000",
+  "efficiency": {
+   "per_approval": null,
+   "per_gram": null,
+   "per_llm_usd": null,
+   "per_print_hour": null,
+   "per_sim_hour": 0.13926676820245676
+  },
+  "iterations": 8,
+  "library_size": 23,
+  "pass_rate": 0.2857142857142857,
+  "reward": 0.2857142857142857,
+  "split": "test",
+  "stop_reason": "iterations",
+  "summary": {
+   "by_class": {
+    "grasp": {
+     "by_verdict": {
+      "pass": 12,
+      "stuck": 14,
+      "wrong_behavior": 16
+     },
+     "n": 42,
+     "passes": 12
+    }
+   },
+   "by_verdict": {
+    "inconclusive": 0,
+    "no_actuation": 0,
+    "no_applicable_primitive": 0,
+    "pass": 12,
+    "rule_violation": 0,
+    "stuck": 14,
+    "unreachable": 0,
+    "wrong_behavior": 16
+   },
+   "control_coverage": 1.0,
+   "coverage_reward": 0.2857142857142857,
+   "covered": 42,
+   "n": 42,
+   "pass_rate": 0.2857142857142857,
+   "passes": 12
+  }
+ },
+ "final_results": [
+  {
+   "panel": "rte000_gelatin_box",
+   "verdict": "stuck",
+   "trials": 8
+  },
+  {
+   "panel": "rte001_pudding_box",
+   "verdict": "stuck",
+   "trials": 8
+  },
+  {
+   "panel": "rte002_sugar_box",
+   "verdict": "stuck",
+   "trials": 8
+  },
+  {
+   "panel": "rte003_potted_meat_can",
+   "verdict": "pass",
+   "trials": 1
+  },
+  {
+   "panel": "rte004_mustard_bottle",
+   "verdict": "stuck",
+   "trials": 8
+  },
+  {
+   "panel": "rte005_foam_brick",
+   "verdict": "wrong_behavior",
+   "trials": 8
+  },
+  {
+   "panel": "rte006_wood_block_cube",
+   "verdict": "pass",
+   "trials": 0
+  },
+  {
+   "panel": "rte007_strawberry",
+   "verdict": "wrong_behavior",
+   "trials": 8
+  },
+  {
+   "panel": "rte008_banana",
+   "verdict": "pass",
+   "trials": 0
+  },
+  {
+   "panel": "rte009_tomato_soup_can",
+   "verdict": "wrong_behavior",
+   "trials": 8
+  },
+  {
+   "panel": "rte010_tuna_fish_can",
+   "verdict": "stuck",
+   "trials": 8
+  },
+  {
+   "panel": "rte011_tennis_ball",
+   "verdict": "wrong_behavior",
+   "trials": 8
+  },
+  {
+   "panel": "rte012_racquetball",
+   "verdict": "wrong_behavior",
+   "trials": 8
+  },
+  {
+   "panel": "rte013_golf_ball",
+   "verdict": "pass",
+   "trials": 3
+  },
+  {
+   "panel": "rte014_lemon",
+   "verdict": "wrong_behavior",
+   "trials": 8
+  },
+  {
+   "panel": "rte015_plum",
+   "verdict": "stuck",
+   "trials": 8
+  },
+  {
+   "panel": "rte016_apple",
+   "verdict": "wrong_behavior",
+   "trials": 8
+  },
+  {
+   "panel": "rte017_large_marker",
+   "verdict": "pass",
+   "trials": 0
+  },
+  {
+   "panel": "rte018_flat_screwdriver",
+   "verdict": "wrong_behavior",
+   "trials": 8
+  },
+  {
+   "panel": "rte019_cup",
+   "verdict": "pass",
+   "trials": 0
+  },
+  {
+   "panel": "rte020_dice",
+   "verdict": "wrong_behavior",
+   "trials": 8
+  },
+  {
+   "panel": "rte021_gelatin_box",
+   "verdict": "stuck",
+   "trials": 8
+  },
+  {
+   "panel": "rte022_pudding_box",
+   "verdict": "stuck",
+   "trials": 8
+  },
+  {
+   "panel": "rte023_sugar_box",
+   "verdict": "stuck",
+   "trials": 8
+  },
+  {
+   "panel": "rte024_potted_meat_can",
+   "verdict": "pass",
+   "trials": 2
+  },
+  {
+   "panel": "rte025_mustard_bottle",
+   "verdict": "stuck",
+   "trials": 8
+  },
+  {
+   "panel": "rte026_foam_brick",
+   "verdict": "pass",
+   "trials": 0
+  },
+  {
+   "panel": "rte027_wood_block_cube",
+   "verdict": "pass",
+   "trials": 0
+  },
+  {
+   "panel": "rte028_strawberry",
+   "verdict": "stuck",
+   "trials": 8
+  },
+  {
+   "panel": "rte029_banana",
+   "verdict": "pass",
+   "trials": 0
+  },
+  {
+   "panel": "rte030_tomato_soup_can",
+   "verdict": "wrong_behavior",
+   "trials": 8
+  },
+  {
+   "panel": "rte031_tuna_fish_can",
+   "verdict": "stuck",
+   "trials": 8
+  },
+  {
+   "panel": "rte032_tennis_ball",
+   "verdict": "wrong_behavior",
+   "trials": 8
+  },
+  {
+   "panel": "rte033_racquetball",
+   "verdict": "wrong_behavior",
+   "trials": 8
+  },
+  {
+   "panel": "rte034_golf_ball",
+   "verdict": "wrong_behavior",
+   "trials": 8
+  },
+  {
+   "panel": "rte035_lemon",
+   "verdict": "wrong_behavior",
+   "trials": 8
+  },
+  {
+   "panel": "rte036_plum",
+   "verdict": "stuck",
+   "trials": 8
+  },
+  {
+   "panel": "rte037_apple",
+   "verdict": "wrong_behavior",
+   "trials": 8
+  },
+  {
+   "panel": "rte038_large_marker",
+   "verdict": "pass",
+   "trials": 0
+  },
+  {
+   "panel": "rte039_flat_screwdriver",
+   "verdict": "stuck",
+   "trials": 8
+  },
+  {
+   "panel": "rte040_cup",
+   "verdict": "pass",
+   "trials": 0
+  },
+  {
+   "panel": "rte041_dice",
+   "verdict": "wrong_behavior",
+   "trials": 8
+  }
+ ],
+ "timing": {
+  "final": 43.64,
+  "iter_000": 40.927,
+  "iter_001": 42.959,
+  "iter_002": 35.44,
+  "iter_003": 36.313,
+  "iter_004": 34.815,
+  "iter_005": 34.444,
+  "iter_006": 33.418,
+  "iter_007": 33.464
+ },
+ "goals": [
+  {
+   "event": "open",
+   "goal": {
+    "id": "root",
+    "parent": null,
+    "serves": [],
+    "slice": {
+     "approvals": 48,
+     "grams_pla": 240.0,
+     "grams_tpu": 40.0,
+     "llm_usd": 16.0,
+     "print_minutes": 192.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 28800.0
+    },
+    "target": "",
+    "task": {
+     "change": "",
+     "kind": "network",
+     "method": "coverage",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "pass_share(train, 1)",
+    "why": "every training control passes"
+   },
+   "iteration": 0
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "rtr001_pudding_box:obj",
+    "parent": "root",
+    "serves": [],
+    "slice": null,
+    "target": "rtr001_pudding_box:obj",
+    "task": {
+     "change": "",
+     "kind": "skill",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "held_for($target, 1.0)",
+    "why": ""
+   },
+   "iteration": 0
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr001_pudding_box:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 0,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 31.04
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "rtr011_tennis_ball:obj",
+    "parent": "root",
+    "serves": [],
+    "slice": null,
+    "target": "rtr011_tennis_ball:obj",
+    "task": {
+     "change": "",
+     "kind": "skill",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "held_for($target, 1.0)",
+    "why": ""
+   },
+   "iteration": 0
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr011_tennis_ball:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 0,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 34.88
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "rtr020_dice:obj",
+    "parent": "root",
+    "serves": [],
+    "slice": null,
+    "target": "rtr020_dice:obj",
+    "task": {
+     "change": "",
+     "kind": "skill",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "held_for($target, 1.0)",
+    "why": ""
+   },
+   "iteration": 0
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr020_dice:obj",
+    "impasse": null,
+    "iteration": 0,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.1
+    },
+    "stopped_by": "slip",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "rtr015_plum:obj",
+    "parent": "root",
+    "serves": [],
+    "slice": null,
+    "target": "rtr015_plum:obj",
+    "task": {
+     "change": "",
+     "kind": "skill",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "held_for($target, 1.0)",
+    "why": ""
+   },
+   "iteration": 0
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr015_plum:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 0,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 45.28
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "rtr007_strawberry:obj",
+    "parent": "root",
+    "serves": [],
+    "slice": null,
+    "target": "rtr007_strawberry:obj",
+    "task": {
+     "change": "",
+     "kind": "skill",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "held_for($target, 1.0)",
+    "why": ""
+   },
+   "iteration": 0
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr007_strawberry:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 0,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 36.0
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "rtr012_racquetball:obj",
+    "parent": "root",
+    "serves": [],
+    "slice": null,
+    "target": "rtr012_racquetball:obj",
+    "task": {
+     "change": "",
+     "kind": "skill",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "held_for($target, 1.0)",
+    "why": ""
+   },
+   "iteration": 0
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr012_racquetball:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 0,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 32.8
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "rtr018_flat_screwdriver:obj",
+    "parent": "root",
+    "serves": [],
+    "slice": null,
+    "target": "rtr018_flat_screwdriver:obj",
+    "task": {
+     "change": "",
+     "kind": "skill",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "held_for($target, 1.0)",
+    "why": ""
+   },
+   "iteration": 0
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr018_flat_screwdriver:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 0,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 36.8
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "rtr017_large_marker:obj",
+    "parent": "root",
+    "serves": [],
+    "slice": null,
+    "target": "rtr017_large_marker:obj",
+    "task": {
+     "change": "",
+     "kind": "skill",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "held_for($target, 1.0)",
+    "why": ""
+   },
+   "iteration": 0
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr017_large_marker:obj",
+    "impasse": null,
+    "iteration": 0,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.92
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "rtr016_apple:obj",
+    "parent": "root",
+    "serves": [],
+    "slice": null,
+    "target": "rtr016_apple:obj",
+    "task": {
+     "change": "",
+     "kind": "skill",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "held_for($target, 1.0)",
+    "why": ""
+   },
+   "iteration": 0
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr016_apple:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 0,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 40.64
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "rtr002_sugar_box:obj",
+    "parent": "root",
+    "serves": [],
+    "slice": null,
+    "target": "rtr002_sugar_box:obj",
+    "task": {
+     "change": "",
+     "kind": "skill",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "held_for($target, 1.0)",
+    "why": ""
+   },
+   "iteration": 0
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr002_sugar_box:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 0,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 29.44
+    },
+    "stopped_by": "slip",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "rtr010_tuna_fish_can:obj",
+    "parent": "root",
+    "serves": [],
+    "slice": null,
+    "target": "rtr010_tuna_fish_can:obj",
+    "task": {
+     "change": "",
+     "kind": "skill",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "held_for($target, 1.0)",
+    "why": ""
+   },
+   "iteration": 0
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr010_tuna_fish_can:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 0,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 32.48
+    },
+    "stopped_by": "load_limit",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "rtr003_potted_meat_can:obj",
+    "parent": "root",
+    "serves": [],
+    "slice": null,
+    "target": "rtr003_potted_meat_can:obj",
+    "task": {
+     "change": "",
+     "kind": "skill",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "held_for($target, 1.0)",
+    "why": ""
+   },
+   "iteration": 0
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr003_potted_meat_can:obj",
+    "impasse": null,
+    "iteration": 0,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 47.52
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "rtr004_mustard_bottle:obj",
+    "parent": "root",
+    "serves": [],
+    "slice": null,
+    "target": "rtr004_mustard_bottle:obj",
+    "task": {
+     "change": "",
+     "kind": "skill",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "held_for($target, 1.0)",
+    "why": ""
+   },
+   "iteration": 0
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr004_mustard_bottle:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 0,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 53.28
+    },
+    "stopped_by": "slip",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "rtr005_foam_brick:obj",
+    "parent": "root",
+    "serves": [],
+    "slice": null,
+    "target": "rtr005_foam_brick:obj",
+    "task": {
+     "change": "",
+     "kind": "skill",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "held_for($target, 1.0)",
+    "why": ""
+   },
+   "iteration": 0
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr005_foam_brick:obj",
+    "impasse": null,
+    "iteration": 0,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 18.54
+    },
+    "stopped_by": "slip",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "rtr008_banana:obj",
+    "parent": "root",
+    "serves": [],
+    "slice": null,
+    "target": "rtr008_banana:obj",
+    "task": {
+     "change": "",
+     "kind": "skill",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "held_for($target, 1.0)",
+    "why": ""
+   },
+   "iteration": 0
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr008_banana:obj",
+    "impasse": null,
+    "iteration": 0,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.16
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "rtr000_gelatin_box:obj",
+    "parent": "root",
+    "serves": [],
+    "slice": null,
+    "target": "rtr000_gelatin_box:obj",
+    "task": {
+     "change": "",
+     "kind": "skill",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "held_for($target, 1.0)",
+    "why": ""
+   },
+   "iteration": 0
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr000_gelatin_box:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 0,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 28.8
+    },
+    "stopped_by": "slip",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "rtr009_tomato_soup_can:obj",
+    "parent": "root",
+    "serves": [],
+    "slice": null,
+    "target": "rtr009_tomato_soup_can:obj",
+    "task": {
+     "change": "",
+     "kind": "skill",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "held_for($target, 1.0)",
+    "why": ""
+   },
+   "iteration": 0
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr009_tomato_soup_can:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 0,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 40.96
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "rtr014_lemon:obj",
+    "parent": "root",
+    "serves": [],
+    "slice": null,
+    "target": "rtr014_lemon:obj",
+    "task": {
+     "change": "",
+     "kind": "skill",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "held_for($target, 1.0)",
+    "why": ""
+   },
+   "iteration": 0
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr014_lemon:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 0,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 40.8
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "rtr013_golf_ball:obj",
+    "parent": "root",
+    "serves": [],
+    "slice": null,
+    "target": "rtr013_golf_ball:obj",
+    "task": {
+     "change": "",
+     "kind": "skill",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "held_for($target, 1.0)",
+    "why": ""
+   },
+   "iteration": 0
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr013_golf_ball:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 0,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 42.56
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "rtr006_wood_block_cube:obj",
+    "parent": "root",
+    "serves": [],
+    "slice": null,
+    "target": "rtr006_wood_block_cube:obj",
+    "task": {
+     "change": "",
+     "kind": "skill",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "held_for($target, 1.0)",
+    "why": ""
+   },
+   "iteration": 0
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr006_wood_block_cube:obj",
+    "impasse": null,
+    "iteration": 0,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 6.86
+    },
+    "stopped_by": "slip",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "rtr019_cup:obj",
+    "parent": "root",
+    "serves": [],
+    "slice": null,
+    "target": "rtr019_cup:obj",
+    "task": {
+     "change": "",
+     "kind": "skill",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "held_for($target, 1.0)",
+    "why": ""
+   },
+   "iteration": 0
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr019_cup:obj",
+    "impasse": null,
+    "iteration": 0,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.54
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "s2.000",
+    "parent": "root",
+    "serves": [
+     "rtr002_sugar_box:obj",
+     "rtr007_strawberry:obj",
+     "rtr012_racquetball:obj"
+    ],
+    "slice": null,
+    "target": "",
+    "task": {
+     "change": "reparam",
+     "kind": "design",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "accepted()",
+    "why": "grasp needs parameters outside the neighbourhood System 1 searched"
+   },
+   "iteration": 0
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "s2.000",
+    "impasse": null,
+    "iteration": 0,
+    "program": "",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 1722.308,
+     "sim_seconds": 190.27999999999997
+    },
+    "stopped_by": "",
+    "verdict": "fail"
+   }
+  },
+  {
+   "event": "close",
+   "goal": "s2.000",
+   "iteration": 0,
+   "reason": "",
+   "status": "failed"
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr000_gelatin_box:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 1,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 28.8
+    },
+    "stopped_by": "slip",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr001_pudding_box:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 1,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 31.04
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr002_sugar_box:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 1,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 29.44
+    },
+    "stopped_by": "slip",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr004_mustard_bottle:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 1,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 53.28
+    },
+    "stopped_by": "slip",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr007_strawberry:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 1,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 36.0
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr009_tomato_soup_can:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 1,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 40.96
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr010_tuna_fish_can:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 1,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 32.48
+    },
+    "stopped_by": "load_limit",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr011_tennis_ball:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 1,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 34.88
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr012_racquetball:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 1,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 32.8
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr013_golf_ball:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 1,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 42.56
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr014_lemon:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 1,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 40.8
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr015_plum:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 1,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 45.28
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr016_apple:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 1,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 40.64
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr018_flat_screwdriver:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 1,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 36.8
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr019_cup:obj",
+    "impasse": null,
+    "iteration": 1,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.54
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr003_potted_meat_can:obj",
+    "impasse": null,
+    "iteration": 1,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 47.52
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr005_foam_brick:obj",
+    "impasse": null,
+    "iteration": 1,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 18.54
+    },
+    "stopped_by": "slip",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr017_large_marker:obj",
+    "impasse": null,
+    "iteration": 1,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.92
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr006_wood_block_cube:obj",
+    "impasse": null,
+    "iteration": 1,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 6.86
+    },
+    "stopped_by": "slip",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr020_dice:obj",
+    "impasse": null,
+    "iteration": 1,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.1
+    },
+    "stopped_by": "slip",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr008_banana:obj",
+    "impasse": null,
+    "iteration": 1,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.16
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "s2.001",
+    "parent": "root",
+    "serves": [
+     "rtr011_tennis_ball:obj",
+     "rtr013_golf_ball:obj",
+     "rtr016_apple:obj"
+    ],
+    "slice": null,
+    "target": "",
+    "task": {
+     "change": "reparam",
+     "kind": "design",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "accepted()",
+    "why": "grasp needs parameters outside the neighbourhood System 1 searched"
+   },
+   "iteration": 1
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "s2.001",
+    "impasse": null,
+    "iteration": 1,
+    "program": "",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 1970.9177000000009,
+     "sim_seconds": 138.0999999999999
+    },
+    "stopped_by": "",
+    "verdict": "fail"
+   }
+  },
+  {
+   "event": "close",
+   "goal": "s2.001",
+   "iteration": 1,
+   "reason": "",
+   "status": "failed"
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr000_gelatin_box:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 2,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 28.8
+    },
+    "stopped_by": "slip",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr001_pudding_box:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 2,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 31.04
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr002_sugar_box:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 2,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 29.44
+    },
+    "stopped_by": "slip",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr004_mustard_bottle:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 2,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 53.28
+    },
+    "stopped_by": "slip",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr007_strawberry:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 2,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 36.0
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr009_tomato_soup_can:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 2,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 40.96
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr010_tuna_fish_can:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 2,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 32.48
+    },
+    "stopped_by": "load_limit",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr011_tennis_ball:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 2,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 34.88
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr012_racquetball:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 2,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 32.8
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr013_golf_ball:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 2,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 42.56
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr014_lemon:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 2,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 40.8
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr015_plum:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 2,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 45.28
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr016_apple:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 2,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 40.64
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr018_flat_screwdriver:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 2,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 36.8
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr019_cup:obj",
+    "impasse": null,
+    "iteration": 2,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.54
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr003_potted_meat_can:obj",
+    "impasse": null,
+    "iteration": 2,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 47.52
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr005_foam_brick:obj",
+    "impasse": null,
+    "iteration": 2,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 18.54
+    },
+    "stopped_by": "slip",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr017_large_marker:obj",
+    "impasse": null,
+    "iteration": 2,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.92
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr006_wood_block_cube:obj",
+    "impasse": null,
+    "iteration": 2,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 6.86
+    },
+    "stopped_by": "slip",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr020_dice:obj",
+    "impasse": null,
+    "iteration": 2,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.1
+    },
+    "stopped_by": "slip",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr008_banana:obj",
+    "impasse": null,
+    "iteration": 2,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.16
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "s2.002",
+    "parent": "root",
+    "serves": [
+     "rtr002_sugar_box:obj",
+     "rtr009_tomato_soup_can:obj",
+     "rtr013_golf_ball:obj"
+    ],
+    "slice": null,
+    "target": "",
+    "task": {
+     "change": "reparam",
+     "kind": "design",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "accepted()",
+    "why": "grasp needs parameters outside the neighbourhood System 1 searched"
+   },
+   "iteration": 2
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "s2.002",
+    "impasse": null,
+    "iteration": 2,
+    "program": "",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 1344.1147,
+     "sim_seconds": 106.17999999999984
+    },
+    "stopped_by": "",
+    "verdict": "fail"
+   }
+  },
+  {
+   "event": "close",
+   "goal": "s2.002",
+   "iteration": 2,
+   "reason": "",
+   "status": "failed"
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr000_gelatin_box:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 3,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 28.8
+    },
+    "stopped_by": "slip",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr001_pudding_box:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 3,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 31.04
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr002_sugar_box:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 3,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 29.44
+    },
+    "stopped_by": "slip",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr004_mustard_bottle:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 3,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 53.28
+    },
+    "stopped_by": "slip",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr007_strawberry:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 3,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 36.0
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr009_tomato_soup_can:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 3,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 40.96
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr010_tuna_fish_can:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 3,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 32.48
+    },
+    "stopped_by": "load_limit",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr011_tennis_ball:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 3,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 34.88
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr012_racquetball:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 3,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 32.8
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr013_golf_ball:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 3,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 42.56
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr014_lemon:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 3,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 40.8
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr015_plum:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 3,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 45.28
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr016_apple:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 3,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 40.64
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr018_flat_screwdriver:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 3,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 36.8
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr019_cup:obj",
+    "impasse": null,
+    "iteration": 3,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.54
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr003_potted_meat_can:obj",
+    "impasse": null,
+    "iteration": 3,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 47.52
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr005_foam_brick:obj",
+    "impasse": null,
+    "iteration": 3,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 18.54
+    },
+    "stopped_by": "slip",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr017_large_marker:obj",
+    "impasse": null,
+    "iteration": 3,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.92
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr006_wood_block_cube:obj",
+    "impasse": null,
+    "iteration": 3,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 6.86
+    },
+    "stopped_by": "slip",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr020_dice:obj",
+    "impasse": null,
+    "iteration": 3,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.1
+    },
+    "stopped_by": "slip",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr008_banana:obj",
+    "impasse": null,
+    "iteration": 3,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.16
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "s2.003",
+    "parent": "root",
+    "serves": [
+     "rtr011_tennis_ball:obj",
+     "rtr018_flat_screwdriver:obj",
+     "rtr009_tomato_soup_can:obj"
+    ],
+    "slice": null,
+    "target": "",
+    "task": {
+     "change": "reparam",
+     "kind": "design",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "accepted()",
+    "why": "grasp needs parameters outside the neighbourhood System 1 searched"
+   },
+   "iteration": 3
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "s2.003",
+    "impasse": null,
+    "iteration": 3,
+    "program": "",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 1083.5750000000007,
+     "sim_seconds": 112.5
+    },
+    "stopped_by": "",
+    "verdict": "fail"
+   }
+  },
+  {
+   "event": "close",
+   "goal": "s2.003",
+   "iteration": 3,
+   "reason": "",
+   "status": "failed"
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr000_gelatin_box:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 4,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 28.8
+    },
+    "stopped_by": "slip",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr001_pudding_box:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 4,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 31.04
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr002_sugar_box:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 4,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 29.44
+    },
+    "stopped_by": "slip",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr004_mustard_bottle:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 4,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 53.28
+    },
+    "stopped_by": "slip",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr007_strawberry:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 4,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 36.0
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr009_tomato_soup_can:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 4,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 40.96
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr010_tuna_fish_can:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 4,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 32.48
+    },
+    "stopped_by": "load_limit",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr011_tennis_ball:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 4,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 34.88
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr012_racquetball:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 4,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 32.8
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr013_golf_ball:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 4,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 42.56
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr014_lemon:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 4,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 40.8
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr015_plum:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 4,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 45.28
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr016_apple:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 4,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 40.64
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr018_flat_screwdriver:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 4,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 36.8
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr019_cup:obj",
+    "impasse": null,
+    "iteration": 4,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.54
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr003_potted_meat_can:obj",
+    "impasse": null,
+    "iteration": 4,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 47.52
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr005_foam_brick:obj",
+    "impasse": null,
+    "iteration": 4,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 18.54
+    },
+    "stopped_by": "slip",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr017_large_marker:obj",
+    "impasse": null,
+    "iteration": 4,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.92
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr006_wood_block_cube:obj",
+    "impasse": null,
+    "iteration": 4,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 6.86
+    },
+    "stopped_by": "slip",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr020_dice:obj",
+    "impasse": null,
+    "iteration": 4,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.1
+    },
+    "stopped_by": "slip",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr008_banana:obj",
+    "impasse": null,
+    "iteration": 4,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.16
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "s2.004",
+    "parent": "root",
+    "serves": [
+     "rtr011_tennis_ball:obj",
+     "rtr016_apple:obj",
+     "rtr018_flat_screwdriver:obj"
+    ],
+    "slice": null,
+    "target": "",
+    "task": {
+     "change": "reparam",
+     "kind": "design",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "accepted()",
+    "why": "grasp needs parameters outside the neighbourhood System 1 searched"
+   },
+   "iteration": 4
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "s2.004",
+    "impasse": null,
+    "iteration": 4,
+    "program": "",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 1006.3500999999997,
+     "sim_seconds": 105.90000000000009
+    },
+    "stopped_by": "",
+    "verdict": "fail"
+   }
+  },
+  {
+   "event": "close",
+   "goal": "s2.004",
+   "iteration": 4,
+   "reason": "",
+   "status": "failed"
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr000_gelatin_box:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 5,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 28.8
+    },
+    "stopped_by": "slip",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr001_pudding_box:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 5,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 31.04
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr002_sugar_box:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 5,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 29.44
+    },
+    "stopped_by": "slip",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr004_mustard_bottle:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 5,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 53.28
+    },
+    "stopped_by": "slip",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr007_strawberry:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 5,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 36.0
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr009_tomato_soup_can:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 5,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 40.96
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr010_tuna_fish_can:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 5,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 32.48
+    },
+    "stopped_by": "load_limit",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr011_tennis_ball:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 5,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 34.88
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr012_racquetball:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 5,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 32.8
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr013_golf_ball:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 5,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 42.56
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr014_lemon:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 5,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 40.8
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr015_plum:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 5,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 45.28
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr016_apple:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 5,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 40.64
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr018_flat_screwdriver:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 5,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 36.8
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr019_cup:obj",
+    "impasse": null,
+    "iteration": 5,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.54
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr003_potted_meat_can:obj",
+    "impasse": null,
+    "iteration": 5,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 47.52
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr005_foam_brick:obj",
+    "impasse": null,
+    "iteration": 5,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 18.54
+    },
+    "stopped_by": "slip",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr017_large_marker:obj",
+    "impasse": null,
+    "iteration": 5,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.92
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr006_wood_block_cube:obj",
+    "impasse": null,
+    "iteration": 5,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 6.86
+    },
+    "stopped_by": "slip",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr020_dice:obj",
+    "impasse": null,
+    "iteration": 5,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.1
+    },
+    "stopped_by": "slip",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr008_banana:obj",
+    "impasse": null,
+    "iteration": 5,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.16
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "s2.005",
+    "parent": "root",
+    "serves": [
+     "rtr011_tennis_ball:obj",
+     "rtr016_apple:obj",
+     "rtr018_flat_screwdriver:obj"
+    ],
+    "slice": null,
+    "target": "",
+    "task": {
+     "change": "reparam",
+     "kind": "design",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "accepted()",
+    "why": "grasp needs parameters outside the neighbourhood System 1 searched"
+   },
+   "iteration": 5
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "s2.005",
+    "impasse": null,
+    "iteration": 5,
+    "program": "",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 1006.3500999999997,
+     "sim_seconds": 105.89999999999964
+    },
+    "stopped_by": "",
+    "verdict": "fail"
+   }
+  },
+  {
+   "event": "close",
+   "goal": "s2.005",
+   "iteration": 5,
+   "reason": "",
+   "status": "failed"
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr000_gelatin_box:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 6,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 28.8
+    },
+    "stopped_by": "slip",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr001_pudding_box:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 6,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 31.04
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr002_sugar_box:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 6,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 29.44
+    },
+    "stopped_by": "slip",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr004_mustard_bottle:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 6,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 53.28
+    },
+    "stopped_by": "slip",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr007_strawberry:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 6,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 36.0
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr009_tomato_soup_can:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 6,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 40.96
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr010_tuna_fish_can:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 6,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 32.48
+    },
+    "stopped_by": "load_limit",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr011_tennis_ball:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 6,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 34.88
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr012_racquetball:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 6,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 32.8
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr013_golf_ball:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 6,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 42.56
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr014_lemon:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 6,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 40.8
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr015_plum:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 6,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 45.28
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr016_apple:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 6,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 40.64
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr018_flat_screwdriver:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 6,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 36.8
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr019_cup:obj",
+    "impasse": null,
+    "iteration": 6,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.54
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr003_potted_meat_can:obj",
+    "impasse": null,
+    "iteration": 6,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 47.52
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr005_foam_brick:obj",
+    "impasse": null,
+    "iteration": 6,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 18.54
+    },
+    "stopped_by": "slip",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr017_large_marker:obj",
+    "impasse": null,
+    "iteration": 6,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.92
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr006_wood_block_cube:obj",
+    "impasse": null,
+    "iteration": 6,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 6.86
+    },
+    "stopped_by": "slip",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr020_dice:obj",
+    "impasse": null,
+    "iteration": 6,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.1
+    },
+    "stopped_by": "slip",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr008_banana:obj",
+    "impasse": null,
+    "iteration": 6,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.16
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "s2.006",
+    "parent": "root",
+    "serves": [
+     "rtr009_tomato_soup_can:obj",
+     "rtr012_racquetball:obj",
+     "rtr013_golf_ball:obj"
+    ],
+    "slice": null,
+    "target": "",
+    "task": {
+     "change": "reparam",
+     "kind": "design",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "accepted()",
+    "why": "grasp needs parameters outside the neighbourhood System 1 searched"
+   },
+   "iteration": 6
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "s2.006",
+    "impasse": null,
+    "iteration": 6,
+    "program": "",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 1077.9197999999997,
+     "sim_seconds": 98.68000000000029
+    },
+    "stopped_by": "",
+    "verdict": "fail"
+   }
+  },
+  {
+   "event": "close",
+   "goal": "s2.006",
+   "iteration": 6,
+   "reason": "",
+   "status": "failed"
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr000_gelatin_box:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 7,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 28.8
+    },
+    "stopped_by": "slip",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr001_pudding_box:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 7,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 31.04
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr002_sugar_box:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 7,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 29.44
+    },
+    "stopped_by": "slip",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr004_mustard_bottle:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 7,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 53.28
+    },
+    "stopped_by": "slip",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr007_strawberry:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 7,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 36.0
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr009_tomato_soup_can:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 7,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 40.96
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr010_tuna_fish_can:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 7,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 32.48
+    },
+    "stopped_by": "load_limit",
+    "verdict": "stuck"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr011_tennis_ball:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 7,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 34.88
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr012_racquetball:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 7,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 32.8
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr013_golf_ball:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 7,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 42.56
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr014_lemon:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 7,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 40.8
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr015_plum:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 7,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 45.28
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr016_apple:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 7,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 40.64
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr018_flat_screwdriver:obj",
+    "impasse": "s1_exhausted",
+    "iteration": 7,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 36.8
+    },
+    "stopped_by": "slip",
+    "verdict": "wrong_behavior"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr019_cup:obj",
+    "impasse": null,
+    "iteration": 7,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.54
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr003_potted_meat_can:obj",
+    "impasse": null,
+    "iteration": 7,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 47.52
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr005_foam_brick:obj",
+    "impasse": null,
+    "iteration": 7,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 18.54
+    },
+    "stopped_by": "slip",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr017_large_marker:obj",
+    "impasse": null,
+    "iteration": 7,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.92
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr006_wood_block_cube:obj",
+    "impasse": null,
+    "iteration": 7,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 6.86
+    },
+    "stopped_by": "slip",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr020_dice:obj",
+    "impasse": null,
+    "iteration": 7,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.1
+    },
+    "stopped_by": "slip",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "rtr008_banana:obj",
+    "impasse": null,
+    "iteration": 7,
+    "program": "pick_up",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 0.0,
+     "sim_seconds": 7.16
+    },
+    "stopped_by": "",
+    "verdict": "pass"
+   }
+  },
+  {
+   "event": "open",
+   "goal": {
+    "id": "s2.007",
+    "parent": "root",
+    "serves": [
+     "rtr009_tomato_soup_can:obj",
+     "rtr012_racquetball:obj",
+     "rtr013_golf_ball:obj"
+    ],
+    "slice": null,
+    "target": "",
+    "task": {
+     "change": "reparam",
+     "kind": "design",
+     "method": "",
+     "needs": [],
+     "program": "",
+     "question": ""
+    },
+    "test": "accepted()",
+    "why": "grasp needs parameters outside the neighbourhood System 1 searched"
+   },
+   "iteration": 7
+  },
+  {
+   "event": "report",
+   "report": {
+    "goal": "s2.007",
+    "impasse": null,
+    "iteration": 7,
+    "program": "",
+    "spent": {
+     "approvals": 0,
+     "grams_pla": 0.0,
+     "grams_tpu": 0.0,
+     "llm_usd": 0.0,
+     "print_minutes": 0.0,
+     "servo_heat_j": 1077.9197999999997,
+     "sim_seconds": 98.68000000000029
+    },
+    "stopped_by": "",
+    "verdict": "fail"
+   }
+  },
+  {
+   "event": "close",
+   "goal": "s2.007",
+   "iteration": 7,
+   "reason": "",
+   "status": "failed"
+  },
+  {
+   "event": "close",
+   "goal": "root",
+   "iteration": 7,
+   "reason": "iterations",
+   "status": "exhausted"
+  }
+ ],
+ "final_design": {
+  "arm": {
+   "base_pitch_rad": 0.0,
+   "fore_scale": 1.0,
+   "riser_m": 0.0,
+   "servo_voltage": {
+    "elbow_flex": 7.4,
+    "gripper": 7.4,
+    "shoulder_lift": 7.4,
+    "shoulder_pan": 7.4,
+    "wrist_flex": 7.4,
+    "wrist_roll": 7.4
+   },
+   "upper_scale": 1.0,
+   "wrist_offset_mm": 0.0
+  },
+  "est": {
+   "added_mass_g": 0.0,
+   "grams_pla": 0.0,
+   "grams_tpu": 0.0,
+   "print_minutes": 0.0
+  },
+  "fingers": {
+   "groove_mm": 0.0,
+   "lip_mm": 0.0,
+   "pad_angle_deg": 0.0,
+   "pad_tpu_mm": 0.0,
+   "reach_mm": 0.0,
+   "width_mm": 0.0
+  },
+  "id": "d000",
+  "parent": null,
+  "sensors": {
+   "jaw_pads": true,
+   "link_skin": false
+  },
+  "tool_rack": []
+ }
+}
