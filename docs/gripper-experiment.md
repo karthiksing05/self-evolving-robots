@@ -252,7 +252,7 @@ Hardware for V5:
 | Scene objects and grasp envelope (D-030) | built |
 | Sensing v0 (D-031) | built |
 | Stock gripper capability table (V1) and jaw-object friction pairs (D-032) | built |
-| Grasp world v0: objects as controls on a table panel, lift check, aperture typecheck rule, grasp primitive, `configs/limits_grasp.yaml` (pinch allowed), its own judge key | next |
+| Grasp world v0: objects as controls on a table, `held_for` check, aperture typecheck rule, `grasp` primitive, `configs/limits_grasp.yaml` (pinch allowed), grasp battery (D-035) | built |
 | Sensors as resources: parts manifest, toggles, System 2 prompt section (D-033) | built |
 | Sensor channels into traces, System 2 summary, memory, System 1 guards (IMU first) | next |
 | Task network contracts (`plan/network.py`); the current loop as the degenerate network, battery unchanged (D-034) | design |

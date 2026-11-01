@@ -1,4 +1,5 @@
-# Seed primitive library (spec 8.7): 9 motor primitives, 5 checks, 6 seed programs.
+# Seed primitive library (spec 8.7): 10 motor primitives, 6 checks, 7 seed programs (grasp and
+# pick_up serve the grasp world, docs/gripper-experiment.md).
 #
 # requires.contact : '|'-separated contact types the mounted tool must provide ("any" = no constraint)
 # requires.min_force / min_reach : N / m
@@ -46,6 +47,11 @@ motor:
     doc: Move back along the approach axis by `distance` at full speed.
     requires: {contact: any}
     params: {distance: [0.01, 0.10]}
+  - name: grasp
+    doc: Pick a free object from above with the jaws - open, descend beside it, close (the servo stalls on the object), lift by `lift`, hold `hold_s`. `depth` is how far below the object's top the tool point goes.
+    requires: {contact: pinch, aperture: width}
+    provides: {lifts: "grasp"}
+    params: {depth: [0.002, 0.035], side: [0.0, 0.006], close: [-0.17, 0.2], close_s: [0.2, 1.0], lift: [0.035, 0.07], hold_s: [1.0, 2.0], speed: [0.01, 0.06]}
 
 checks:
   - {name: moved_at_least, doc: "True when the control moved at least d (m or rad) from rest; d may be `travel`."}
@@ -53,6 +59,7 @@ checks:
   - {name: detent_crossed, doc: "True once at least n detents were crossed (with hysteresis)."}
   - {name: force_below, doc: "True while tip force is below N newtons."}
   - {name: no_banned_contact, doc: "True while no banned contact type has touched the control."}
+  - {name: held_for, doc: "True once the control has stayed at least its travel from rest for s seconds (a lifted object held up)."}
 
 programs:
   - name: press_button
@@ -85,3 +92,9 @@ programs:
     doc: Touch the slider knob and slide it along its track.
     provides: {actuates: "slider"}
     text: Seq(approach($target), contact($target), slide($target), retreat())
+  - name: pick_up
+    target_cls: grasp
+    doc: Grasp a free object from above, lift it and hold it.
+    provides: {lifts: "grasp"}
+    text: grasp($target)
+

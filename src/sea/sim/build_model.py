@@ -8,7 +8,9 @@ Scene objects (free rigid bodies for the tabletop world, or fixed fixture probes
 conaffinity 10: they rest on panels and the table (contype 2) and touch each other.  When a scene has
 objects, non-jaw robot geoms add bit 8 to their conaffinity, and every jaw-object geom pair is an
 explicit contact pair whose friction combines both surfaces (``pair_friction``, D-032); MuJoCo's
-default rule would take the larger of the two and hide any surface slicker than the jaw.
+default rule would take the larger of the two and hide any surface slicker than the jaw.  Grasp-world
+controls (class ``grasp``) are built the same way: a free body with object bits on the panel, which is
+the table.
 
 Rack tools are all attached to the gripper at build time; only the mounted one collides
 (``Sim.mount``), so a ``With`` swap needs no recompile.
@@ -40,6 +42,7 @@ from sea.sim.controls import (
 TIMESTEP = 0.002
 STALL_TORQUE = {7.4: 1.62, 12.0: 2.94}
 TABLE_HALF = 0.3  # m; the table spans x in [-0.05, 0.55], y in [-0.3, 0.3]
+FLOOR_DROP = 0.4  # m from a grasp-world table top down to the floor
 ROBOT_BITS = (1, 1)
 PANEL_BITS = (2, 1)
 CONTROL_BITS = (4, 1)
@@ -252,9 +255,17 @@ def _add_geom(body, g: GeomSpec, name: str, bits: tuple[int, int], condim: int =
     return body.add_geom(**kw)
 
 
-def _add_moving(parent, part: MovingPart, prefix: str, ctl_pos: np.ndarray, ctl_rot: np.ndarray, faults: Faults):
+def _add_moving(parent, part: MovingPart, prefix: str, ctl_pos: np.ndarray, ctl_rot: np.ndarray, faults: Faults,
+                friction: float = 1.0):
     pos = ctl_pos + ctl_rot @ np.asarray(part.pos)
     rot = ctl_rot @ quat_wxyz_to_mat(part.quat)
+    if part.joint == "free":  # a grasp object: gravity on, object bits, its own surface friction
+        body = parent.add_body(name=prefix, pos=pos.tolist(), quat=mat_to_quat_wxyz(rot).tolist())
+        body.add_freejoint(name=f"{prefix}_q")
+        for k, g in enumerate(part.geoms):
+            geom = _add_geom(body, g, f"{prefix}_{k}_{g.name}", OBJECT_BITS, mass=part.mass / max(len(part.geoms), 1))
+            geom.friction = [friction, 0.005, 0.0001]
+        return body, part.range[1]
     body = parent.add_body(name=prefix, pos=pos.tolist(), quat=mat_to_quat_wxyz(rot).tolist(), gravcomp=1.0)
     axis = np.asarray(part.axis, dtype=float)
     lo, hi = part.range
@@ -362,13 +373,22 @@ def build_model(design: Design, panel: PanelSpec | None = None, tools: list | No
 
     faults = faults or {}
     handles_pre: dict[str, tuple] = {}
+    draws = (dr or DomainRandomization()).draws([c.id for c in panel.controls] if panel else [])
+    surfaces: list[tuple[str, float]] = [(f"obj_{ob.name}_geom", ob.friction) for ob in objects]  # jaw pairs
     if panel is not None:
         from sea.sim.panels import board_half_extents
 
         p_pos = np.array(panel.pose_world.pos.as_list())
         p_rot = quat_wxyz_to_mat(panel.pose_world.quat_wxyz)
         pbody = spec.worldbody.add_body(name="panel", pos=p_pos.tolist(), quat=list(panel.pose_world.quat_wxyz))
-        hx, hy = board_half_extents(panel)
+        from sea.sim.grasp_world import table_half
+
+        grasp_only = bool(panel.controls) and all(c.cls == "grasp" for c in panel.controls)
+        hx, hy = table_half() if grasp_only else board_half_extents(panel)
+        if grasp_only:  # a floor under the table, so an object squeezed off the edge comes to rest
+            spec.worldbody.add_geom(name="floor", type=GEOM_TYPES["box"], size=[1.0, 1.0, 0.01],
+                                    pos=[0.0, 0.0, float(panel.pose_world.pos.z) - FLOOR_DROP - 0.01],
+                                    rgba=[0.5, 0.5, 0.5, 1.0], contype=PANEL_BITS[0], conaffinity=PANEL_BITS[1])
         pbody.add_geom(name="panel_board", type=GEOM_TYPES["box"], size=[hx, hy, 0.005], pos=[0, 0, -0.005],
                        rgba=[0.9, 0.9, 0.85, 1.0], contype=PANEL_BITS[0], conaffinity=PANEL_BITS[1], condim=4)
         pbody.add_camera(name="panel_cam", pos=[0, 0, 0.35], quat=[1, 0, 0, 0], fovy=45)
@@ -381,7 +401,13 @@ def build_model(design: Design, panel: PanelSpec | None = None, tools: list | No
                 gg = GeomSpec(g.name, g.type, g.size, tuple(cpos + crot @ np.asarray(g.pos)),
                               tuple(mat_to_quat_wxyz(crot @ quat_wxyz_to_mat(g.quat))), g.rgba)
                 _add_geom(pbody, gg, f"panel_{c.id}_{k}_{g.name}", PANEL_BITS)
-            _, hi = _add_moving(pbody, geo.moving, f"ctl_{c.id}", cpos, crot, f)
+            mu = c.friction * draws[c.id][0]
+            if geo.moving.joint == "free":  # MuJoCo allows free joints on top-level bodies only
+                _, hi = _add_moving(spec.worldbody, geo.moving, f"ctl_{c.id}", p_pos + p_rot @ cpos, p_rot @ crot, f,
+                                    friction=mu)
+                surfaces += [(f"ctl_{c.id}_{k}_{g.name}", mu) for k, g in enumerate(geo.moving.geoms)]
+            else:
+                _, hi = _add_moving(pbody, geo.moving, f"ctl_{c.id}", cpos, crot, f)
             flap_hi = None
             if geo.flap is not None:
                 _, flap_hi = _add_moving(pbody, geo.flap, f"ctl_{c.id}_flap", cpos, crot, Faults())
@@ -401,16 +427,15 @@ def build_model(design: Design, panel: PanelSpec | None = None, tools: list | No
         obody.add_geom(name=f"obj_{ob.name}_geom", type=GEOM_TYPES[ob.shape], size=list(ob.size) + [0.0] * (3 - len(ob.size)),
                        mass=ob.mass_kg, friction=[ob.friction, 0.005, 0.0001], rgba=[0.3, 0.5, 0.8, 1.0],
                        contype=OBJECT_BITS[0], conaffinity=OBJECT_BITS[1], condim=4)
-    if objects:
+    if surfaces:
         jaws = [g.name for g in spec.geoms if g.name.startswith(("jaw_fixed", "jaw_moving"))]
         for g in spec.geoms:
             if g.contype == ROBOT_BITS[0] and not g.name.startswith(("jaw_fixed", "jaw_moving")):
                 g.conaffinity |= OBJECT_BIT
-        for ob in objects:
-            mu = pair_friction(JAW_FRICTION, ob.friction)
+        for name, friction in surfaces:
+            mu = pair_friction(JAW_FRICTION, friction)
             for j in jaws:
-                spec.add_pair(geomname1=j, geomname2=f"obj_{ob.name}_geom", condim=4,
-                              friction=[mu, mu, 0.005, 0.0001, 0.0001])
+                spec.add_pair(geomname1=j, geomname2=name, condim=4, friction=[mu, mu, 0.005, 0.0001, 0.0001])
 
     model = spec.compile()
     data = mujoco.MjData(model)
@@ -432,7 +457,6 @@ def build_model(design: Design, panel: PanelSpec | None = None, tools: list | No
         elif model.geom_bodyid[g] in robot_bodies and (model.geom_contype[g] or model.geom_conaffinity[g]):
             geom_kind[g] = "arm"
 
-    draws = (dr or DomainRandomization()).draws([c.id for c in panel.controls] if panel else [])
     controls: dict[str, ControlHandle] = {}
     body_to_control: dict[int, str] = {}
     for cid, (c, geo, f, T, _hi, _flap_hi) in handles_pre.items():
@@ -450,7 +474,9 @@ def build_model(design: Design, panel: PanelSpec | None = None, tools: list | No
             flap = (fb, fj, int(model.jnt_qposadr[fj]), int(model.jnt_dofadr[fj]))
             gids |= {g for g in range(model.ngeom) if model.geom_bodyid[g] == fb}
             body_to_control[fb] = cid
-        controls[cid] = ControlHandle(c, geo, dyn, bid, jid, int(model.jnt_qposadr[jid]), int(model.jnt_dofadr[jid]),
+        off = 2 if geo.moving.joint == "free" else 0  # a free object's coordinate is its height (z)
+        controls[cid] = ControlHandle(c, geo, dyn, bid, jid, int(model.jnt_qposadr[jid]) + off,
+                                      int(model.jnt_dofadr[jid]) + off,
                                       gids, T, noise, float(model.jnt_range[jid][1]), flap)
     sim = Sim(model, data, panel, design, controls, arm_qadr, arm_dadr, model.site(MJCF_TOOL_SITE).id,
               geom_kind, geom_contact, body_to_control=body_to_control,

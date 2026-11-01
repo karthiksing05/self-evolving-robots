@@ -496,6 +496,48 @@ def finish(ep: Episode) -> Gen:
     return True
 
 
+PICK_OPEN = 1.0  # gripper joint while descending beside an object (the V1 probe's setting)
+PICK_SIDE = 2 * MM  # fixed jaw's inner face to the object on the way down
+PICK_TABLE_CLEAR = 3 * MM  # jaw tips never go closer than this to the table
+
+
+def pick_depth(spec, past_equator: float = 5 * MM) -> float:
+    """Default depth of the tool point below an object's top: the V1 probe's grip (sim/grasp_probe.py)."""
+    w, hgt = spec.size_mm[0] * MM, spec.size_mm[1] * MM
+    if spec.shape == "sphere":
+        return w / 2 + past_equator - STOCK_TIP_EXT
+    return min(17 * MM, hgt - STOCK_TIP_EXT - PICK_TABLE_CLEAR)
+
+
+def grasp(ep: Episode, cid: str, depth: float | None = None, side: float = PICK_SIDE, close: float = GRIP_CLOSED,
+          close_s: float = 0.6, lift: float = 0.05, hold_s: float = 1.2, speed: float = 0.03) -> Gen:
+    """Pick a free object from above with the stock jaws: open, descend beside it with the fixed jaw
+    ``side`` clear, close toward ``close`` (the servo stalls on the object first), lift by ``lift`` and
+    hold for ``hold_s``.  ``depth`` is how far below the object's top the tool point goes.  Returns
+    False if the descent lands on something (the opening does not fit) or a tool is mounted."""
+    h = ep.sim.controls[cid]
+    if h.spec.cls != "grasp" or ep.sim.mounted is not None:
+        return False
+    w, hgt = h.spec.size_mm[0] * MM, h.spec.size_mm[1] * MM
+    depth = pick_depth(h.spec) if depth is None else depth
+    depth = min(depth, hgt - STOCK_TIP_EXT - PICK_TABLE_CLEAR)
+    down = ep.approach_dir(cid)
+    roll = ep.sim.ctl_dir_world(cid, h.geo.roll_ctl)
+    target = ep.contact_point(cid) + roll * (w / 2 + side) + down * depth
+    v = min(speed, ep.cfg.limits.max_tip_speed_mps)
+    ep.axis_ref, ep.roll_ref = down, roll  # type: ignore[attr-defined]
+    yield from ep.set_gripper(PICK_OPEN, 0.3)
+    yield from ep.move_to(target - down * 0.04, down, None, roll)
+    if not (yield from ep.move_to(target, down, v, roll, guard_force=3.0)):
+        return False
+    ep.squeezing = True
+    yield from ep.set_gripper(close, close_s)
+    yield from ep.hold(0.3)
+    yield from ep.move_to(ep.tip_cmd - down * lift, down, v, roll)
+    yield from ep.hold(hold_s)
+    return True
+
+
 MOTOR = {
     "approach": approach,
     "contact": contact,
@@ -506,4 +548,5 @@ MOTOR = {
     "insert": insert,
     "release": release,
     "retreat": retreat,
+    "grasp": grasp,
 }

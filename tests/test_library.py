@@ -25,9 +25,10 @@ def _ctl(cls: str = "door", handle: str = "none") -> ControlSpec:
 def test_seed_library_contents():
     lib = Library.seed()
     kinds = {k: [p.name for p in lib.prims.values() if p.kind == k] for k in ("motor", "check", "composite")}
-    assert len(kinds["motor"]) == 9 and len(kinds["check"]) == 5
+    assert len(kinds["motor"]) == 10 and len(kinds["check"]) == 6  # grasp and held_for: the grasp world
     assert sorted(kinds["composite"]) == sorted(["press_button", "flip_toggle", "turn_knob", "pull_lever",
-                                                 "open_door_pull", "slide_slider"])
+                                                 "open_door_pull", "slide_slider", "pick_up"])
+    assert lib.get("grasp").requires == {"contact": "pinch", "aperture": "width"}
     assert lib.get("press_button").requires["contact"] == "edge|pad|probe"
     assert lib.get("turn_knob").requires == {"contact": "cup|pinch", "min_force": 0.5}
     assert "push" in lib and "fly" not in lib and lib.get("fly") is None

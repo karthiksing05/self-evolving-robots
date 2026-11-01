@@ -6,7 +6,7 @@ Hand-written recursive descent; nothing here calls ``eval``.  Grammar::
     term   := factor ("&" factor)*
     factor := "~" factor | "(" check ")" | atom
     atom   := moved_at_least(ref, value) | latched(ref) | detent_crossed(ref, INT)
-            | force_below(NUMBER) | no_banned_contact()
+            | force_below(NUMBER) | no_banned_contact() | held_for(ref, NUMBER)
     ref    := "$target" | CONTROL_ID
     value  := NUMBER | "travel"
 """
@@ -117,7 +117,7 @@ class Or:
 
 Expr = Atom | Not | And | Or
 
-ATOMS = ("moved_at_least", "latched", "detent_crossed", "force_below", "no_banned_contact")
+ATOMS = ("moved_at_least", "latched", "detent_crossed", "force_below", "no_banned_contact", "held_for")
 
 
 def _parse_ref(ts: TokenStream) -> str:
@@ -163,6 +163,10 @@ def _parse_atom(ts: TokenStream) -> Atom:
         atom = Atom(name, ref, float(_parse_int(ts)))
     elif name == "force_below":
         atom = Atom(name, None, _parse_number(ts))
+    elif name == "held_for":
+        ref = _parse_ref(ts)
+        ts.expect(",")
+        atom = Atom(name, ref, _parse_number(ts))
     else:  # no_banned_contact
         atom = Atom(name)
     ts.expect(")")
@@ -220,6 +224,8 @@ def _pretty(expr: Expr, parent_prec: int) -> str:
             return f"detent_crossed({expr.ref}, {int(expr.value)})"  # type: ignore[arg-type]
         if expr.name == "force_below":
             return f"force_below({float(expr.value)!r})"  # type: ignore[arg-type]
+        if expr.name == "held_for":
+            return f"held_for({expr.ref}, {float(expr.value)!r})"  # type: ignore[arg-type]
         return "no_banned_contact()"
     if isinstance(expr, Not):
         return "~" + _pretty(expr.arg, 3)
@@ -244,6 +250,7 @@ class CheckEnv(Protocol):
     def detents(self, ref: str) -> int: ...
     def force(self) -> float: ...
     def banned_contact(self) -> bool: ...
+    def held_s(self, ref: str) -> float: ...  # seconds continuously at least its travel from rest
 
 
 def evaluate(expr: Expr, env: CheckEnv) -> bool:
@@ -266,6 +273,9 @@ def evaluate(expr: Expr, env: CheckEnv) -> bool:
         return env.detents(expr.ref) >= int(expr.value)  # type: ignore[arg-type]
     if name == "force_below":
         return env.force() < float(expr.value)  # type: ignore[arg-type]
+    if name == "held_for":
+        assert expr.ref is not None
+        return env.held_s(expr.ref) >= float(expr.value) - 1e-9  # type: ignore[arg-type]
     return not env.banned_contact()
 
 

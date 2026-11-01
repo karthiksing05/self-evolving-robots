@@ -104,6 +104,12 @@ class SimCheckEnv:
     def banned_contact(self) -> bool:
         return self.ep.banned_seen
 
+    def held_s(self, ref: str) -> float:
+        """Seconds the episode's target has stayed at least its travel from rest (0 for other refs)."""
+        if self._cid(ref) != self.ep.cid or self.ep.held_since is None:
+            return 0.0
+        return self.ep.t - self.ep.held_since
+
 
 class Episode:
     """One attempt on one control: commanded joints, recording, contacts, limits."""
@@ -122,6 +128,8 @@ class Episode:
         self.contact_types: set[str] = set()
         self.jaw_touch: dict[tuple[str, str], float] = {}
         self.push_phase = False
+        self.held_since: float | None = None  # when the target last reached its travel (held_for)
+        self.squeezing = False  # set by ``grasp`` once the jaws close on its target
         self.success = checks.parse(sim.controls[cid].spec.success)
         self.q_rest0 = {c: sim.control_q(c) for c in sim.controls}
         self.env = SimCheckEnv(self)
@@ -257,11 +265,14 @@ class Episode:
             rg, og = (g1, g2) if kind1 is not None else (g2, g1)
             mujoco.mj_contactForce(m, d, i, f6)
             fn = abs(float(f6[0]))
-            total += fn
             cid = sim.body_to_control.get(int(m.geom_bodyid[og]))
+            kind = sim.geom_kind[rg]
+            # The jaws' squeeze on a grasp target is the task, bounded by the servo and the grasp class
+            # cap; the hard force limit bounds every other contact (configs/limits_grasp.yaml).
+            if not (self.squeezing and cid == self.cid and kind in ("jaw_fixed", "jaw_moving")):
+                total += fn
             if cid is None:
                 continue
-            kind = sim.geom_kind[rg]
             ctype: str
             if kind == "tool":
                 ctype = sim.geom_contact[rg]
@@ -293,6 +304,8 @@ class Episode:
         tr.q.append([round(float(v), 5) for v in self.sim.arm_q()])
         tr.tip_force.append(round(fmax, 4))
         tr.control_q.append(round(self.sim.control_q(self.cid), 6))
+        up = self.sim.control_q(self.cid) - self.q_rest0[self.cid] >= self.handle.spec.travel - 1e-9
+        self.held_since = (self.held_since if self.held_since is not None else self.t) if up else None
         touching = any(c[2] == self.cid and abs(c[0] - self.t) < 1e-9 for c in tr.contacts[-6:])
         tr.in_contact.append(touching or self._touching())
         tr.push_phase.append(self.push_phase)

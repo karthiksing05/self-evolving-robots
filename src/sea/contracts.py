@@ -35,11 +35,15 @@ MEASUREMENTS: tuple[str, ...] = ("peak_force", "travel_reached", "detents", "tim
 CheckExpr = str
 
 ControlClass = Literal[
-    "push_button", "toggle", "knob", "lever", "door", "drawer", "slider", "slot", "recessed_button"
+    "push_button", "toggle", "knob", "lever", "door", "drawer", "slider", "slot", "recessed_button", "grasp"
 ]
+# The panel classes.  ``grasp`` (a free object on the grasp world's table, docs/gripper-experiment.md)
+# is a ControlClass but not a panel class, so panel generation and the memory encoding never see it.
 CONTROL_CLASSES: tuple[str, ...] = (
     "push_button", "toggle", "knob", "lever", "door", "drawer", "slider", "slot", "recessed_button"
 )
+GRASP_CLASS = "grasp"
+ObjectShape = Literal["box", "cylinder", "sphere"]
 ContactType = Literal["pad", "hook", "cup", "probe", "edge", "pinch"]
 Verdict = Literal[
     "pass",
@@ -97,12 +101,14 @@ class ControlSpec(_Model):
     handle: Handle = "none"
     recess_depth_mm: float = 0.0
     success: CheckExpr
+    shape: ObjectShape | None = None  # grasp objects: size_mm = (width across the jaws, height)
+    mass_g: float = 0.0  # grasp objects; panel controls get their mass from the geometry
 
 
 class PanelSpec(_Model):
     id: str
     seed: int
-    split: Literal["train", "val", "test", "compose", "reference"]
+    split: Literal["train", "val", "test", "compose", "reference", "phase_b"]
     pose_world: Pose
     tilt_rad: float
     controls: list[ControlSpec]

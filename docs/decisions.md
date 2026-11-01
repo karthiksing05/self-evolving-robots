@@ -647,3 +647,49 @@ Build: the current loop is expressed first as the degenerate network (one root, 
 control, one-shot System 2 at impasses), and the battery checks that nothing moved.  Agentic depth
 comes with the `sea-arm` server.
 
+## D-035 Grasp world v0: objects are controls whose coordinate is their height (judge, world, skill)
+Change: the grasp world runs through the panel pipeline unchanged instead of beside it.
+- **Tasks:** `configs/grasp.yaml` and `sim/grasp_world.py` (judge tier) generate tables with one
+  object each:
+  - phase A: cylinders 25-45 mm and boxes 20-50 mm, 50-400 g, friction 0.5-1.0, placed within
+    4-5 cm of the table centre;
+  - phase B: five fixed objects, each failing for one known reason.
+- **Contract:** a `grasp` object is a `ControlSpec` with a shape and a mass. Its success check is
+  the new `held_for($target, 1.0)`: at least its 30 mm travel above rest, continuously for 1 s.
+  A lift that falls back is therefore `wrong_behavior`, and a grip that never lifts is `stuck`.
+- **Sim:** `build_model` makes each object a top-level free body (MuJoCo allows free joints only
+  there) with object collision bits, and mixes its friction into the jaw contacts (D-032). Its
+  control coordinate is the free joint's z, so `control_q`, `q_rest`, travel and every verdict
+  rule apply unchanged. A floor 0.4 m below the table catches objects squeezed off the edge.
+- **Executor:** once `grasp` starts closing, the jaws' squeeze on the target is left out of the
+  hard force limit and counted against the grasp class cap. The servo bounds it: about 46 N static
+  at stall, closing peaks measured at 54-83 N, cap 120 N. Every other contact, including a jaw
+  landing on the object during the descent, stays under the 15 N limit (`configs/limits_grasp.yaml`,
+  which also allows the pinch).
+- **Skill:**
+  - the `grasp` motor primitive has 7 System 1 parameters: depth, side clearance, close target,
+    close time, lift, hold and speed;
+  - the seed program is `pick_up = grasp($target)`;
+  - the typecheck's aperture rule (`requires: {aperture: width}`) rejects an object wider than
+    `design/grip.py`'s widest stable grip, which is the V1 numbers for the stock jaws (cylinder
+    45 mm, box 50 mm, sphere 40 mm with a deep grip). An object too wide for every program is
+    `no_applicable_primitive`, which is structural and escalates before any simulation.
+- **Battery:** `scripts/battery.py --world grasp` (17 s) reports pass share per shape into its own
+  baseline.
+
+Measured (stock gripper, System 1 at m = 2):
+- phase A train 15/16 and val 16/16. The one failure is a tall, heavy can (34 mm wide, 77 mm tall,
+  388 g) that cleared its travel and slid out during the hold, which is a grip phase A should learn;
+- phase B 0/5, each with its declared failure: the 55 and 65 mm cans and the 60 mm box are
+  `no_applicable_primitive` (aperture); the 30 and 40 mm balls are `wrong_behavior` and `stuck`. With
+  m = 8, System 1 still does not find the deep sphere grip that V1 shows exists, so the balls
+  escalate as `s1_exhausted`.
+
+Panel world: `grasp` is a `ControlClass` but not in `CONTROL_CLASSES`, so panel generation and the
+memory encoding are untouched, and the seed program `pick_up` applies to grasp objects only. Judge
+key c64218777cbc -> 27ac5d986ca4 (contracts, grasp world, grasp limits). The panel battery's
+numbers and the golden verdicts were identical before the baseline was re-saved.
+Not yet: memory's class one-hot has no `grasp` slot (grasp results share the zero vector), and the
+loop cannot yet be pointed at the grasp world (the phase A->B runner, build step 5).
+Test: `tests/test_grasp_world.py`.
+

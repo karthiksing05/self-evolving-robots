@@ -13,7 +13,9 @@
   class accepts (Appendix B).  Banned contacts are not rejected here; the verifier flags them;
 - that some actuating primitive acting on the target provides its class (and handle);
 - reach: the contact point and approach direction of the target must lie in the reach grid for
-  the tool tip in use.
+  the tool tip in use;
+- aperture: a primitive that requires one (``grasp``) can only take an object no wider than the
+  gripper's widest stable grip (``design.grip``, measured by the V1 capability table).
 
 ``applicable_programs`` and ``wrap_with_tool`` are what the suite runner uses to pick a program
 and a rack slot for a control (and to emit ``no_applicable_primitive`` when nothing fits).
@@ -54,6 +56,7 @@ ACCEPTS: dict[str, frozenset[str]] = {
     "lever": frozenset({"pad", "hook"}),
     "slider": frozenset({"pad", "edge"}),
     "slot": frozenset({"edge"}),
+    "grasp": frozenset({"pinch"}),
 }
 HANDLE_ACCEPTS: dict[str, frozenset[str]] = {
     "tab": frozenset({"pinch", "hook"}),
@@ -64,7 +67,7 @@ HANDLE_ACCEPTS: dict[str, frozenset[str]] = {
 
 @dataclass(frozen=True)
 class TypeCheckError:
-    code: str  # structure | unknown | arg | range | hard_limit | tool | contact | provides | ref | reach
+    code: str  # structure | unknown | arg | range | hard_limit | tool | contact | provides | ref | reach | aperture
     message: str
     path: str
 
@@ -312,6 +315,13 @@ def _check_prim(ctx: _Ctx, node: Node, path: str, tool: ToolSpec | None, target_
         ctx.err("contact", path, f"{name} on {cls}[{handle}] needs one of {wanted}; {tname} offers {sorted(offered)}")
     if cls == "slot" and name == "insert" and (tool is None or tool.template != "slot_inserter"):
         ctx.err("contact", path, "insert on a slot needs the slot_inserter tool")
+    if "aperture" in defn.requires and target is not None and target.cls == "grasp":
+        from sea.design.grip import widest_mm
+
+        widest = widest_mm(ctx.design, target.shape or "cylinder")
+        if target.size_mm[0] > widest + 1e-9:
+            ctx.err("aperture", path, f"{name}: a {target.size_mm[0]:g} mm {target.shape} is wider than this "
+                    f"gripper's widest stable grip ({widest:g} mm, V1 capability table)")
     if not on_target:
         return
     ctx.acts_on_target = True

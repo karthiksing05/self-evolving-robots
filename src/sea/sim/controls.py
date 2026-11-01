@@ -51,7 +51,7 @@ class MovingPart:
     name: str
     pos: tuple[float, float, float]
     quat: tuple[float, float, float, float]
-    joint: str  # slide | hinge
+    joint: str  # slide | hinge | free (a grasp object: its coordinate is its height)
     axis: tuple[float, float, float]
     range: tuple[float, float]
     geoms: list[GeomSpec] = field(default_factory=list)
@@ -253,9 +253,32 @@ def build_geometry(spec: ControlSpec) -> ControlGeometry:
             geo.flap = flap
             geo.flap_handle_body = fpt
             geo.handle_kind = spec.handle
+    elif cls == "grasp":
+        geo = _grasp_geometry(spec)
     else:  # pragma: no cover - ControlClass is a closed Literal
         raise ValueError(cls)
     return geo
+
+
+GRASP_BOX_DEPTH = 30 * MM  # box extent along the approach (sim/grasp_world.py BOX_DEPTH_MM)
+
+
+def _grasp_geometry(spec: ControlSpec) -> ControlGeometry:
+    """A free object standing on the table: width ``size_mm[0]`` across the jaws (ctl y), height
+    ``size_mm[1]``.  The tool comes straight down onto its top and the jaws close along ctl y."""
+    w, hgt = spec.size_mm[0] * MM, spec.size_mm[1] * MM
+    if spec.shape == "sphere":
+        g, hgt = GeomSpec("ball", "sphere", (w / 2,), rgba=GREEN), w
+    elif spec.shape == "box":
+        g = _box("box", (GRASP_BOX_DEPTH / 2, w / 2, hgt / 2), rgba=GREEN)
+    else:
+        g = _cyl("can", w / 2, hgt / 2, rgba=GREEN)
+    moving = MovingPart("object", (0, 0, hgt / 2), (1, 0, 0, 0), "free", (0, 0, 1), (0.0, 1.0), [g],
+                        spec.mass_g / 1000)
+    depth = GRASP_BOX_DEPTH if spec.shape == "box" else w
+    return ControlGeometry(moving, [], contact_body=np.array([0.0, 0.0, hgt / 2]),
+                           approach_ctl=np.array([0.0, 0.0, -1.0]), actuation_body=np.array([0.0, 0.0, 1.0]),
+                           roll_ctl=np.array([0.0, 1.0, 0.0]), handle_body=np.zeros(3), footprint=(depth, w))
 
 
 # ---------------------------------------------------------------- dynamics
@@ -283,7 +306,9 @@ class ControlDynamics:
         self.spec = spec
         self.faults = faults or Faults()
         self.k = spec.stiffness * stiffness_scale * self.faults.stiffness_scale
-        self.friction = spec.friction * friction_scale * self.faults.friction_scale
+        # a grasp object's friction is its surface's (build_model mixes it into the jaw contacts);
+        # nothing pushes on its height coordinate but gravity and contact
+        self.friction = 0.0 if spec.cls == "grasp" else spec.friction * friction_scale * self.faults.friction_scale
         self.rotary = spec.cls in ("toggle", "knob", "lever", "door")
         self.detents = [] if self.faults.no_detent else list(spec.detents)
         self.peak = 0.0 if self.faults.no_detent else spec.detent_peak

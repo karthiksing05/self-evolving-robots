@@ -1,0 +1,22 @@
+# The grasp world (docs/gripper-experiment.md section 1).  Judge tier: like panels.yaml, this is the
+# task distribution, so changing it changes the ruler.  One object per table; the task is to pick
+# it up, lift it `lift_mm` and hold it `hold_s`.  Widths are across the jaws' closing axis.
+table: {x: 0.22, y: 0.0, z: 0.0, half_x: 0.12, half_y: 0.15}
+task:
+  lift_mm: 30
+  hold_s: 1.0
+  time_limit_s: 20
+  squeeze_cap_n: 120  # jaw squeeze on the target: static about 46 N at stall, closing peaks 54-83 N (D-035)
+placement: {dx: [-0.04, 0.04], dy: [-0.05, 0.05]}  # object centre offset from the table centre (m)
+friction: [0.5, 1.0]  # object surface friction; jaw contacts mix it with the PLA jaw (D-032)
+# Phase A: inside the stock envelope measured by V1 (tests/golden/stock_grasp.json).
+phase_a:
+  cylinder: {width_mm: [25, 45], height_mm: [50, 80], mass_g: [50, 400]}
+  box: {width_mm: [20, 50], height_mm: [40, 70], mass_g: [50, 400]}
+# Phase B: each object fails the stock gripper for one known reason (gold designs come in V2).
+phase_b:
+  - {id: wide_can_55, shape: cylinder, width_mm: 55, height_mm: 80, mass_g: 150, why: wider than the stable opening}
+  - {id: wide_can_65, shape: cylinder, width_mm: 65, height_mm: 90, mass_g: 200, why: wider than the stable opening}
+  - {id: wide_box_60, shape: box, width_mm: 60, height_mm: 60, mass_g: 150, why: wider than the stable opening}
+  - {id: ball_30, shape: sphere, width_mm: 30, height_mm: 30, mass_g: 50, why: rolls out of a flat grip}
+  - {id: ball_40, shape: sphere, width_mm: 40, height_mm: 40, mass_g: 60, why: rolls out of a flat grip}

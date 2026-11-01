@@ -1,0 +1,83 @@
+{
+ "judge_key": "27ac5d986ca4",
+ "m": 2,
+ "n": 16,
+ "rack": [],
+ "splits": {
+  "phase_b": {
+   "all": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "by_class": {
+    "box": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "cylinder": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "sphere": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "verdicts": {
+    "no_applicable_primitive": 3,
+    "stuck": 1,
+    "wrong_behavior": 1
+   }
+  },
+  "train": {
+   "all": [
+    0.9375,
+    0.8125,
+    1.0
+   ],
+   "by_class": {
+    "box": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "cylinder": [
+     0.875,
+     0.625,
+     1.0
+    ]
+   },
+   "verdicts": {
+    "pass": 15,
+    "wrong_behavior": 1
+   }
+  },
+  "val": {
+   "all": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "by_class": {
+    "box": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "cylinder": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "verdicts": {
+    "pass": 16
+   }
+  }
+ },
+ "world": "grasp"
+}
