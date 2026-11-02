@@ -72,6 +72,19 @@ Phase A and phase B are split by measurement, not by a table. `scripts/measure_r
 
 The stored result is `results/real_stock.json`.
 
+**Re-measured with friction that does not creep (D-048).** At MuJoCo's default `impratio` of 1, soft
+friction let a pinched object slide out under a steady load. A 50 g plum squeezed at 30 N fell, which
+real TPU would not allow. With `impratio` 10 in grasp scenes, the stock jaws hold **13/21**:
+- **phase A** is the five objects above, plus the potted meat can, tomato soup can, tennis ball,
+  racquetball, golf ball, lemon, screwdriver and dice;
+- **phase B** is now eight objects:
+  - the gelatin, pudding and sugar boxes and the mustard bottle, wide flat sides on splayed faces;
+  - the tuna can, an arm stall while a jaw presses its top;
+  - the strawberry, plum and apple, each failing one placement.
+
+The 6/21 split above is kept in `results/superseded/impratio1/`. So is everything built on it: the
+gold check, and the first live run below.
+
 The gold check (V2) runs the same script on finger designs (`results/gold/`). Two designs hold
 9/21 objects and lose none of phase A:
 
@@ -329,6 +342,8 @@ Hardware for V5:
 | Finger family: pads built into the model, priced by the ledger, pad-aware grasp and probe (D-038) | built |
 | Real objects: 21 YCB scans, phase A/B split by measurement, gold check (V2) over finger designs (D-038) | built |
 | Live gripper experiment (`configs/exp/gripper_live.yaml`) and its System-1-only control | first run done (D-039) |
+| Evolution core: the gripper as a world (jaw joints, pads and arm servos as parts with bills of materials), frontier, tuning, merging (D-040–D-047) | built; `gripper_s2_s0` 6→13/21, `gripper_s2v2_s0` 6→19/21 in 4 iterations (old physics) |
+| Grasp-scene `impratio` 10, every grasp ruler re-measured (D-048) | built; `gripper_s2v3_s0` running on it |
 | Finger CAD export (STEP/STL for printing), difficulty check (V3) | design |
 | `sea-arm` MCP server over the sim: sense, analyze and goal tools, call log and replay, agentic `s2_agent` over the task network | design |
 | `design/arm.py` (L2), actuator (L3), phase C fault injection | design |

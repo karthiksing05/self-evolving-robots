@@ -145,6 +145,11 @@ task needs, the cheapest move left is a swap.
 The test split is scored for both the final body and the stock body: other placements or seeds of
 the same groups.
 
+`scripts/collect_evolve.py` gathers a run into `results/evolve/`, with `--aggregate` for many seeds of
+a baseline arm. `scripts/ideas.py` lists every idea recorded across runs, with its costing and the
+mechanisms open when it was proposed. That list is the outer loop's input, for example
+`results/evolve/ideas_gripper.md`.
+
 ## Adding a world
 
 1. Write `src/sea/worlds/<name>.py` with a class satisfying `World`, and register it in

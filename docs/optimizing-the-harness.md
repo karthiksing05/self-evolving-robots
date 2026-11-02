@@ -107,6 +107,31 @@ Measure the allowance with `--tune-trials 0` against the default, under the same
   swaps rarely gain a group while breaking a held one, which is what triggers tuning. The allowance is
   for directed swaps; System 2 runs measure it there.
 
+## Evidence so far (2 November 2026)
+
+The frozen campaign `results/evolve/c1/` ran one commit (`7efc6b9`) on two worlds. Each world had
+three System 2 seeds, 30 random-arm seeds and the stock body:
+
+| World | System 2: groups held, train / test | Random: train / test (solved) | Stock | System 2 cost |
+|---|---|---|---|---|
+| mobile (10 groups) | 10/10, 10/10 on 3 of 3 seeds | 6.5, 6.3 (0 of 30) | 4 | 2 calls, 5–8 trials per seed |
+| phonology (13 groups) | 13/13, 13/13 on 3 of 3 seeds | 11.0, 10.2 (7 of 30) | 6 | 1 call, 4 trials per seed |
+
+- **Information design (lever 1)** carried most of it. In the mobile world, System 2 ruled out wheels
+  across their whole range from the brief ("r = 4.5 cm climbs about 3.35 cm"). It ruled out the
+  rocker-bogie from the sofa clearance, and chose tracks with an idler between the porch edge and
+  the sofa.
+- **Merging (D-045)** turned three kept-eligible single-slot proposals into one body in both worlds.
+  In phonology the union also gained a group neither part gained alone.
+- **Tuning (D-044)** has not yet produced a keeper in a live run. In 7 dimensions, perturbing every
+  parameter at once broke a different held group each trial, so steps are now sparse.
+- **Task validity (lever 6)** mattered most for the gripper. The diagnosis's own numbers, a 50 g plum
+  sliding out at 30 N, exposed soft-contact creep in the simulator (D-048). It had made round objects
+  fail for a reason no design could fix.
+- **The gripper** under the same loop with the frontier, full swap trials and tuning
+  (`gripper_s2v2_s0`, old physics) went from 6 to 19/21 in 4 iterations. The first loop
+  (`gripper_s2_s0`) reached 13/21 in 10.
+
 ## Failure modes to watch
 
 - **Repetition:** the same refused or rejected change proposed again. The record is in the prompt;
