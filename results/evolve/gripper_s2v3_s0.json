@@ -1,0 +1,2147 @@
+{
+ "run": "gripper_s2v3_s0",
+ "summary": {
+  "world": "gripper",
+  "arm": "s2",
+  "seed": 0,
+  "final_body": {
+   "id": "b031",
+   "parent": "b021",
+   "parts": {
+    "jaw": {
+     "type": "prismatic",
+     "params": {
+      "drive_mm_per_rad": 56.0
+     }
+    },
+    "pads": {
+     "type": "pads",
+     "params": {
+      "reach_mm": 6.5,
+      "pad_angle_deg": 0.0,
+      "groove_mm": 0.0,
+      "lip_mm": 0.25,
+      "pad_tpu_mm": 1.6,
+      "width_mm": 13.6
+     }
+    },
+    "arm_servos": {
+     "type": "servos_7v4",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 14,
+    "tasks_passed": 30,
+    "sim_s": 803.3,
+    "wall_s": 15.7
+   },
+   {
+    "iteration": 1,
+    "body": "stock",
+    "held_groups": 14,
+    "tasks_passed": 30,
+    "sim_s": 5014.5,
+    "wall_s": 127.2
+   },
+   {
+    "iteration": 2,
+    "body": "stock",
+    "held_groups": 14,
+    "tasks_passed": 30,
+    "sim_s": 8196.6,
+    "wall_s": 249.0
+   },
+   {
+    "iteration": 3,
+    "body": "b021",
+    "held_groups": 20,
+    "tasks_passed": 41,
+    "sim_s": 9619.7,
+    "wall_s": 408.7
+   },
+   {
+    "iteration": 4,
+    "body": "b031",
+    "held_groups": 21,
+    "tasks_passed": 42,
+    "sim_s": 10962.9,
+    "wall_s": 507.9
+   }
+  ],
+  "train_groups": 21,
+  "final_held_train": [
+   "apple",
+   "banana",
+   "cup",
+   "dice",
+   "flat_screwdriver",
+   "foam_brick",
+   "gelatin_box",
+   "golf_ball",
+   "large_marker",
+   "lemon",
+   "mustard_bottle",
+   "plum",
+   "potted_meat_can",
+   "pudding_box",
+   "racquetball",
+   "strawberry",
+   "sugar_box",
+   "tennis_ball",
+   "tomato_soup_can",
+   "tuna_fish_can",
+   "wood_block_cube"
+  ],
+  "test": {
+   "final_held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "mustard_bottle",
+    "plum",
+    "pudding_box",
+    "racquetball",
+    "strawberry",
+    "sugar_box",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "stock_held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "foam_brick",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "potted_meat_can",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "final_tasks": 40,
+   "stock_tasks": 30,
+   "n": 42
+  },
+  "spent": {
+   "usd": 5.4,
+   "fab_minutes": 204.2,
+   "lead_days": 3.0,
+   "owned": {
+    "sts3215_7v4": 6.0,
+    "lm3uu_bearing": 2.0,
+    "steel_rod_3x100": 2.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 12399.3,
+  "attempts": 2048,
+  "proposals": {
+   "total": 20,
+   "tried": 20,
+   "refused": 0,
+   "ideas": 0,
+   "kept": 2,
+   "rejected_regression": 16,
+   "moves": {
+    "params": 3,
+    "swap": 9,
+    "idea": 0,
+    "tune": 8,
+    "merge": 0
+   },
+   "mean_prediction_precision": 0.81
+  },
+  "frontier": [
+   {
+    "id": "b000",
+    "body": "arm_servos: servos_7v4; jaw: prismatic (drive_mm_per_rad=55); pads: none",
+    "gained": [
+     "apple",
+     "gelatin_box",
+     "pudding_box",
+     "tuna_fish_can"
+    ],
+    "lost": [
+     "flat_screwdriver",
+     "potted_meat_can"
+    ],
+    "why_lost": "lost flat_screwdriver, potted_meat_can (potted_meat_can: squeezed_up_out, verdict rule_violation; closed to 0.64 rad (fingertips 51 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 30 N on the stock j; flat_screwdriver: slipped_under_load, verdict wrong_behavior; closed to 0.06 rad (fingertips 19 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 34 N on the stock j; flat_screwdriver: slipped_under_load, verdict wrong_behavior; closed to 0.08 rad (fingertips 20 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 42 N on the stock j)",
+    "iteration": 0,
+    "edit": "jaw -> prismatic (drive_mm_per_rad=55)"
+   },
+   {
+    "id": "b001",
+    "body": "arm_servos: servos_7v4; jaw: revolute; pads: pads (groove_mm=2, lip_mm=0, pad_angle_deg=25, pad_tpu_mm=2, reach_mm=0, width_mm=12)",
+    "gained": [
+     "apple",
+     "gelatin_box",
+     "strawberry"
+    ],
+    "lost": [
+     "dice"
+    ],
+    "why_lost": "lost dice (dice: slipped_under_load, verdict wrong_behavior; closed to -0.07 rad (fingertips -0 mm apart), moving fingertip +2 mm vs the fixed one; fixed jaw: 10 N on the pad an; dice: slipped_under_load, verdict wrong_behavior; closed to -0.06 rad (fingertips 0 mm apart), moving fingertip +2 mm vs the fixed one; fixed jaw: 13 N on the pad and)",
+    "iteration": 0,
+    "edit": "pads -> pads (groove_mm=2, lip_mm=0, pad_angle_deg=25, pad_tpu_mm=2, reach_mm=0, width_mm=12)"
+   },
+   {
+    "id": "b002",
+    "body": "arm_servos: servos_7v4; jaw: prismatic (drive_mm_per_rad=55); pads: pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=2, reach_mm=0, width_mm=12)",
+    "gained": [
+     "apple",
+     "gelatin_box",
+     "pudding_box",
+     "strawberry",
+     "tuna_fish_can"
+    ],
+    "lost": [
+     "banana"
+    ],
+    "why_lost": "lost banana (banana: squeezed_up_out, verdict wrong_behavior; closed to 0.41 rad (fingertips 29 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 26 N on the pad and)",
+    "iteration": 0,
+    "edit": "jaw -> prismatic (drive_mm_per_rad=55); pads -> pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=2, reach_mm=0, width_mm=12)"
+   },
+   {
+    "id": "b00t0",
+    "body": "arm_servos: servos_7v4; jaw: prismatic (drive_mm_per_rad=56.257); pads: pads (groove_mm=1.802, lip_mm=0.64, pad_angle_deg=1.18, pad_tpu_mm=1.598, reach_mm=2.712, width_mm=17.216)",
+    "gained": [
+     "apple",
+     "gelatin_box",
+     "pudding_box",
+     "strawberry",
+     "sugar_box"
+    ],
+    "lost": [
+     "racquetball"
+    ],
+    "why_lost": "lost racquetball (racquetball: fixed_jaw_missed, verdict stuck; closed to 1.06 rad (fingertips 66 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no c)",
+    "iteration": 0,
+    "edit": "jaw (drive_mm_per_rad=56.257); pads (groove_mm=1.802, lip_mm=0.64, pad_angle_deg=1.18, pad_tpu_mm=1.598, reach_mm=2.712, width_mm=17.216)"
+   },
+   {
+    "id": "b00t1",
+    "body": "arm_servos: servos_7v4; jaw: prismatic (drive_mm_per_rad=60); pads: pads (groove_mm=1.156, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=2.025, reach_mm=0, width_mm=11.3)",
+    "gained": [
+     "apple",
+     "gelatin_box",
+     "pudding_box",
+     "strawberry",
+     "tuna_fish_can"
+    ],
+    "lost": [
+     "dice"
+    ],
+    "why_lost": "lost dice (dice: slipped_under_load, verdict wrong_behavior; closed to -0.15 rad (fingertips -3 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 18 N on the pad an)",
+    "iteration": 0,
+    "edit": "jaw (drive_mm_per_rad=60); pads (groove_mm=1.156, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=2.025, reach_mm=0, width_mm=11.3)"
+   },
+   {
+    "id": "b00t2",
+    "body": "arm_servos: servos_7v4; jaw: prismatic (drive_mm_per_rad=47.026); pads: pads (groove_mm=1.297, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=2.198, reach_mm=5.004, width_mm=11.671)",
+    "gained": [
+     "apple",
+     "gelatin_box",
+     "strawberry",
+     "tuna_fish_can"
+    ],
+    "lost": [
+     "dice",
+     "foam_brick",
+     "tomato_soup_can"
+    ],
+    "why_lost": "lost dice, foam_brick, tomato_soup_can (foam_brick: slipped_under_load, verdict rule_violation; closed to 0.72 rad (fingertips 39 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 37 N on the pad and; foam_brick: slipped_under_load, verdict rule_violation; closed to 0.73 rad (fingertips 40 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 46 N on the pad and; tomato_soup_can: slipped_under_load, verdict rule_violation; closed to 1.26 rad (fingertips 65 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 36 N on the pad at ; dice: slipped_under_load, verdict wrong_behavior; closed to -0.15 rad (fi)",
+    "iteration": 0,
+    "edit": "jaw (drive_mm_per_rad=47.026); pads (groove_mm=1.297, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=2.198, reach_mm=5.004, width_mm=11.671)"
+   },
+   {
+    "id": "b00t3",
+    "body": "arm_servos: servos_7v4; jaw: prismatic (drive_mm_per_rad=60); pads: pads (groove_mm=1.489, lip_mm=0.18, pad_angle_deg=5.204, pad_tpu_mm=2.036, reach_mm=0, width_mm=10.112)",
+    "gained": [
+     "apple",
+     "gelatin_box",
+     "pudding_box",
+     "strawberry",
+     "sugar_box",
+     "tuna_fish_can"
+    ],
+    "lost": [
+     "banana",
+     "flat_screwdriver",
+     "racquetball"
+    ],
+    "why_lost": "lost banana, flat_screwdriver, racquetball (banana: squeezed_up_out, verdict wrong_behavior; closed to 0.41 rad (fingertips 30 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 23 N on the pad at ; racquetball: moving_jaw_missed, verdict stuck; closed to 1.17 rad (fingertips 76 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 1 N on the pad at +4 mm from; flat_screwdriver: slipped_under_load, verdict wrong_behavior; closed to 0.34 rad (fingertips 26 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 27 N on the pad at )",
+    "iteration": 0,
+    "edit": "jaw (drive_mm_per_rad=60); pads (groove_mm=1.489, lip_mm=0.18, pad_angle_deg=5.204, pad_tpu_mm=2.036, reach_mm=0, width_mm=10.112)"
+   },
+   {
+    "id": "b010",
+    "body": "arm_servos: servos_7v4; jaw: prismatic (drive_mm_per_rad=55); pads: pads (groove_mm=1.2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=2, reach_mm=0, width_mm=12)",
+    "gained": [
+     "apple",
+     "gelatin_box",
+     "pudding_box",
+     "strawberry",
+     "tuna_fish_can"
+    ],
+    "lost": [
+     "dice"
+    ],
+    "why_lost": "lost dice (dice: slipped_under_load, verdict wrong_behavior; closed to -0.13 rad (fingertips -1 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 18 N on the pad an)",
+    "iteration": 1,
+    "edit": "jaw (drive_mm_per_rad=55); pads (groove_mm=1.2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=2, reach_mm=0, width_mm=12)"
+   },
+   {
+    "id": "b011",
+    "body": "arm_servos: servos_7v4; jaw: prismatic (drive_mm_per_rad=56); pads: pads (groove_mm=2, lip_mm=0.35, pad_angle_deg=1.2, pad_tpu_mm=1.6, reach_mm=0, width_mm=17)",
+    "gained": [
+     "apple",
+     "gelatin_box",
+     "pudding_box",
+     "strawberry",
+     "sugar_box"
+    ],
+    "lost": [
+     "racquetball"
+    ],
+    "why_lost": "lost racquetball (racquetball: fixed_jaw_missed, verdict stuck; closed to 1.07 rad (fingertips 66 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no c)",
+    "iteration": 1,
+    "edit": "jaw (drive_mm_per_rad=56); pads (groove_mm=2, lip_mm=0.35, pad_angle_deg=1.2, pad_tpu_mm=1.6, reach_mm=0, width_mm=17)"
+   },
+   {
+    "id": "b012",
+    "body": "arm_servos: servos_7v4; jaw: prismatic (drive_mm_per_rad=55); pads: pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=2, reach_mm=0, width_mm=17)",
+    "gained": [
+     "apple",
+     "gelatin_box",
+     "pudding_box",
+     "strawberry"
+    ],
+    "lost": [
+     "banana"
+    ],
+    "why_lost": "lost banana (banana: squeezed_up_out, verdict wrong_behavior; closed to 0.44 rad (fingertips 30 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 26 N on the pad and)",
+    "iteration": 1,
+    "edit": "jaw (drive_mm_per_rad=55); pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=2, reach_mm=0, width_mm=17)"
+   },
+   {
+    "id": "b01t0",
+    "body": "arm_servos: servos_7v4; jaw: prismatic (drive_mm_per_rad=56.03); pads: pads (groove_mm=0, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1.569, reach_mm=14.783, width_mm=13.573)",
+    "gained": [
+     "gelatin_box",
+     "mustard_bottle",
+     "pudding_box",
+     "strawberry",
+     "tuna_fish_can"
+    ],
+    "lost": [
+     "potted_meat_can"
+    ],
+    "why_lost": "lost potted_meat_can (potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.70 s (squeezing or pressing down); potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.84 s (squeezing or pressing down))",
+    "iteration": 1,
+    "edit": "jaw (drive_mm_per_rad=56.03); pads (groove_mm=0, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1.569, reach_mm=14.783, width_mm=13.573)"
+   },
+   {
+    "id": "b01t1",
+    "body": "arm_servos: servos_7v4; jaw: prismatic (drive_mm_per_rad=56.011); pads: pads (groove_mm=0, lip_mm=1.554, pad_angle_deg=0.175, pad_tpu_mm=0.212, reach_mm=15.224, width_mm=14.262)",
+    "gained": [
+     "gelatin_box",
+     "mustard_bottle",
+     "pudding_box",
+     "strawberry"
+    ],
+    "lost": [
+     "potted_meat_can",
+     "racquetball"
+    ],
+    "why_lost": "lost potted_meat_can, racquetball (potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.68 s (squeezing or pressing down); potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.84 s (squeezing or pressing down); racquetball: fixed_jaw_missed, verdict stuck; closed to 1.00 rad (fingertips 66 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no c)",
+    "iteration": 1,
+    "edit": "jaw (drive_mm_per_rad=56.011); pads (groove_mm=0, lip_mm=1.554, pad_angle_deg=0.175, pad_tpu_mm=0.212, reach_mm=15.224, width_mm=14.262)"
+   },
+   {
+    "id": "b01t2",
+    "body": "arm_servos: servos_7v4; jaw: prismatic (drive_mm_per_rad=60); pads: pads (groove_mm=0.03, lip_mm=0, pad_angle_deg=1.63, pad_tpu_mm=1.384, reach_mm=8.019, width_mm=14.35)",
+    "gained": [
+     "apple",
+     "gelatin_box",
+     "mustard_bottle",
+     "strawberry"
+    ],
+    "lost": [
+     "dice",
+     "potted_meat_can",
+     "tomato_soup_can"
+    ],
+    "why_lost": "lost dice, potted_meat_can, tomato_soup_can (potted_meat_can: fixed_jaw_on_top_face, verdict stuck; closed to 1.20 rad (fingertips 79 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 12 N on the pad at +38 mm fr; tomato_soup_can: slipped_under_load, verdict rule_violation; closed to 0.97 rad (fingertips 65 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 29 N on the pad at ; dice: slipped_under_load, verdict wrong_behavior; closed to -0.14 rad (fingertips -2 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 22 N on the pad an)",
+    "iteration": 1,
+    "edit": "jaw (drive_mm_per_rad=60); pads (groove_mm=0.03, lip_mm=0, pad_angle_deg=1.63, pad_tpu_mm=1.384, reach_mm=8.019, width_mm=14.35)"
+   },
+   {
+    "id": "b01t3",
+    "body": "arm_servos: servos_7v4; jaw: prismatic (drive_mm_per_rad=60); pads: pads (groove_mm=0.754, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1.253, reach_mm=8.506, width_mm=13.441)",
+    "gained": [
+     "apple",
+     "gelatin_box",
+     "mustard_bottle",
+     "pudding_box",
+     "strawberry",
+     "tuna_fish_can"
+    ],
+    "lost": [
+     "dice",
+     "potted_meat_can"
+    ],
+    "why_lost": "lost dice, potted_meat_can (potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=1.22 s (squeezing or pressing down); dice: slipped_under_load, verdict wrong_behavior; closed to -0.07 rad (fingertips 3 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 14 N on the pad and)",
+    "iteration": 1,
+    "edit": "jaw (drive_mm_per_rad=60); pads (groove_mm=0.754, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1.253, reach_mm=8.506, width_mm=13.441)"
+   },
+   {
+    "id": "b020",
+    "body": "arm_servos: servos_7v4; jaw: prismatic (drive_mm_per_rad=55); pads: pads (groove_mm=1.6, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=3, reach_mm=0, width_mm=17)",
+    "gained": [
+     "apple",
+     "gelatin_box",
+     "pudding_box",
+     "strawberry"
+    ],
+    "lost": [
+     "dice"
+    ],
+    "why_lost": "lost dice (dice: never_lifted, verdict wrong_behavior; closed to -0.14 rad (fingertips -4 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 18 N on the pad an)",
+    "iteration": 2,
+    "edit": "jaw -> prismatic (drive_mm_per_rad=55); pads -> pads (groove_mm=1.6, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=3, reach_mm=0, width_mm=17)"
+   },
+   {
+    "id": "b022",
+    "body": "arm_servos: servos_7v4; jaw: prismatic (drive_mm_per_rad=56); pads: pads (groove_mm=4, lip_mm=0.5, pad_angle_deg=0, pad_tpu_mm=2.5, reach_mm=2, width_mm=17)",
+    "gained": [
+     "apple",
+     "gelatin_box",
+     "pudding_box",
+     "strawberry",
+     "sugar_box"
+    ],
+    "lost": [
+     "foam_brick",
+     "potted_meat_can",
+     "racquetball"
+    ],
+    "why_lost": "lost foam_brick, potted_meat_can, racquetball (potted_meat_can: slipped_under_load, verdict rule_violation; closed to 0.93 rad (fingertips 57 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 29 N on the pad at ; potted_meat_can: fixed_jaw_on_top_face, verdict stuck; closed to 1.21 rad (fingertips 73 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 3 N on the pad at +42 mm fro; foam_brick: fixed_jaw_on_top_face, verdict stuck; closed to 1.09 rad (fingertips 66 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 3 N on the pad at +24 mm fro; racquetball: fixed_jaw_missed, verdict stuck; closed to 1.10 r)",
+    "iteration": 2,
+    "edit": "jaw -> prismatic (drive_mm_per_rad=56); pads -> pads (groove_mm=4, lip_mm=0.5, pad_angle_deg=0, pad_tpu_mm=2.5, reach_mm=2, width_mm=17)"
+   }
+  ],
+  "wall_s": 528.1,
+  "llm": {
+   "calls": 4,
+   "tokens_in": 92861,
+   "tokens_out": 34665,
+   "usd_list_price": 1.223
+  }
+ },
+ "final_body": "arm_servos: servos_7v4; jaw: prismatic (drive_mm_per_rad=56); pads: pads (groove_mm=0, lip_mm=0.25, pad_angle_deg=0, pad_tpu_mm=1.6, reach_mm=6.5, width_mm=13.6)",
+ "final_bom": [
+  {
+   "item": "print:PLA",
+   "qty": 37.599999999999994,
+   "slot": "jaw",
+   "note": "carriage, rack, pinion, rod clamps"
+  },
+  {
+   "item": "steel_rod_3x100",
+   "qty": 2.0,
+   "slot": "jaw",
+   "note": ""
+  },
+  {
+   "item": "lm3uu_bearing",
+   "qty": 2.0,
+   "slot": "jaw",
+   "note": ""
+  },
+  {
+   "item": "m3_screw",
+   "qty": 6.0,
+   "slot": "jaw",
+   "note": ""
+  },
+  {
+   "item": "print:PLA",
+   "qty": 0.94,
+   "slot": "pads",
+   "note": ""
+  },
+  {
+   "item": "print:TPU",
+   "qty": 0.49,
+   "slot": "pads",
+   "note": ""
+  },
+  {
+   "item": "m2_screw",
+   "qty": 4.0,
+   "slot": "pads",
+   "note": ""
+  },
+  {
+   "item": "sts3215_7v4",
+   "qty": 6.0,
+   "slot": "arm_servos",
+   "note": ""
+  }
+ ],
+ "stock_bom": [
+  {
+   "item": "sts3215_7v4",
+   "qty": 6.0,
+   "slot": "arm_servos",
+   "note": ""
+  }
+ ],
+ "judge_key": "a4eda72d936f",
+ "iterations": [
+  {
+   "iteration": 0,
+   "body": "arm_servos: servos_7v4; jaw: revolute; pads: none",
+   "held": [
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "potted_meat_can",
+    "racquetball",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "moving_jaw_on_top_face": 8,
+    "squeezed_down_out": 4
+   },
+   "failing": {
+    "reg_gelatin_box": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict stuck; closed to 0.74 rad (fingertips 73 mm apart), moving fingertip +13 mm vs the fixed one; fixed jaw: 10 N on the stock jaw at -3 mm from the centre (top at +15), pushing 0 deg down; moving jaw: 23 N on the stock jaw at +13 mm from the centre (top at +15), pushing 47 deg down; rose 7 mm, ended +2 mm; 97 g"
+    },
+    "rva000_gelatin_box": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict stuck; closed to 0.68 rad (fingertips 69 mm apart), moving fingertip +10 mm vs the fixed one; fixed jaw: 20 N on the stock jaw at -1 mm from the centre (top at +15), pushing 5 deg down; moving jaw: 26 N on the stock jaw at +9 mm from the centre (top at +15), pushing 49 deg down; rose 3 mm, ended -2 mm; 97 g"
+    },
+    "reg_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.79 rad (fingertips 77 mm apart), moving fingertip +16 mm vs the fixed one; fixed jaw: 2 N on the stock jaw at +2 mm from the centre (top at +19), pushing 3 deg down; moving jaw: 20 N on the stock jaw at +16 mm from the centre (top at +19), pushing 84 deg down; rose 0 mm, ended -1 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.75 rad (fingertips 74 mm apart), moving fingertip +14 mm vs the fixed one; fixed jaw: no contact; moving jaw: 20 N on the stock jaw at +17 mm from the centre (top at +19), pushing 85 deg down; rose 0 mm, ended -1 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.77 rad (fingertips 75 mm apart), moving fingertip +15 mm vs the fixed one; fixed jaw: 2 N on the stock jaw at +7 mm from the centre (top at +23), pushing 2 deg down; moving jaw: 21 N on the stock jaw at +20 mm from the centre (top at +23), pushing 83 deg down; rose 1 mm, ended +1 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.64 rad (fingertips 66 mm apart), moving fingertip +9 mm vs the fixed one; fixed jaw: no contact; moving jaw: 22 N on the stock jaw at +21 mm from the centre (top at +23), pushing 87 deg down; rose 0 mm, ended -0 mm; 514 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.69 rad (fingertips 70 mm apart), moving fingertip +11 mm vs the fixed one; fixed jaw: 6 N on the stock jaw at +13 mm from the centre (top at +29), pushing 19 deg down; moving jaw: 23 N on the stock jaw at +22 mm from the centre (top at +29), pushing 73 deg down; rose 1 mm, ended +1 mm; 431 g"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.44 rad (fingertips 51 mm apart), moving fingertip +3 mm vs the fixed one; fixed jaw: no contact; moving jaw: 23 N on the stock jaw at +27 mm from the centre (top at +29), pushing 83 deg down; rose 2 mm, ended +2 mm; 431 g"
+    },
+    "reg_strawberry": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict wrong_behavior; closed to 0.22 rad (fingertips 34 mm apart), moving fingertip -0 mm vs the fixed one; fixed jaw: 21 N on the stock jaw at +0 mm from the centre (top at +21), pushing 7 deg down; moving jaw: 24 N on the stock jaw at +7 mm from the centre (top at +21), pushing 16 deg down; rose 40 mm, ended +1 mm; 18 g"
+    },
+    "reg_tuna_fish_can": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; an arm joint stalled (load_limit reflex); closed to 0.38 rad (fingertips 46 mm apart), moving fingertip +2 mm vs the fixed one; fixed jaw: no contact; moving jaw: 19 N on the stock jaw at +14 mm from the centre (top at +17), pushing 83 deg down; rose 0 mm, ended -0 mm; 171 g"
+    },
+    "rva000_tuna_fish_can": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; an arm joint stalled (load_limit reflex); closed to 0.38 rad (fingertips 47 mm apart), moving fingertip +2 mm vs the fixed one; fixed jaw: no contact; moving jaw: 21 N on the stock jaw at +14 mm from the centre (top at +17), pushing 83 deg down; rose 0 mm, ended +0 mm; 171 g"
+    },
+    "rva000_apple": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict wrong_behavior; closed to 0.72 rad (fingertips 72 mm apart), moving fingertip +12 mm vs the fixed one; fixed jaw: 21 N on the stock jaw at +3 mm from the centre (top at +36), pushing 7 deg down; moving jaw: 24 N on the stock jaw at +26 mm from the centre (top at +36), pushing 32 deg down; rose 37 mm, ended +29 mm; 68 g"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "jaw -> prismatic (drive_mm_per_rad=55)",
+     "base": null,
+     "mechanism": "moving_jaw_on_top_face (pudding, sugar, mustard, tuna) and squeezed_down_out (gelatin, apple, strawberry). Both come from the hinged jaw's geometry. Its fingertip rises with the opening: +14 mm at 75 mm, +23 at 85, +35 at 95. Its face tilts with the opening: 44, 53 and 64 deg at those widths. At 73-96 mm the moving tip lands above the object's top (pudding top +19, tip +16) or presses at 47-87 deg down. Grip force then goes into pushing the object down, and in tuna's case into the table until the arm stalls.",
+     "principle": "Two contacts hold only when their normals are horizontal and opposed. A finger holds a side only if its tip reaches below the top. A slide neither turns nor rises (R(1-cos q) = 0), so the faces stay antipodal at every width.",
+     "hypothesis": "Prismatic jaw at drive_mm_per_rad 55. By the brief's linear trend (51 mm at 20, 121 mm at 60) it opens to about 112 mm, enough for the 96 mm mustard bottle plus clearance. Squeeze is about 27*60/55 \u2248 29 N, and the face stays at 0 deg with the tip at +1 mm at every width. Sugar box: 2*0.5*29 = 29 N of grip against 5 N of weight. The arm load is 0.41 + 0.15*5.14 = 1.18 N*m, under the 1.62 N*m stall, so the 12 V servos ($68, refused) are not needed. Params cannot fix this: no revolute value changes the hinge's tilt or rise, and pads alone still leave the tip about +20 mm high at 90 mm.",
+     "predicted_gains": [
+      "gelatin_box",
+      "pudding_box",
+      "sugar_box",
+      "mustard_bottle",
+      "tuna_fish_can",
+      "apple",
+      "strawberry"
+     ],
+     "risks": [
+      "golf_ball, lemon, plum, racquetball, tennis_ball, tomato_soup_can: the round objects lose whatever centring the tilted hinge face gave. Parallel flat faces at the equator are antipodal, and System 1 retunes grasp height, so they should hold.",
+      "dice, large_marker: small objects at about 30 N squeeze instead of 20 N. Faces now stay parallel, so the extra force is horizontal and should not eject them."
+     ],
+     "idea": null,
+     "result": "rejected: lost flat_screwdriver, potted_meat_can (potted_meat_can: squeezed_up_out, verdict rule_violation; closed to 0.64 rad (fingertips 51 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 30 N on the stock j; flat_screwdriver: slipped_under_load, verdict wrong_behavior; closed to 0.06 rad (fingertips 19 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 34 N on the stock j; flat_screwdriver: slipped_under_load, verdict wrong_behavior; closed to 0.08 rad (fingertips 20 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 42 N on the stock j); it would gain apple, gelatin_box, pudding_box, tuna_fish_can; kept on the frontier as b000",
+     "gained": [
+      "apple",
+      "gelatin_box",
+      "pudding_box",
+      "tuna_fish_can"
+     ],
+     "lost": [
+      "flat_screwdriver",
+      "potted_meat_can"
+     ],
+     "prediction": {
+      "predicted": [
+       "apple",
+       "gelatin_box",
+       "mustard_bottle",
+       "pudding_box",
+       "strawberry",
+       "sugar_box",
+       "tuna_fish_can"
+      ],
+      "hit": [
+       "apple",
+       "gelatin_box",
+       "pudding_box",
+       "tuna_fish_can"
+      ],
+      "missed": [
+       "mustard_bottle",
+       "strawberry",
+       "sugar_box"
+      ],
+      "unpredicted": [],
+      "precision": 0.571,
+      "lost": [
+       "flat_screwdriver",
+       "potted_meat_can"
+      ]
+     },
+     "resources": {
+      "usd": 5.4,
+      "lead_days": 3.0,
+      "fab_minutes": 186.2,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x100 x2: 0 provided, buy 2 at $1.5 ($3.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 37.2 g for jaw: 186 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "arm_stall",
+      "slipped_under_load",
+      "squeezed_down_out",
+      "squeezed_up_out"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "pads -> pads (groove_mm=2, lip_mm=0, pad_angle_deg=25, pad_tpu_mm=2, reach_mm=0, width_mm=12)",
+     "base": null,
+     "mechanism": "squeezed_down_out on the mid-wide objects (gelatin 73 mm at 47 deg, apple 75 mm at 32 deg, strawberry 47 mm at 16 deg). The tilted moving contact pushes down by N sin a, and bare PLA friction (0.45, a slip limit of about 24 deg) cannot resist it.",
+     "principle": "A tilted contact squeezes the object out when tan a exceeds mu. Pre-tilting the pad back cuts a, and a TPU skin doubles mu to 0.9 (a limit of about 42 deg). A V-groove centres round objects.",
+     "hypothesis": "Keep the revolute jaw and add pads at pad_angle 25, pad_tpu 2, groove 2, reach 0. The pads shift the face about -23 deg, giving roughly -3 deg at 35 mm, +12 at 55, +29 at 75 and +38 at 85. All of these are under the 42 deg slip limit with TPU. Reach 0 keeps the lever, the squeeze and the fingertip rise unchanged. This is free and on hand: $0, 16 machine min.",
+     "predicted_gains": [
+      "gelatin_box",
+      "apple",
+      "strawberry"
+     ],
+     "risks": [
+      "dice, wood_block_cube, large_marker: at small openings the pad tilts about -16 deg and the tip drops a few mm. TPU friction should still hold them, and System 1 can raise the grasp height.",
+      "This does not fix the top-face failures on pudding, sugar, mustard or tuna. Do not combine it with the prismatic jaw: the 25 deg tilt would make that slide's face permanently non-parallel."
+     ],
+     "idea": null,
+     "result": "rejected: lost dice (dice: slipped_under_load, verdict wrong_behavior; closed to -0.07 rad (fingertips -0 mm apart), moving fingertip +2 mm vs the fixed one; fixed jaw: 10 N on the pad an; dice: slipped_under_load, verdict wrong_behavior; closed to -0.06 rad (fingertips 0 mm apart), moving fingertip +2 mm vs the fixed one; fixed jaw: 13 N on the pad and); it would gain apple, gelatin_box, strawberry; kept on the frontier as b001",
+     "gained": [
+      "apple",
+      "gelatin_box",
+      "strawberry"
+     ],
+     "lost": [
+      "dice"
+     ],
+     "prediction": {
+      "predicted": [
+       "apple",
+       "gelatin_box",
+       "strawberry"
+      ],
+      "hit": [
+       "apple",
+       "gelatin_box",
+       "strawberry"
+      ],
+      "missed": [],
+      "unpredicted": [],
+      "precision": 1.0,
+      "lost": [
+       "dice"
+      ]
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 5.4,
+      "lines": [
+       "m2_screw x4: provided (on hand)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 0.5 g for pads: 3 machine minutes",
+       "print:TPU 0.3 g for pads: 3 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "moving_jaw_on_top_face",
+      "slipped_under_load"
+     ]
+    },
+    {
+     "k": 2,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "jaw -> prismatic (drive_mm_per_rad=55); pads -> pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=2, reach_mm=0, width_mm=12)",
+     "base": null,
+     "mechanism": "Both mechanisms together. The slide removes tilt and rise (moving_jaw_on_top_face, squeezed_down_out), and TPU raises the friction margin for the heavy, slippery objects (metal cans at mu 0.35, sugar box 514 g) and for the round ones.",
+     "principle": "Antipodal horizontal contacts from a slide. Friction 2 mu N must exceed m g with margin for the lift's acceleration. A V-groove centres round objects.",
+     "hypothesis": "Prismatic jaw at 55 mm/rad plus pads at pad_angle 0, so the parallel faces stay parallel. The pads add TPU 2 mm (mu 0.9) and a 2 mm groove. Grip on the sugar box rises from about 29 N to about 52 N against 5 N of weight, and the rolling objects are centred. Cost is $5.40, 3 days and about 176 machine min, all within budget.",
+     "predicted_gains": [
+      "gelatin_box",
+      "pudding_box",
+      "sugar_box",
+      "mustard_bottle",
+      "tuna_fish_can",
+      "apple",
+      "strawberry"
+     ],
+     "risks": [
+      "foam_brick, cup: higher friction plus a 13 g cup could deform or tip during the close. System 1's close-speed tuning should cover this.",
+      "Pad thickness (about 2-3 mm per side) slightly reduces the maximum opening, which stays about 105 mm or more, still above the 96 mm mustard bottle."
+     ],
+     "idea": null,
+     "result": "rejected: lost banana (banana: squeezed_up_out, verdict wrong_behavior; closed to 0.41 rad (fingertips 29 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 26 N on the pad and); it would gain apple, gelatin_box, pudding_box, strawberry, tuna_fish_can; kept on the frontier as b002",
+     "gained": [
+      "apple",
+      "gelatin_box",
+      "pudding_box",
+      "strawberry",
+      "tuna_fish_can"
+     ],
+     "lost": [
+      "banana"
+     ],
+     "prediction": {
+      "predicted": [
+       "apple",
+       "gelatin_box",
+       "mustard_bottle",
+       "pudding_box",
+       "strawberry",
+       "sugar_box",
+       "tuna_fish_can"
+      ],
+      "hit": [
+       "apple",
+       "gelatin_box",
+       "pudding_box",
+       "strawberry",
+       "tuna_fish_can"
+      ],
+      "missed": [
+       "mustard_bottle",
+       "sugar_box"
+      ],
+      "unpredicted": [],
+      "precision": 0.714,
+      "lost": [
+       "banana"
+      ]
+     },
+     "resources": {
+      "usd": 5.4,
+      "lead_days": 3.0,
+      "fab_minutes": 191.1,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m2_screw x4: provided (on hand)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x100 x2: 0 provided, buy 2 at $1.5 ($3.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 37.2 g for jaw: 186 machine minutes",
+       "print:PLA 0.5 g for pads: 2 machine minutes",
+       "print:TPU 0.3 g for pads: 2 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "slipped_under_load",
+      "squeezed_down_out",
+      "squeezed_up_out"
+     ]
+    },
+    {
+     "k": "t0",
+     "move": "tune",
+     "declared_move": "tune",
+     "edit": "jaw (drive_mm_per_rad=56.257); pads (groove_mm=1.802, lip_mm=0.64, pad_angle_deg=1.18, pad_tpu_mm=1.598, reach_mm=2.712, width_mm=17.216)",
+     "base": "b002",
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the loop fits b002's new jaw, pads before judging it (tuning trial 1 of 4)",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost racquetball (racquetball: fixed_jaw_missed, verdict stuck; closed to 1.06 rad (fingertips 66 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no c); it would gain apple, gelatin_box, pudding_box, strawberry, sugar_box; kept on the frontier as b00t0",
+     "gained": [
+      "apple",
+      "gelatin_box",
+      "pudding_box",
+      "strawberry",
+      "sugar_box"
+     ],
+     "lost": [
+      "racquetball"
+     ],
+     "prediction": null,
+     "resources": {
+      "usd": 5.4,
+      "lead_days": 3.0,
+      "fab_minutes": 197.4,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m2_screw x4: provided (on hand)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x100 x2: 0 provided, buy 2 at $1.5 ($3.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 37.7 g for jaw: 188 machine minutes",
+       "print:PLA 1.0 g for pads: 5 machine minutes",
+       "print:TPU 0.5 g for pads: 4 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "fixed_jaw_on_top_face",
+      "squeezed_down_out"
+     ]
+    },
+    {
+     "k": "t1",
+     "move": "tune",
+     "declared_move": "tune",
+     "edit": "jaw (drive_mm_per_rad=60); pads (groove_mm=1.156, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=2.025, reach_mm=0, width_mm=11.3)",
+     "base": "b002",
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the loop fits b002's new jaw, pads before judging it (tuning trial 2 of 4)",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost dice (dice: slipped_under_load, verdict wrong_behavior; closed to -0.15 rad (fingertips -3 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 18 N on the pad an); it would gain apple, gelatin_box, pudding_box, strawberry, tuna_fish_can; kept on the frontier as b00t1",
+     "gained": [
+      "apple",
+      "gelatin_box",
+      "pudding_box",
+      "strawberry",
+      "tuna_fish_can"
+     ],
+     "lost": [
+      "dice"
+     ],
+     "prediction": null,
+     "resources": {
+      "usd": 5.4,
+      "lead_days": 3.0,
+      "fab_minutes": 199.4,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m2_screw x4: provided (on hand)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x100 x2: 0 provided, buy 2 at $1.5 ($3.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 39.0 g for jaw: 195 machine minutes",
+       "print:PLA 0.4 g for pads: 2 machine minutes",
+       "print:TPU 0.3 g for pads: 2 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "slipped_under_load",
+      "squeezed_down_out"
+     ]
+    },
+    {
+     "k": "t2",
+     "move": "tune",
+     "declared_move": "tune",
+     "edit": "jaw (drive_mm_per_rad=47.026); pads (groove_mm=1.297, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=2.198, reach_mm=5.004, width_mm=11.671)",
+     "base": "b002",
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the loop fits b002's new jaw, pads before judging it (tuning trial 3 of 4)",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost dice, foam_brick, tomato_soup_can (foam_brick: slipped_under_load, verdict rule_violation; closed to 0.72 rad (fingertips 39 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 37 N on the pad and; foam_brick: slipped_under_load, verdict rule_violation; closed to 0.73 rad (fingertips 40 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 46 N on the pad and; tomato_soup_can: slipped_under_load, verdict rule_violation; closed to 1.26 rad (fingertips 65 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 36 N on the pad at ; dice: slipped_under_load, verdict wrong_behavior; closed to -0.15 rad (fi); it would gain apple, gelatin_box, strawberry, tuna_fish_can; kept on the frontier as b00t2",
+     "gained": [
+      "apple",
+      "gelatin_box",
+      "strawberry",
+      "tuna_fish_can"
+     ],
+     "lost": [
+      "dice",
+      "foam_brick",
+      "tomato_soup_can"
+     ],
+     "prediction": null,
+     "resources": {
+      "usd": 5.4,
+      "lead_days": 3.0,
+      "fab_minutes": 179.5,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m2_screw x4: provided (on hand)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x100 x2: 0 provided, buy 2 at $1.5 ($3.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 34.5 g for jaw: 172 machine minutes",
+       "print:PLA 0.7 g for pads: 3 machine minutes",
+       "print:TPU 0.5 g for pads: 4 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "moving_jaw_on_top_face",
+      "slipped_under_load"
+     ]
+    },
+    {
+     "k": "t3",
+     "move": "tune",
+     "declared_move": "tune",
+     "edit": "jaw (drive_mm_per_rad=60); pads (groove_mm=1.489, lip_mm=0.18, pad_angle_deg=5.204, pad_tpu_mm=2.036, reach_mm=0, width_mm=10.112)",
+     "base": "b002",
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the loop fits b002's new jaw, pads before judging it (tuning trial 4 of 4)",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost banana, flat_screwdriver, racquetball (banana: squeezed_up_out, verdict wrong_behavior; closed to 0.41 rad (fingertips 30 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 23 N on the pad at ; racquetball: moving_jaw_missed, verdict stuck; closed to 1.17 rad (fingertips 76 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 1 N on the pad at +4 mm from; flat_screwdriver: slipped_under_load, verdict wrong_behavior; closed to 0.34 rad (fingertips 26 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 27 N on the pad at ); it would gain apple, gelatin_box, pudding_box, strawberry, sugar_box, tuna_fish_can; kept on the frontier as b00t3",
+     "gained": [
+      "apple",
+      "gelatin_box",
+      "pudding_box",
+      "strawberry",
+      "sugar_box",
+      "tuna_fish_can"
+     ],
+     "lost": [
+      "banana",
+      "flat_screwdriver",
+      "racquetball"
+     ],
+     "prediction": null,
+     "resources": {
+      "usd": 5.4,
+      "lead_days": 3.0,
+      "fab_minutes": 199.8,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m2_screw x4: provided (on hand)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x100 x2: 0 provided, buy 2 at $1.5 ($3.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 39.0 g for jaw: 195 machine minutes",
+       "print:PLA 0.5 g for pads: 2 machine minutes",
+       "print:TPU 0.3 g for pads: 2 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "moving_jaw_missed",
+      "slipped_under_load",
+      "squeezed_down_out",
+      "squeezed_up_out"
+     ]
+    }
+   ],
+   "accepted": null,
+   "notes": "I've proposed three body changes for the 7 failing objects. The main one replaces the hinged jaw with the catalogue's sliding (rack-and-pinion) jaw.\n\n**Why the hinged jaw fails.** Every failure comes from its geometry:\n- **Fingertip rises as it opens:** +14 mm at 75 mm wide, +23 mm at 85 mm, +35 mm at 95 mm. On the low wide objects (pudding box, sugar box, mustard bottle, tuna can) the tip lands on the top face instead of the side. Tuna is the worst case: the jaw presses down until an arm joint stalls.\n- **Face tilts as it opens:** 44 to 64 deg off parallel at those widths. On the gelatin box, apple and strawberry the tilted face pushes the object down and out of the grip.\n- **No setting of the hinge fixes it:** its parameters can't change the tilt or the rise, and pads alone still leave the tip about 20 mm too high at 90 mm.\n\n**The three proposals:**\n1. **Sliding jaw at 55 mm per radian.** The face stays parallel and the tip stays within 1 mm at every width. It opens to about 112 mm, enough for the 96 mm mustard bottle, and squeezes about 29 N. The 514 g sugar box needs 1.18 N*m at the shoulder, under the 1.62 N*m stall, so the 12 V servos aren't needed. That upgrade was refused anyway: it costs $68 and $40 is left. To buy: 2 linear bushings ($1.20 each) and 2 steel rods ($1.50 each). Total $5.40, 3 days, 160 machine minutes.\n2. **Pads on the existing hinged jaw, as a fallback.** They're tilted back 25 deg, with a 2 mm rubber-like TPU skin (friction 0.9 instead of 0.45) and a 2 mm centring groove. This is free and takes 16 machine minutes. It should only fix the gelatin box, apple and strawberry, not the four top-face failures. The 25 deg tilt must not be paired with the sliding jaw, because it would knock the slide's face out of parallel.\n3. **Sliding jaw plus untilted TPU pads.** This is the right pairing of the two. Grip on the sugar box rises to about 52 N against its 5 N weight, and round objects get centred. Total cost is still $5.40, about 176 machine minutes.\n\n**Risks to objects that pass now:**\n- **Round objects** (golf ball, lemon, plum, racquetball, tennis ball, soup can) lose any centring the tilted hinge face gave them.\n- **Small objects** (dice, marker) take about 30 N instead of 20 N.\n- **Light objects:** the 13 g cup and the foam brick could deform under higher-friction pads.\n\nI expect these to survive because the contacts stay horizontal and the grasp settings are retuned. The trials will decide.",
+   "llm": {
+    "tag": "iter00",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 61.0,
+    "tokens_in": 12065,
+    "tokens_out": 5749,
+    "usd_list_price": 0.1939,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 127.2,
+   "stop": null
+  },
+  {
+   "iteration": 1,
+   "body": "arm_servos: servos_7v4; jaw: revolute; pads: none",
+   "held": [
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "potted_meat_can",
+    "racquetball",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "moving_jaw_on_top_face": 8,
+    "squeezed_down_out": 4
+   },
+   "failing": {
+    "reg_gelatin_box": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict stuck; closed to 0.74 rad (fingertips 73 mm apart), moving fingertip +13 mm vs the fixed one; fixed jaw: 10 N on the stock jaw at -3 mm from the centre (top at +15), pushing 0 deg down; moving jaw: 23 N on the stock jaw at +13 mm from the centre (top at +15), pushing 47 deg down; rose 7 mm, ended +2 mm; 97 g"
+    },
+    "rva000_gelatin_box": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict stuck; closed to 0.68 rad (fingertips 69 mm apart), moving fingertip +10 mm vs the fixed one; fixed jaw: 20 N on the stock jaw at -1 mm from the centre (top at +15), pushing 5 deg down; moving jaw: 26 N on the stock jaw at +9 mm from the centre (top at +15), pushing 49 deg down; rose 3 mm, ended -2 mm; 97 g"
+    },
+    "reg_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.79 rad (fingertips 77 mm apart), moving fingertip +16 mm vs the fixed one; fixed jaw: 2 N on the stock jaw at +2 mm from the centre (top at +19), pushing 3 deg down; moving jaw: 20 N on the stock jaw at +16 mm from the centre (top at +19), pushing 84 deg down; rose 0 mm, ended -1 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.75 rad (fingertips 74 mm apart), moving fingertip +14 mm vs the fixed one; fixed jaw: no contact; moving jaw: 20 N on the stock jaw at +17 mm from the centre (top at +19), pushing 85 deg down; rose 0 mm, ended -1 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.77 rad (fingertips 75 mm apart), moving fingertip +15 mm vs the fixed one; fixed jaw: 2 N on the stock jaw at +7 mm from the centre (top at +23), pushing 2 deg down; moving jaw: 21 N on the stock jaw at +20 mm from the centre (top at +23), pushing 83 deg down; rose 1 mm, ended +1 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.64 rad (fingertips 66 mm apart), moving fingertip +9 mm vs the fixed one; fixed jaw: no contact; moving jaw: 22 N on the stock jaw at +21 mm from the centre (top at +23), pushing 87 deg down; rose 0 mm, ended -0 mm; 514 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.69 rad (fingertips 70 mm apart), moving fingertip +11 mm vs the fixed one; fixed jaw: 6 N on the stock jaw at +13 mm from the centre (top at +29), pushing 19 deg down; moving jaw: 23 N on the stock jaw at +22 mm from the centre (top at +29), pushing 73 deg down; rose 1 mm, ended +1 mm; 431 g"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.44 rad (fingertips 51 mm apart), moving fingertip +3 mm vs the fixed one; fixed jaw: no contact; moving jaw: 23 N on the stock jaw at +27 mm from the centre (top at +29), pushing 83 deg down; rose 2 mm, ended +2 mm; 431 g"
+    },
+    "reg_strawberry": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict wrong_behavior; closed to 0.22 rad (fingertips 34 mm apart), moving fingertip -0 mm vs the fixed one; fixed jaw: 21 N on the stock jaw at +0 mm from the centre (top at +21), pushing 7 deg down; moving jaw: 24 N on the stock jaw at +7 mm from the centre (top at +21), pushing 16 deg down; rose 40 mm, ended +1 mm; 18 g"
+    },
+    "reg_tuna_fish_can": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; an arm joint stalled (load_limit reflex); closed to 0.38 rad (fingertips 46 mm apart), moving fingertip +2 mm vs the fixed one; fixed jaw: no contact; moving jaw: 19 N on the stock jaw at +14 mm from the centre (top at +17), pushing 83 deg down; rose 0 mm, ended -0 mm; 171 g"
+    },
+    "rva000_tuna_fish_can": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; an arm joint stalled (load_limit reflex); closed to 0.38 rad (fingertips 47 mm apart), moving fingertip +2 mm vs the fixed one; fixed jaw: no contact; moving jaw: 21 N on the stock jaw at +14 mm from the centre (top at +17), pushing 83 deg down; rose 0 mm, ended +0 mm; 171 g"
+    },
+    "rva000_apple": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict wrong_behavior; closed to 0.72 rad (fingertips 72 mm apart), moving fingertip +12 mm vs the fixed one; fixed jaw: 21 N on the stock jaw at +3 mm from the centre (top at +36), pushing 7 deg down; moving jaw: 24 N on the stock jaw at +26 mm from the centre (top at +36), pushing 32 deg down; rose 37 mm, ended +29 mm; 68 g"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "swap",
+     "declared_move": "params",
+     "edit": "jaw (drive_mm_per_rad=55); pads (groove_mm=1.2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=2, reach_mm=0, width_mm=12)",
+     "base": "b002",
+     "mechanism": "moving_jaw_on_top_face (pudding, sugar, tuna, mustard) and squeezed_down_out (gelatin, apple, strawberry). On the revolute jaw the moving fingertip rises +14 mm at 75 mm and +23 mm at 85 mm, and the face tilts 44\u201353 deg. That lands the contact at +16 to +22 mm on boxes whose tops are at +19 to +23 mm, pushing 73\u201387 deg down.",
+     "principle": "A finger that neither turns nor rises keeps its contact normal horizontal at every opening. The prismatic jaw holds face 0 deg and tip +1 mm from 35 to 85 mm. No value of the revolute part or its pads cancels a +23 mm rise.",
+     "hypothesis": "b002 lost only banana. b00t1 used the same pads but groove 1.16 and drive 60, and it kept banana, but it lost dice because its squeeze was lower (27 N). This body keeps b002's drive of 55, which held dice at about 29 N, and takes b00t1's shallower groove of about 1.2 mm, which held banana. A shallower V puts the curved banana's contact back on the flat of the pad, so its edges no longer cradle it below the equator. Cost: $5.40, 3 days, about 176 machine min. Buy lm3uu x2 and 3x100 rod x2.",
+     "predicted_gains": [
+      "apple",
+      "gelatin_box",
+      "pudding_box",
+      "strawberry",
+      "tuna_fish_can"
+     ],
+     "risks": [
+      "banana: was squeezed up at groove 2. Groove 1.16 held it, so groove 1.2 should too.",
+      "dice: was lost at drive 60 (lower squeeze). Drive 55 held it in b002.",
+      "racquetball, golf_ball, tennis_ball: rely on the groove for centring. Groove 1.16 held them in b00t1."
+     ],
+     "idea": null,
+     "result": "rejected: lost dice (dice: slipped_under_load, verdict wrong_behavior; closed to -0.13 rad (fingertips -1 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 18 N on the pad an); it would gain apple, gelatin_box, pudding_box, strawberry, tuna_fish_can; kept on the frontier as b010",
+     "gained": [
+      "apple",
+      "gelatin_box",
+      "pudding_box",
+      "strawberry",
+      "tuna_fish_can"
+     ],
+     "lost": [
+      "dice"
+     ],
+     "prediction": {
+      "predicted": [
+       "apple",
+       "gelatin_box",
+       "pudding_box",
+       "strawberry",
+       "tuna_fish_can"
+      ],
+      "hit": [
+       "apple",
+       "gelatin_box",
+       "pudding_box",
+       "strawberry",
+       "tuna_fish_can"
+      ],
+      "missed": [],
+      "unpredicted": [],
+      "precision": 1.0,
+      "lost": [
+       "dice"
+      ]
+     },
+     "resources": {
+      "usd": 5.4,
+      "lead_days": 3.0,
+      "fab_minutes": 191.0,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m2_screw x4: provided (on hand)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x100 x2: 0 provided, buy 2 at $1.5 ($3.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 37.2 g for jaw: 186 machine minutes",
+       "print:PLA 0.5 g for pads: 2 machine minutes",
+       "print:TPU 0.3 g for pads: 2 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "slipped_under_load",
+      "squeezed_down_out"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "swap",
+     "declared_move": "params",
+     "edit": "jaw (drive_mm_per_rad=56); pads (groove_mm=2, lip_mm=0.35, pad_angle_deg=1.2, pad_tpu_mm=1.6, reach_mm=0, width_mm=17)",
+     "base": "b00t0",
+     "mechanism": "moving_jaw_on_top_face on the 514 g sugar box (it stays stuck at 0\u20131 mm rise), plus the rising, tilting revolute contact on the other wide or low objects.",
+     "principle": "Sugar was gained only by bodies with a small bottom lip: b00t0 (lip 0.64) and b00t3 (lip 0.18). A lip hooks under the flat bottom edge of a heavy lying box. Both bodies lost racquetball because the jaw missed it: the lip and the extra reach strike a rolling ball low and push it away before the faces close. A centring groove traps a sphere, and friction alone does not.",
+     "hypothesis": "Start from b00t0, which kept banana, dice and flat_screwdriver and lost only racquetball. Set reach to 0, as in b002, which held racquetball. Set lip to 0.35, between the 0.18 and 0.64 that both gained sugar. Deepen the groove to 2 mm so the ball is centred instead of pushed off. The 17 mm width stays, since b00t0 kept banana and flat_screwdriver with it. Cost: $5.40, 3 days, about 176 machine min.",
+     "predicted_gains": [
+      "apple",
+      "gelatin_box",
+      "pudding_box",
+      "strawberry",
+      "sugar_box",
+      "tuna_fish_can"
+     ],
+     "risks": [
+      "racquetball: the lip may still push it away. Reach 0 and the deeper groove are meant to prevent that.",
+      "banana: groove 2 lost it on b002, but b002 used a 12 mm pad. The 17 mm pad in b00t0 kept it.",
+      "dice: lip and groove act on a 17 mm cube. b00t0 at lip 0.64 held it."
+     ],
+     "idea": null,
+     "result": "rejected: lost racquetball (racquetball: fixed_jaw_missed, verdict stuck; closed to 1.07 rad (fingertips 66 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no c); it would gain apple, gelatin_box, pudding_box, strawberry, sugar_box; kept on the frontier as b011",
+     "gained": [
+      "apple",
+      "gelatin_box",
+      "pudding_box",
+      "strawberry",
+      "sugar_box"
+     ],
+     "lost": [
+      "racquetball"
+     ],
+     "prediction": {
+      "predicted": [
+       "apple",
+       "gelatin_box",
+       "pudding_box",
+       "strawberry",
+       "sugar_box",
+       "tuna_fish_can"
+      ],
+      "hit": [
+       "apple",
+       "gelatin_box",
+       "pudding_box",
+       "strawberry",
+       "sugar_box"
+      ],
+      "missed": [
+       "tuna_fish_can"
+      ],
+      "unpredicted": [],
+      "precision": 0.833,
+      "lost": [
+       "racquetball"
+      ]
+     },
+     "resources": {
+      "usd": 5.4,
+      "lead_days": 3.0,
+      "fab_minutes": 195.2,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m2_screw x4: provided (on hand)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x100 x2: 0 provided, buy 2 at $1.5 ($3.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 37.6 g for jaw: 188 machine minutes",
+       "print:PLA 0.8 g for pads: 4 machine minutes",
+       "print:TPU 0.4 g for pads: 3 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "fixed_jaw_on_top_face",
+      "squeezed_down_out"
+     ]
+    },
+    {
+     "k": 2,
+     "move": "swap",
+     "declared_move": "params",
+     "edit": "jaw (drive_mm_per_rad=55); pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=2, reach_mm=0, width_mm=17)",
+     "base": "b002",
+     "mechanism": "Same rising, tilting revolute contact on the wide, low objects. On b002 the banana was squeezed up and out.",
+     "principle": "A wider pad touches the long, curved banana over a longer stretch of its depth. The squeeze is then shared over more of the body and is less likely to land on one low patch below its equator. b00t0 held banana at 17 mm width and groove 1.8.",
+     "hypothesis": "This isolates the width variable on b002, the best body (it lost only banana). Width 17 replaces 12, and drive 55 and groove 2 stay, keeping dice, racquetball and flat_screwdriver as b002 did. Prismatic purchases are as above: $5.40, 3 days.",
+     "predicted_gains": [
+      "apple",
+      "gelatin_box",
+      "pudding_box",
+      "strawberry",
+      "tuna_fish_can"
+     ],
+     "risks": [
+      "banana: if width is not the cause, it is lost again as in b002.",
+      "flat_screwdriver: lost at width 10 (b00t3). The wider pad should only help.",
+      "dice: a 17 mm pad on a 17 mm cube is full contact, so there should be no edge effect."
+     ],
+     "idea": null,
+     "result": "rejected: lost banana (banana: squeezed_up_out, verdict wrong_behavior; closed to 0.44 rad (fingertips 30 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 26 N on the pad and); it would gain apple, gelatin_box, pudding_box, strawberry; kept on the frontier as b012",
+     "gained": [
+      "apple",
+      "gelatin_box",
+      "pudding_box",
+      "strawberry"
+     ],
+     "lost": [
+      "banana"
+     ],
+     "prediction": {
+      "predicted": [
+       "apple",
+       "gelatin_box",
+       "pudding_box",
+       "strawberry",
+       "tuna_fish_can"
+      ],
+      "hit": [
+       "apple",
+       "gelatin_box",
+       "pudding_box",
+       "strawberry"
+      ],
+      "missed": [
+       "tuna_fish_can"
+      ],
+      "unpredicted": [],
+      "precision": 0.8,
+      "lost": [
+       "banana"
+      ]
+     },
+     "resources": {
+      "usd": 5.4,
+      "lead_days": 3.0,
+      "fab_minutes": 192.9,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m2_screw x4: provided (on hand)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x100 x2: 0 provided, buy 2 at $1.5 ($3.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 37.2 g for jaw: 186 machine minutes",
+       "print:PLA 0.7 g for pads: 3 machine minutes",
+       "print:TPU 0.4 g for pads: 3 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "slipped_under_load",
+      "squeezed_down_out",
+      "squeezed_up_out"
+     ]
+    },
+    {
+     "k": "t0",
+     "move": "tune",
+     "declared_move": "tune",
+     "edit": "jaw (drive_mm_per_rad=56.03); pads (groove_mm=0, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1.569, reach_mm=14.783, width_mm=13.573)",
+     "base": "b010",
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the loop fits b010's new jaw, pads before judging it (tuning trial 1 of 4)",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost potted_meat_can (potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.70 s (squeezing or pressing down); potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.84 s (squeezing or pressing down)); it would gain gelatin_box, mustard_bottle, pudding_box, strawberry, tuna_fish_can; kept on the frontier as b01t0",
+     "gained": [
+      "gelatin_box",
+      "mustard_bottle",
+      "pudding_box",
+      "strawberry",
+      "tuna_fish_can"
+     ],
+     "lost": [
+      "potted_meat_can"
+     ],
+     "prediction": null,
+     "resources": {
+      "usd": 5.4,
+      "lead_days": 3.0,
+      "fab_minutes": 199.4,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m2_screw x4: provided (on hand)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x100 x2: 0 provided, buy 2 at $1.5 ($3.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 37.6 g for jaw: 188 machine minutes",
+       "print:PLA 1.2 g for pads: 6 machine minutes",
+       "print:TPU 0.6 g for pads: 5 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "force_limit",
+      "slipped_under_load"
+     ]
+    },
+    {
+     "k": "t1",
+     "move": "tune",
+     "declared_move": "tune",
+     "edit": "jaw (drive_mm_per_rad=56.011); pads (groove_mm=0, lip_mm=1.554, pad_angle_deg=0.175, pad_tpu_mm=0.212, reach_mm=15.224, width_mm=14.262)",
+     "base": "b010",
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the loop fits b010's new jaw, pads before judging it (tuning trial 2 of 4)",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost potted_meat_can, racquetball (potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.68 s (squeezing or pressing down); potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.84 s (squeezing or pressing down); racquetball: fixed_jaw_missed, verdict stuck; closed to 1.00 rad (fingertips 66 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no c); it would gain gelatin_box, mustard_bottle, pudding_box, strawberry; kept on the frontier as b01t1",
+     "gained": [
+      "gelatin_box",
+      "mustard_bottle",
+      "pudding_box",
+      "strawberry"
+     ],
+     "lost": [
+      "potted_meat_can",
+      "racquetball"
+     ],
+     "prediction": null,
+     "resources": {
+      "usd": 5.4,
+      "lead_days": 3.0,
+      "fab_minutes": 196.3,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m2_screw x4: provided (on hand)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x100 x2: 0 provided, buy 2 at $1.5 ($3.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 37.6 g for jaw: 188 machine minutes",
+       "print:PLA 1.5 g for pads: 8 machine minutes",
+       "print:TPU 0.1 g for pads: 1 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "fixed_jaw_on_top_face",
+      "force_limit",
+      "slipped_under_load"
+     ]
+    },
+    {
+     "k": "t2",
+     "move": "tune",
+     "declared_move": "tune",
+     "edit": "jaw (drive_mm_per_rad=60); pads (groove_mm=0.03, lip_mm=0, pad_angle_deg=1.63, pad_tpu_mm=1.384, reach_mm=8.019, width_mm=14.35)",
+     "base": "b010",
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the loop fits b010's new jaw, pads before judging it (tuning trial 3 of 4)",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost dice, potted_meat_can, tomato_soup_can (potted_meat_can: fixed_jaw_on_top_face, verdict stuck; closed to 1.20 rad (fingertips 79 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 12 N on the pad at +38 mm fr; tomato_soup_can: slipped_under_load, verdict rule_violation; closed to 0.97 rad (fingertips 65 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 29 N on the pad at ; dice: slipped_under_load, verdict wrong_behavior; closed to -0.14 rad (fingertips -2 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 22 N on the pad an); it would gain apple, gelatin_box, mustard_bottle, strawberry; kept on the frontier as b01t2",
+     "gained": [
+      "apple",
+      "gelatin_box",
+      "mustard_bottle",
+      "strawberry"
+     ],
+     "lost": [
+      "dice",
+      "potted_meat_can",
+      "tomato_soup_can"
+     ],
+     "prediction": null,
+     "resources": {
+      "usd": 5.4,
+      "lead_days": 3.0,
+      "fab_minutes": 203.2,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m2_screw x4: provided (on hand)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x100 x2: 0 provided, buy 2 at $1.5 ($3.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 39.0 g for jaw: 195 machine minutes",
+       "print:PLA 1.0 g for pads: 5 machine minutes",
+       "print:TPU 0.4 g for pads: 3 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_on_top_face",
+      "slipped_under_load"
+     ]
+    },
+    {
+     "k": "t3",
+     "move": "tune",
+     "declared_move": "tune",
+     "edit": "jaw (drive_mm_per_rad=60); pads (groove_mm=0.754, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1.253, reach_mm=8.506, width_mm=13.441)",
+     "base": "b010",
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the loop fits b010's new jaw, pads before judging it (tuning trial 4 of 4)",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost dice, potted_meat_can (potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=1.22 s (squeezing or pressing down); dice: slipped_under_load, verdict wrong_behavior; closed to -0.07 rad (fingertips 3 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 14 N on the pad and); it would gain apple, gelatin_box, mustard_bottle, pudding_box, strawberry, tuna_fish_can; kept on the frontier as b01t3",
+     "gained": [
+      "apple",
+      "gelatin_box",
+      "mustard_bottle",
+      "pudding_box",
+      "strawberry",
+      "tuna_fish_can"
+     ],
+     "lost": [
+      "dice",
+      "potted_meat_can"
+     ],
+     "prediction": null,
+     "resources": {
+      "usd": 5.4,
+      "lead_days": 3.0,
+      "fab_minutes": 202.7,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m2_screw x4: provided (on hand)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x100 x2: 0 provided, buy 2 at $1.5 ($3.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 39.0 g for jaw: 195 machine minutes",
+       "print:PLA 0.9 g for pads: 5 machine minutes",
+       "print:TPU 0.4 g for pads: 3 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "force_limit",
+      "slipped_under_load"
+     ]
+    }
+   ],
+   "accepted": null,
+   "notes": "Diagnosis: on the revolute jaw the fingertip rises +14 to +23 mm and the face tilts 44\u201353 deg at 75\u201385 mm. That puts the contact on the top face of every low, wide object, and no pad or close value removes the rise. The prismatic jaw (face 0 deg, tip +1 mm) is therefore needed. Across iteration 1, the prismatic bodies each lost only one held group, and which one depended on parameters: banana (groove 2, width 12), dice (drive 60), racquetball (lip or reach). All three proposals tune near b002 and b00t0 to close that gap. Parallelogram is ruled out: its tip rises +33 mm at 85 mm. servos_12v is refused on budget. Mustard was gained by no body; its cause (possibly arm load or reach) is still undiagnosed and is not addressed here. Purchases for any of these: lm3uu_bearing x2 ($2.40) and steel_rod_3x100 x2 ($3.00). Total $5.40, 3 days lead time, about 176 machine min.",
+   "llm": {
+    "tag": "iter01",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 83.8,
+    "tokens_in": 16240,
+    "tokens_out": 8084,
+    "usd_list_price": 0.2745,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 121.8,
+   "stop": null
+  },
+  {
+   "iteration": 2,
+   "body": "arm_servos: servos_7v4; jaw: revolute; pads: none",
+   "held": [
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "potted_meat_can",
+    "racquetball",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "moving_jaw_on_top_face": 8,
+    "squeezed_down_out": 4
+   },
+   "failing": {
+    "reg_gelatin_box": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict stuck; closed to 0.74 rad (fingertips 73 mm apart), moving fingertip +13 mm vs the fixed one; fixed jaw: 10 N on the stock jaw at -3 mm from the centre (top at +15), pushing 0 deg down; moving jaw: 23 N on the stock jaw at +13 mm from the centre (top at +15), pushing 47 deg down; rose 7 mm, ended +2 mm; 97 g"
+    },
+    "rva000_gelatin_box": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict stuck; closed to 0.68 rad (fingertips 69 mm apart), moving fingertip +10 mm vs the fixed one; fixed jaw: 20 N on the stock jaw at -1 mm from the centre (top at +15), pushing 5 deg down; moving jaw: 26 N on the stock jaw at +9 mm from the centre (top at +15), pushing 49 deg down; rose 3 mm, ended -2 mm; 97 g"
+    },
+    "reg_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.79 rad (fingertips 77 mm apart), moving fingertip +16 mm vs the fixed one; fixed jaw: 2 N on the stock jaw at +2 mm from the centre (top at +19), pushing 3 deg down; moving jaw: 20 N on the stock jaw at +16 mm from the centre (top at +19), pushing 84 deg down; rose 0 mm, ended -1 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.75 rad (fingertips 74 mm apart), moving fingertip +14 mm vs the fixed one; fixed jaw: no contact; moving jaw: 20 N on the stock jaw at +17 mm from the centre (top at +19), pushing 85 deg down; rose 0 mm, ended -1 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.77 rad (fingertips 75 mm apart), moving fingertip +15 mm vs the fixed one; fixed jaw: 2 N on the stock jaw at +7 mm from the centre (top at +23), pushing 2 deg down; moving jaw: 21 N on the stock jaw at +20 mm from the centre (top at +23), pushing 83 deg down; rose 1 mm, ended +1 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.64 rad (fingertips 66 mm apart), moving fingertip +9 mm vs the fixed one; fixed jaw: no contact; moving jaw: 22 N on the stock jaw at +21 mm from the centre (top at +23), pushing 87 deg down; rose 0 mm, ended -0 mm; 514 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.69 rad (fingertips 70 mm apart), moving fingertip +11 mm vs the fixed one; fixed jaw: 6 N on the stock jaw at +13 mm from the centre (top at +29), pushing 19 deg down; moving jaw: 23 N on the stock jaw at +22 mm from the centre (top at +29), pushing 73 deg down; rose 1 mm, ended +1 mm; 431 g"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.44 rad (fingertips 51 mm apart), moving fingertip +3 mm vs the fixed one; fixed jaw: no contact; moving jaw: 23 N on the stock jaw at +27 mm from the centre (top at +29), pushing 83 deg down; rose 2 mm, ended +2 mm; 431 g"
+    },
+    "reg_strawberry": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict wrong_behavior; closed to 0.22 rad (fingertips 34 mm apart), moving fingertip -0 mm vs the fixed one; fixed jaw: 21 N on the stock jaw at +0 mm from the centre (top at +21), pushing 7 deg down; moving jaw: 24 N on the stock jaw at +7 mm from the centre (top at +21), pushing 16 deg down; rose 40 mm, ended +1 mm; 18 g"
+    },
+    "reg_tuna_fish_can": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; an arm joint stalled (load_limit reflex); closed to 0.38 rad (fingertips 46 mm apart), moving fingertip +2 mm vs the fixed one; fixed jaw: no contact; moving jaw: 19 N on the stock jaw at +14 mm from the centre (top at +17), pushing 83 deg down; rose 0 mm, ended -0 mm; 171 g"
+    },
+    "rva000_tuna_fish_can": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; an arm joint stalled (load_limit reflex); closed to 0.38 rad (fingertips 47 mm apart), moving fingertip +2 mm vs the fixed one; fixed jaw: no contact; moving jaw: 21 N on the stock jaw at +14 mm from the centre (top at +17), pushing 83 deg down; rose 0 mm, ended +0 mm; 171 g"
+    },
+    "rva000_apple": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict wrong_behavior; closed to 0.72 rad (fingertips 72 mm apart), moving fingertip +12 mm vs the fixed one; fixed jaw: 21 N on the stock jaw at +3 mm from the centre (top at +36), pushing 7 deg down; moving jaw: 24 N on the stock jaw at +26 mm from the centre (top at +36), pushing 32 deg down; rose 37 mm, ended +29 mm; 68 g"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "jaw -> prismatic (drive_mm_per_rad=55); pads -> pads (groove_mm=1.6, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=3, reach_mm=0, width_mm=17)",
+     "base": "b002",
+     "mechanism": "moving_jaw_on_top_face (pudding_box, tuna_fish_can) and squeezed_down_out (gelatin_box, apple, strawberry). b002 itself lost banana to squeezed_up_out.",
+     "principle": "A finger that neither turns nor rises keeps its fingertip below a low object's top and its face antipodal. Higher friction (mu 0.9) and a compliant skin resist the out-of-plane push that squeezes a round object out.",
+     "hypothesis": "The revolute fingertip rises +14 mm at 75 mm and +23 mm at 85 mm, so it rides onto tops at +17 to +23 mm. No value in its range fixes that, so the jaw stays prismatic (tip +1 mm, face 0 deg). Across the record, dice held at groove 1.49 mm or more (reach 0 to 2.7) and racquetball held only with lip 0. Banana was lost at groove 1.49 mm or more with TPU 2 mm or less and no lip. This body keeps groove 1.6 for dice and lip 0 for racquetball, and raises the TPU skin to 3 mm and the width to 17 mm. The aim is to spread the banana contact around its curve so it is not squeezed upward.",
+     "predicted_gains": [
+      "apple",
+      "gelatin_box",
+      "pudding_box",
+      "strawberry",
+      "tuna_fish_can"
+     ],
+     "risks": [
+      "banana: the fix relies on TPU compliance and width, which is untested; groove 1.6 is close to the band where banana was lost",
+      "dice: 1.6 mm is only slightly above the 1.49 mm threshold"
+     ],
+     "idea": null,
+     "result": "rejected: lost dice (dice: never_lifted, verdict wrong_behavior; closed to -0.14 rad (fingertips -4 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 18 N on the pad an); it would gain apple, gelatin_box, pudding_box, strawberry; kept on the frontier as b020",
+     "gained": [
+      "apple",
+      "gelatin_box",
+      "pudding_box",
+      "strawberry"
+     ],
+     "lost": [
+      "dice"
+     ],
+     "prediction": {
+      "predicted": [
+       "apple",
+       "gelatin_box",
+       "pudding_box",
+       "strawberry",
+       "tuna_fish_can"
+      ],
+      "hit": [
+       "apple",
+       "gelatin_box",
+       "pudding_box",
+       "strawberry"
+      ],
+      "missed": [
+       "tuna_fish_can"
+      ],
+      "unpredicted": [],
+      "precision": 0.8,
+      "lost": [
+       "dice"
+      ]
+     },
+     "resources": {
+      "usd": 5.4,
+      "lead_days": 3.0,
+      "fab_minutes": 194.5,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m2_screw x4: provided (on hand)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x100 x2: 0 provided, buy 2 at $1.5 ($3.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 37.2 g for jaw: 186 machine minutes",
+       "print:PLA 0.6 g for pads: 3 machine minutes",
+       "print:TPU 0.6 g for pads: 5 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "never_lifted",
+      "slipped_under_load",
+      "squeezed_down_out"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "jaw -> prismatic (drive_mm_per_rad=56); pads -> pads (groove_mm=0, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1.6, reach_mm=6.5, width_mm=13.6)",
+     "base": "b01t0",
+     "mechanism": "moving_jaw_on_top_face (mustard_bottle, pudding_box, tuna_fish_can). b01t0 lost potted_meat_can to force_limit at reach 14.8.",
+     "principle": "A finger can only hold an object's side if its tip reaches below the object's top with clearance above the table. Pad reach sets how far the tip extends, and too much reach makes the pads press on a tall object.",
+     "hypothesis": "b01t0 kept dice, banana and racquetball and lost only potted_meat_can (force limit at reach 15). Potted_meat_can held at reach 5 mm or less and was lost at 8 mm or more. Mustard_bottle was gained only at reach 8 mm or more. Reach 6.5 sits in the gap and should keep potted_meat_can, while possibly still reaching below the mustard bottle's top.",
+     "predicted_gains": [
+      "gelatin_box",
+      "pudding_box",
+      "strawberry",
+      "tuna_fish_can",
+      "mustard_bottle"
+     ],
+     "risks": [
+      "potted_meat_can if 6.5 mm is still too long (lost at 8)",
+      "dice: b01t0 relied on long reach to hold dice at groove 0"
+     ],
+     "idea": null,
+     "result": "KEPT: gained apple, gelatin_box, mustard_bottle, pudding_box, strawberry, tuna_fish_can, lost none; costs $5.40, 196 machine min",
+     "gained": [
+      "apple",
+      "gelatin_box",
+      "mustard_bottle",
+      "pudding_box",
+      "strawberry",
+      "tuna_fish_can"
+     ],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "gelatin_box",
+       "mustard_bottle",
+       "pudding_box",
+       "strawberry",
+       "tuna_fish_can"
+      ],
+      "hit": [
+       "gelatin_box",
+       "mustard_bottle",
+       "pudding_box",
+       "strawberry",
+       "tuna_fish_can"
+      ],
+      "missed": [],
+      "unpredicted": [
+       "apple"
+      ],
+      "precision": 1.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 5.4,
+      "lead_days": 3.0,
+      "fab_minutes": 195.6,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m2_screw x4: provided (on hand)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x100 x2: 0 provided, buy 2 at $1.5 ($3.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 37.6 g for jaw: 188 machine minutes",
+       "print:PLA 0.8 g for pads: 4 machine minutes",
+       "print:TPU 0.4 g for pads: 3 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "slipped_under_load"
+     ]
+    },
+    {
+     "k": 2,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "jaw -> prismatic (drive_mm_per_rad=56); pads -> pads (groove_mm=4, lip_mm=0.5, pad_angle_deg=0, pad_tpu_mm=2.5, reach_mm=2, width_mm=17)",
+     "base": "b00t0",
+     "mechanism": "moving_jaw_on_top_face (sugar_box, pudding_box). b00t0 lost racquetball: fixed_jaw_missed, the ball rolled away from the jaws.",
+     "principle": "Friction alone does not trap a sphere squeezed by a closing jaw; a concave or grooved contact centres it. Faces must be antipodal (pad angle 0 on a slide).",
+     "hypothesis": "b00t0's lip (0.64) gained sugar_box and saved banana, but racquetball rolled out, as it did at every lip above 0 with pad angle 0.2 to 5 deg. This body keeps a 0.5 mm lip for sugar_box and banana and sets the pad angle to 0 so the faces are exactly parallel on the slide. It deepens the V-groove to 4 mm so the ball is cradled and centred instead of pushed off.",
+     "predicted_gains": [
+      "apple",
+      "gelatin_box",
+      "pudding_box",
+      "strawberry",
+      "sugar_box"
+     ],
+     "risks": [
+      "racquetball: the lip may still knock the ball; this proposal is speculative",
+      "dice and wood_block_cube: a 4 mm groove could change contact on flat faces, but a flat face bridges the groove edges"
+     ],
+     "idea": null,
+     "result": "rejected: lost foam_brick, potted_meat_can, racquetball (potted_meat_can: slipped_under_load, verdict rule_violation; closed to 0.93 rad (fingertips 57 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 29 N on the pad at ; potted_meat_can: fixed_jaw_on_top_face, verdict stuck; closed to 1.21 rad (fingertips 73 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 3 N on the pad at +42 mm fro; foam_brick: fixed_jaw_on_top_face, verdict stuck; closed to 1.09 rad (fingertips 66 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 3 N on the pad at +24 mm fro; racquetball: fixed_jaw_missed, verdict stuck; closed to 1.10 r); it would gain apple, gelatin_box, pudding_box, strawberry, sugar_box; kept on the frontier as b022",
+     "gained": [
+      "apple",
+      "gelatin_box",
+      "pudding_box",
+      "strawberry",
+      "sugar_box"
+     ],
+     "lost": [
+      "foam_brick",
+      "potted_meat_can",
+      "racquetball"
+     ],
+     "prediction": {
+      "predicted": [
+       "apple",
+       "gelatin_box",
+       "pudding_box",
+       "strawberry",
+       "sugar_box"
+      ],
+      "hit": [
+       "apple",
+       "gelatin_box",
+       "pudding_box",
+       "strawberry",
+       "sugar_box"
+      ],
+      "missed": [],
+      "unpredicted": [],
+      "precision": 1.0,
+      "lost": [
+       "foam_brick",
+       "potted_meat_can",
+       "racquetball"
+      ]
+     },
+     "resources": {
+      "usd": 5.4,
+      "lead_days": 3.0,
+      "fab_minutes": 199.2,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m2_screw x4: provided (on hand)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x100 x2: 0 provided, buy 2 at $1.5 ($3.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 37.6 g for jaw: 188 machine minutes",
+       "print:PLA 1.0 g for pads: 5 machine minutes",
+       "print:TPU 0.8 g for pads: 6 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "fixed_jaw_on_top_face",
+      "slipped_under_load",
+      "squeezed_down_out"
+     ]
+    }
+   ],
+   "accepted": "b021",
+   "notes": "The jaw has to be prismatic. The revolute fingertip rises +14 mm at 75 mm and +23 mm at 85 mm, which puts it on the top face of the low boxes and cans. That is why pudding_box, sugar_box, mustard_bottle and tuna_fish_can fail. All three proposals tune the pads using what the record ties to each lost group: a lip loses racquetball, a groove of 1.49 mm or more holds dice, a deep groove without a lip loses banana, reach of 8 mm or more loses potted_meat_can, and reach of 8 mm or more gains mustard_bottle. Each proposal costs $5.40 (2 LM3UU bushings and 2 steel rods, 3 days lead time) and about 190 machine minutes, with M2 and M3 screws on hand. 12 V servos ($68) are over budget and aren't needed: the 514 g sugar box needs about 1.18 N\u00b7m against the 1.62 N\u00b7m stall.",
+   "llm": {
+    "tag": "iter02",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 137.2,
+    "tokens_in": 48429,
+    "tokens_out": 13486,
+    "usd_list_price": 0.4962,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 159.7,
+   "stop": null
+  },
+  {
+   "iteration": 3,
+   "body": "arm_servos: servos_7v4; jaw: prismatic (drive_mm_per_rad=56); pads: pads (groove_mm=0, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1.6, reach_mm=6.5, width_mm=13.6)",
+   "held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "mustard_bottle",
+    "plum",
+    "potted_meat_can",
+    "pudding_box",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "tuna_fish_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "slipped_under_load": 1
+   },
+   "failing": {
+    "reg_sugar_box": {
+     "mechanism": "slipped_under_load",
+     "detail": "verdict rule_violation; closed to 1.49 rad (fingertips 90 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 29 N on the pad at -2 mm from the centre (top at +23), pushing 0 deg up; moving jaw: 29 N on the pad at -3 mm from the centre (top at +23), pushing 0 deg down; rose 47 mm, ended +47 mm; 514 g"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "pads (groove_mm=0, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1.6, reach_mm=6.5, width_mm=24)",
+     "base": null,
+     "mechanism": "slipped_under_load on sugar_box (92 mm, 514 g, 176 mm deep, \u03bc 0.5). Contacts at 29 N per jaw near mid-height (\u22122/\u22123 mm from centre), faces at 0\u00b0. Linear friction capacity is 2\u00b70.5\u00b729 \u2248 29 N against 5.0 N of weight (\u22486\u00d7), so the slip is the long box pivoting about the closing axis between two small 13.6 mm pad patches, not too little squeeze.",
+     "principle": "Friction resists pivoting in proportion to squeeze \u00d7 the size of the contact patch. A wider pad along the object's depth lengthens the lever that opposes the m\u00b7g\u00b7offset torque of a long box, without changing squeeze (servo torque / pinion radius stays 29 N) or face angle.",
+     "hypothesis": "Raising width_mm from 13.6 to 24 (the range maximum) adds about 76% more patch length along the sugar box's 176 mm depth, enough to stop it pivoting. Cheaper moves won't work. Squeeze can't rise: drive must stay at 54 mm/rad or more to open past the 96 mm mustard bottle, which gives only about 30 N. Arm torque is fine (about 1.18 N\u00b7m against 1.62 N\u00b7m, and the box didn't sag). The 12 V servos are over budget. This is the only pad change never paired with a racquetball loss: b012, at width 17 with no lip, kept racquetball. Costs about 3 g PLA/TPU, no purchases.",
+     "predicted_gains": [
+      "sugar_box"
+     ],
+     "risks": [
+      "dice: 17 mm cube with a 24 mm pad. The pad overhangs along the depth, but contact stays on parallel faces at the same 29 N, so it should hold. The risk is wider pads touching the table or the side of the dice during descent.",
+      "racquetball / tennis_ball / golf_ball: a flat parallel pad touches a sphere at one point whatever its width, so these should be unaffected.",
+      "potted_meat_can (force_limit at large reach): reach is unchanged at 6.5 mm, so it should survive."
+     ],
+     "idea": null,
+     "result": "not kept (another proposal gained more): gained 1 tasks, lost none; costs $0.00, 14 machine min",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "sugar_box"
+      ],
+      "hit": [],
+      "missed": [
+       "sugar_box"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 13.5,
+      "lines": [
+       "lm3uu_bearing x2: provided (reused)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (reused)",
+       "steel_rod_3x100 x2: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.5 g for pads: 7 machine minutes",
+       "print:TPU 0.8 g for pads: 6 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "slipped_under_load"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "pads (groove_mm=0, lip_mm=0.25, pad_angle_deg=0, pad_tpu_mm=1.6, reach_mm=6.5, width_mm=13.6)",
+     "base": null,
+     "mechanism": "slipped_under_load on sugar_box: the 514 g box slides or pivots down out of two vertical friction contacts. All four bodies that gained sugar_box (b00t0, b00t3, b011, b022) had lip_mm of 0.18\u20130.64. b012, at width 17 with no lip, did not gain it.",
+     "principle": "An inward hook at the bottom of each pad takes part of the weight on a horizontal surface (the box's bottom edge) instead of on friction alone, so the hold no longer depends on \u03bcN.",
+     "hypothesis": "A small lip (0.25 mm, near b00t3's 0.18 that already gained sugar) at the current 6.5 mm reach. No lip has been tested at this reach. Every past lip body that lost racquetball had a reach of 0\u20132.7 mm, except b01t1 at reach 15. The deeper fingertip may let the small hook sit below the ball's lower curve, so it doesn't jam against the ball. If racquetball is lost, the 4-trial fitting can search lip and reach together. Costs about 3 g print, nothing bought.",
+     "predicted_gains": [
+      "sugar_box"
+     ],
+     "risks": [
+      "racquetball: every lip body so far lost it (fixed/moving_jaw_missed, stuck at 66\u201376 mm). This is the main risk.",
+      "potted_meat_can and foam_brick: b022 lost them with lip 0.5 and groove 4. The lip here is half that and there is no groove, so they are more likely to survive.",
+      "dice: the lip could catch the 17 mm cube's bottom edge, but at 0.25 mm that is unlikely."
+     ],
+     "idea": null,
+     "result": "KEPT: gained sugar_box, lost none; costs $0.00, 9 machine min",
+     "gained": [
+      "sugar_box"
+     ],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "sugar_box"
+      ],
+      "hit": [
+       "sugar_box"
+      ],
+      "missed": [],
+      "unpredicted": [],
+      "precision": 1.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 8.6,
+      "lines": [
+       "lm3uu_bearing x2: provided (reused)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (reused)",
+       "steel_rod_3x100 x2: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 0.9 g for pads: 5 machine minutes",
+       "print:TPU 0.5 g for pads: 4 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    },
+    {
+     "k": 2,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "pads (groove_mm=1.5, lip_mm=0.15, pad_angle_deg=0, pad_tpu_mm=1.6, reach_mm=6.5, width_mm=13.6)",
+     "base": null,
+     "mechanism": "slipped_under_load on sugar_box. The lip fixes it but costs racquetball: the ball, rubber with \u03bc 0.9, gets pushed off-centre and the jaws stall without contact.",
+     "principle": "A V-groove centres a round object across the pad, so a sphere being squeezed is pulled into line with the contact instead of being rolled away. A minimal lip still supports the flat box's bottom edge.",
+     "hypothesis": "Use the smallest lip that has gained sugar_box (0.15, near b00t3's 0.18) plus a 1.5 mm groove. In the record, dice held at grooves of 1.49 mm or more and banana held at 1.16\u20131.5, while groove 2 lost banana. Unlike b00t0, b011 and b022, this keeps the 6.5 mm reach and 0\u00b0 angle that hold mustard, potted_meat and tuna. Costs about 3 g print, nothing bought.",
+     "predicted_gains": [
+      "sugar_box"
+     ],
+     "risks": [
+      "racquetball: lip bodies have lost it every time; this relies on the groove to centre the ball.",
+      "banana: squeezed_up_out at groove 2. 1.5 is below that, and b00t3 at 1.49 kept banana.",
+      "potted_meat_can: the groove plus lip at this reach is untested."
+     ],
+     "idea": null,
+     "result": "not kept (another proposal gained more): gained sugar_box, lost none; costs $0.00, 9 machine min",
+     "gained": [
+      "sugar_box"
+     ],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "sugar_box"
+      ],
+      "hit": [
+       "sugar_box"
+      ],
+      "missed": [],
+      "unpredicted": [],
+      "precision": 1.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 8.8,
+      "lines": [
+       "lm3uu_bearing x2: provided (reused)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (reused)",
+       "steel_rod_3x100 x2: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.0 g for pads: 5 machine minutes",
+       "print:TPU 0.5 g for pads: 4 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    }
+   ],
+   "accepted": "b031",
+   "notes": "My reading: sugar_box doesn't fail for lack of squeeze, since linear friction margin is about 6\u00d7. It's likely the long box pivoting, or a load-path problem that the lip fixes. The arm is not the limit (about 1.18 N\u00b7m against 1.62 N\u00b7m) and the 12 V servos are over budget. Opening needed for the 96 mm mustard bottle pins drive at 54 mm/rad or more. All three proposals change only the pads and are print-only (about 3 g, 20\u201330 machine minutes). They share a slot, so they won't be combined.",
+   "llm": {
+    "tag": "iter03",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 77.7,
+    "tokens_in": 16127,
+    "tokens_out": 7346,
+    "usd_list_price": 0.2587,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 99.2,
+   "stop": null
+  },
+  {
+   "iteration": 4,
+   "body": "arm_servos: servos_7v4; jaw: prismatic (drive_mm_per_rad=56); pads: pads (groove_mm=0, lip_mm=0.25, pad_angle_deg=0, pad_tpu_mm=1.6, reach_mm=6.5, width_mm=13.6)",
+   "held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "mustard_bottle",
+    "plum",
+    "potted_meat_can",
+    "pudding_box",
+    "racquetball",
+    "strawberry",
+    "sugar_box",
+    "tennis_ball",
+    "tomato_soup_can",
+    "tuna_fish_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {},
+   "failing": {},
+   "proposals": [],
+   "accepted": null,
+   "notes": "",
+   "llm": {},
+   "seconds": null,
+   "stop": "all groups held"
+  }
+ ],
+ "llm_calls": [
+  {
+   "tag": "iter00",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 61.0,
+   "tokens_in": 12065,
+   "tokens_out": 5749,
+   "usd_list_price": 0.1939,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter01",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 83.8,
+   "tokens_in": 16240,
+   "tokens_out": 8084,
+   "usd_list_price": 0.2745,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter02",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 137.2,
+   "tokens_in": 48429,
+   "tokens_out": 13486,
+   "usd_list_price": 0.4962,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter03",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 77.7,
+   "tokens_in": 16127,
+   "tokens_out": 7346,
+   "usd_list_price": 0.2587,
+   "billing": "plan",
+   "error": ""
+  }
+ ]
+}
