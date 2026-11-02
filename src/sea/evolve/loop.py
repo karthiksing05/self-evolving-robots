@@ -12,9 +12,10 @@ Each iteration:
    failing ones.
 6. **Merge** kept-eligible proposals that change disjoint slots into one body, trialled once: a gain
    in one slot and a gain in another are not alternatives (D-045).
-7. **Tune** the most promising new part type (a swap that gained a group but broke a held one) for up
-   to ``tune_trials`` more trials, before it is judged against a body whose parameters have had several
-   iterations of tuning.  A structural change is protected until its own parameters are fitted (D-044).
+7. **Tune** the most promising new part type (a swap that gained a group but broke a held one, and gained
+   more groups than the best kept-eligible candidate) for up to ``tune_trials`` more trials, before it is
+   judged against a body whose parameters have had several iterations of tuning.  A structural change is
+   protected until its own parameters are fitted (D-044).
 8. **Accept** the best candidate that gains a group and loses none: the held set only grows (a ratchet,
    the PASS_TO_PASS rule).  Its purchases and fabrication are charged.
 
@@ -407,7 +408,9 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                     log(f"    merge of {', '.join(parts)}: {entry['edit']}: {entry['result'][:160]}")
                     if score is not None and (best is None or score > best[0]):
                         best = (score, mbody, entry)
-            promising = [(c, e) for c, e in swaps if e["gained"] and e["lost"]]
+            # worth tuning only if it already gains more groups than the best candidate this iteration keeps
+            promising = [(c, e) for c, e in swaps if e["gained"] and e["lost"]
+                         and (best is None or len(e["gained"]) > best[0][0])]
             if promising and cfg.tune_trials > 0:
                 cand, entry = max(promising, key=lambda ce: (len(ce[1]["gained"]) - len(ce[1]["lost"]),
                                                               len(ce[1]["gained"]), ce[1]["new_tasks"]))

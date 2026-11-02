@@ -1121,3 +1121,9 @@ All three worlds and `resources.py` change, which re-keys the judge. Runs starte
 (gripper `s2v2_s0`, the first mobile seeds) carry the earlier key in `harness.json`.
 
 Tests: `tests/test_evolve.py` (`test_a_spare_is_used_once`).
+
+Amendment (after `phonology_s2_s0`): tuning now runs only if the promising swap gained more groups than
+the best kept-eligible candidate that iteration. In that run, a merge already gained seven groups
+while the loop spent four tuning trials on a 15.5 cm cast that gained one and broke four. A tuned
+body can be kept only if it outscores the best candidate. A swap that already gains fewer groups is
+unlikely to, so the allowance goes where it can change the decision.
