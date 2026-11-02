@@ -33,9 +33,11 @@ def collect(run: Path) -> dict:
         mech = Counter(o["mechanism"] for o in rec.get("failing", {}).values())
         props = []
         for t in rec.get("trials", []):
-            p = t["proposal"]
+            p = t.get("proposal") or {"move": t.get("move"), "mechanism": "", "principle": "",  # tuning trials
+                                      "hypothesis": t.get("hypothesis", "")}
             props.append({
                 "k": t["k"], "move": t.get("move"), "declared_move": p["move"], "edit": t.get("edit"),
+                "base": t.get("base") or p.get("base"),
                 "mechanism": p["mechanism"], "principle": p["principle"], "hypothesis": p["hypothesis"],
                 "predicted_gains": p.get("gains", []), "risks": p.get("risks", []), "idea": p.get("idea"),
                 "result": t.get("result"), "gained": t.get("gained", []), "lost": t.get("lost", []),

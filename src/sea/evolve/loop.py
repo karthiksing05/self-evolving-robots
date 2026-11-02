@@ -10,7 +10,10 @@ Each iteration:
    the body, and the resource check must pass.  Ideas are recorded with what they would need.
 5. **Trial.** Each admitted body solves the held groups first (stopping at the first loss), then the
    failing ones.
-6. **Accept** the best candidate that gains a group and loses none: the held set only grows (a ratchet,
+6. **Tune** the most promising new part type (a swap that gained a group but broke a held one) for up
+   to ``tune_trials`` more trials, before it is judged against a body whose parameters have had several
+   iterations of tuning.  A structural change is protected until its own parameters are fitted (D-044).
+7. **Accept** the best candidate that gains a group and loses none: the held set only grows (a ratchet,
    the PASS_TO_PASS rule).  Its purchases and fabrication are charged.
 
 Everything is written to ``out``: every prompt and answer, every screen, trial and decision, so a run
@@ -45,6 +48,7 @@ class RunConfig(BaseModel):
     seed: int = 0
     max_proposals: int = 3
     full_trials: bool = False  # score every group even after a loss; swaps always are (the frontier needs it)
+    tune_trials: int = 4  # per iteration: trials spent fitting a promising swap's parameters before judging it
     workers: int = 1
     budget: dict[str, float] = {}  # overrides the manifest's budget
     model: str = "claude-opus-5-5"
@@ -174,8 +178,19 @@ def _proposal_stats(history: Sequence[dict[str, Any]]) -> dict[str, Any]:
             "ideas": sum(h["result"].startswith("idea") for h in history),
             "kept": sum(h["result"].startswith("KEPT") for h in history),
             "rejected_regression": sum(bool(h.get("lost")) for h in tried),
-            "moves": {m: sum(h.get("move") == m for h in history) for m in ("params", "swap", "idea")},
+            "moves": {m: sum(h.get("move") == m for h in history) for m in ("params", "swap", "idea", "tune")},
             "mean_prediction_precision": round(sum(prec) / len(prec), 3) if prec else None}
+
+
+def _diff(a: Body, b: Body) -> list[Edit]:
+    """The edits that turn ``a`` into ``b``."""
+    return [Edit(slot=s, type=p.type, params=p.params) for s, p in b.parts.items() if a.parts.get(s) != p]
+
+
+def _tune_key(entry: dict[str, Any]) -> tuple[float, ...]:
+    """Tuning's objective: kept-eligible first, then net groups, then tasks newly passed, then partial credit."""
+    return (float(bool(entry["gained"]) and not entry["lost"]), len(entry["gained"]) - len(entry["lost"]),
+            entry["new_tasks"], entry.get("score_sum", 0.0))
 
 
 def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: World | None = None,
@@ -210,6 +225,87 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
     tried: dict[str, str] = {}  # body key -> what its trial found: a body is never paid for twice
     frontier: dict[str, dict[str, Any]] = {}  # promising bodies not kept: they gained more groups than they lost
     t_start = time.time()
+
+    def trial(cand: Body, entry: dict[str, Any], full_always: bool) -> tuple[float, ...] | None:
+        """Screen ``cand`` against the current body and, if admitted, solve it, filling ``entry``.  Returns its
+        acceptance score if it gains a group and loses none."""
+        errs = world.check(cand)
+        res = check(cand, world.bom(cand), body, world.bom(body), manifest, spent)
+        entry["resources"] = res.model_dump()
+        if cand.key() == body.key():
+            errs = ["the edit leaves the body unchanged", *errs]
+        elif cand.key() in tried:
+            errs = [f"this exact body was already trialled: {tried[cand.key()]}", *errs]
+        if errs or not res.ok:
+            entry.update(result="refused before trial: " + "; ".join([*errs, *res.errors]), tried=False)
+            return None
+        held_tasks = [t for t in train if t.group in held]
+        cand_out = ev.solve(cand, held_tasks)
+        lost = sorted({t.group for t in held_tasks if not cand_out[t.id].success})
+        full = not lost or cfg.full_trials or full_always
+        if full:
+            cand_out.update(ev.solve(cand, [t for t in train if t.group not in held]))
+        cand_held = held_groups(train, cand_out) if full else held - set(lost)
+        gained = sorted(cand_held - held)
+        n_new = sum(cand_out[t.id].success for t in train if t.group not in held) if full else 0
+        still = sorted({cand_out[t.id].mechanism for t in train if t.id in cand_out and not cand_out[t.id].success})
+        entry.update(tried=True, gained=gained, lost=lost, new_tasks=n_new, still_failing=still,
+                     score_sum=round(sum(o.score for o in cand_out.values()), 3),
+                     outcomes={t: o.model_dump() for t, o in cand_out.items()})
+        why = (f"lost {', '.join(lost)} (" + "; ".join(f"{t.group}: {cand_out[t.id].mechanism}, "
+                                                       f"{cand_out[t.id].detail[:140]}"
+                                                       for t in held_tasks if t.group in lost
+                                                       and not cand_out[t.id].success)[:600] + ")") if lost else ""
+        score = None
+        if lost:
+            entry["result"] = f"rejected: {why}" + (f"; it would gain {', '.join(gained)}" if gained else "")
+            if len(gained) > len(lost):
+                frontier[cand.id] = {"id": cand.id, "body": cand, "gained": gained, "lost": lost,
+                                     "why_lost": why, "iteration": it, "edit": entry["edit"]}
+                entry["result"] += f"; kept on the frontier as {cand.id}"
+        elif not gained and n_new == 0:
+            entry["result"] = "rejected: gained nothing; still failing: " + ", ".join(still[:6])
+        else:
+            entry["result"] = (f"kept-eligible: gained {', '.join(gained) or f'{n_new} tasks'}, lost none; "
+                               f"costs ${res.usd:.2f}, {res.fab_minutes:.0f} machine min")
+            score = (len(gained), n_new, -res.usd - res.fab_minutes / 60,
+                     -int(edit_rung(body, _diff(body, cand)) == "swap"))
+        tried[cand.key()] = f"iteration {it + 1}: {entry['result'][:200]}"
+        return score
+
+    def tune(seed: Body, seed_entry: dict[str, Any], rng: np.random.Generator):
+        """Fit the parameters of the slots a promising swap edited: a Gaussian search in each parameter's range,
+        centred on the best body so far, until one is kept-eligible or ``tune_trials`` trials have run."""
+        space = [(slot, k, catalogue[seed.parts[slot].type].params[k]) for slot in seed_entry["slots"]
+                 for k in sorted(catalogue[seed.parts[slot].type].params)]
+        if not space:
+            return
+        x = np.array([(seed.parts[s].params[k] - p.lo) / ((p.hi - p.lo) or 1.0) for s, k, p in space])
+        best_x, best_key, sigma, ran = x, _tune_key(seed_entry), 0.25, 0
+        for i in range(3 * cfg.tune_trials):
+            if ran >= cfg.tune_trials:
+                break
+            xi = np.clip(best_x + rng.normal(0.0, sigma, len(space)), 0.0, 1.0)
+            edits: dict[str, dict[str, float]] = {}
+            for (s, k, p), v in zip(space, xi, strict=True):
+                edits.setdefault(s, {})[k] = round(float(p.lo + v * (p.hi - p.lo)), 3)
+            ed = [Edit(slot=s, params=ps) for s, ps in edits.items()]
+            cand = apply(seed, ed, catalogue, new_id=f"b{it:02d}t{i}")
+            entry: dict[str, Any] = {"k": f"t{i}", "iteration": it, "move": "tune", "base": seed.id,
+                                     "slots": seed_entry["slots"], "edit": _edit_text(ed),
+                                     "hypothesis": f"the loop fits {seed.id}'s new {', '.join(seed_entry['slots'])} "
+                                                   f"before judging it (tuning trial {ran + 1} of {cfg.tune_trials})"}
+            score = trial(cand, entry, full_always=True)
+            if entry.get("tried"):
+                ran += 1
+                key = _tune_key(entry)
+                if key > best_key:
+                    best_x, best_key = xi, key
+                sigma = max(0.05, sigma * 0.8)
+            yield score, cand, entry
+            if score is not None:
+                return
+
     records = (out / "iterations.jsonl").open("w")
     try:
         for it in range(cfg.iterations + 1):
@@ -233,11 +329,12 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                 proposer.body = body
             front = sorted(frontier.values(), key=lambda f: (-(len(f["gained"]) - len(f["lost"])), f["iteration"]))
             prompt = build(world, body, train, outcomes, held, history, ideas, spent, manifest, it, cfg.iterations,
-                           cfg.max_proposals, frontier=front[:5])
+                           cfg.max_proposals, frontier=front[:5], tune_trials=cfg.tune_trials)
             batch = proposer.propose(SYSTEM, prompt, tag=f"iter{it:02d}")
             rec["llm"] = proposer.calls[-1] if getattr(proposer, "calls", None) else {}
             rec["notes"] = batch.notes
             trials = []
+            swaps: list[tuple[Body, dict[str, Any]]] = []
             best: tuple[tuple[float, ...], Body, dict[str, Any]] | None = None
             for k, prop in enumerate(batch.proposals[: cfg.max_proposals]):
                 entry: dict[str, Any] = {"k": k, "proposal": prop.model_dump(), "iteration": it, "move": prop.move,
@@ -261,54 +358,29 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                     trials.append(entry)
                     history.append(entry)
                     continue
-                entry["move"] = edit_rung(body, prop.edits)
-                entry["slots"] = sorted({e.slot for e in prop.edits})
-                errs = world.check(cand)
-                res = check(cand, world.bom(cand), body, world.bom(body), manifest, spent)
-                entry["resources"] = res.model_dump()
-                if cand.key() == body.key():
-                    errs = ["the edit leaves the body unchanged", *errs]
-                elif cand.key() in tried:
-                    errs = [f"this exact body was already trialled: {tried[cand.key()]}", *errs]
-                if errs or not res.ok:
-                    entry.update(result="refused before trial: " + "; ".join([*errs, *res.errors]), tried=False)
-                    trials.append(entry)
-                    history.append(entry)
-                    continue
-                held_tasks = [t for t in train if t.group in held]
-                cand_out = ev.solve(cand, held_tasks)
-                lost = sorted({t.group for t in held_tasks if not cand_out[t.id].success})
-                full = not lost or cfg.full_trials or entry["move"] == "swap"  # a redesign is always scored whole
-                if full:
-                    cand_out.update(ev.solve(cand, [t for t in train if t.group not in held]))
-                cand_held = held_groups(train, cand_out) if full else held - set(lost)
-                gained = sorted(cand_held - held)
-                n_new = sum(cand_out[t.id].success for t in train if t.group not in held) if full else 0
-                still = sorted({cand_out[t.id].mechanism for t in train if t.id in cand_out and not cand_out[t.id].success})
-                entry.update(tried=True, gained=gained, lost=lost, new_tasks=n_new, still_failing=still,
-                             outcomes={t: o.model_dump() for t, o in cand_out.items()})
-                why = (f"lost {', '.join(lost)} (" + "; ".join(f"{t.group}: {cand_out[t.id].mechanism}"
-                                                               for t in held_tasks if t.group in lost
-                                                               and not cand_out[t.id].success)[:300] + ")") if lost else ""
-                if lost:
-                    entry["result"] = f"rejected: {why}" + (f"; it would gain {', '.join(gained)}" if gained else "")
-                    if len(gained) > len(lost):
-                        frontier[cand.id] = {"id": cand.id, "body": cand, "gained": gained, "lost": lost,
-                                             "why_lost": why, "iteration": it, "edit": entry["edit"]}
-                        entry["result"] += f"; kept on the frontier as {cand.id}"
-                elif not gained and n_new == 0:
-                    entry["result"] = "rejected: gained nothing; still failing: " + ", ".join(still[:6])
-                else:
-                    entry["result"] = (f"kept-eligible: gained {', '.join(gained) or f'{n_new} tasks'}, lost none; "
-                                       f"costs ${res.usd:.2f}, {res.fab_minutes:.0f} machine min")
-                    score = (len(gained), n_new, -res.usd - res.fab_minutes / 60, -int(entry["move"] == "swap"))
-                    if best is None or score > best[0]:
-                        best = (score, cand, entry)
-                tried[cand.key()] = f"iteration {it + 1}: {entry['result'][:200]}"
-                entry["prediction"] = _score_prediction(prop.gains, gained, lost)
+                change = _diff(body, cand)  # against the current body, also when the proposal builds on another
+                entry["move"] = edit_rung(body, change)
+                entry["slots"] = sorted({e.slot for e in change})
+                score = trial(cand, entry, full_always=entry["move"] == "swap")  # a redesign is always scored whole
+                if entry.get("tried"):
+                    entry["prediction"] = _score_prediction(prop.gains, entry["gained"], entry["lost"])
+                    if entry["move"] == "swap":
+                        swaps.append((cand, entry))
+                if score is not None and (best is None or score > best[0]):
+                    best = (score, cand, entry)
                 trials.append(entry)
                 history.append(entry)
                 log(f"    proposal {k} [{entry['move']}] {entry['edit']}: {entry['result'][:160]}")
+            promising = [(c, e) for c, e in swaps if e["gained"] and e["lost"]]
+            if promising and cfg.tune_trials > 0:
+                cand, entry = max(promising, key=lambda ce: (len(ce[1]["gained"]) - len(ce[1]["lost"]),
+                                                              len(ce[1]["gained"]), ce[1]["new_tasks"]))
+                for score, tcand, tentry in tune(cand, entry, np.random.default_rng([cfg.seed, it])):
+                    trials.append(tentry)
+                    history.append(tentry)
+                    log(f"    tune {tentry['k']} of {cand.id}: {tentry['edit']}: {tentry['result'][:160]}")
+                    if score is not None and (best is None or score > best[0]):
+                        best = (score, tcand, tentry)
             accepted = None
             if best is not None:
                 _, cand, entry = best

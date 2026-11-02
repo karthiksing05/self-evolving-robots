@@ -222,10 +222,38 @@ def test_frontier_lets_a_redesign_be_repaired(tmp_path):
                ProposalBatch(proposals=[_p("params", [Edit(slot="hand", params={"care": 1.0})], base="b000"),
                                         _p("params", [Edit(slot="hand", params={"care": 1.0})], base="nope")])]
     llm = Scripted(batches)
-    s = run(RunConfig(world="trade", iterations=3), tmp_path, proposer=llm, world=Trade(), log=lambda m: None)
+    s = run(RunConfig(world="trade", iterations=3, tune_trials=0), tmp_path, proposer=llm, world=Trade(),
+            log=lambda m: None)
     recs = [json.loads(x) for x in (tmp_path / "iterations.jsonl").read_text().splitlines()]
     first = recs[0]["trials"][0]["result"]
     assert first.startswith("rejected: lost a") and "would gain b, c" in first and "frontier as b000" in first
     assert "# Promising bodies not kept" in llm.prompts[1] and "b000" in llm.prompts[1]
     assert recs[1]["trials"][0]["result"].startswith("KEPT") and "no promising body 'nope'" in recs[1]["trials"][1]["result"]
     assert s["final_held_train"] == ["a", "b", "c"] and len(s["frontier"]) == 1
+
+
+class Gentle(Trade):
+    """As Trade, but the new hand keeps ``a`` once ``care`` is past 0.6: its midpoint is close, not right."""
+
+    def solve(self, body: Body, task: Task, seed: int = 0) -> Outcome:
+        h = body.parts["hand"]
+        ok = (task.data["g"] == "a") if h.type == "old" else (task.data["g"] != "a" or h.params["care"] > 0.6)
+        score = float(ok) if h.type == "old" or ok else h.params["care"]
+        return Outcome(task=task.id, success=ok, score=score, mechanism="" if ok else "wrong_hand")
+
+
+def test_tuning_protects_a_new_part(tmp_path):
+    """A swap judged at its midpoint would break ``a``; the loop fits its parameter first (D-044)."""
+    llm = Scripted([ProposalBatch(proposals=[_p("swap", [Edit(slot="hand", type="new")], gains=["b", "c"])])])
+    s = run(RunConfig(world="gentle", iterations=2, tune_trials=6), tmp_path, proposer=llm, world=Gentle(),
+            log=lambda m: None)
+    rec = json.loads((tmp_path / "iterations.jsonl").read_text().splitlines()[0])
+    first, *tuned = rec["trials"]
+    assert first["result"].startswith("rejected: lost a") and first["move"] == "swap"
+    assert tuned and all(t["move"] == "tune" and t["base"] == "b000" for t in tuned)
+    assert tuned[-1]["result"].startswith("KEPT") and rec["accepted"] == f"b00{tuned[-1]['k']}"
+    assert s["final_held_train"] == ["a", "b", "c"] and s["final_body"]["parts"]["hand"]["params"]["care"] > 0.6
+    assert s["proposals"]["moves"]["tune"] == len(tuned) and len(llm.prompts) == 1
+    off = run(RunConfig(world="gentle", iterations=1, tune_trials=0), tmp_path / "off", proposer=Scripted(
+        [ProposalBatch(proposals=[_p("swap", [Edit(slot="hand", type="new")])])]), world=Gentle(), log=lambda m: None)
+    assert off["final_held_train"] == ["a"] and off["proposals"]["moves"]["tune"] == 0

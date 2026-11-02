@@ -1042,3 +1042,39 @@ gaps, fixed for the next runs (that run keeps the code it started with):
 
 Tests: `tests/test_evolve.py` (`test_frontier_lets_a_redesign_be_repaired`, repeat refusal,
 prediction scoring) and `tests/test_world_gripper.py` (`test_part_facts_show_each_joint_on_this_body`).
+
+## D-044 A new part is tuned before it is judged; System 2 sees held tasks, loss numbers and swap costs (policy)
+A swap's parameters are System 2's first guess. A swap is judged against a body whose parameters have
+had several iterations of tuning, so a good mechanism can lose to a well-tuned bad one. NEAT protects
+structural innovations for the same reason (Stanley & Miikkulainen 2002): a new structure needs its
+weights fitted before it competes.
+
+The loop now gives each iteration a **tuning allowance** (`tune_trials`, default 4):
+- **What gets tuned:** the swap this iteration that gained a group but lost a held one, taking the
+  one with the best net gain.
+- **How:** a Gaussian search over the parameters of every slot that body changes. It works in each
+  parameter's own range, centres on the best tuned body so far, and its step shrinks. Each tuning
+  trial is screened, costed and scored on every group, like a proposal.
+- **Objective:** kept-eligible first, then net groups, then tasks newly passed, then partial credit.
+- **When it stops:** at the first kept-eligible body.
+- **Logging:** tuning trials appear in the record as `tune` rows, and the summary counts them.
+- **Same for every arm:** the random arm gets the same allowance, so the comparison still measures
+  what reasoning buys.
+- **What System 2 is told:** "judge a part type by what it can do across its range".
+
+Three prompt gaps, found while building the mobile world:
+- **Held groups:** shown with their task facts. Before, System 2 could not see the 9 cm sofa clearance
+  until a body broke it.
+- **Rejections:** show each lost task's numbers, not only its mechanism.
+- **Catalogue costs:**
+  - Each catalogue part now shows its true marginal cost from the current body ("swapping it in now
+    costs $14.00, 4 days, 57 machine min"), or why it is refused.
+  - Items the current body already has show as reused, not bought.
+- **Calibration:** a section compares System 2's predicted gains and named risks with what its trials
+  found.
+
+The two formatting helpers (`availability`, `manifest_text`) moved from `resources.py` (judge) to
+`prompt.py` (policy). What System 2 is shown is policy. Only `check` decides admissibility.
+
+Tests: `tests/test_evolve.py` (`test_tuning_protects_a_new_part`: a swap that breaks a group at its
+midpoint is tuned into a keeper; with `tune_trials=0` it is not).

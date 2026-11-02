@@ -44,7 +44,7 @@ class ResourceReport(BaseModel):
     fab_minutes: float = 0.0
 
 
-def _totals(lines: Sequence[BomLine]) -> dict[str, float]:
+def totals(lines: Sequence[BomLine]) -> dict[str, float]:
     out: dict[str, float] = defaultdict(float)
     for ln in lines:
         out[ln.item] += ln.qty
@@ -65,7 +65,7 @@ def check(new: Body, new_bom: Sequence[BomLine], cur: Body, cur_bom: Sequence[Bo
     lines: list[str] = []
     errors: list[str] = []
     usd = lead = minutes = 0.0
-    need, have = _totals([b for b in new_bom if not is_fab(b.item)]), _totals([b for b in cur_bom if not is_fab(b.item)])
+    need, have = totals([b for b in new_bom if not is_fab(b.item)]), totals([b for b in cur_bom if not is_fab(b.item)])
     for item, qty in sorted(need.items()):
         spec = items.get(item)
         if spec is None:
@@ -104,41 +104,3 @@ def check(new: Body, new_bom: Sequence[BomLine], cur: Body, cur_bom: Sequence[Bo
                       f"{float(budget.get('fab_minutes', 0.0)) - spent.fab_minutes:.0f} left")
     return ResourceReport(ok=not errors, lines=lines, errors=errors, usd=round(usd, 2), lead_days=lead,
                           fab_minutes=round(minutes, 1))
-
-
-def availability(bom: Sequence[BomLine], manifest: dict[str, Any]) -> str:
-    """One line per item a part type needs, saying whether the bench provides it: for the catalogue."""
-    items = manifest.get("items", {})
-    fab = manifest.get("fabrication", {})
-    out = []
-    for item, qty in sorted(_totals(bom).items()):
-        if is_fab(item):
-            out.append(f"{item} {qty:.0f}{fab.get(item, {}).get('unit', '')}" + ("" if item in fab else " (NO MACHINE)"))
-            continue
-        spec = items.get(item)
-        if spec is None:
-            out.append(f"{item} x{qty:g} (NOT PROVIDED)")
-        elif float(spec.get("on_hand", 0)) >= qty:
-            out.append(f"{item} x{qty:g} (on hand)")
-        elif spec.get("usd") is not None:
-            out.append(f"{item} x{qty:g} (buy ${float(spec['usd']):g} each, {float(spec.get('lead_days', 0)):g} d)")
-        else:
-            out.append(f"{item} x{qty:g} (NOT PROVIDED)")
-    return ", ".join(out)
-
-
-def manifest_text(manifest: dict[str, Any], spent: Spent) -> str:
-    b = manifest.get("budget", {})
-    head = (f"budget left: ${float(b.get('usd', 0)) - spent.usd:.2f} to buy parts, at most "
-            f"{float(b.get('lead_days', 0)):g} days of lead time, "
-            f"{float(b.get('fab_minutes', 0)) - spent.fab_minutes:.0f} machine minutes")
-    rows = []
-    for name, spec in sorted(manifest.get("items", {}).items()):
-        buy = f"buy ${float(spec['usd']):g}, {float(spec.get('lead_days', 0)):g} d" if spec.get("usd") is not None \
-            else "cannot be bought"
-        rows.append(f"  {name}: {float(spec.get('on_hand', 0)):g} on hand, {buy}" +
-                    (f" ({spec['doc']})" if spec.get("doc") else ""))
-    for name, spec in sorted(manifest.get("fabrication", {}).items()):
-        rows.append(f"  {name}: {float(spec.get('minutes_per_unit', 0)):g} min per {spec.get('unit', 'unit')}" +
-                    (f" ({spec['doc']})" if spec.get("doc") else ""))
-    return head + "\n" + "\n".join(rows)

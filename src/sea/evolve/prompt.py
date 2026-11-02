@@ -11,8 +11,8 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import Any
 
-from sea.evolve.core import Body, Outcome, PartType, Task, World
-from sea.evolve.resources import Spent, availability, manifest_text
+from sea.evolve.core import Body, BomLine, Outcome, PartType, Task, World
+from sea.evolve.resources import Spent, check, is_fab, totals
 
 SYSTEM = """You are System 2 of a self-evolving robot.  System 1 has already searched the control \
 parameters of every task; what still fails is yours.  You change the robot's body, and only the body.  \
@@ -38,21 +38,28 @@ refused before any trial.  Do not repeat a refused or failed change; change your
 prediction, decides what is kept."""
 
 
-def _catalogue_text(world: World, body: Body, manifest: dict[str, Any]) -> str:
+def _catalogue_text(world: World, body: Body, manifest: dict[str, Any], spent: Spent) -> str:
     out = []
     cat = world.catalogue()
+    cur_bom = world.bom(body)
     for slot in sorted({p.slot for p in cat}):
         cur = body.parts.get(slot)
         out.append(f"slot `{slot}` (now: {cur.type if cur else 'empty'})")
         for pt in [p for p in cat if p.slot == slot]:
             probe = Body(parts={**body.parts, slot: _mid(pt)})
-            needs = availability([b for b in world.bom(probe) if b.slot == slot], manifest)
+            probe_bom = world.bom(probe)
+            needs = availability([b for b in probe_bom if b.slot == slot], manifest, cur_bom)
             out.append(f"  - {pt.name}{' [stock]' if pt.stock else ''}: {pt.doc}")
             if pt.provides:
                 out.append(f"      provides: {pt.provides}")
             for k, p in pt.params.items():
                 out.append(f"      {k} [{p.lo:g}, {p.hi:g}] {p.unit}: {p.doc}")
             out.append(f"      needs (at mid-range): {needs or 'nothing'}")
+            if cur is not None and cur.type != pt.name:  # the swap's true marginal cost from this body
+                res = check(probe, probe_bom, body, cur_bom, manifest, spent)
+                out.append(f"      swapping it in now costs ${res.usd:.2f}, {res.lead_days:g} days, "
+                           f"{res.fab_minutes:.0f} machine min" if res.ok else
+                           f"      swapping it in now is refused: {'; '.join(res.errors)}")
             facts = getattr(world, "part_facts", None)
             if facts is not None:  # what the part would do on this body, computed, at its parameters' ranges
                 out.extend(f"      {line}" for line in facts(body, pt))
@@ -73,11 +80,15 @@ def _outcome_line(task: Task, o: Outcome) -> str:
 
 def build(world: World, body: Body, tasks: Sequence[Task], outcomes: dict[str, Outcome], held: set[str],
           history: Sequence[dict[str, Any]], ideas: Sequence[dict[str, Any]], spent: Spent, manifest: dict[str, Any],
-          iteration: int, iterations: int, max_proposals: int = 3, frontier: Sequence[dict[str, Any]] = ()) -> str:
+          iteration: int, iterations: int, max_proposals: int = 3, frontier: Sequence[dict[str, Any]] = (),
+          tune_trials: int = 0) -> str:
     by_id = {t.id: t for t in tasks}
     groups = sorted({t.group for t in tasks})
     failing = [t for t in tasks if not outcomes[t.id].success]
-    held_txt = ", ".join(sorted(held)) or "none"
+    first = {}
+    for t in tasks:
+        first.setdefault(t.group, t)
+    held_txt = "\n".join(f"- {g}: {first[g].facts}" if first[g].facts else f"- {g}" for g in sorted(held)) or "none"
     fail_groups = sorted({t.group for t in failing})
     sec = [f"# World: {world.name}\n{world.description}",
            f"# Iteration {iteration + 1} of {iterations}\n{len(held)}/{len(groups)} task groups held "
@@ -85,17 +96,23 @@ def build(world: World, body: Body, tasks: Sequence[Task], outcomes: dict[str, O
            f"# Current body\n{body.describe()}",
            f"# Brief: computed facts about the current body\n{world.brief(body, tasks)}",
            "# Physics principles of this world\n" + "\n".join(f"- {p}" for p in world.principles()),
-           f"# Catalogue: every part type, by slot\n{_catalogue_text(world, body, manifest)}",
+           f"# Catalogue: every part type, by slot\n{_catalogue_text(world, body, manifest, spent)}",
            f"# Resources\n{manifest_text(manifest, spent)}",
            f"# Held task groups (each must keep passing)\n{held_txt}",
            f"# Failing tasks ({len(fail_groups)} groups)\n" + "\n".join(_outcome_line(by_id[t.id], outcomes[t.id])
                                                                         for t in failing)]
     if history:
         rows = []
-        for h in history[-12:]:
+        for h in history[-16:]:
+            if h["move"] == "tune":
+                rows.append(f"- iteration {h['iteration'] + 1}, tuning {h['base']}: {h['edit']}\n    result: {h['result']}")
+                continue
             rows.append(f"- iteration {h['iteration'] + 1}, {h['move']}: {h['edit']}\n    hypothesis: {h['hypothesis'][:300]}"
                         f"\n    result: {h['result']}")
         sec.append("# Record of past proposals (most recent last)\n" + "\n".join(rows))
+        cal = _calibration(history)
+        if cal:
+            sec.append(f"# Your predictions against the trials\n{cal}")
         tried = _exhaustion(history)
         if tried:
             sec.append("# What parameter moves have not fixed\n" + tried)
@@ -108,9 +125,28 @@ def build(world: World, body: Body, tasks: Sequence[Task], outcomes: dict[str, O
     if ideas:
         sec.append("# Ideas recorded so far (untested: no builder in the simulator)\n" +
                    "\n".join(f"- {i['name']}: needs {', '.join(i['needs']) or 'nothing listed'}" for i in ideas[-6:]))
-    sec.append(f"Propose 1 to {max_proposals} body changes for the failing groups.  Each proposal is tried on "
-               "its own and kept only if it gains a group and loses none.")
+    close = (f"Propose 1 to {max_proposals} body changes for the failing groups.  Each proposal is tried on "
+             "its own and kept only if it gains a group and loses none.")
+    if tune_trials:
+        close += (f"  A swap that gains a group but breaks a held one is not judged on your values alone: the loop "
+                  f"spends up to {tune_trials} more trials fitting the parameters of the slots it changed, so judge a "
+                  "part type by what it can do across its range.")
+    sec.append(close)
     return "\n\n".join(sec)
+
+
+def _calibration(history: Sequence[dict[str, Any]]) -> str:
+    """System 2's predicted gains and named risks against what its trials found."""
+    tried = [h for h in history if h.get("prediction")]
+    if not tried:
+        return ""
+    pred = sum(len(h["prediction"]["predicted"]) for h in tried)
+    hit = sum(len(h["prediction"]["hit"]) for h in tried)
+    unpred = sum(len(h["prediction"]["unpredicted"]) for h in tried)
+    lost = [(g, h) for h in tried for g in h["prediction"]["lost"]]
+    unwarned = sum(not any(g in r for r in h.get("proposal", {}).get("risks", [])) for g, h in lost)
+    return (f"Over {len(tried)} trials: {hit} of the {pred} gains you predicted happened, {unpred} gains came "
+            f"unpredicted, and {len(lost)} held groups were lost, {unwarned} of them not named in your risks.")
 
 
 def _exhaustion(history: Sequence[dict[str, Any]]) -> str:
@@ -127,3 +163,45 @@ def _exhaustion(history: Sequence[dict[str, Any]]) -> str:
         out.append(f"- slot `{slot}`: {len(hs)} parameter-only trials, {gained} groups gained in total; mechanisms "
                    f"still failing after them: {', '.join(mech[:8]) or 'none'}")
     return "\n".join(out)
+
+
+def availability(bom: Sequence[BomLine], manifest: dict[str, Any], have: Sequence[BomLine] = ()) -> str:
+    """One line per item a part type needs, saying whether the bench provides it: for the catalogue.  Items in
+    ``have`` (the current body's bill) are reused."""
+    items = manifest.get("items", {})
+    fab = manifest.get("fabrication", {})
+    owned = totals([b for b in have if not is_fab(b.item)])
+    out = []
+    for item, qty in sorted(totals(bom).items()):
+        if is_fab(item):
+            out.append(f"{item} {qty:.0f}{fab.get(item, {}).get('unit', '')}" + ("" if item in fab else " (NO MACHINE)"))
+            continue
+        spec = items.get(item)
+        if spec is None:
+            out.append(f"{item} x{qty:g} (NOT PROVIDED)")
+        elif owned.get(item, 0.0) >= qty:
+            out.append(f"{item} x{qty:g} (reused from the current body)")
+        elif float(spec.get("on_hand", 0)) + owned.get(item, 0.0) >= qty:
+            out.append(f"{item} x{qty:g} (on hand)")
+        elif spec.get("usd") is not None:
+            out.append(f"{item} x{qty:g} (buy ${float(spec['usd']):g} each, {float(spec.get('lead_days', 0)):g} d)")
+        else:
+            out.append(f"{item} x{qty:g} (NOT PROVIDED)")
+    return ", ".join(out)
+
+
+def manifest_text(manifest: dict[str, Any], spent: Spent) -> str:
+    b = manifest.get("budget", {})
+    head = (f"budget left: ${float(b.get('usd', 0)) - spent.usd:.2f} to buy parts, at most "
+            f"{float(b.get('lead_days', 0)):g} days of lead time, "
+            f"{float(b.get('fab_minutes', 0)) - spent.fab_minutes:.0f} machine minutes")
+    rows = []
+    for name, spec in sorted(manifest.get("items", {}).items()):
+        buy = f"buy ${float(spec['usd']):g}, {float(spec.get('lead_days', 0)):g} d" if spec.get("usd") is not None \
+            else "cannot be bought"
+        rows.append(f"  {name}: {float(spec.get('on_hand', 0)):g} on hand, {buy}" +
+                    (f" ({spec['doc']})" if spec.get("doc") else ""))
+    for name, spec in sorted(manifest.get("fabrication", {}).items()):
+        rows.append(f"  {name}: {float(spec.get('minutes_per_unit', 0)):g} min per {spec.get('unit', 'unit')}" +
+                    (f" ({spec['doc']})" if spec.get("doc") else ""))
+    return head + "\n" + "\n".join(rows)
