@@ -104,8 +104,9 @@ def build(world: World, body: Body, tasks: Sequence[Task], outcomes: dict[str, O
     if history:
         rows = []
         for h in history[-16:]:
-            if h["move"] == "tune":
-                rows.append(f"- iteration {h['iteration'] + 1}, tuning {h['base']}: {h['edit']}\n    result: {h['result']}")
+            if h["move"] in ("tune", "merge"):
+                what = f"tuning {h['base']}" if h["move"] == "tune" else f"merging {' and '.join(h['merged'])}"
+                rows.append(f"- iteration {h['iteration'] + 1}, {what}: {h['edit']}\n    result: {h['result']}")
                 continue
             rows.append(f"- iteration {h['iteration'] + 1}, {h['move']}: {h['edit']}\n    hypothesis: {h['hypothesis'][:300]}"
                         f"\n    result: {h['result']}")
@@ -126,7 +127,8 @@ def build(world: World, body: Body, tasks: Sequence[Task], outcomes: dict[str, O
         sec.append("# Ideas recorded so far (untested: no builder in the simulator)\n" +
                    "\n".join(f"- {i['name']}: needs {', '.join(i['needs']) or 'nothing listed'}" for i in ideas[-6:]))
     close = (f"Propose 1 to {max_proposals} body changes for the failing groups.  Each proposal is tried on "
-             "its own and kept only if it gains a group and loses none.")
+             "its own and kept only if it gains a group and loses none; proposals that are each kept-eligible and "
+             "change different slots are also tried together.")
     if tune_trials:
         close += (f"  A swap that gains a group but breaks a held one is not judged on your values alone: the loop "
                   f"spends up to {tune_trials} more trials fitting the parameters of the slots it changed, so judge a "

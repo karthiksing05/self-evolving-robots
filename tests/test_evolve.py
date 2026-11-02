@@ -257,3 +257,40 @@ def test_tuning_protects_a_new_part(tmp_path):
     off = run(RunConfig(world="gentle", iterations=1, tune_trials=0), tmp_path / "off", proposer=Scripted(
         [ProposalBatch(proposals=[_p("swap", [Edit(slot="hand", type="new")])])]), world=Gentle(), log=lambda m: None)
     assert off["final_held_train"] == ["a"] and off["proposals"]["moves"]["tune"] == 0
+
+
+class Two(Reach):
+    """Two independent slots, each with a part that gains its own group."""
+
+    def tasks(self) -> list[Task]:
+        return [Task(id=f"{g}_train", group=g, data={"g": g}) for g in ("base", "x", "y")]
+
+    def catalogue(self) -> list[PartType]:
+        return [PartType(name=n, slot=s, stock=n.endswith("0"), doc=n) for s in ("sx", "sy") for n in (s + "0", s + "1")]
+
+    def stock(self) -> Body:
+        return Body(parts={"sx": Part(type="sx0"), "sy": Part(type="sy0")})
+
+    def solve(self, body: Body, task: Task, seed: int = 0) -> Outcome:
+        g = task.data["g"]
+        ok = g == "base" or body.parts["s" + g].type.endswith("1")
+        return Outcome(task=task.id, success=ok, score=float(ok), mechanism="" if ok else "missing_part")
+
+    def bom(self, body: Body) -> list[BomLine]:
+        return []
+
+    def brief(self, body: Body, tasks: Sequence[Task]) -> str:
+        return body.describe()
+
+
+def test_disjoint_gains_are_merged(tmp_path):
+    """Two kept-eligible swaps in different slots: the loop trials and keeps their union (D-045)."""
+    batch = ProposalBatch(proposals=[_p("swap", [Edit(slot="sx", type="sx1")]), _p("swap", [Edit(slot="sy", type="sy1")])])
+    s = run(RunConfig(world="two", iterations=2), tmp_path, proposer=Scripted([batch]), world=Two(), log=lambda m: None)
+    rec = json.loads((tmp_path / "iterations.jsonl").read_text().splitlines()[0])
+    merge = rec["trials"][-1]
+    assert merge["move"] == "merge" and merge["merged"] == ["b000", "b001"] and merge["result"].startswith("KEPT")
+    assert s["final_held_train"] == ["base", "x", "y"] and s["proposals"]["moves"]["merge"] == 1
+    off = run(RunConfig(world="two", iterations=1, merge=False), tmp_path / "off", proposer=Scripted([batch]),
+              world=Two(), log=lambda m: None)
+    assert len(off["final_held_train"]) == 2

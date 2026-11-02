@@ -10,10 +10,12 @@ Each iteration:
    the body, and the resource check must pass.  Ideas are recorded with what they would need.
 5. **Trial.** Each admitted body solves the held groups first (stopping at the first loss), then the
    failing ones.
-6. **Tune** the most promising new part type (a swap that gained a group but broke a held one) for up
+6. **Merge** kept-eligible proposals that change disjoint slots into one body, trialled once: a gain
+   in one slot and a gain in another are not alternatives (D-045).
+7. **Tune** the most promising new part type (a swap that gained a group but broke a held one) for up
    to ``tune_trials`` more trials, before it is judged against a body whose parameters have had several
    iterations of tuning.  A structural change is protected until its own parameters are fitted (D-044).
-7. **Accept** the best candidate that gains a group and loses none: the held set only grows (a ratchet,
+8. **Accept** the best candidate that gains a group and loses none: the held set only grows (a ratchet,
    the PASS_TO_PASS rule).  Its purchases and fabrication are charged.
 
 Everything is written to ``out``: every prompt and answer, every screen, trial and decision, so a run
@@ -49,6 +51,7 @@ class RunConfig(BaseModel):
     max_proposals: int = 3
     full_trials: bool = False  # score every group even after a loss; swaps always are (the frontier needs it)
     tune_trials: int = 4  # per iteration: trials spent fitting a promising swap's parameters before judging it
+    merge: bool = True  # trial the union of kept-eligible proposals that change disjoint slots
     workers: int = 1
     budget: dict[str, float] = {}  # overrides the manifest's budget
     model: str = "claude-opus-5-5"
@@ -178,13 +181,29 @@ def _proposal_stats(history: Sequence[dict[str, Any]]) -> dict[str, Any]:
             "ideas": sum(h["result"].startswith("idea") for h in history),
             "kept": sum(h["result"].startswith("KEPT") for h in history),
             "rejected_regression": sum(bool(h.get("lost")) for h in tried),
-            "moves": {m: sum(h.get("move") == m for h in history) for m in ("params", "swap", "idea", "tune")},
+            "moves": {m: sum(h.get("move") == m for h in history) for m in ("params", "swap", "idea", "tune", "merge")},
             "mean_prediction_precision": round(sum(prec) / len(prec), 3) if prec else None}
 
 
 def _diff(a: Body, b: Body) -> list[Edit]:
     """The edits that turn ``a`` into ``b``."""
     return [Edit(slot=s, type=p.type, params=p.params) for s, p in b.parts.items() if a.parts.get(s) != p]
+
+
+def _merge(body: Body, ranked: Sequence[Body], it: int) -> tuple[Body, list[str]] | None:
+    """The best candidate plus every other one whose changed slots are disjoint from those taken so far, if that
+    joins at least two: the parts of each, by slot."""
+    parts, taken, ids = dict(body.parts), set(), []
+    for cand in ranked:
+        slots = {e.slot for e in _diff(body, cand)}
+        if slots & taken:
+            continue
+        parts.update({s: cand.parts[s] for s in slots})
+        taken |= slots
+        ids.append(cand.id)
+    if len(ids) < 2:
+        return None
+    return Body(id=f"b{it:02d}m", parent=body.id, parts=parts), ids
 
 
 def _tune_key(entry: dict[str, Any]) -> tuple[float, ...]:
@@ -335,6 +354,7 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
             rec["notes"] = batch.notes
             trials = []
             swaps: list[tuple[Body, dict[str, Any]]] = []
+            eligible: list[tuple[tuple[float, ...], Body, dict[str, Any]]] = []
             best: tuple[tuple[float, ...], Body, dict[str, Any]] | None = None
             for k, prop in enumerate(batch.proposals[: cfg.max_proposals]):
                 entry: dict[str, Any] = {"k": k, "proposal": prop.model_dump(), "iteration": it, "move": prop.move,
@@ -366,11 +386,27 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                     entry["prediction"] = _score_prediction(prop.gains, entry["gained"], entry["lost"])
                     if entry["move"] == "swap":
                         swaps.append((cand, entry))
-                if score is not None and (best is None or score > best[0]):
-                    best = (score, cand, entry)
+                if score is not None:
+                    eligible.append((score, cand, entry))
+                    if best is None or score > best[0]:
+                        best = (score, cand, entry)
                 trials.append(entry)
                 history.append(entry)
                 log(f"    proposal {k} [{entry['move']}] {entry['edit']}: {entry['result'][:160]}")
+            if cfg.merge and len(eligible) > 1:
+                merged = _merge(body, [c for _, c, _ in sorted(eligible, key=lambda x: x[0], reverse=True)], it)
+                if merged is not None:
+                    mbody, parts = merged
+                    entry = {"k": "m", "iteration": it, "move": "merge", "edit": _edit_text(_diff(body, mbody)),
+                             "slots": sorted({e.slot for e in _diff(body, mbody)}), "merged": parts,
+                             "hypothesis": f"the union of kept-eligible proposals {', '.join(parts)}, which change "
+                                           "disjoint slots"}
+                    score = trial(mbody, entry, full_always=True)
+                    trials.append(entry)
+                    history.append(entry)
+                    log(f"    merge of {', '.join(parts)}: {entry['edit']}: {entry['result'][:160]}")
+                    if score is not None and (best is None or score > best[0]):
+                        best = (score, mbody, entry)
             promising = [(c, e) for c, e in swaps if e["gained"] and e["lost"]]
             if promising and cfg.tune_trials > 0:
                 cand, entry = max(promising, key=lambda ce: (len(ce[1]["gained"]) - len(ce[1]["lost"]),

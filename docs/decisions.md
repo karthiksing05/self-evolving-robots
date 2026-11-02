@@ -1078,3 +1078,22 @@ The two formatting helpers (`availability`, `manifest_text`) moved from `resourc
 
 Tests: `tests/test_evolve.py` (`test_tuning_protects_a_new_part`: a swap that breaks a group at its
 midpoint is tuned into a keeper; with `tune_trials=0` it is not).
+
+## D-045 Kept-eligible proposals in different slots are merged (policy)
+In the first mobile run's iteration 0, System 2 made three proposals and each was kept-eligible:
+- a narrower tub with more cells, gaining the lawn;
+- a sonar, gaining the hallway;
+- tracks, gaining the garden, the sandbox and the lawn.
+
+The loop kept only the tracks, and the sonar waited an iteration. Gains in different slots are not
+alternatives. After its trials, the loop now merges kept-eligible candidates:
+- It takes the best candidate, then adds each other candidate whose changed slots are disjoint from
+  those already taken.
+- If that joins at least two, it trials the union once, screened and costed like any proposal. The
+  union is kept if it scores higher.
+- The ratchet still decides: the merged body must keep every held group.
+
+`RunConfig.merge` (default on) turns it off, and the record shows `merge` rows. The mobile seed 0 run
+predates this change. Seeds started later carry it in `harness.json`.
+
+Tests: `tests/test_evolve.py` (`test_disjoint_gains_are_merged`).
