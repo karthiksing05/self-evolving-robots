@@ -131,6 +131,19 @@ three System 2 seeds, 30 random-arm seeds and the stock body:
 - **The gripper** under the same loop with the frontier, full swap trials and tuning
   (`gripper_s2v2_s0`, old physics) went from 6 to 19/21 in 4 iterations. The first loop
   (`gripper_s2_s0`) reached 13/21 in 10.
+- **On the corrected physics** (commit `61129fd`), all three System 2 seeds held 21/21 train groups.
+  They took 4, 2 and 11 iterations and 4, 2 and 11 calls, and reached 19, 20 and 21 of 21 on test.
+  The stock body held 13–15 on test. The random arm, given the same screen and trials, reached 17
+  train and 15 test.
+  - Every seed arrived at the same redesign, a slide with flat TPU pads.
+  - In seed 0, System 2 built from a tuned frontier body. It also read the tuning trials as a
+    sensitivity map ("potted meat held at reach ≤ 5 mm, lost at ≥ 8; the mustard bottle needed ≥ 8")
+    and chose 6.5 mm.
+  - None of the tuning trials was kept, but they were the cheapest experiments in the run.
+- **Generalization:** seed 0 fitted its fingertip reach to the train placements. It lost the potted
+  meat can and the tuna can at one test placement each: a force limit, and a jaw landing on top.
+  `gripper_dense` (four train placements per object, same test) measures whether denser training
+  closes that gap.
 
 ## Failure modes to watch
 
