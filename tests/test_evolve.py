@@ -337,3 +337,31 @@ def test_tuning_moves_one_or_two_parameters_at_a_time(tmp_path):
     tuned = [t for t in rec["trials"] if t["move"] == "tune"]
     vals = dict(kv.split("=") for kv in tuned[0]["edit"].split("(")[1].rstrip(")").split(", "))
     assert len(vals) == 6 and 1 <= sum(abs(float(v) - 0.5) > 1e-9 for v in vals.values()) <= 2  # vs the midpoints
+
+
+def test_plan_claude_waits_out_an_outage_without_spending_an_attempt():
+    """Three seeds of the D-061 campaign died when the network dropped: the CLI's "can't reach the API server"
+    was read as a malformed answer, retried once and fatal.  An outage is waited out instead."""
+    import json
+    from types import SimpleNamespace
+
+    from sea.evolve.llm import PlanClaude
+
+    def cli(*replies):
+        replies, calls = list(replies), []
+
+        def run(args, **kw):
+            calls.append(kw.get("input"))
+            body = {"loggedIn": True, "authMethod": "claude.ai"} if args[1:3] == ["auth", "status"] else replies.pop(0)
+            return SimpleNamespace(stdout=json.dumps(body), stderr="", returncode=0)
+        return run, calls
+
+    down = {"is_error": True, "result": "API Error: Can't reach the API server (ENOTFOUND)"}
+    batch = ProposalBatch(proposals=[_p("swap", [Edit(slot="hand", type="new")])]).model_dump(mode="json")
+    run, calls = cli(down, down, {"is_error": False, "structured_output": batch, "usage": {}})
+    slept: list[float] = []
+    assert len(PlanClaude(run=run, sleep=slept.append).propose("sys", "prompt").proposals) == 1
+    assert slept == [30.0, 60.0] and "not a valid ProposalBatch" not in calls[-1]  # the outage spent no attempt
+    run, _ = cli(*[down] * 9)
+    with pytest.raises(RuntimeError, match="unreachable"):
+        PlanClaude(run=run, sleep=lambda s: None, outage_s=100.0).propose("sys", "prompt")

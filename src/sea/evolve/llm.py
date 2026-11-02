@@ -31,6 +31,13 @@ from sea.propose.llm import (
     find_claude,
 )
 
+UNREACHABLE = ("can't reach the api server", "enotfound", "econnreset", "econnrefused", "etimedout", "overloaded")
+
+
+def unreachable(msg: str) -> bool:
+    """The CLI could not reach Claude: a network or service outage, not an answer."""
+    return any(k in msg.lower() for k in UNREACHABLE)
+
 
 class Proposer(Protocol):
     def propose(self, system: str, prompt: str, tag: str = "") -> ProposalBatch: ...
@@ -38,12 +45,14 @@ class Proposer(Protocol):
 
 class PlanClaude:
     def __init__(self, model: str = "claude-opus-5-5", effort: str = "high", log_dir: Path | None = None,
-                 timeout_s: float = 900.0, run: Callable[..., subprocess.CompletedProcess] = subprocess.run):
+                 timeout_s: float = 900.0, run: Callable[..., subprocess.CompletedProcess] = subprocess.run,
+                 outage_s: float = 1800.0, sleep: Callable[[float], None] = time.sleep):
         import os
 
         self.model, self.effort, self.timeout_s = model, effort, timeout_s
         self.log_dir = log_dir
         self._run = run
+        self.outage_s, self._sleep = outage_s, sleep  # how long to wait out an outage, and how
         self._env = {k: v for k, v in os.environ.items() if k not in SCRUBBED_ENV}
         self._cwd = tempfile.mkdtemp(prefix="sea-evolve-")
         self._checked = False
@@ -77,7 +86,8 @@ class PlanClaude:
         tokens_in = tokens_out = 0
         usd = 0.0
         result: dict[str, Any] = {}
-        for _ in range(2):
+        attempts, waited, wait = 0, 0.0, 30.0
+        while attempts < 2:
             out = self._exec(args, stdin=text)
             try:
                 result = json.loads(out.stdout)
@@ -87,6 +97,13 @@ class PlanClaude:
                 msg = str(result.get("result", ""))
                 if result.get("api_error_status") == 429 or "usage limit" in msg.lower():
                     raise PlanLimitReached(msg[:300])
+                if unreachable(msg):  # an outage is not an answer: wait it out, then ask again (2026-11-02)
+                    if waited >= self.outage_s:
+                        raise RuntimeError(f"Claude unreachable for {waited:.0f} s: {msg[:200]}")
+                    self._sleep(wait)
+                    waited, wait = waited + wait, min(2 * wait, 300.0)
+                    continue
+            attempts += 1
             usage = result.get("usage") or {}
             t_in = int(usage.get("input_tokens") or 0)
             c_w, c_r = int(usage.get("cache_creation_input_tokens") or 0), int(usage.get("cache_read_input_tokens") or 0)
