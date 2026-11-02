@@ -1,0 +1,4119 @@
+{
+ "run": "gripper_random_s0",
+ "summary": {
+  "world": "gripper",
+  "arm": "random",
+  "seed": 0,
+  "final_body": {
+   "id": "b05t1",
+   "parent": "b050",
+   "parts": {
+    "jaw": {
+     "type": "revolute",
+     "params": {}
+    },
+    "pads": {
+     "type": "pads",
+     "params": {
+      "reach_mm": 0.0,
+      "pad_angle_deg": 3.095,
+      "groove_mm": 0.0,
+      "lip_mm": 0.283,
+      "pad_tpu_mm": 1.337,
+      "width_mm": 9.796
+     }
+    },
+    "arm_servos": {
+     "type": "servos_7v4",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 14,
+    "tasks_passed": 30,
+    "sim_s": 803.3,
+    "wall_s": 15.8
+   },
+   {
+    "iteration": 1,
+    "body": "stock",
+    "held_groups": 14,
+    "tasks_passed": 30,
+    "sim_s": 5611.0,
+    "wall_s": 78.3
+   },
+   {
+    "iteration": 2,
+    "body": "stock",
+    "held_groups": 14,
+    "tasks_passed": 30,
+    "sim_s": 5611.0,
+    "wall_s": 78.4
+   },
+   {
+    "iteration": 3,
+    "body": "stock",
+    "held_groups": 14,
+    "tasks_passed": 30,
+    "sim_s": 6774.8,
+    "wall_s": 91.3
+   },
+   {
+    "iteration": 4,
+    "body": "stock",
+    "held_groups": 14,
+    "tasks_passed": 30,
+    "sim_s": 11714.3,
+    "wall_s": 178.6
+   },
+   {
+    "iteration": 5,
+    "body": "stock",
+    "held_groups": 14,
+    "tasks_passed": 30,
+    "sim_s": 15973.3,
+    "wall_s": 238.2
+   },
+   {
+    "iteration": 6,
+    "body": "b05t1",
+    "held_groups": 17,
+    "tasks_passed": 34,
+    "sim_s": 19835.8,
+    "wall_s": 310.7
+   },
+   {
+    "iteration": 7,
+    "body": "b05t1",
+    "held_groups": 17,
+    "tasks_passed": 34,
+    "sim_s": 21315.1,
+    "wall_s": 334.0
+   },
+   {
+    "iteration": 8,
+    "body": "b05t1",
+    "held_groups": 17,
+    "tasks_passed": 34,
+    "sim_s": 21971.1,
+    "wall_s": 357.2
+   },
+   {
+    "iteration": 9,
+    "body": "b05t1",
+    "held_groups": 17,
+    "tasks_passed": 34,
+    "sim_s": 23116.0,
+    "wall_s": 378.5
+   },
+   {
+    "iteration": 10,
+    "body": "b05t1",
+    "held_groups": 17,
+    "tasks_passed": 34,
+    "sim_s": 23698.6,
+    "wall_s": 384.6
+   },
+   {
+    "iteration": 11,
+    "body": "b05t1",
+    "held_groups": 17,
+    "tasks_passed": 34,
+    "sim_s": 25793.0,
+    "wall_s": 413.1
+   },
+   {
+    "iteration": 12,
+    "body": "b05t1",
+    "held_groups": 17,
+    "tasks_passed": 34,
+    "sim_s": 25793.0,
+    "wall_s": 413.2
+   },
+   {
+    "iteration": 13,
+    "body": "b05t1",
+    "held_groups": 17,
+    "tasks_passed": 34,
+    "sim_s": 26942.4,
+    "wall_s": 429.5
+   },
+   {
+    "iteration": 14,
+    "body": "b05t1",
+    "held_groups": 17,
+    "tasks_passed": 34,
+    "sim_s": 28963.2,
+    "wall_s": 458.8
+   }
+  ],
+  "train_groups": 21,
+  "final_held_train": [
+   "apple",
+   "banana",
+   "cup",
+   "dice",
+   "flat_screwdriver",
+   "foam_brick",
+   "gelatin_box",
+   "golf_ball",
+   "large_marker",
+   "lemon",
+   "plum",
+   "potted_meat_can",
+   "racquetball",
+   "strawberry",
+   "tennis_ball",
+   "tomato_soup_can",
+   "wood_block_cube"
+  ],
+  "test": {
+   "final_held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "foam_brick",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "potted_meat_can",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "stock_held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "foam_brick",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "potted_meat_can",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "final_tasks": 32,
+   "stock_tasks": 30,
+   "n": 42
+  },
+  "spent": {
+   "usd": 0.0,
+   "fab_minutes": 3.7,
+   "lead_days": 0.0,
+   "owned": {
+    "sts3215_7v4": 6.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 30642.5,
+  "attempts": 6775,
+  "proposals": {
+   "total": 56,
+   "tried": 36,
+   "refused": 20,
+   "ideas": 0,
+   "kept": 1,
+   "rejected_regression": 34,
+   "moves": {
+    "params": 15,
+    "swap": 27,
+    "idea": 0,
+    "tune": 14,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [
+   {
+    "id": "b001",
+    "body": "arm_servos: servos_7v4; jaw: parallelogram (link_mm=82.6341); pads: none",
+    "gained": [
+     "apple",
+     "strawberry"
+    ],
+    "lost": [
+     "flat_screwdriver"
+    ],
+    "why_lost": "lost flat_screwdriver (flat_screwdriver: slipped_under_load, verdict wrong_behavior; closed to 0.09 rad (fingertips 23 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 21 N on the stock j; flat_screwdriver: squeezed_down_out, verdict wrong_behavior; closed to 0.08 rad (fingertips 23 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 26 N on the stock j)",
+    "iteration": 0,
+    "edit": "jaw -> parallelogram (link_mm=82.6341)"
+   },
+   {
+    "id": "b00t0",
+    "body": "arm_servos: servos_7v4; jaw: parallelogram (link_mm=83.891); pads: none",
+    "gained": [
+     "apple",
+     "strawberry"
+    ],
+    "lost": [
+     "flat_screwdriver"
+    ],
+    "why_lost": "lost flat_screwdriver (flat_screwdriver: never_lifted, verdict wrong_behavior; closed to 0.04 rad (fingertips 19 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 40 N on the stock j)",
+    "iteration": 0,
+    "edit": "jaw (link_mm=83.891)"
+   },
+   {
+    "id": "b00t1",
+    "body": "arm_servos: servos_7v4; jaw: parallelogram (link_mm=82.835); pads: none",
+    "gained": [
+     "apple",
+     "strawberry"
+    ],
+    "lost": [
+     "flat_screwdriver"
+    ],
+    "why_lost": "lost flat_screwdriver (flat_screwdriver: squeezed_down_out, verdict wrong_behavior; closed to 0.08 rad (fingertips 23 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 25 N on the stock j)",
+    "iteration": 0,
+    "edit": "jaw (link_mm=82.835)"
+   },
+   {
+    "id": "b00t2",
+    "body": "arm_servos: servos_7v4; jaw: parallelogram (link_mm=87.99); pads: none",
+    "gained": [
+     "apple",
+     "strawberry"
+    ],
+    "lost": [
+     "flat_screwdriver"
+    ],
+    "why_lost": "lost flat_screwdriver (flat_screwdriver: slipped_under_load, verdict wrong_behavior; closed to 0.05 rad (fingertips 20 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 33 N on the stock j)",
+    "iteration": 0,
+    "edit": "jaw (link_mm=87.99)"
+   },
+   {
+    "id": "b00t3",
+    "body": "arm_servos: servos_7v4; jaw: parallelogram (link_mm=88.527); pads: none",
+    "gained": [
+     "apple",
+     "gelatin_box",
+     "strawberry"
+    ],
+    "lost": [
+     "flat_screwdriver"
+    ],
+    "why_lost": "lost flat_screwdriver (flat_screwdriver: slipped_under_load, verdict wrong_behavior; closed to 0.05 rad (fingertips 21 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 28 N on the stock j)",
+    "iteration": 0,
+    "edit": "jaw (link_mm=88.527)"
+   },
+   {
+    "id": "b03t2",
+    "body": "arm_servos: servos_7v4; jaw: prismatic (drive_mm_per_rad=48.57); pads: none",
+    "gained": [
+     "apple",
+     "gelatin_box",
+     "pudding_box",
+     "tuna_fish_can"
+    ],
+    "lost": [
+     "cup",
+     "flat_screwdriver",
+     "tomato_soup_can"
+    ],
+    "why_lost": "lost cup, flat_screwdriver, tomato_soup_can (tomato_soup_can: slipped_under_load, verdict rule_violation; closed to 1.01 rad (fingertips 65 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 36 N on the stock j; flat_screwdriver: slipped_under_load, verdict wrong_behavior; closed to 0.05 rad (fingertips 18 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 43 N on the stock j; flat_screwdriver: never_lifted, verdict wrong_behavior; closed to 0.08 rad (fingertips 19 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 49 N on the stock j; cup: never_lifted, verdict wrong_behavior; closed to 0.45 rad (fing)",
+    "iteration": 3,
+    "edit": "jaw (drive_mm_per_rad=48.57)"
+   },
+   {
+    "id": "b03t3",
+    "body": "arm_servos: servos_7v4; jaw: prismatic (drive_mm_per_rad=51.791); pads: none",
+    "gained": [
+     "apple",
+     "gelatin_box",
+     "pudding_box",
+     "tuna_fish_can"
+    ],
+    "lost": [
+     "flat_screwdriver",
+     "tomato_soup_can"
+    ],
+    "why_lost": "lost flat_screwdriver, tomato_soup_can (tomato_soup_can: slipped_under_load, verdict rule_violation; closed to 0.95 rad (fingertips 65 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 34 N on the stock j; flat_screwdriver: slipped_under_load, verdict wrong_behavior; closed to 0.06 rad (fingertips 19 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 38 N on the stock j; flat_screwdriver: slipped_under_load, verdict wrong_behavior; closed to 0.09 rad (fingertips 21 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 44 N on the stock j)",
+    "iteration": 3,
+    "edit": "jaw (drive_mm_per_rad=51.791)"
+   },
+   {
+    "id": "b050",
+    "body": "arm_servos: servos_7v4; jaw: revolute; pads: pads (groove_mm=1.19108, lip_mm=0.363012, pad_angle_deg=18.2048, pad_tpu_mm=1.741, reach_mm=1.56064, width_mm=12.7791)",
+    "gained": [
+     "apple",
+     "gelatin_box",
+     "strawberry"
+    ],
+    "lost": [
+     "racquetball"
+    ],
+    "why_lost": "lost racquetball (racquetball: fixed_jaw_missed, verdict stuck; closed to 1.00 rad (fingertips 82 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: no contact; moving jaw: no )",
+    "iteration": 5,
+    "edit": "pads -> pads (groove_mm=1.19108, lip_mm=0.363012, pad_angle_deg=18.2048, pad_tpu_mm=1.741, reach_mm=1.56064, width_mm=12.7791)"
+   },
+   {
+    "id": "b05t0",
+    "body": "arm_servos: servos_7v4; jaw: revolute; pads: pads (groove_mm=1.049, lip_mm=0, pad_angle_deg=21.599, pad_tpu_mm=0, reach_mm=3.14, width_mm=8)",
+    "gained": [
+     "apple",
+     "gelatin_box",
+     "strawberry"
+    ],
+    "lost": [
+     "dice",
+     "tomato_soup_can"
+    ],
+    "why_lost": "lost dice, tomato_soup_can (tomato_soup_can: squeezed_down_out, verdict rule_violation; closed to 0.70 rad (fingertips 66 mm apart), moving fingertip +10 mm vs the fixed one; fixed jaw: 23 N on the pad at; dice: slipped_under_load, verdict wrong_behavior; closed to -0.07 rad (fingertips 3 mm apart), moving fingertip +2 mm vs the fixed one; fixed jaw: 10 N on the pad and; dice: never_lifted, verdict wrong_behavior; closed to -0.14 rad (fingertips -3 mm apart), moving fingertip +4 mm vs the fixed one; fixed jaw: 9 N on the pad and)",
+    "iteration": 5,
+    "edit": "pads (groove_mm=1.049, lip_mm=0, pad_angle_deg=21.599, pad_tpu_mm=0, reach_mm=3.14, width_mm=8)"
+   }
+  ],
+  "wall_s": 484.9,
+  "llm": {
+   "calls": 14,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ "final_body": "arm_servos: servos_7v4; jaw: revolute; pads: pads (groove_mm=0, lip_mm=0.283, pad_angle_deg=3.095, pad_tpu_mm=1.337, reach_mm=0, width_mm=9.796)",
+ "final_bom": [
+  {
+   "item": "print:PLA",
+   "qty": 0.43,
+   "slot": "pads",
+   "note": ""
+  },
+  {
+   "item": "print:TPU",
+   "qty": 0.19,
+   "slot": "pads",
+   "note": ""
+  },
+  {
+   "item": "m2_screw",
+   "qty": 4.0,
+   "slot": "pads",
+   "note": ""
+  },
+  {
+   "item": "sts3215_7v4",
+   "qty": 6.0,
+   "slot": "arm_servos",
+   "note": ""
+  }
+ ],
+ "stock_bom": [
+  {
+   "item": "sts3215_7v4",
+   "qty": 6.0,
+   "slot": "arm_servos",
+   "note": ""
+  }
+ ],
+ "judge_key": "a4eda72d936f",
+ "iterations": [
+  {
+   "iteration": 0,
+   "body": "arm_servos: servos_7v4; jaw: revolute; pads: none",
+   "held": [
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "potted_meat_can",
+    "racquetball",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "moving_jaw_on_top_face": 8,
+    "squeezed_down_out": 4
+   },
+   "failing": {
+    "reg_gelatin_box": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict stuck; closed to 0.74 rad (fingertips 73 mm apart), moving fingertip +13 mm vs the fixed one; fixed jaw: 10 N on the stock jaw at -3 mm from the centre (top at +15), pushing 0 deg down; moving jaw: 23 N on the stock jaw at +13 mm from the centre (top at +15), pushing 47 deg down; rose 7 mm, ended +2 mm; 97 g"
+    },
+    "rva000_gelatin_box": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict stuck; closed to 0.68 rad (fingertips 69 mm apart), moving fingertip +10 mm vs the fixed one; fixed jaw: 20 N on the stock jaw at -1 mm from the centre (top at +15), pushing 5 deg down; moving jaw: 26 N on the stock jaw at +9 mm from the centre (top at +15), pushing 49 deg down; rose 3 mm, ended -2 mm; 97 g"
+    },
+    "reg_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.79 rad (fingertips 77 mm apart), moving fingertip +16 mm vs the fixed one; fixed jaw: 2 N on the stock jaw at +2 mm from the centre (top at +19), pushing 3 deg down; moving jaw: 20 N on the stock jaw at +16 mm from the centre (top at +19), pushing 84 deg down; rose 0 mm, ended -1 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.75 rad (fingertips 74 mm apart), moving fingertip +14 mm vs the fixed one; fixed jaw: no contact; moving jaw: 20 N on the stock jaw at +17 mm from the centre (top at +19), pushing 85 deg down; rose 0 mm, ended -1 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.77 rad (fingertips 75 mm apart), moving fingertip +15 mm vs the fixed one; fixed jaw: 2 N on the stock jaw at +7 mm from the centre (top at +23), pushing 2 deg down; moving jaw: 21 N on the stock jaw at +20 mm from the centre (top at +23), pushing 83 deg down; rose 1 mm, ended +1 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.64 rad (fingertips 66 mm apart), moving fingertip +9 mm vs the fixed one; fixed jaw: no contact; moving jaw: 22 N on the stock jaw at +21 mm from the centre (top at +23), pushing 87 deg down; rose 0 mm, ended -0 mm; 514 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.69 rad (fingertips 70 mm apart), moving fingertip +11 mm vs the fixed one; fixed jaw: 6 N on the stock jaw at +13 mm from the centre (top at +29), pushing 19 deg down; moving jaw: 23 N on the stock jaw at +22 mm from the centre (top at +29), pushing 73 deg down; rose 1 mm, ended +1 mm; 431 g"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.44 rad (fingertips 51 mm apart), moving fingertip +3 mm vs the fixed one; fixed jaw: no contact; moving jaw: 23 N on the stock jaw at +27 mm from the centre (top at +29), pushing 83 deg down; rose 2 mm, ended +2 mm; 431 g"
+    },
+    "reg_strawberry": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict wrong_behavior; closed to 0.22 rad (fingertips 34 mm apart), moving fingertip -0 mm vs the fixed one; fixed jaw: 21 N on the stock jaw at +0 mm from the centre (top at +21), pushing 7 deg down; moving jaw: 24 N on the stock jaw at +7 mm from the centre (top at +21), pushing 16 deg down; rose 40 mm, ended +1 mm; 18 g"
+    },
+    "reg_tuna_fish_can": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; an arm joint stalled (load_limit reflex); closed to 0.38 rad (fingertips 46 mm apart), moving fingertip +2 mm vs the fixed one; fixed jaw: no contact; moving jaw: 19 N on the stock jaw at +14 mm from the centre (top at +17), pushing 83 deg down; rose 0 mm, ended -0 mm; 171 g"
+    },
+    "rva000_tuna_fish_can": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; an arm joint stalled (load_limit reflex); closed to 0.38 rad (fingertips 47 mm apart), moving fingertip +2 mm vs the fixed one; fixed jaw: no contact; moving jaw: 21 N on the stock jaw at +14 mm from the centre (top at +17), pushing 83 deg down; rose 0 mm, ended +0 mm; 171 g"
+    },
+    "rva000_apple": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict wrong_behavior; closed to 0.72 rad (fingertips 72 mm apart), moving fingertip +12 mm vs the fixed one; fixed jaw: 21 N on the stock jaw at +3 mm from the centre (top at +36), pushing 7 deg down; moving jaw: 24 N on the stock jaw at +26 mm from the centre (top at +36), pushing 32 deg down; rose 37 mm, ended +29 mm; 68 g"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "pads -> pads (groove_mm=4.87962, lip_mm=3.65102, pad_angle_deg=0.743744, pad_tpu_mm=1.81991, reach_mm=1.22921, width_mm=19.6719)",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost cup, dice, foam_brick, golf_ball, lemon, plum, potted_meat_can, racquetball, tennis_ball, tomato_soup_can, wood_block_cube (potted_meat_can: fixed_jaw_on_top_face, verdict stuck; closed to 1.00 rad (fingertips 83 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: 3 N on the pad at +42 mm fr; foam_brick: fixed_jaw_on_top_face, verdict stuck; closed to 1.00 rad (fingertips 83 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: 3 N on the pad at +24 mm fr; foam_brick: fixed_jaw_on_top_face, verdict stuck; closed to 1.00 rad (fingertips 83 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: 4 N on the pad at +24 mm fr; wood_block_cube: fixed_jaw_missed, verdict stuck; closed to 1.00)",
+     "gained": [],
+     "lost": [
+      "cup",
+      "dice",
+      "foam_brick",
+      "golf_ball",
+      "lemon",
+      "plum",
+      "potted_meat_can",
+      "racquetball",
+      "tennis_ball",
+      "tomato_soup_can",
+      "wood_block_cube"
+     ],
+     "prediction": {
+      "predicted": [],
+      "hit": [],
+      "missed": [],
+      "unpredicted": [],
+      "precision": null,
+      "lost": [
+       "cup",
+       "dice",
+       "foam_brick",
+       "golf_ball",
+       "lemon",
+       "plum",
+       "potted_meat_can",
+       "racquetball",
+       "tennis_ball",
+       "tomato_soup_can",
+       "wood_block_cube"
+      ]
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 11.4,
+      "lines": [
+       "m2_screw x4: provided (on hand)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.2 g for pads: 6 machine minutes",
+       "print:TPU 0.7 g for pads: 6 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "fixed_jaw_on_top_face",
+      "moving_jaw_missed",
+      "moving_jaw_on_top_face"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "jaw -> parallelogram (link_mm=82.6341)",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost flat_screwdriver (flat_screwdriver: slipped_under_load, verdict wrong_behavior; closed to 0.09 rad (fingertips 23 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 21 N on the stock j; flat_screwdriver: squeezed_down_out, verdict wrong_behavior; closed to 0.08 rad (fingertips 23 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 26 N on the stock j); it would gain apple, strawberry; kept on the frontier as b001",
+     "gained": [
+      "apple",
+      "strawberry"
+     ],
+     "lost": [
+      "flat_screwdriver"
+     ],
+     "prediction": {
+      "predicted": [],
+      "hit": [],
+      "missed": [],
+      "unpredicted": [
+       "apple",
+       "strawberry"
+      ],
+      "precision": null,
+      "lost": [
+       "flat_screwdriver"
+      ]
+     },
+     "resources": {
+      "usd": 3.6,
+      "lead_days": 3.0,
+      "fab_minutes": 89.6,
+      "lines": [
+       "m3_screw x4: provided (on hand)",
+       "mr63_bearing x4: 0 provided, buy 4 at $0.9 ($3.60, 3 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 17.9 g for jaw: 90 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "moving_jaw_on_top_face",
+      "slipped_under_load",
+      "squeezed_down_out"
+     ]
+    },
+    {
+     "k": 2,
+     "move": "params",
+     "declared_move": "swap",
+     "edit": "pads -> none",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "refused before trial: the edit leaves the body unchanged",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "sts3215_7v4 x6: provided (reused)"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    },
+    {
+     "k": "t0",
+     "move": "tune",
+     "declared_move": "tune",
+     "edit": "jaw (link_mm=83.891)",
+     "base": "b001",
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the loop fits b001's new jaw before judging it (tuning trial 1 of 4)",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost flat_screwdriver (flat_screwdriver: never_lifted, verdict wrong_behavior; closed to 0.04 rad (fingertips 19 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 40 N on the stock j); it would gain apple, strawberry; kept on the frontier as b00t0",
+     "gained": [
+      "apple",
+      "strawberry"
+     ],
+     "lost": [
+      "flat_screwdriver"
+     ],
+     "prediction": null,
+     "resources": {
+      "usd": 3.6,
+      "lead_days": 3.0,
+      "fab_minutes": 90.3,
+      "lines": [
+       "m3_screw x4: provided (on hand)",
+       "mr63_bearing x4: 0 provided, buy 4 at $0.9 ($3.60, 3 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 18.1 g for jaw: 90 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "moving_jaw_on_top_face",
+      "never_lifted"
+     ]
+    },
+    {
+     "k": "t1",
+     "move": "tune",
+     "declared_move": "tune",
+     "edit": "jaw (link_mm=82.835)",
+     "base": "b001",
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the loop fits b001's new jaw before judging it (tuning trial 2 of 4)",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost flat_screwdriver (flat_screwdriver: squeezed_down_out, verdict wrong_behavior; closed to 0.08 rad (fingertips 23 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 25 N on the stock j); it would gain apple, strawberry; kept on the frontier as b00t1",
+     "gained": [
+      "apple",
+      "strawberry"
+     ],
+     "lost": [
+      "flat_screwdriver"
+     ],
+     "prediction": null,
+     "resources": {
+      "usd": 3.6,
+      "lead_days": 3.0,
+      "fab_minutes": 89.7,
+      "lines": [
+       "m3_screw x4: provided (on hand)",
+       "mr63_bearing x4: 0 provided, buy 4 at $0.9 ($3.60, 3 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 17.9 g for jaw: 90 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "moving_jaw_on_top_face",
+      "squeezed_down_out"
+     ]
+    },
+    {
+     "k": "t2",
+     "move": "tune",
+     "declared_move": "tune",
+     "edit": "jaw (link_mm=87.99)",
+     "base": "b001",
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the loop fits b001's new jaw before judging it (tuning trial 3 of 4)",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost flat_screwdriver (flat_screwdriver: slipped_under_load, verdict wrong_behavior; closed to 0.05 rad (fingertips 20 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 33 N on the stock j); it would gain apple, strawberry; kept on the frontier as b00t2",
+     "gained": [
+      "apple",
+      "strawberry"
+     ],
+     "lost": [
+      "flat_screwdriver"
+     ],
+     "prediction": null,
+     "resources": {
+      "usd": 3.6,
+      "lead_days": 3.0,
+      "fab_minutes": 92.8,
+      "lines": [
+       "m3_screw x4: provided (on hand)",
+       "mr63_bearing x4: 0 provided, buy 4 at $0.9 ($3.60, 3 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 18.6 g for jaw: 93 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "moving_jaw_on_top_face",
+      "slipped_under_load"
+     ]
+    },
+    {
+     "k": "t3",
+     "move": "tune",
+     "declared_move": "tune",
+     "edit": "jaw (link_mm=88.527)",
+     "base": "b001",
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the loop fits b001's new jaw before judging it (tuning trial 4 of 4)",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost flat_screwdriver (flat_screwdriver: slipped_under_load, verdict wrong_behavior; closed to 0.05 rad (fingertips 21 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 28 N on the stock j); it would gain apple, gelatin_box, strawberry; kept on the frontier as b00t3",
+     "gained": [
+      "apple",
+      "gelatin_box",
+      "strawberry"
+     ],
+     "lost": [
+      "flat_screwdriver"
+     ],
+     "prediction": null,
+     "resources": {
+      "usd": 3.6,
+      "lead_days": 3.0,
+      "fab_minutes": 93.1,
+      "lines": [
+       "m3_screw x4: provided (on hand)",
+       "mr63_bearing x4: 0 provided, buy 4 at $0.9 ($3.60, 3 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 18.6 g for jaw: 93 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "moving_jaw_on_top_face",
+      "slipped_under_load"
+     ]
+    }
+   ],
+   "accepted": null,
+   "notes": "",
+   "llm": {
+    "tag": "iter00",
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "usd_list_price": 0.0,
+    "billing": "none"
+   },
+   "seconds": 78.3,
+   "stop": null
+  },
+  {
+   "iteration": 1,
+   "body": "arm_servos: servos_7v4; jaw: revolute; pads: none",
+   "held": [
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "potted_meat_can",
+    "racquetball",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "moving_jaw_on_top_face": 8,
+    "squeezed_down_out": 4
+   },
+   "failing": {
+    "reg_gelatin_box": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict stuck; closed to 0.74 rad (fingertips 73 mm apart), moving fingertip +13 mm vs the fixed one; fixed jaw: 10 N on the stock jaw at -3 mm from the centre (top at +15), pushing 0 deg down; moving jaw: 23 N on the stock jaw at +13 mm from the centre (top at +15), pushing 47 deg down; rose 7 mm, ended +2 mm; 97 g"
+    },
+    "rva000_gelatin_box": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict stuck; closed to 0.68 rad (fingertips 69 mm apart), moving fingertip +10 mm vs the fixed one; fixed jaw: 20 N on the stock jaw at -1 mm from the centre (top at +15), pushing 5 deg down; moving jaw: 26 N on the stock jaw at +9 mm from the centre (top at +15), pushing 49 deg down; rose 3 mm, ended -2 mm; 97 g"
+    },
+    "reg_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.79 rad (fingertips 77 mm apart), moving fingertip +16 mm vs the fixed one; fixed jaw: 2 N on the stock jaw at +2 mm from the centre (top at +19), pushing 3 deg down; moving jaw: 20 N on the stock jaw at +16 mm from the centre (top at +19), pushing 84 deg down; rose 0 mm, ended -1 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.75 rad (fingertips 74 mm apart), moving fingertip +14 mm vs the fixed one; fixed jaw: no contact; moving jaw: 20 N on the stock jaw at +17 mm from the centre (top at +19), pushing 85 deg down; rose 0 mm, ended -1 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.77 rad (fingertips 75 mm apart), moving fingertip +15 mm vs the fixed one; fixed jaw: 2 N on the stock jaw at +7 mm from the centre (top at +23), pushing 2 deg down; moving jaw: 21 N on the stock jaw at +20 mm from the centre (top at +23), pushing 83 deg down; rose 1 mm, ended +1 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.64 rad (fingertips 66 mm apart), moving fingertip +9 mm vs the fixed one; fixed jaw: no contact; moving jaw: 22 N on the stock jaw at +21 mm from the centre (top at +23), pushing 87 deg down; rose 0 mm, ended -0 mm; 514 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.69 rad (fingertips 70 mm apart), moving fingertip +11 mm vs the fixed one; fixed jaw: 6 N on the stock jaw at +13 mm from the centre (top at +29), pushing 19 deg down; moving jaw: 23 N on the stock jaw at +22 mm from the centre (top at +29), pushing 73 deg down; rose 1 mm, ended +1 mm; 431 g"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.44 rad (fingertips 51 mm apart), moving fingertip +3 mm vs the fixed one; fixed jaw: no contact; moving jaw: 23 N on the stock jaw at +27 mm from the centre (top at +29), pushing 83 deg down; rose 2 mm, ended +2 mm; 431 g"
+    },
+    "reg_strawberry": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict wrong_behavior; closed to 0.22 rad (fingertips 34 mm apart), moving fingertip -0 mm vs the fixed one; fixed jaw: 21 N on the stock jaw at +0 mm from the centre (top at +21), pushing 7 deg down; moving jaw: 24 N on the stock jaw at +7 mm from the centre (top at +21), pushing 16 deg down; rose 40 mm, ended +1 mm; 18 g"
+    },
+    "reg_tuna_fish_can": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; an arm joint stalled (load_limit reflex); closed to 0.38 rad (fingertips 46 mm apart), moving fingertip +2 mm vs the fixed one; fixed jaw: no contact; moving jaw: 19 N on the stock jaw at +14 mm from the centre (top at +17), pushing 83 deg down; rose 0 mm, ended -0 mm; 171 g"
+    },
+    "rva000_tuna_fish_can": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; an arm joint stalled (load_limit reflex); closed to 0.38 rad (fingertips 47 mm apart), moving fingertip +2 mm vs the fixed one; fixed jaw: no contact; moving jaw: 21 N on the stock jaw at +14 mm from the centre (top at +17), pushing 83 deg down; rose 0 mm, ended +0 mm; 171 g"
+    },
+    "rva000_apple": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict wrong_behavior; closed to 0.72 rad (fingertips 72 mm apart), moving fingertip +12 mm vs the fixed one; fixed jaw: 21 N on the stock jaw at +3 mm from the centre (top at +36), pushing 7 deg down; moving jaw: 24 N on the stock jaw at +26 mm from the centre (top at +36), pushing 32 deg down; rose 37 mm, ended +29 mm; 68 g"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "params",
+     "declared_move": "swap",
+     "edit": "jaw -> revolute",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "refused before trial: the edit leaves the body unchanged",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "sts3215_7v4 x6: provided (reused)"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    },
+    {
+     "k": 1,
+     "move": "params",
+     "declared_move": "swap",
+     "edit": "pads -> none",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "refused before trial: the edit leaves the body unchanged",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "sts3215_7v4 x6: provided (reused)"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    },
+    {
+     "k": 2,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "arm_servos -> servos_12v",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "refused before trial: buying costs $68.00; the run has $40.00 left",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 68.0,
+      "lead_days": 5.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "psu_12v x1: 0 provided, buy 1 at $14 ($14.00, 3 days)",
+       "sts3215_12v x3: 0 provided, buy 3 at $18 ($54.00, 5 days)",
+       "sts3215_7v4 x3: provided (reused)"
+      ],
+      "errors": [
+       "buying costs $68.00; the run has $40.00 left"
+      ]
+     },
+     "still_failing": []
+    }
+   ],
+   "accepted": null,
+   "notes": "",
+   "llm": {
+    "tag": "iter01",
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "usd_list_price": 0.0,
+    "billing": "none"
+   },
+   "seconds": 0.0,
+   "stop": null
+  },
+  {
+   "iteration": 2,
+   "body": "arm_servos: servos_7v4; jaw: revolute; pads: none",
+   "held": [
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "potted_meat_can",
+    "racquetball",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "moving_jaw_on_top_face": 8,
+    "squeezed_down_out": 4
+   },
+   "failing": {
+    "reg_gelatin_box": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict stuck; closed to 0.74 rad (fingertips 73 mm apart), moving fingertip +13 mm vs the fixed one; fixed jaw: 10 N on the stock jaw at -3 mm from the centre (top at +15), pushing 0 deg down; moving jaw: 23 N on the stock jaw at +13 mm from the centre (top at +15), pushing 47 deg down; rose 7 mm, ended +2 mm; 97 g"
+    },
+    "rva000_gelatin_box": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict stuck; closed to 0.68 rad (fingertips 69 mm apart), moving fingertip +10 mm vs the fixed one; fixed jaw: 20 N on the stock jaw at -1 mm from the centre (top at +15), pushing 5 deg down; moving jaw: 26 N on the stock jaw at +9 mm from the centre (top at +15), pushing 49 deg down; rose 3 mm, ended -2 mm; 97 g"
+    },
+    "reg_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.79 rad (fingertips 77 mm apart), moving fingertip +16 mm vs the fixed one; fixed jaw: 2 N on the stock jaw at +2 mm from the centre (top at +19), pushing 3 deg down; moving jaw: 20 N on the stock jaw at +16 mm from the centre (top at +19), pushing 84 deg down; rose 0 mm, ended -1 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.75 rad (fingertips 74 mm apart), moving fingertip +14 mm vs the fixed one; fixed jaw: no contact; moving jaw: 20 N on the stock jaw at +17 mm from the centre (top at +19), pushing 85 deg down; rose 0 mm, ended -1 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.77 rad (fingertips 75 mm apart), moving fingertip +15 mm vs the fixed one; fixed jaw: 2 N on the stock jaw at +7 mm from the centre (top at +23), pushing 2 deg down; moving jaw: 21 N on the stock jaw at +20 mm from the centre (top at +23), pushing 83 deg down; rose 1 mm, ended +1 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.64 rad (fingertips 66 mm apart), moving fingertip +9 mm vs the fixed one; fixed jaw: no contact; moving jaw: 22 N on the stock jaw at +21 mm from the centre (top at +23), pushing 87 deg down; rose 0 mm, ended -0 mm; 514 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.69 rad (fingertips 70 mm apart), moving fingertip +11 mm vs the fixed one; fixed jaw: 6 N on the stock jaw at +13 mm from the centre (top at +29), pushing 19 deg down; moving jaw: 23 N on the stock jaw at +22 mm from the centre (top at +29), pushing 73 deg down; rose 1 mm, ended +1 mm; 431 g"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.44 rad (fingertips 51 mm apart), moving fingertip +3 mm vs the fixed one; fixed jaw: no contact; moving jaw: 23 N on the stock jaw at +27 mm from the centre (top at +29), pushing 83 deg down; rose 2 mm, ended +2 mm; 431 g"
+    },
+    "reg_strawberry": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict wrong_behavior; closed to 0.22 rad (fingertips 34 mm apart), moving fingertip -0 mm vs the fixed one; fixed jaw: 21 N on the stock jaw at +0 mm from the centre (top at +21), pushing 7 deg down; moving jaw: 24 N on the stock jaw at +7 mm from the centre (top at +21), pushing 16 deg down; rose 40 mm, ended +1 mm; 18 g"
+    },
+    "reg_tuna_fish_can": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; an arm joint stalled (load_limit reflex); closed to 0.38 rad (fingertips 46 mm apart), moving fingertip +2 mm vs the fixed one; fixed jaw: no contact; moving jaw: 19 N on the stock jaw at +14 mm from the centre (top at +17), pushing 83 deg down; rose 0 mm, ended -0 mm; 171 g"
+    },
+    "rva000_tuna_fish_can": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; an arm joint stalled (load_limit reflex); closed to 0.38 rad (fingertips 47 mm apart), moving fingertip +2 mm vs the fixed one; fixed jaw: no contact; moving jaw: 21 N on the stock jaw at +14 mm from the centre (top at +17), pushing 83 deg down; rose 0 mm, ended +0 mm; 171 g"
+    },
+    "rva000_apple": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict wrong_behavior; closed to 0.72 rad (fingertips 72 mm apart), moving fingertip +12 mm vs the fixed one; fixed jaw: 21 N on the stock jaw at +3 mm from the centre (top at +36), pushing 7 deg down; moving jaw: 24 N on the stock jaw at +26 mm from the centre (top at +36), pushing 32 deg down; rose 37 mm, ended +29 mm; 68 g"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "jaw -> parallelogram (link_mm=54.9713)",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost flat_screwdriver, lemon, plum, tennis_ball, tomato_soup_can (tomato_soup_can: squeezed_down_out, verdict wrong_behavior; closed to 0.89 rad (fingertips 58 mm apart), moving fingertip +21 mm vs the fixed one; fixed jaw: 31 N on the stock ; tennis_ball: squeezed_down_out, verdict wrong_behavior; closed to 0.78 rad (fingertips 54 mm apart), moving fingertip +16 mm vs the fixed one; fixed jaw: 28 N on the stock ; tennis_ball: squeezed_down_out, verdict wrong_behavior; closed to 0.78 rad (fingertips 54 mm apart), moving fingertip +16 mm vs the fixed one; fixed jaw: 30 N on the stock ; lemon: slipped_under_load, verdict wrong_behavior; closed to 0.55 rad (fin)",
+     "gained": [],
+     "lost": [
+      "flat_screwdriver",
+      "lemon",
+      "plum",
+      "tennis_ball",
+      "tomato_soup_can"
+     ],
+     "prediction": {
+      "predicted": [],
+      "hit": [],
+      "missed": [],
+      "unpredicted": [],
+      "precision": null,
+      "lost": [
+       "flat_screwdriver",
+       "lemon",
+       "plum",
+       "tennis_ball",
+       "tomato_soup_can"
+      ]
+     },
+     "resources": {
+      "usd": 3.6,
+      "lead_days": 3.0,
+      "fab_minutes": 73.0,
+      "lines": [
+       "m3_screw x4: provided (on hand)",
+       "mr63_bearing x4: 0 provided, buy 4 at $0.9 ($3.60, 3 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 14.6 g for jaw: 73 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "moving_jaw_on_top_face",
+      "slipped_under_load",
+      "squeezed_down_out"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "arm_servos -> servos_12v",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "refused before trial: buying costs $68.00; the run has $40.00 left",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 68.0,
+      "lead_days": 5.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "psu_12v x1: 0 provided, buy 1 at $14 ($14.00, 3 days)",
+       "sts3215_12v x3: 0 provided, buy 3 at $18 ($54.00, 5 days)",
+       "sts3215_7v4 x3: provided (reused)"
+      ],
+      "errors": [
+       "buying costs $68.00; the run has $40.00 left"
+      ]
+     },
+     "still_failing": []
+    },
+    {
+     "k": 2,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "arm_servos -> servos_12v",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "refused before trial: buying costs $68.00; the run has $40.00 left",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 68.0,
+      "lead_days": 5.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "psu_12v x1: 0 provided, buy 1 at $14 ($14.00, 3 days)",
+       "sts3215_12v x3: 0 provided, buy 3 at $18 ($54.00, 5 days)",
+       "sts3215_7v4 x3: provided (reused)"
+      ],
+      "errors": [
+       "buying costs $68.00; the run has $40.00 left"
+      ]
+     },
+     "still_failing": []
+    }
+   ],
+   "accepted": null,
+   "notes": "",
+   "llm": {
+    "tag": "iter02",
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "usd_list_price": 0.0,
+    "billing": "none"
+   },
+   "seconds": 13.0,
+   "stop": null
+  },
+  {
+   "iteration": 3,
+   "body": "arm_servos: servos_7v4; jaw: revolute; pads: none",
+   "held": [
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "potted_meat_can",
+    "racquetball",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "moving_jaw_on_top_face": 8,
+    "squeezed_down_out": 4
+   },
+   "failing": {
+    "reg_gelatin_box": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict stuck; closed to 0.74 rad (fingertips 73 mm apart), moving fingertip +13 mm vs the fixed one; fixed jaw: 10 N on the stock jaw at -3 mm from the centre (top at +15), pushing 0 deg down; moving jaw: 23 N on the stock jaw at +13 mm from the centre (top at +15), pushing 47 deg down; rose 7 mm, ended +2 mm; 97 g"
+    },
+    "rva000_gelatin_box": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict stuck; closed to 0.68 rad (fingertips 69 mm apart), moving fingertip +10 mm vs the fixed one; fixed jaw: 20 N on the stock jaw at -1 mm from the centre (top at +15), pushing 5 deg down; moving jaw: 26 N on the stock jaw at +9 mm from the centre (top at +15), pushing 49 deg down; rose 3 mm, ended -2 mm; 97 g"
+    },
+    "reg_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.79 rad (fingertips 77 mm apart), moving fingertip +16 mm vs the fixed one; fixed jaw: 2 N on the stock jaw at +2 mm from the centre (top at +19), pushing 3 deg down; moving jaw: 20 N on the stock jaw at +16 mm from the centre (top at +19), pushing 84 deg down; rose 0 mm, ended -1 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.75 rad (fingertips 74 mm apart), moving fingertip +14 mm vs the fixed one; fixed jaw: no contact; moving jaw: 20 N on the stock jaw at +17 mm from the centre (top at +19), pushing 85 deg down; rose 0 mm, ended -1 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.77 rad (fingertips 75 mm apart), moving fingertip +15 mm vs the fixed one; fixed jaw: 2 N on the stock jaw at +7 mm from the centre (top at +23), pushing 2 deg down; moving jaw: 21 N on the stock jaw at +20 mm from the centre (top at +23), pushing 83 deg down; rose 1 mm, ended +1 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.64 rad (fingertips 66 mm apart), moving fingertip +9 mm vs the fixed one; fixed jaw: no contact; moving jaw: 22 N on the stock jaw at +21 mm from the centre (top at +23), pushing 87 deg down; rose 0 mm, ended -0 mm; 514 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.69 rad (fingertips 70 mm apart), moving fingertip +11 mm vs the fixed one; fixed jaw: 6 N on the stock jaw at +13 mm from the centre (top at +29), pushing 19 deg down; moving jaw: 23 N on the stock jaw at +22 mm from the centre (top at +29), pushing 73 deg down; rose 1 mm, ended +1 mm; 431 g"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.44 rad (fingertips 51 mm apart), moving fingertip +3 mm vs the fixed one; fixed jaw: no contact; moving jaw: 23 N on the stock jaw at +27 mm from the centre (top at +29), pushing 83 deg down; rose 2 mm, ended +2 mm; 431 g"
+    },
+    "reg_strawberry": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict wrong_behavior; closed to 0.22 rad (fingertips 34 mm apart), moving fingertip -0 mm vs the fixed one; fixed jaw: 21 N on the stock jaw at +0 mm from the centre (top at +21), pushing 7 deg down; moving jaw: 24 N on the stock jaw at +7 mm from the centre (top at +21), pushing 16 deg down; rose 40 mm, ended +1 mm; 18 g"
+    },
+    "reg_tuna_fish_can": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; an arm joint stalled (load_limit reflex); closed to 0.38 rad (fingertips 46 mm apart), moving fingertip +2 mm vs the fixed one; fixed jaw: no contact; moving jaw: 19 N on the stock jaw at +14 mm from the centre (top at +17), pushing 83 deg down; rose 0 mm, ended -0 mm; 171 g"
+    },
+    "rva000_tuna_fish_can": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; an arm joint stalled (load_limit reflex); closed to 0.38 rad (fingertips 47 mm apart), moving fingertip +2 mm vs the fixed one; fixed jaw: no contact; moving jaw: 21 N on the stock jaw at +14 mm from the centre (top at +17), pushing 83 deg down; rose 0 mm, ended +0 mm; 171 g"
+    },
+    "rva000_apple": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict wrong_behavior; closed to 0.72 rad (fingertips 72 mm apart), moving fingertip +12 mm vs the fixed one; fixed jaw: 21 N on the stock jaw at +3 mm from the centre (top at +36), pushing 7 deg down; moving jaw: 24 N on the stock jaw at +26 mm from the centre (top at +36), pushing 32 deg down; rose 37 mm, ended +29 mm; 68 g"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "jaw -> prismatic (drive_mm_per_rad=47.4217)",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost cup, flat_screwdriver, potted_meat_can, tomato_soup_can (potted_meat_can: squeezed_up_out, verdict rule_violation; closed to 0.74 rad (fingertips 51 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 38 N on the stock j; tomato_soup_can: slipped_under_load, verdict rule_violation; closed to 1.04 rad (fingertips 65 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 37 N on the stock j; tomato_soup_can: slipped_under_load, verdict rule_violation; closed to 1.04 rad (fingertips 65 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 37 N on the stock j; flat_screwdriver: slipped_under_load, verdict wrong_behavior; clos); it would gain apple, gelatin_box, pudding_box, tuna_fish_can",
+     "gained": [
+      "apple",
+      "gelatin_box",
+      "pudding_box",
+      "tuna_fish_can"
+     ],
+     "lost": [
+      "cup",
+      "flat_screwdriver",
+      "potted_meat_can",
+      "tomato_soup_can"
+     ],
+     "prediction": {
+      "predicted": [],
+      "hit": [],
+      "missed": [],
+      "unpredicted": [
+       "apple",
+       "gelatin_box",
+       "pudding_box",
+       "tuna_fish_can"
+      ],
+      "precision": null,
+      "lost": [
+       "cup",
+       "flat_screwdriver",
+       "potted_meat_can",
+       "tomato_soup_can"
+      ]
+     },
+     "resources": {
+      "usd": 5.4,
+      "lead_days": 3.0,
+      "fab_minutes": 173.0,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x100 x2: 0 provided, buy 2 at $1.5 ($3.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 34.6 g for jaw: 173 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "never_lifted",
+      "slipped_under_load",
+      "squeezed_down_out",
+      "squeezed_up_out"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "pads -> pads (groove_mm=4.32893, lip_mm=2.10142, pad_angle_deg=6.07934, pad_tpu_mm=0.930726, reach_mm=11.6676, width_mm=15.7734)",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost foam_brick, potted_meat_can, racquetball (potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.74 s (squeezing or pressing down); potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.90 s (squeezing or pressing down); foam_brick: fixed_jaw_on_top_face, verdict stuck; closed to 1.00 rad (fingertips 91 mm apart), moving fingertip +29 mm vs the fixed one; fixed jaw: 3 N on the pad at +24 mm fr; racquetball: fixed_jaw_missed, verdict stuck; closed to 1.00 rad (fingertips 91 mm apart), moving fingertip +29 mm vs the fixed one; fixed jaw: no contact; moving jaw: no ; racque); it would gain gelatin_box, strawberry",
+     "gained": [
+      "gelatin_box",
+      "strawberry"
+     ],
+     "lost": [
+      "foam_brick",
+      "potted_meat_can",
+      "racquetball"
+     ],
+     "prediction": {
+      "predicted": [],
+      "hit": [],
+      "missed": [],
+      "unpredicted": [
+       "gelatin_box",
+       "strawberry"
+      ],
+      "precision": null,
+      "lost": [
+       "foam_brick",
+       "potted_meat_can",
+       "racquetball"
+      ]
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 11.8,
+      "lines": [
+       "m2_screw x4: provided (on hand)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.6 g for pads: 8 machine minutes",
+       "print:TPU 0.5 g for pads: 4 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "fixed_jaw_on_top_face",
+      "force_limit",
+      "moving_jaw_missed",
+      "moving_jaw_on_top_face"
+     ]
+    },
+    {
+     "k": 2,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "pads -> pads (groove_mm=1.93122, lip_mm=2.3772, pad_angle_deg=25.7188, pad_tpu_mm=1.01373, reach_mm=10.7339, width_mm=14.2659)",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost dice, foam_brick, potted_meat_can, racquetball, wood_block_cube (potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.76 s (squeezing or pressing down); potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.92 s (squeezing or pressing down); foam_brick: fixed_jaw_on_top_face, verdict stuck; closed to 1.00 rad (fingertips 89 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: 3 N on the pad at +24 mm fr; wood_block_cube: fixed_jaw_missed, verdict stuck; closed to 1.00 rad (fingertips 89 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: no contact; moving jaw: no ; ra); it would gain gelatin_box, strawberry",
+     "gained": [
+      "gelatin_box",
+      "strawberry"
+     ],
+     "lost": [
+      "dice",
+      "foam_brick",
+      "potted_meat_can",
+      "racquetball",
+      "wood_block_cube"
+     ],
+     "prediction": {
+      "predicted": [],
+      "hit": [],
+      "missed": [],
+      "unpredicted": [
+       "gelatin_box",
+       "strawberry"
+      ],
+      "precision": null,
+      "lost": [
+       "dice",
+       "foam_brick",
+       "potted_meat_can",
+       "racquetball",
+       "wood_block_cube"
+      ]
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 10.6,
+      "lines": [
+       "m2_screw x4: provided (on hand)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.4 g for pads: 7 machine minutes",
+       "print:TPU 0.5 g for pads: 4 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "fixed_jaw_on_top_face",
+      "force_limit",
+      "moving_jaw_missed",
+      "moving_jaw_on_top_face"
+     ]
+    },
+    {
+     "k": "t0",
+     "move": "tune",
+     "declared_move": "tune",
+     "edit": "jaw (drive_mm_per_rad=44.619)",
+     "base": "b030",
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the loop fits b030's new jaw before judging it (tuning trial 1 of 4)",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost cup, flat_screwdriver, potted_meat_can, tennis_ball, tomato_soup_can (potted_meat_can: squeezed_up_out, verdict rule_violation; closed to 0.79 rad (fingertips 51 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 39 N on the stock j; tomato_soup_can: slipped_under_load, verdict rule_violation; closed to 1.10 rad (fingertips 65 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 38 N on the stock j; tomato_soup_can: slipped_under_load, verdict rule_violation; closed to 1.10 rad (fingertips 65 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 39 N on the stock j; tennis_ball: slipped_under_load, verdict rule_violation; closed to); it would gain apple, gelatin_box, pudding_box, sugar_box, tuna_fish_can",
+     "gained": [
+      "apple",
+      "gelatin_box",
+      "pudding_box",
+      "sugar_box",
+      "tuna_fish_can"
+     ],
+     "lost": [
+      "cup",
+      "flat_screwdriver",
+      "potted_meat_can",
+      "tennis_ball",
+      "tomato_soup_can"
+     ],
+     "prediction": null,
+     "resources": {
+      "usd": 5.4,
+      "lead_days": 3.0,
+      "fab_minutes": 168.1,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x100 x2: 0 provided, buy 2 at $1.5 ($3.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 33.6 g for jaw: 168 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "slipped_under_load",
+      "squeezed_down_out",
+      "squeezed_up_out"
+     ]
+    },
+    {
+     "k": "t1",
+     "move": "tune",
+     "declared_move": "tune",
+     "edit": "jaw (drive_mm_per_rad=48.75)",
+     "base": "b030",
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the loop fits b030's new jaw before judging it (tuning trial 2 of 4)",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost cup, flat_screwdriver, potted_meat_can, tennis_ball, tomato_soup_can (potted_meat_can: squeezed_up_out, verdict rule_violation; closed to 0.72 rad (fingertips 51 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 38 N on the stock j; tomato_soup_can: slipped_under_load, verdict rule_violation; closed to 1.01 rad (fingertips 65 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 37 N on the stock j; tomato_soup_can: slipped_under_load, verdict rule_violation; closed to 1.01 rad (fingertips 65 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 36 N on the stock j; tennis_ball: slipped_under_load, verdict rule_violation; closed to); it would gain apple, gelatin_box, pudding_box, tuna_fish_can",
+     "gained": [
+      "apple",
+      "gelatin_box",
+      "pudding_box",
+      "tuna_fish_can"
+     ],
+     "lost": [
+      "cup",
+      "flat_screwdriver",
+      "potted_meat_can",
+      "tennis_ball",
+      "tomato_soup_can"
+     ],
+     "prediction": null,
+     "resources": {
+      "usd": 5.4,
+      "lead_days": 3.0,
+      "fab_minutes": 175.3,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x100 x2: 0 provided, buy 2 at $1.5 ($3.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 35.1 g for jaw: 175 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "arm_stall",
+      "never_lifted",
+      "slipped_under_load",
+      "squeezed_down_out",
+      "squeezed_up_out"
+     ]
+    },
+    {
+     "k": "t2",
+     "move": "tune",
+     "declared_move": "tune",
+     "edit": "jaw (drive_mm_per_rad=48.57)",
+     "base": "b030",
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the loop fits b030's new jaw before judging it (tuning trial 3 of 4)",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost cup, flat_screwdriver, tomato_soup_can (tomato_soup_can: slipped_under_load, verdict rule_violation; closed to 1.01 rad (fingertips 65 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 36 N on the stock j; flat_screwdriver: slipped_under_load, verdict wrong_behavior; closed to 0.05 rad (fingertips 18 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 43 N on the stock j; flat_screwdriver: never_lifted, verdict wrong_behavior; closed to 0.08 rad (fingertips 19 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 49 N on the stock j; cup: never_lifted, verdict wrong_behavior; closed to 0.45 rad (fing); it would gain apple, gelatin_box, pudding_box, tuna_fish_can; kept on the frontier as b03t2",
+     "gained": [
+      "apple",
+      "gelatin_box",
+      "pudding_box",
+      "tuna_fish_can"
+     ],
+     "lost": [
+      "cup",
+      "flat_screwdriver",
+      "tomato_soup_can"
+     ],
+     "prediction": null,
+     "resources": {
+      "usd": 5.4,
+      "lead_days": 3.0,
+      "fab_minutes": 175.0,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x100 x2: 0 provided, buy 2 at $1.5 ($3.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 35.0 g for jaw: 175 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "never_lifted",
+      "slipped_under_load",
+      "squeezed_down_out",
+      "squeezed_up_out"
+     ]
+    },
+    {
+     "k": "t3",
+     "move": "tune",
+     "declared_move": "tune",
+     "edit": "jaw (drive_mm_per_rad=51.791)",
+     "base": "b030",
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the loop fits b030's new jaw before judging it (tuning trial 4 of 4)",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost flat_screwdriver, tomato_soup_can (tomato_soup_can: slipped_under_load, verdict rule_violation; closed to 0.95 rad (fingertips 65 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 34 N on the stock j; flat_screwdriver: slipped_under_load, verdict wrong_behavior; closed to 0.06 rad (fingertips 19 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 38 N on the stock j; flat_screwdriver: slipped_under_load, verdict wrong_behavior; closed to 0.09 rad (fingertips 21 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 44 N on the stock j); it would gain apple, gelatin_box, pudding_box, tuna_fish_can; kept on the frontier as b03t3",
+     "gained": [
+      "apple",
+      "gelatin_box",
+      "pudding_box",
+      "tuna_fish_can"
+     ],
+     "lost": [
+      "flat_screwdriver",
+      "tomato_soup_can"
+     ],
+     "prediction": null,
+     "resources": {
+      "usd": 5.4,
+      "lead_days": 3.0,
+      "fab_minutes": 180.6,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x100 x2: 0 provided, buy 2 at $1.5 ($3.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 36.1 g for jaw: 181 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "arm_stall",
+      "slipped_under_load",
+      "squeezed_down_out"
+     ]
+    }
+   ],
+   "accepted": null,
+   "notes": "",
+   "llm": {
+    "tag": "iter03",
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "usd_list_price": 0.0,
+    "billing": "none"
+   },
+   "seconds": 87.2,
+   "stop": null
+  },
+  {
+   "iteration": 4,
+   "body": "arm_servos: servos_7v4; jaw: revolute; pads: none",
+   "held": [
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "potted_meat_can",
+    "racquetball",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "moving_jaw_on_top_face": 8,
+    "squeezed_down_out": 4
+   },
+   "failing": {
+    "reg_gelatin_box": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict stuck; closed to 0.74 rad (fingertips 73 mm apart), moving fingertip +13 mm vs the fixed one; fixed jaw: 10 N on the stock jaw at -3 mm from the centre (top at +15), pushing 0 deg down; moving jaw: 23 N on the stock jaw at +13 mm from the centre (top at +15), pushing 47 deg down; rose 7 mm, ended +2 mm; 97 g"
+    },
+    "rva000_gelatin_box": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict stuck; closed to 0.68 rad (fingertips 69 mm apart), moving fingertip +10 mm vs the fixed one; fixed jaw: 20 N on the stock jaw at -1 mm from the centre (top at +15), pushing 5 deg down; moving jaw: 26 N on the stock jaw at +9 mm from the centre (top at +15), pushing 49 deg down; rose 3 mm, ended -2 mm; 97 g"
+    },
+    "reg_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.79 rad (fingertips 77 mm apart), moving fingertip +16 mm vs the fixed one; fixed jaw: 2 N on the stock jaw at +2 mm from the centre (top at +19), pushing 3 deg down; moving jaw: 20 N on the stock jaw at +16 mm from the centre (top at +19), pushing 84 deg down; rose 0 mm, ended -1 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.75 rad (fingertips 74 mm apart), moving fingertip +14 mm vs the fixed one; fixed jaw: no contact; moving jaw: 20 N on the stock jaw at +17 mm from the centre (top at +19), pushing 85 deg down; rose 0 mm, ended -1 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.77 rad (fingertips 75 mm apart), moving fingertip +15 mm vs the fixed one; fixed jaw: 2 N on the stock jaw at +7 mm from the centre (top at +23), pushing 2 deg down; moving jaw: 21 N on the stock jaw at +20 mm from the centre (top at +23), pushing 83 deg down; rose 1 mm, ended +1 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.64 rad (fingertips 66 mm apart), moving fingertip +9 mm vs the fixed one; fixed jaw: no contact; moving jaw: 22 N on the stock jaw at +21 mm from the centre (top at +23), pushing 87 deg down; rose 0 mm, ended -0 mm; 514 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.69 rad (fingertips 70 mm apart), moving fingertip +11 mm vs the fixed one; fixed jaw: 6 N on the stock jaw at +13 mm from the centre (top at +29), pushing 19 deg down; moving jaw: 23 N on the stock jaw at +22 mm from the centre (top at +29), pushing 73 deg down; rose 1 mm, ended +1 mm; 431 g"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.44 rad (fingertips 51 mm apart), moving fingertip +3 mm vs the fixed one; fixed jaw: no contact; moving jaw: 23 N on the stock jaw at +27 mm from the centre (top at +29), pushing 83 deg down; rose 2 mm, ended +2 mm; 431 g"
+    },
+    "reg_strawberry": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict wrong_behavior; closed to 0.22 rad (fingertips 34 mm apart), moving fingertip -0 mm vs the fixed one; fixed jaw: 21 N on the stock jaw at +0 mm from the centre (top at +21), pushing 7 deg down; moving jaw: 24 N on the stock jaw at +7 mm from the centre (top at +21), pushing 16 deg down; rose 40 mm, ended +1 mm; 18 g"
+    },
+    "reg_tuna_fish_can": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; an arm joint stalled (load_limit reflex); closed to 0.38 rad (fingertips 46 mm apart), moving fingertip +2 mm vs the fixed one; fixed jaw: no contact; moving jaw: 19 N on the stock jaw at +14 mm from the centre (top at +17), pushing 83 deg down; rose 0 mm, ended -0 mm; 171 g"
+    },
+    "rva000_tuna_fish_can": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; an arm joint stalled (load_limit reflex); closed to 0.38 rad (fingertips 47 mm apart), moving fingertip +2 mm vs the fixed one; fixed jaw: no contact; moving jaw: 21 N on the stock jaw at +14 mm from the centre (top at +17), pushing 83 deg down; rose 0 mm, ended +0 mm; 171 g"
+    },
+    "rva000_apple": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict wrong_behavior; closed to 0.72 rad (fingertips 72 mm apart), moving fingertip +12 mm vs the fixed one; fixed jaw: 21 N on the stock jaw at +3 mm from the centre (top at +36), pushing 7 deg down; moving jaw: 24 N on the stock jaw at +26 mm from the centre (top at +36), pushing 32 deg down; rose 37 mm, ended +29 mm; 68 g"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "arm_servos -> servos_12v",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "refused before trial: buying costs $68.00; the run has $40.00 left",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 68.0,
+      "lead_days": 5.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "psu_12v x1: 0 provided, buy 1 at $14 ($14.00, 3 days)",
+       "sts3215_12v x3: 0 provided, buy 3 at $18 ($54.00, 5 days)",
+       "sts3215_7v4 x3: provided (reused)"
+      ],
+      "errors": [
+       "buying costs $68.00; the run has $40.00 left"
+      ]
+     },
+     "still_failing": []
+    },
+    {
+     "k": 1,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "pads -> pads (groove_mm=1.43622, lip_mm=3.50594, pad_angle_deg=35.4194, pad_tpu_mm=0.175704, reach_mm=24.9793, width_mm=13.3779)",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost banana, cup, dice, flat_screwdriver, foam_brick, lemon, potted_meat_can, racquetball, tennis_ball, tomato_soup_can, wood_block_cube (potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.40 s (squeezing or pressing down); potted_meat_can: knocked_on_descent, verdict wrong_behavior; the descending jaws pushed the object 64 mm before closing; closed to 1.00 rad (fingertips 95 mm apart), moving fing; foam_brick: force_limit, verdict stuck; a contact exceeded the force limit at t=0.94 s (squeezing or pressing down); foam_brick: force_limit, verdict stuck; a contact exceeded the force limit at t=1.32 s (squeezing or pressing down); wood_block_cube: fixed_jaw_on_top_face, verdict stuck; closed to ); it would gain gelatin_box",
+     "gained": [
+      "gelatin_box"
+     ],
+     "lost": [
+      "banana",
+      "cup",
+      "dice",
+      "flat_screwdriver",
+      "foam_brick",
+      "lemon",
+      "potted_meat_can",
+      "racquetball",
+      "tennis_ball",
+      "tomato_soup_can",
+      "wood_block_cube"
+     ],
+     "prediction": {
+      "predicted": [],
+      "hit": [],
+      "missed": [],
+      "unpredicted": [
+       "gelatin_box"
+      ],
+      "precision": null,
+      "lost": [
+       "banana",
+       "cup",
+       "dice",
+       "flat_screwdriver",
+       "foam_brick",
+       "lemon",
+       "potted_meat_can",
+       "racquetball",
+       "tennis_ball",
+       "tomato_soup_can",
+       "wood_block_cube"
+      ]
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 12.0,
+      "lines": [
+       "m2_screw x4: provided (on hand)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 2.2 g for pads: 11 machine minutes",
+       "print:TPU 0.1 g for pads: 1 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_on_top_face",
+      "force_limit",
+      "knocked_on_descent",
+      "moving_jaw_missed",
+      "never_lifted",
+      "squeezed_up_out"
+     ]
+    },
+    {
+     "k": 2,
+     "move": "params",
+     "declared_move": "swap",
+     "edit": "jaw -> revolute",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "refused before trial: the edit leaves the body unchanged",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "sts3215_7v4 x6: provided (reused)"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    },
+    {
+     "k": "t0",
+     "move": "tune",
+     "declared_move": "tune",
+     "edit": "pads (groove_mm=1.545, lip_mm=2.674, pad_angle_deg=39.46, pad_tpu_mm=0.503, reach_mm=27.965, width_mm=9.628)",
+     "base": "b041",
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the loop fits b041's new pads before judging it (tuning trial 1 of 4)",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost banana, cup, dice, flat_screwdriver, foam_brick, golf_ball, large_marker, potted_meat_can, racquetball, tennis_ball, tomato_soup_can, wood_block_cube (potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.40 s (squeezing or pressing down); potted_meat_can: knocked_on_descent, verdict wrong_behavior; the descending jaws pushed the object 63 mm before closing; closed to 1.00 rad (fingertips 94 mm apart), moving fing; foam_brick: force_limit, verdict stuck; a contact exceeded the force limit at t=0.92 s (squeezing or pressing down); foam_brick: fixed_jaw_on_top_face, verdict stuck; closed to 1.00 rad (fingertips 94 mm apart), moving fingertip +17 mm vs the fixed one; fixed jaw: 9 N on the pad at +23 mm fr; wood_); it would gain gelatin_box, pudding_box, strawberry",
+     "gained": [
+      "gelatin_box",
+      "pudding_box",
+      "strawberry"
+     ],
+     "lost": [
+      "banana",
+      "cup",
+      "dice",
+      "flat_screwdriver",
+      "foam_brick",
+      "golf_ball",
+      "large_marker",
+      "potted_meat_can",
+      "racquetball",
+      "tennis_ball",
+      "tomato_soup_can",
+      "wood_block_cube"
+     ],
+     "prediction": null,
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 11.1,
+      "lines": [
+       "m2_screw x4: provided (on hand)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.8 g for pads: 9 machine minutes",
+       "print:TPU 0.3 g for pads: 2 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "fixed_jaw_on_top_face",
+      "force_limit",
+      "knocked_on_descent",
+      "moving_jaw_missed",
+      "squeezed_up_out"
+     ]
+    },
+    {
+     "k": "t1",
+     "move": "tune",
+     "declared_move": "tune",
+     "edit": "pads (groove_mm=2.55, lip_mm=3.933, pad_angle_deg=29.173, pad_tpu_mm=0.302, reach_mm=19.895, width_mm=8)",
+     "base": "b041",
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the loop fits b041's new pads before judging it (tuning trial 2 of 4)",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost cup, dice, flat_screwdriver, foam_brick, lemon, plum, potted_meat_can, racquetball, tennis_ball, tomato_soup_can, wood_block_cube (potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.62 s (squeezing or pressing down); potted_meat_can: knocked_on_descent, verdict wrong_behavior; the descending jaws pushed the object 64 mm before closing; closed to 1.00 rad (fingertips 94 mm apart), moving fing; foam_brick: force_limit, verdict stuck; a contact exceeded the force limit at t=1.00 s (squeezing or pressing down); foam_brick: fixed_jaw_on_top_face, verdict stuck; closed to 1.00 rad (fingertips 94 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: 1 N on the pad at +25 mm fr; wood_)",
+     "gained": [],
+     "lost": [
+      "cup",
+      "dice",
+      "flat_screwdriver",
+      "foam_brick",
+      "lemon",
+      "plum",
+      "potted_meat_can",
+      "racquetball",
+      "tennis_ball",
+      "tomato_soup_can",
+      "wood_block_cube"
+     ],
+     "prediction": null,
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 7.3,
+      "lines": [
+       "m2_screw x4: provided (on hand)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.3 g for pads: 6 machine minutes",
+       "print:TPU 0.1 g for pads: 1 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "fixed_jaw_on_top_face",
+      "force_limit",
+      "knocked_on_descent",
+      "moving_jaw_missed",
+      "moving_jaw_on_top_face",
+      "squeezed_down_out",
+      "squeezed_up_out"
+     ]
+    },
+    {
+     "k": "t2",
+     "move": "tune",
+     "declared_move": "tune",
+     "edit": "pads (groove_mm=1.34, lip_mm=2.997, pad_angle_deg=33.673, pad_tpu_mm=0, reach_mm=30, width_mm=8.98)",
+     "base": "b041",
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the loop fits b041's new pads before judging it (tuning trial 3 of 4)",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost banana, cup, dice, flat_screwdriver, foam_brick, potted_meat_can, racquetball, tennis_ball, tomato_soup_can, wood_block_cube (potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.40 s (squeezing or pressing down); potted_meat_can: knocked_on_descent, verdict wrong_behavior; the descending jaws pushed the object 63 mm before closing; closed to 1.00 rad (fingertips 98 mm apart), moving fing; foam_brick: force_limit, verdict stuck; a contact exceeded the force limit at t=0.88 s (squeezing or pressing down); foam_brick: force_limit, verdict stuck; a contact exceeded the force limit at t=1.24 s (squeezing or pressing down); wood_block_cube: fixed_jaw_on_top_face, verdict stuck; closed to ); it would gain gelatin_box, pudding_box, strawberry",
+     "gained": [
+      "gelatin_box",
+      "pudding_box",
+      "strawberry"
+     ],
+     "lost": [
+      "banana",
+      "cup",
+      "dice",
+      "flat_screwdriver",
+      "foam_brick",
+      "potted_meat_can",
+      "racquetball",
+      "tennis_ball",
+      "tomato_soup_can",
+      "wood_block_cube"
+     ],
+     "prediction": null,
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 8.2,
+      "lines": [
+       "m2_screw x4: provided (on hand)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.6 g for pads: 8 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "fixed_jaw_on_top_face",
+      "force_limit",
+      "knocked_on_descent",
+      "moving_jaw_missed",
+      "squeezed_up_out"
+     ]
+    },
+    {
+     "k": "t3",
+     "move": "tune",
+     "declared_move": "tune",
+     "edit": "pads (groove_mm=0.683, lip_mm=3.456, pad_angle_deg=22.184, pad_tpu_mm=0, reach_mm=30, width_mm=8.43)",
+     "base": "b041",
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the loop fits b041's new pads before judging it (tuning trial 4 of 4)",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost cup, dice, foam_brick, potted_meat_can, racquetball, tennis_ball, tomato_soup_can, wood_block_cube (potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.40 s (squeezing or pressing down); potted_meat_can: knocked_on_descent, verdict wrong_behavior; the descending jaws pushed the object 63 mm before closing; closed to 1.00 rad (fingertips 102 mm apart), moving fin; foam_brick: force_limit, verdict stuck; a contact exceeded the force limit at t=0.88 s (squeezing or pressing down); foam_brick: force_limit, verdict stuck; a contact exceeded the force limit at t=1.22 s (squeezing or pressing down); wood_block_cube: squeezed_up_out, verdict wrong_behavior; closed ); it would gain gelatin_box, strawberry",
+     "gained": [
+      "gelatin_box",
+      "strawberry"
+     ],
+     "lost": [
+      "cup",
+      "dice",
+      "foam_brick",
+      "potted_meat_can",
+      "racquetball",
+      "tennis_ball",
+      "tomato_soup_can",
+      "wood_block_cube"
+     ],
+     "prediction": null,
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 7.1,
+      "lines": [
+       "m2_screw x4: provided (on hand)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.4 g for pads: 7 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "fixed_jaw_on_top_face",
+      "force_limit",
+      "knocked_on_descent",
+      "moving_jaw_missed",
+      "squeezed_up_out"
+     ]
+    }
+   ],
+   "accepted": null,
+   "notes": "",
+   "llm": {
+    "tag": "iter04",
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "usd_list_price": 0.0,
+    "billing": "none"
+   },
+   "seconds": 59.7,
+   "stop": null
+  },
+  {
+   "iteration": 5,
+   "body": "arm_servos: servos_7v4; jaw: revolute; pads: none",
+   "held": [
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "potted_meat_can",
+    "racquetball",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "moving_jaw_on_top_face": 8,
+    "squeezed_down_out": 4
+   },
+   "failing": {
+    "reg_gelatin_box": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict stuck; closed to 0.74 rad (fingertips 73 mm apart), moving fingertip +13 mm vs the fixed one; fixed jaw: 10 N on the stock jaw at -3 mm from the centre (top at +15), pushing 0 deg down; moving jaw: 23 N on the stock jaw at +13 mm from the centre (top at +15), pushing 47 deg down; rose 7 mm, ended +2 mm; 97 g"
+    },
+    "rva000_gelatin_box": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict stuck; closed to 0.68 rad (fingertips 69 mm apart), moving fingertip +10 mm vs the fixed one; fixed jaw: 20 N on the stock jaw at -1 mm from the centre (top at +15), pushing 5 deg down; moving jaw: 26 N on the stock jaw at +9 mm from the centre (top at +15), pushing 49 deg down; rose 3 mm, ended -2 mm; 97 g"
+    },
+    "reg_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.79 rad (fingertips 77 mm apart), moving fingertip +16 mm vs the fixed one; fixed jaw: 2 N on the stock jaw at +2 mm from the centre (top at +19), pushing 3 deg down; moving jaw: 20 N on the stock jaw at +16 mm from the centre (top at +19), pushing 84 deg down; rose 0 mm, ended -1 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.75 rad (fingertips 74 mm apart), moving fingertip +14 mm vs the fixed one; fixed jaw: no contact; moving jaw: 20 N on the stock jaw at +17 mm from the centre (top at +19), pushing 85 deg down; rose 0 mm, ended -1 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.77 rad (fingertips 75 mm apart), moving fingertip +15 mm vs the fixed one; fixed jaw: 2 N on the stock jaw at +7 mm from the centre (top at +23), pushing 2 deg down; moving jaw: 21 N on the stock jaw at +20 mm from the centre (top at +23), pushing 83 deg down; rose 1 mm, ended +1 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.64 rad (fingertips 66 mm apart), moving fingertip +9 mm vs the fixed one; fixed jaw: no contact; moving jaw: 22 N on the stock jaw at +21 mm from the centre (top at +23), pushing 87 deg down; rose 0 mm, ended -0 mm; 514 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.69 rad (fingertips 70 mm apart), moving fingertip +11 mm vs the fixed one; fixed jaw: 6 N on the stock jaw at +13 mm from the centre (top at +29), pushing 19 deg down; moving jaw: 23 N on the stock jaw at +22 mm from the centre (top at +29), pushing 73 deg down; rose 1 mm, ended +1 mm; 431 g"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.44 rad (fingertips 51 mm apart), moving fingertip +3 mm vs the fixed one; fixed jaw: no contact; moving jaw: 23 N on the stock jaw at +27 mm from the centre (top at +29), pushing 83 deg down; rose 2 mm, ended +2 mm; 431 g"
+    },
+    "reg_strawberry": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict wrong_behavior; closed to 0.22 rad (fingertips 34 mm apart), moving fingertip -0 mm vs the fixed one; fixed jaw: 21 N on the stock jaw at +0 mm from the centre (top at +21), pushing 7 deg down; moving jaw: 24 N on the stock jaw at +7 mm from the centre (top at +21), pushing 16 deg down; rose 40 mm, ended +1 mm; 18 g"
+    },
+    "reg_tuna_fish_can": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; an arm joint stalled (load_limit reflex); closed to 0.38 rad (fingertips 46 mm apart), moving fingertip +2 mm vs the fixed one; fixed jaw: no contact; moving jaw: 19 N on the stock jaw at +14 mm from the centre (top at +17), pushing 83 deg down; rose 0 mm, ended -0 mm; 171 g"
+    },
+    "rva000_tuna_fish_can": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; an arm joint stalled (load_limit reflex); closed to 0.38 rad (fingertips 47 mm apart), moving fingertip +2 mm vs the fixed one; fixed jaw: no contact; moving jaw: 21 N on the stock jaw at +14 mm from the centre (top at +17), pushing 83 deg down; rose 0 mm, ended +0 mm; 171 g"
+    },
+    "rva000_apple": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict wrong_behavior; closed to 0.72 rad (fingertips 72 mm apart), moving fingertip +12 mm vs the fixed one; fixed jaw: 21 N on the stock jaw at +3 mm from the centre (top at +36), pushing 7 deg down; moving jaw: 24 N on the stock jaw at +26 mm from the centre (top at +36), pushing 32 deg down; rose 37 mm, ended +29 mm; 68 g"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "pads -> pads (groove_mm=1.19108, lip_mm=0.363012, pad_angle_deg=18.2048, pad_tpu_mm=1.741, reach_mm=1.56064, width_mm=12.7791)",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost racquetball (racquetball: fixed_jaw_missed, verdict stuck; closed to 1.00 rad (fingertips 82 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: no contact; moving jaw: no ); it would gain apple, gelatin_box, strawberry; kept on the frontier as b050",
+     "gained": [
+      "apple",
+      "gelatin_box",
+      "strawberry"
+     ],
+     "lost": [
+      "racquetball"
+     ],
+     "prediction": {
+      "predicted": [],
+      "hit": [],
+      "missed": [],
+      "unpredicted": [
+       "apple",
+       "gelatin_box",
+       "strawberry"
+      ],
+      "precision": null,
+      "lost": [
+       "racquetball"
+      ]
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 6.4,
+      "lines": [
+       "m2_screw x4: provided (on hand)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 0.7 g for pads: 3 machine minutes",
+       "print:TPU 0.4 g for pads: 3 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "moving_jaw_on_top_face"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "pads -> pads (groove_mm=0.632972, lip_mm=2.51643, pad_angle_deg=16.43, pad_tpu_mm=2.78146, reach_mm=28.2634, width_mm=15.046)",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost cup, dice, foam_brick, lemon, potted_meat_can, racquetball, tennis_ball, tomato_soup_can, wood_block_cube (potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.38 s (squeezing or pressing down); potted_meat_can: knocked_on_descent, verdict wrong_behavior; the descending jaws pushed the object 64 mm before closing; closed to 1.00 rad (fingertips 97 mm apart), moving fing; foam_brick: force_limit, verdict stuck; a contact exceeded the force limit at t=0.88 s (squeezing or pressing down); foam_brick: force_limit, verdict stuck; a contact exceeded the force limit at t=1.28 s (squeezing or pressing down); wood_block_cube: fixed_jaw_missed, verdict wrong_behavior; closed)",
+     "gained": [],
+     "lost": [
+      "cup",
+      "dice",
+      "foam_brick",
+      "lemon",
+      "potted_meat_can",
+      "racquetball",
+      "tennis_ball",
+      "tomato_soup_can",
+      "wood_block_cube"
+     ],
+     "prediction": {
+      "predicted": [],
+      "hit": [],
+      "missed": [],
+      "unpredicted": [],
+      "precision": null,
+      "lost": [
+       "cup",
+       "dice",
+       "foam_brick",
+       "lemon",
+       "potted_meat_can",
+       "racquetball",
+       "tennis_ball",
+       "tomato_soup_can",
+       "wood_block_cube"
+      ]
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 28.1,
+      "lines": [
+       "m2_screw x4: provided (on hand)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 2.3 g for pads: 12 machine minutes",
+       "print:TPU 2.1 g for pads: 17 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "fixed_jaw_on_top_face",
+      "force_limit",
+      "knocked_on_descent",
+      "moving_jaw_missed",
+      "moving_jaw_on_top_face",
+      "never_lifted"
+     ]
+    },
+    {
+     "k": 2,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "jaw -> prismatic (drive_mm_per_rad=37.0091)",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost cup, flat_screwdriver, golf_ball, lemon, potted_meat_can, racquetball, tennis_ball, tomato_soup_can (potted_meat_can: slipped_under_load, verdict rule_violation; closed to 0.92 rad (fingertips 50 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 45 N on the stock j; potted_meat_can: squeezed_up_out, verdict rule_violation; closed to 0.95 rad (fingertips 51 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 45 N on the stock j; tomato_soup_can: slipped_under_load, verdict rule_violation; closed to 1.32 rad (fingertips 65 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 47 N on the stock j; tomato_soup_can: slipped_under_load, verdict rule_violation; close); it would gain apple, gelatin_box",
+     "gained": [
+      "apple",
+      "gelatin_box"
+     ],
+     "lost": [
+      "cup",
+      "flat_screwdriver",
+      "golf_ball",
+      "lemon",
+      "potted_meat_can",
+      "racquetball",
+      "tennis_ball",
+      "tomato_soup_can"
+     ],
+     "prediction": {
+      "predicted": [],
+      "hit": [],
+      "missed": [],
+      "unpredicted": [
+       "apple",
+       "gelatin_box"
+      ],
+      "precision": null,
+      "lost": [
+       "cup",
+       "flat_screwdriver",
+       "golf_ball",
+       "lemon",
+       "potted_meat_can",
+       "racquetball",
+       "tennis_ball",
+       "tomato_soup_can"
+      ]
+     },
+     "resources": {
+      "usd": 5.4,
+      "lead_days": 3.0,
+      "fab_minutes": 154.8,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x100 x2: 0 provided, buy 2 at $1.5 ($3.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 31.0 g for jaw: 155 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "force_limit",
+      "moving_jaw_on_top_face",
+      "never_lifted",
+      "slipped_under_load",
+      "squeezed_down_out",
+      "squeezed_up_out"
+     ]
+    },
+    {
+     "k": "t0",
+     "move": "tune",
+     "declared_move": "tune",
+     "edit": "pads (groove_mm=1.049, lip_mm=0, pad_angle_deg=21.599, pad_tpu_mm=0, reach_mm=3.14, width_mm=8)",
+     "base": "b050",
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the loop fits b050's new pads before judging it (tuning trial 1 of 4)",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost dice, tomato_soup_can (tomato_soup_can: squeezed_down_out, verdict rule_violation; closed to 0.70 rad (fingertips 66 mm apart), moving fingertip +10 mm vs the fixed one; fixed jaw: 23 N on the pad at; dice: slipped_under_load, verdict wrong_behavior; closed to -0.07 rad (fingertips 3 mm apart), moving fingertip +2 mm vs the fixed one; fixed jaw: 10 N on the pad and; dice: never_lifted, verdict wrong_behavior; closed to -0.14 rad (fingertips -3 mm apart), moving fingertip +4 mm vs the fixed one; fixed jaw: 9 N on the pad and); it would gain apple, gelatin_box, strawberry; kept on the frontier as b05t0",
+     "gained": [
+      "apple",
+      "gelatin_box",
+      "strawberry"
+     ],
+     "lost": [
+      "dice",
+      "tomato_soup_can"
+     ],
+     "prediction": null,
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 2.1,
+      "lines": [
+       "m2_screw x4: provided (on hand)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 0.4 g for pads: 2 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "moving_jaw_on_top_face",
+      "never_lifted",
+      "slipped_under_load",
+      "squeezed_down_out"
+     ]
+    },
+    {
+     "k": "t1",
+     "move": "tune",
+     "declared_move": "tune",
+     "edit": "pads (groove_mm=0, lip_mm=0.283, pad_angle_deg=3.095, pad_tpu_mm=1.337, reach_mm=0, width_mm=9.796)",
+     "base": "b050",
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the loop fits b050's new pads before judging it (tuning trial 2 of 4)",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "KEPT: gained apple, gelatin_box, strawberry, lost none; costs $0.00, 4 machine min",
+     "gained": [
+      "apple",
+      "gelatin_box",
+      "strawberry"
+     ],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 3.7,
+      "lines": [
+       "m2_screw x4: provided (on hand)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 0.4 g for pads: 2 machine minutes",
+       "print:TPU 0.2 g for pads: 2 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_on_top_face",
+      "moving_jaw_on_top_face"
+     ]
+    }
+   ],
+   "accepted": "b05t1",
+   "notes": "",
+   "llm": {
+    "tag": "iter05",
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "usd_list_price": 0.0,
+    "billing": "none"
+   },
+   "seconds": 72.5,
+   "stop": null
+  },
+  {
+   "iteration": 6,
+   "body": "arm_servos: servos_7v4; jaw: revolute; pads: pads (groove_mm=0, lip_mm=0.283, pad_angle_deg=3.095, pad_tpu_mm=1.337, reach_mm=0, width_mm=9.796)",
+   "held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "potted_meat_can",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "moving_jaw_on_top_face": 6,
+    "fixed_jaw_on_top_face": 2
+   },
+   "failing": {
+    "reg_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.92 rad (fingertips 77 mm apart), moving fingertip +19 mm vs the fixed one; fixed jaw: 4 N on the pad at -0 mm from the centre (top at +19), pushing 3 deg down; moving jaw: 20 N on the pad at +17 mm from the centre (top at +19), pushing 85 deg down; rose 0 mm, ended -0 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.87 rad (fingertips 74 mm apart), moving fingertip +17 mm vs the fixed one; fixed jaw: 3 N on the pad at +2 mm from the centre (top at +19), pushing 2 deg down; moving jaw: 18 N on the pad at +17 mm from the centre (top at +19), pushing 86 deg down; rose 0 mm, ended -0 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.87 rad (fingertips 74 mm apart), moving fingertip +17 mm vs the fixed one; fixed jaw: 5 N on the pad at +6 mm from the centre (top at +23), pushing 0 deg up; moving jaw: 18 N on the pad at +21 mm from the centre (top at +23), pushing 86 deg down; rose 1 mm, ended -0 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.80 rad (fingertips 69 mm apart), moving fingertip +13 mm vs the fixed one; fixed jaw: 8 N on the pad at +9 mm from the centre (top at +23), pushing 4 deg down; moving jaw: 19 N on the pad at +21 mm from the centre (top at +23), pushing 86 deg down; rose 1 mm, ended +1 mm; 514 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.84 rad (fingertips 72 mm apart), moving fingertip +16 mm vs the fixed one; fixed jaw: 4 N on the pad at +9 mm from the centre (top at +29), pushing 9 deg down; moving jaw: 21 N on the pad at +23 mm from the centre (top at +29), pushing 76 deg down; rose 2 mm, ended +0 mm; 431 g"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.48 rad (fingertips 45 mm apart), moving fingertip +3 mm vs the fixed one; fixed jaw: no contact; moving jaw: 23 N on the pad and stock jaw at +29 mm from the centre (top at +29), pushing 81 deg down; rose 2 mm, ended +1 mm; 431 g"
+    },
+    "reg_tuna_fish_can": {
+     "mechanism": "fixed_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.00 rad (fingertips 82 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: 4 N on the pad at +17 mm from the centre (top at +17), pushing 88 deg down; moving jaw: no contact; rose 0 mm, ended +0 mm; 171 g"
+    },
+    "rva000_tuna_fish_can": {
+     "mechanism": "fixed_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.00 rad (fingertips 82 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: 2 N on the pad at +17 mm from the centre (top at +17), pushing 88 deg down; moving jaw: no contact; rose 0 mm, ended +0 mm; 171 g"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "params",
+     "declared_move": "swap",
+     "edit": "pads -> pads (groove_mm=4.54637, lip_mm=1.98969, pad_angle_deg=20.702, pad_tpu_mm=1.58794, reach_mm=28.4683, width_mm=20.5726)",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost apple, cup, dice, foam_brick, potted_meat_can, racquetball, tennis_ball, tomato_soup_can, wood_block_cube (potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.02 s (squeezing or pressing down); potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.36 s (squeezing or pressing down); foam_brick: force_limit, verdict stuck; a contact exceeded the force limit at t=0.88 s (squeezing or pressing down); foam_brick: force_limit, verdict stuck; a contact exceeded the force limit at t=1.26 s (squeezing or pressing down); wood_block_cube: fixed_jaw_on_top_face, verdict wrong_behavior; closed to 1.00 rad (fingertips 98 mm apart), moving finger)",
+     "gained": [],
+     "lost": [
+      "apple",
+      "cup",
+      "dice",
+      "foam_brick",
+      "potted_meat_can",
+      "racquetball",
+      "tennis_ball",
+      "tomato_soup_can",
+      "wood_block_cube"
+     ],
+     "prediction": {
+      "predicted": [],
+      "hit": [],
+      "missed": [],
+      "unpredicted": [],
+      "precision": null,
+      "lost": [
+       "apple",
+       "cup",
+       "dice",
+       "foam_brick",
+       "potted_meat_can",
+       "racquetball",
+       "tennis_ball",
+       "tomato_soup_can",
+       "wood_block_cube"
+      ]
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 31.7,
+      "lines": [
+       "m2_screw x4: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 3.5 g for pads: 17 machine minutes",
+       "print:TPU 1.8 g for pads: 14 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "fixed_jaw_on_top_face",
+      "force_limit",
+      "knocked_on_descent",
+      "moving_jaw_missed"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "params",
+     "declared_move": "swap",
+     "edit": "arm_servos -> servos_7v4",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "refused before trial: the edit leaves the body unchanged",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "m2_screw x4: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    },
+    {
+     "k": 2,
+     "move": "params",
+     "declared_move": "swap",
+     "edit": "pads -> pads (groove_mm=5.56454, lip_mm=3.8717, pad_angle_deg=32.8057, pad_tpu_mm=0.0441189, reach_mm=3.44798, width_mm=21.8182)",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost apple, banana, cup, dice, flat_screwdriver, foam_brick, gelatin_box, large_marker, lemon, potted_meat_can, racquetball, strawberry, tennis_ball, wood_block_cube (gelatin_box: fixed_jaw_on_top_face, verdict stuck; closed to 1.00 rad (fingertips 87 mm apart), moving fingertip +21 mm vs the fixed one; fixed jaw: 2 N on the pad at +13 mm fr; potted_meat_can: fixed_jaw_on_top_face, verdict stuck; closed to 1.00 rad (fingertips 87 mm apart), moving fingertip +21 mm vs the fixed one; fixed jaw: 3 N on the pad at +42 mm fr; foam_brick: fixed_jaw_on_top_face, verdict stuck; closed to 1.00 rad (fingertips 87 mm apart), moving fingertip +21 mm vs the fixed one; fixed jaw: 2 N on the pad at +25 mm fr; foam_brick: fixed_jaw_on_top_face, verdict stuck; closed to 1.0)",
+     "gained": [],
+     "lost": [
+      "apple",
+      "banana",
+      "cup",
+      "dice",
+      "flat_screwdriver",
+      "foam_brick",
+      "gelatin_box",
+      "large_marker",
+      "lemon",
+      "potted_meat_can",
+      "racquetball",
+      "strawberry",
+      "tennis_ball",
+      "wood_block_cube"
+     ],
+     "prediction": {
+      "predicted": [],
+      "hit": [],
+      "missed": [],
+      "unpredicted": [],
+      "precision": null,
+      "lost": [
+       "apple",
+       "banana",
+       "cup",
+       "dice",
+       "flat_screwdriver",
+       "foam_brick",
+       "gelatin_box",
+       "large_marker",
+       "lemon",
+       "potted_meat_can",
+       "racquetball",
+       "strawberry",
+       "tennis_ball",
+       "wood_block_cube"
+      ]
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 9.6,
+      "lines": [
+       "m2_screw x4: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.9 g for pads: 9 machine minutes",
+       "print:TPU 0.0 g for pads: 0 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "fixed_jaw_on_top_face",
+      "moving_jaw_missed",
+      "squeezed_down_out"
+     ]
+    }
+   ],
+   "accepted": null,
+   "notes": "",
+   "llm": {
+    "tag": "iter06",
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "usd_list_price": 0.0,
+    "billing": "none"
+   },
+   "seconds": 23.3,
+   "stop": null
+  },
+  {
+   "iteration": 7,
+   "body": "arm_servos: servos_7v4; jaw: revolute; pads: pads (groove_mm=0, lip_mm=0.283, pad_angle_deg=3.095, pad_tpu_mm=1.337, reach_mm=0, width_mm=9.796)",
+   "held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "potted_meat_can",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "moving_jaw_on_top_face": 6,
+    "fixed_jaw_on_top_face": 2
+   },
+   "failing": {
+    "reg_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.92 rad (fingertips 77 mm apart), moving fingertip +19 mm vs the fixed one; fixed jaw: 4 N on the pad at -0 mm from the centre (top at +19), pushing 3 deg down; moving jaw: 20 N on the pad at +17 mm from the centre (top at +19), pushing 85 deg down; rose 0 mm, ended -0 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.87 rad (fingertips 74 mm apart), moving fingertip +17 mm vs the fixed one; fixed jaw: 3 N on the pad at +2 mm from the centre (top at +19), pushing 2 deg down; moving jaw: 18 N on the pad at +17 mm from the centre (top at +19), pushing 86 deg down; rose 0 mm, ended -0 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.87 rad (fingertips 74 mm apart), moving fingertip +17 mm vs the fixed one; fixed jaw: 5 N on the pad at +6 mm from the centre (top at +23), pushing 0 deg up; moving jaw: 18 N on the pad at +21 mm from the centre (top at +23), pushing 86 deg down; rose 1 mm, ended -0 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.80 rad (fingertips 69 mm apart), moving fingertip +13 mm vs the fixed one; fixed jaw: 8 N on the pad at +9 mm from the centre (top at +23), pushing 4 deg down; moving jaw: 19 N on the pad at +21 mm from the centre (top at +23), pushing 86 deg down; rose 1 mm, ended +1 mm; 514 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.84 rad (fingertips 72 mm apart), moving fingertip +16 mm vs the fixed one; fixed jaw: 4 N on the pad at +9 mm from the centre (top at +29), pushing 9 deg down; moving jaw: 21 N on the pad at +23 mm from the centre (top at +29), pushing 76 deg down; rose 2 mm, ended +0 mm; 431 g"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.48 rad (fingertips 45 mm apart), moving fingertip +3 mm vs the fixed one; fixed jaw: no contact; moving jaw: 23 N on the pad and stock jaw at +29 mm from the centre (top at +29), pushing 81 deg down; rose 2 mm, ended +1 mm; 431 g"
+    },
+    "reg_tuna_fish_can": {
+     "mechanism": "fixed_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.00 rad (fingertips 82 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: 4 N on the pad at +17 mm from the centre (top at +17), pushing 88 deg down; moving jaw: no contact; rose 0 mm, ended +0 mm; 171 g"
+    },
+    "rva000_tuna_fish_can": {
+     "mechanism": "fixed_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.00 rad (fingertips 82 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: 2 N on the pad at +17 mm from the centre (top at +17), pushing 88 deg down; moving jaw: no contact; rose 0 mm, ended +0 mm; 171 g"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "arm_servos -> servos_12v",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "refused before trial: buying costs $68.00; the run has $40.00 left",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 68.0,
+      "lead_days": 5.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "m2_screw x4: provided (reused)",
+       "psu_12v x1: 0 provided, buy 1 at $14 ($14.00, 3 days)",
+       "sts3215_12v x3: 0 provided, buy 3 at $18 ($54.00, 5 days)",
+       "sts3215_7v4 x3: provided (reused)"
+      ],
+      "errors": [
+       "buying costs $68.00; the run has $40.00 left"
+      ]
+     },
+     "still_failing": []
+    },
+    {
+     "k": 1,
+     "move": "params",
+     "declared_move": "swap",
+     "edit": "jaw -> revolute",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "refused before trial: the edit leaves the body unchanged",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "m2_screw x4: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    },
+    {
+     "k": 2,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "jaw -> prismatic (drive_mm_per_rad=39.1995)",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost apple, flat_screwdriver, foam_brick, gelatin_box (gelatin_box: moving_jaw_on_top_face, verdict stuck; closed to 1.75 rad (fingertips 76 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 3 N ; gelatin_box: moving_jaw_on_top_face, verdict stuck; closed to 1.75 rad (fingertips 76 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 4 N ; foam_brick: fixed_jaw_on_top_face, verdict rule_violation; closed to 1.51 rad (fingertips 66 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 2 N on the pad at +; apple: fixed_jaw_missed, verdict stuck; closed to 1.75 rad (finge)",
+     "gained": [],
+     "lost": [
+      "apple",
+      "flat_screwdriver",
+      "foam_brick",
+      "gelatin_box"
+     ],
+     "prediction": {
+      "predicted": [],
+      "hit": [],
+      "missed": [],
+      "unpredicted": [],
+      "precision": null,
+      "lost": [
+       "apple",
+       "flat_screwdriver",
+       "foam_brick",
+       "gelatin_box"
+      ]
+     },
+     "resources": {
+      "usd": 5.4,
+      "lead_days": 3.0,
+      "fab_minutes": 158.6,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x100 x2: 0 provided, buy 2 at $1.5 ($3.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 31.7 g for jaw: 159 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "fixed_jaw_on_top_face",
+      "force_limit",
+      "moving_jaw_on_top_face",
+      "squeezed_down_out"
+     ]
+    }
+   ],
+   "accepted": null,
+   "notes": "",
+   "llm": {
+    "tag": "iter07",
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "usd_list_price": 0.0,
+    "billing": "none"
+   },
+   "seconds": 23.2,
+   "stop": null
+  },
+  {
+   "iteration": 8,
+   "body": "arm_servos: servos_7v4; jaw: revolute; pads: pads (groove_mm=0, lip_mm=0.283, pad_angle_deg=3.095, pad_tpu_mm=1.337, reach_mm=0, width_mm=9.796)",
+   "held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "potted_meat_can",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "moving_jaw_on_top_face": 6,
+    "fixed_jaw_on_top_face": 2
+   },
+   "failing": {
+    "reg_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.92 rad (fingertips 77 mm apart), moving fingertip +19 mm vs the fixed one; fixed jaw: 4 N on the pad at -0 mm from the centre (top at +19), pushing 3 deg down; moving jaw: 20 N on the pad at +17 mm from the centre (top at +19), pushing 85 deg down; rose 0 mm, ended -0 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.87 rad (fingertips 74 mm apart), moving fingertip +17 mm vs the fixed one; fixed jaw: 3 N on the pad at +2 mm from the centre (top at +19), pushing 2 deg down; moving jaw: 18 N on the pad at +17 mm from the centre (top at +19), pushing 86 deg down; rose 0 mm, ended -0 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.87 rad (fingertips 74 mm apart), moving fingertip +17 mm vs the fixed one; fixed jaw: 5 N on the pad at +6 mm from the centre (top at +23), pushing 0 deg up; moving jaw: 18 N on the pad at +21 mm from the centre (top at +23), pushing 86 deg down; rose 1 mm, ended -0 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.80 rad (fingertips 69 mm apart), moving fingertip +13 mm vs the fixed one; fixed jaw: 8 N on the pad at +9 mm from the centre (top at +23), pushing 4 deg down; moving jaw: 19 N on the pad at +21 mm from the centre (top at +23), pushing 86 deg down; rose 1 mm, ended +1 mm; 514 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.84 rad (fingertips 72 mm apart), moving fingertip +16 mm vs the fixed one; fixed jaw: 4 N on the pad at +9 mm from the centre (top at +29), pushing 9 deg down; moving jaw: 21 N on the pad at +23 mm from the centre (top at +29), pushing 76 deg down; rose 2 mm, ended +0 mm; 431 g"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.48 rad (fingertips 45 mm apart), moving fingertip +3 mm vs the fixed one; fixed jaw: no contact; moving jaw: 23 N on the pad and stock jaw at +29 mm from the centre (top at +29), pushing 81 deg down; rose 2 mm, ended +1 mm; 431 g"
+    },
+    "reg_tuna_fish_can": {
+     "mechanism": "fixed_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.00 rad (fingertips 82 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: 4 N on the pad at +17 mm from the centre (top at +17), pushing 88 deg down; moving jaw: no contact; rose 0 mm, ended +0 mm; 171 g"
+    },
+    "rva000_tuna_fish_can": {
+     "mechanism": "fixed_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.00 rad (fingertips 82 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: 2 N on the pad at +17 mm from the centre (top at +17), pushing 88 deg down; moving jaw: no contact; rose 0 mm, ended +0 mm; 171 g"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "params",
+     "declared_move": "swap",
+     "edit": "arm_servos -> servos_7v4",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "refused before trial: the edit leaves the body unchanged",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "m2_screw x4: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    },
+    {
+     "k": 1,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "arm_servos -> servos_12v",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "refused before trial: buying costs $68.00; the run has $40.00 left",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 68.0,
+      "lead_days": 5.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "m2_screw x4: provided (reused)",
+       "psu_12v x1: 0 provided, buy 1 at $14 ($14.00, 3 days)",
+       "sts3215_12v x3: 0 provided, buy 3 at $18 ($54.00, 5 days)",
+       "sts3215_7v4 x3: provided (reused)"
+      ],
+      "errors": [
+       "buying costs $68.00; the run has $40.00 left"
+      ]
+     },
+     "still_failing": []
+    },
+    {
+     "k": 2,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "jaw -> parallelogram (link_mm=87.2407)",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost apple, flat_screwdriver, gelatin_box, lemon, plum, potted_meat_can, tomato_soup_can (gelatin_box: moving_jaw_on_top_face, verdict stuck; closed to 0.45 rad (fingertips 45 mm apart), moving fingertip +9 mm vs the fixed one; fixed jaw: no contact; moving jaw: 19 N; gelatin_box: moving_jaw_on_top_face, verdict stuck; closed to 0.41 rad (fingertips 42 mm apart), moving fingertip +8 mm vs the fixed one; fixed jaw: no contact; moving jaw: 19 N; potted_meat_can: never_lifted, verdict stuck; closed to 0.53 rad (fingertips 51 mm apart), moving fingertip +13 mm vs the fixed one; fixed jaw: 21 N on the pad at +40 mm f; tomato_soup_can: squeezed_down_out, verdict wrong_behavior; closed to)",
+     "gained": [],
+     "lost": [
+      "apple",
+      "flat_screwdriver",
+      "gelatin_box",
+      "lemon",
+      "plum",
+      "potted_meat_can",
+      "tomato_soup_can"
+     ],
+     "prediction": {
+      "predicted": [],
+      "hit": [],
+      "missed": [],
+      "unpredicted": [],
+      "precision": null,
+      "lost": [
+       "apple",
+       "flat_screwdriver",
+       "gelatin_box",
+       "lemon",
+       "plum",
+       "potted_meat_can",
+       "tomato_soup_can"
+      ]
+     },
+     "resources": {
+      "usd": 3.6,
+      "lead_days": 3.0,
+      "fab_minutes": 92.3,
+      "lines": [
+       "m2_screw x4: provided (reused)",
+       "m3_screw x4: provided (on hand)",
+       "mr63_bearing x4: 0 provided, buy 4 at $0.9 ($3.60, 3 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 18.5 g for jaw: 92 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "arm_stall_before_lift",
+      "fixed_jaw_missed",
+      "moving_jaw_missed",
+      "moving_jaw_on_top_face",
+      "never_lifted",
+      "squeezed_down_out"
+     ]
+    }
+   ],
+   "accepted": null,
+   "notes": "",
+   "llm": {
+    "tag": "iter08",
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "usd_list_price": 0.0,
+    "billing": "none"
+   },
+   "seconds": 21.2,
+   "stop": null
+  },
+  {
+   "iteration": 9,
+   "body": "arm_servos: servos_7v4; jaw: revolute; pads: pads (groove_mm=0, lip_mm=0.283, pad_angle_deg=3.095, pad_tpu_mm=1.337, reach_mm=0, width_mm=9.796)",
+   "held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "potted_meat_can",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "moving_jaw_on_top_face": 6,
+    "fixed_jaw_on_top_face": 2
+   },
+   "failing": {
+    "reg_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.92 rad (fingertips 77 mm apart), moving fingertip +19 mm vs the fixed one; fixed jaw: 4 N on the pad at -0 mm from the centre (top at +19), pushing 3 deg down; moving jaw: 20 N on the pad at +17 mm from the centre (top at +19), pushing 85 deg down; rose 0 mm, ended -0 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.87 rad (fingertips 74 mm apart), moving fingertip +17 mm vs the fixed one; fixed jaw: 3 N on the pad at +2 mm from the centre (top at +19), pushing 2 deg down; moving jaw: 18 N on the pad at +17 mm from the centre (top at +19), pushing 86 deg down; rose 0 mm, ended -0 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.87 rad (fingertips 74 mm apart), moving fingertip +17 mm vs the fixed one; fixed jaw: 5 N on the pad at +6 mm from the centre (top at +23), pushing 0 deg up; moving jaw: 18 N on the pad at +21 mm from the centre (top at +23), pushing 86 deg down; rose 1 mm, ended -0 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.80 rad (fingertips 69 mm apart), moving fingertip +13 mm vs the fixed one; fixed jaw: 8 N on the pad at +9 mm from the centre (top at +23), pushing 4 deg down; moving jaw: 19 N on the pad at +21 mm from the centre (top at +23), pushing 86 deg down; rose 1 mm, ended +1 mm; 514 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.84 rad (fingertips 72 mm apart), moving fingertip +16 mm vs the fixed one; fixed jaw: 4 N on the pad at +9 mm from the centre (top at +29), pushing 9 deg down; moving jaw: 21 N on the pad at +23 mm from the centre (top at +29), pushing 76 deg down; rose 2 mm, ended +0 mm; 431 g"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.48 rad (fingertips 45 mm apart), moving fingertip +3 mm vs the fixed one; fixed jaw: no contact; moving jaw: 23 N on the pad and stock jaw at +29 mm from the centre (top at +29), pushing 81 deg down; rose 2 mm, ended +1 mm; 431 g"
+    },
+    "reg_tuna_fish_can": {
+     "mechanism": "fixed_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.00 rad (fingertips 82 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: 4 N on the pad at +17 mm from the centre (top at +17), pushing 88 deg down; moving jaw: no contact; rose 0 mm, ended +0 mm; 171 g"
+    },
+    "rva000_tuna_fish_can": {
+     "mechanism": "fixed_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.00 rad (fingertips 82 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: 2 N on the pad at +17 mm from the centre (top at +17), pushing 88 deg down; moving jaw: no contact; rose 0 mm, ended +0 mm; 171 g"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "pads -> none",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost apple, gelatin_box, strawberry (gelatin_box: squeezed_down_out, verdict stuck; closed to 0.74 rad (fingertips 73 mm apart), moving fingertip +13 mm vs the fixed one; fixed jaw: 10 N on the stock jaw at -3; gelatin_box: squeezed_down_out, verdict stuck; closed to 0.68 rad (fingertips 69 mm apart), moving fingertip +10 mm vs the fixed one; fixed jaw: 20 N on the stock jaw at -1; strawberry: squeezed_down_out, verdict wrong_behavior; closed to 0.22 rad (fingertips 34 mm apart), moving fingertip -0 mm vs the fixed one; fixed jaw: 21 N on the stock j; apple: squeezed_down_out, verdict wrong_behavior; closed to 0.72 rad (fingertip)",
+     "gained": [],
+     "lost": [
+      "apple",
+      "gelatin_box",
+      "strawberry"
+     ],
+     "prediction": {
+      "predicted": [],
+      "hit": [],
+      "missed": [],
+      "unpredicted": [],
+      "precision": null,
+      "lost": [
+       "apple",
+       "gelatin_box",
+       "strawberry"
+      ]
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "sts3215_7v4 x6: provided (reused)"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "moving_jaw_on_top_face",
+      "squeezed_down_out"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "arm_servos -> servos_12v",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "refused before trial: buying costs $68.00; the run has $40.00 left",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 68.0,
+      "lead_days": 5.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "m2_screw x4: provided (reused)",
+       "psu_12v x1: 0 provided, buy 1 at $14 ($14.00, 3 days)",
+       "sts3215_12v x3: 0 provided, buy 3 at $18 ($54.00, 5 days)",
+       "sts3215_7v4 x3: provided (reused)"
+      ],
+      "errors": [
+       "buying costs $68.00; the run has $40.00 left"
+      ]
+     },
+     "still_failing": []
+    },
+    {
+     "k": 2,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "pads (pad_tpu_mm=2.78731, reach_mm=1.98247)",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost apple, racquetball (racquetball: fixed_jaw_missed, verdict stuck; closed to 1.00 rad (fingertips 81 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: no contact; moving jaw: no ; apple: squeezed_down_out, verdict wrong_behavior; closed to 0.91 rad (fingertips 76 mm apart), moving fingertip +19 mm vs the fixed one; fixed jaw: 21 N on the pad at)",
+     "gained": [],
+     "lost": [
+      "apple",
+      "racquetball"
+     ],
+     "prediction": {
+      "predicted": [],
+      "hit": [],
+      "missed": [],
+      "unpredicted": [],
+      "precision": null,
+      "lost": [
+       "apple",
+       "racquetball"
+      ]
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 6.2,
+      "lines": [
+       "m2_screw x4: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 0.5 g for pads: 2 machine minutes",
+       "print:TPU 0.5 g for pads: 4 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "squeezed_down_out"
+     ]
+    }
+   ],
+   "accepted": null,
+   "notes": "",
+   "llm": {
+    "tag": "iter09",
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "usd_list_price": 0.0,
+    "billing": "none"
+   },
+   "seconds": 6.2,
+   "stop": null
+  },
+  {
+   "iteration": 10,
+   "body": "arm_servos: servos_7v4; jaw: revolute; pads: pads (groove_mm=0, lip_mm=0.283, pad_angle_deg=3.095, pad_tpu_mm=1.337, reach_mm=0, width_mm=9.796)",
+   "held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "potted_meat_can",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "moving_jaw_on_top_face": 6,
+    "fixed_jaw_on_top_face": 2
+   },
+   "failing": {
+    "reg_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.92 rad (fingertips 77 mm apart), moving fingertip +19 mm vs the fixed one; fixed jaw: 4 N on the pad at -0 mm from the centre (top at +19), pushing 3 deg down; moving jaw: 20 N on the pad at +17 mm from the centre (top at +19), pushing 85 deg down; rose 0 mm, ended -0 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.87 rad (fingertips 74 mm apart), moving fingertip +17 mm vs the fixed one; fixed jaw: 3 N on the pad at +2 mm from the centre (top at +19), pushing 2 deg down; moving jaw: 18 N on the pad at +17 mm from the centre (top at +19), pushing 86 deg down; rose 0 mm, ended -0 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.87 rad (fingertips 74 mm apart), moving fingertip +17 mm vs the fixed one; fixed jaw: 5 N on the pad at +6 mm from the centre (top at +23), pushing 0 deg up; moving jaw: 18 N on the pad at +21 mm from the centre (top at +23), pushing 86 deg down; rose 1 mm, ended -0 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.80 rad (fingertips 69 mm apart), moving fingertip +13 mm vs the fixed one; fixed jaw: 8 N on the pad at +9 mm from the centre (top at +23), pushing 4 deg down; moving jaw: 19 N on the pad at +21 mm from the centre (top at +23), pushing 86 deg down; rose 1 mm, ended +1 mm; 514 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.84 rad (fingertips 72 mm apart), moving fingertip +16 mm vs the fixed one; fixed jaw: 4 N on the pad at +9 mm from the centre (top at +29), pushing 9 deg down; moving jaw: 21 N on the pad at +23 mm from the centre (top at +29), pushing 76 deg down; rose 2 mm, ended +0 mm; 431 g"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.48 rad (fingertips 45 mm apart), moving fingertip +3 mm vs the fixed one; fixed jaw: no contact; moving jaw: 23 N on the pad and stock jaw at +29 mm from the centre (top at +29), pushing 81 deg down; rose 2 mm, ended +1 mm; 431 g"
+    },
+    "reg_tuna_fish_can": {
+     "mechanism": "fixed_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.00 rad (fingertips 82 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: 4 N on the pad at +17 mm from the centre (top at +17), pushing 88 deg down; moving jaw: no contact; rose 0 mm, ended +0 mm; 171 g"
+    },
+    "rva000_tuna_fish_can": {
+     "mechanism": "fixed_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.00 rad (fingertips 82 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: 2 N on the pad at +17 mm from the centre (top at +17), pushing 88 deg down; moving jaw: no contact; rose 0 mm, ended +0 mm; 171 g"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "jaw -> parallelogram (link_mm=63.7724)",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost apple, flat_screwdriver, gelatin_box, golf_ball, lemon, plum, potted_meat_can, racquetball, strawberry, tennis_ball, tomato_soup_can (gelatin_box: moving_jaw_on_top_face, verdict wrong_behavior; an arm joint stalled (load_limit reflex); closed to 0.61 rad (fingertips 43 mm apart), moving fingertip +12 mm vs th; gelatin_box: moving_jaw_on_top_face, verdict wrong_behavior; an arm joint stalled (load_limit reflex); closed to 0.58 rad (fingertips 42 mm apart), moving fingertip +11 mm vs th; potted_meat_can: squeezed_down_out, verdict wrong_behavior; closed to 0.76 rad (fingertips 51 mm apart), moving fingertip +18 mm vs the fixed one; fixed jaw: 8 N on the pad at ; potted_meat_can: moving_jaw_on_top_face, verdict stuck; an arm j)",
+     "gained": [],
+     "lost": [
+      "apple",
+      "flat_screwdriver",
+      "gelatin_box",
+      "golf_ball",
+      "lemon",
+      "plum",
+      "potted_meat_can",
+      "racquetball",
+      "strawberry",
+      "tennis_ball",
+      "tomato_soup_can"
+     ],
+     "prediction": {
+      "predicted": [],
+      "hit": [],
+      "missed": [],
+      "unpredicted": [],
+      "precision": null,
+      "lost": [
+       "apple",
+       "flat_screwdriver",
+       "gelatin_box",
+       "golf_ball",
+       "lemon",
+       "plum",
+       "potted_meat_can",
+       "racquetball",
+       "strawberry",
+       "tennis_ball",
+       "tomato_soup_can"
+      ]
+     },
+     "resources": {
+      "usd": 3.6,
+      "lead_days": 3.0,
+      "fab_minutes": 78.3,
+      "lines": [
+       "m2_screw x4: provided (reused)",
+       "m3_screw x4: provided (on hand)",
+       "mr63_bearing x4: 0 provided, buy 4 at $0.9 ($3.60, 3 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 15.7 g for jaw: 78 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "moving_jaw_missed",
+      "moving_jaw_on_top_face",
+      "slipped_under_load",
+      "squeezed_down_out"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "arm_servos -> servos_12v",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "refused before trial: buying costs $68.00; the run has $40.00 left",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 68.0,
+      "lead_days": 5.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "m2_screw x4: provided (reused)",
+       "psu_12v x1: 0 provided, buy 1 at $14 ($14.00, 3 days)",
+       "sts3215_12v x3: 0 provided, buy 3 at $18 ($54.00, 5 days)",
+       "sts3215_7v4 x3: provided (reused)"
+      ],
+      "errors": [
+       "buying costs $68.00; the run has $40.00 left"
+      ]
+     },
+     "still_failing": []
+    },
+    {
+     "k": 2,
+     "move": "params",
+     "declared_move": "swap",
+     "edit": "pads -> pads (groove_mm=1.35522, lip_mm=0.498219, pad_angle_deg=39.9653, pad_tpu_mm=0.864992, reach_mm=7.25027, width_mm=17.378)",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost banana, dice, large_marker, potted_meat_can (potted_meat_can: fixed_jaw_on_top_face, verdict stuck; closed to 1.00 rad (fingertips 87 mm apart), moving fingertip +16 mm vs the fixed one; fixed jaw: 8 N on the pad at +40 mm fr; banana: force_limit, verdict stuck; a contact exceeded the force limit at t=3.32 s (squeezing or pressing down); banana: force_limit, verdict stuck; a contact exceeded the force limit at t=3.22 s (squeezing or pressing down); large_marker: fixed_jaw_on_top_face, verdict wrong_behavior; closed to 0.11 rad (fingertips 7 mm apart), moving fingertip -6 mm vs the fixed one; fixed jaw: 27 N on the pad at +; dice: squeeze)",
+     "gained": [],
+     "lost": [
+      "banana",
+      "dice",
+      "large_marker",
+      "potted_meat_can"
+     ],
+     "prediction": {
+      "predicted": [],
+      "hit": [],
+      "missed": [],
+      "unpredicted": [],
+      "precision": null,
+      "lost": [
+       "banana",
+       "dice",
+       "large_marker",
+       "potted_meat_can"
+      ]
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 11.8,
+      "lines": [
+       "m2_screw x4: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.6 g for pads: 8 machine minutes",
+       "print:TPU 0.5 g for pads: 4 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_on_top_face",
+      "force_limit",
+      "squeezed_down_out"
+     ]
+    }
+   ],
+   "accepted": null,
+   "notes": "",
+   "llm": {
+    "tag": "iter10",
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "usd_list_price": 0.0,
+    "billing": "none"
+   },
+   "seconds": 28.5,
+   "stop": null
+  },
+  {
+   "iteration": 11,
+   "body": "arm_servos: servos_7v4; jaw: revolute; pads: pads (groove_mm=0, lip_mm=0.283, pad_angle_deg=3.095, pad_tpu_mm=1.337, reach_mm=0, width_mm=9.796)",
+   "held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "potted_meat_can",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "moving_jaw_on_top_face": 6,
+    "fixed_jaw_on_top_face": 2
+   },
+   "failing": {
+    "reg_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.92 rad (fingertips 77 mm apart), moving fingertip +19 mm vs the fixed one; fixed jaw: 4 N on the pad at -0 mm from the centre (top at +19), pushing 3 deg down; moving jaw: 20 N on the pad at +17 mm from the centre (top at +19), pushing 85 deg down; rose 0 mm, ended -0 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.87 rad (fingertips 74 mm apart), moving fingertip +17 mm vs the fixed one; fixed jaw: 3 N on the pad at +2 mm from the centre (top at +19), pushing 2 deg down; moving jaw: 18 N on the pad at +17 mm from the centre (top at +19), pushing 86 deg down; rose 0 mm, ended -0 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.87 rad (fingertips 74 mm apart), moving fingertip +17 mm vs the fixed one; fixed jaw: 5 N on the pad at +6 mm from the centre (top at +23), pushing 0 deg up; moving jaw: 18 N on the pad at +21 mm from the centre (top at +23), pushing 86 deg down; rose 1 mm, ended -0 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.80 rad (fingertips 69 mm apart), moving fingertip +13 mm vs the fixed one; fixed jaw: 8 N on the pad at +9 mm from the centre (top at +23), pushing 4 deg down; moving jaw: 19 N on the pad at +21 mm from the centre (top at +23), pushing 86 deg down; rose 1 mm, ended +1 mm; 514 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.84 rad (fingertips 72 mm apart), moving fingertip +16 mm vs the fixed one; fixed jaw: 4 N on the pad at +9 mm from the centre (top at +29), pushing 9 deg down; moving jaw: 21 N on the pad at +23 mm from the centre (top at +29), pushing 76 deg down; rose 2 mm, ended +0 mm; 431 g"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.48 rad (fingertips 45 mm apart), moving fingertip +3 mm vs the fixed one; fixed jaw: no contact; moving jaw: 23 N on the pad and stock jaw at +29 mm from the centre (top at +29), pushing 81 deg down; rose 2 mm, ended +1 mm; 431 g"
+    },
+    "reg_tuna_fish_can": {
+     "mechanism": "fixed_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.00 rad (fingertips 82 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: 4 N on the pad at +17 mm from the centre (top at +17), pushing 88 deg down; moving jaw: no contact; rose 0 mm, ended +0 mm; 171 g"
+    },
+    "rva000_tuna_fish_can": {
+     "mechanism": "fixed_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.00 rad (fingertips 82 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: 2 N on the pad at +17 mm from the centre (top at +17), pushing 88 deg down; moving jaw: no contact; rose 0 mm, ended +0 mm; 171 g"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "arm_servos -> servos_12v",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "refused before trial: buying costs $68.00; the run has $40.00 left",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 68.0,
+      "lead_days": 5.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "m2_screw x4: provided (reused)",
+       "psu_12v x1: 0 provided, buy 1 at $14 ($14.00, 3 days)",
+       "sts3215_12v x3: 0 provided, buy 3 at $18 ($54.00, 5 days)",
+       "sts3215_7v4 x3: provided (reused)"
+      ],
+      "errors": [
+       "buying costs $68.00; the run has $40.00 left"
+      ]
+     },
+     "still_failing": []
+    },
+    {
+     "k": 1,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "pads -> none",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "refused before trial: this exact body was already trialled: iteration 10: rejected: lost apple, gelatin_box, strawberry (gelatin_box: squeezed_down_out, verdict stuck; closed to 0.74 rad (fingertips 73 mm apart), moving fingertip +13 mm vs the fixed one; fixed jaw: 10 N on ",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "sts3215_7v4 x6: provided (reused)"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    },
+    {
+     "k": 2,
+     "move": "params",
+     "declared_move": "swap",
+     "edit": "arm_servos -> servos_7v4",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "refused before trial: the edit leaves the body unchanged",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "m2_screw x4: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    }
+   ],
+   "accepted": null,
+   "notes": "",
+   "llm": {
+    "tag": "iter11",
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "usd_list_price": 0.0,
+    "billing": "none"
+   },
+   "seconds": 0.0,
+   "stop": null
+  },
+  {
+   "iteration": 12,
+   "body": "arm_servos: servos_7v4; jaw: revolute; pads: pads (groove_mm=0, lip_mm=0.283, pad_angle_deg=3.095, pad_tpu_mm=1.337, reach_mm=0, width_mm=9.796)",
+   "held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "potted_meat_can",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "moving_jaw_on_top_face": 6,
+    "fixed_jaw_on_top_face": 2
+   },
+   "failing": {
+    "reg_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.92 rad (fingertips 77 mm apart), moving fingertip +19 mm vs the fixed one; fixed jaw: 4 N on the pad at -0 mm from the centre (top at +19), pushing 3 deg down; moving jaw: 20 N on the pad at +17 mm from the centre (top at +19), pushing 85 deg down; rose 0 mm, ended -0 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.87 rad (fingertips 74 mm apart), moving fingertip +17 mm vs the fixed one; fixed jaw: 3 N on the pad at +2 mm from the centre (top at +19), pushing 2 deg down; moving jaw: 18 N on the pad at +17 mm from the centre (top at +19), pushing 86 deg down; rose 0 mm, ended -0 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.87 rad (fingertips 74 mm apart), moving fingertip +17 mm vs the fixed one; fixed jaw: 5 N on the pad at +6 mm from the centre (top at +23), pushing 0 deg up; moving jaw: 18 N on the pad at +21 mm from the centre (top at +23), pushing 86 deg down; rose 1 mm, ended -0 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.80 rad (fingertips 69 mm apart), moving fingertip +13 mm vs the fixed one; fixed jaw: 8 N on the pad at +9 mm from the centre (top at +23), pushing 4 deg down; moving jaw: 19 N on the pad at +21 mm from the centre (top at +23), pushing 86 deg down; rose 1 mm, ended +1 mm; 514 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.84 rad (fingertips 72 mm apart), moving fingertip +16 mm vs the fixed one; fixed jaw: 4 N on the pad at +9 mm from the centre (top at +29), pushing 9 deg down; moving jaw: 21 N on the pad at +23 mm from the centre (top at +29), pushing 76 deg down; rose 2 mm, ended +0 mm; 431 g"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.48 rad (fingertips 45 mm apart), moving fingertip +3 mm vs the fixed one; fixed jaw: no contact; moving jaw: 23 N on the pad and stock jaw at +29 mm from the centre (top at +29), pushing 81 deg down; rose 2 mm, ended +1 mm; 431 g"
+    },
+    "reg_tuna_fish_can": {
+     "mechanism": "fixed_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.00 rad (fingertips 82 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: 4 N on the pad at +17 mm from the centre (top at +17), pushing 88 deg down; moving jaw: no contact; rose 0 mm, ended +0 mm; 171 g"
+    },
+    "rva000_tuna_fish_can": {
+     "mechanism": "fixed_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.00 rad (fingertips 82 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: 2 N on the pad at +17 mm from the centre (top at +17), pushing 88 deg down; moving jaw: no contact; rose 0 mm, ended +0 mm; 171 g"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "params",
+     "declared_move": "swap",
+     "edit": "pads -> pads (groove_mm=3.56355, lip_mm=3.39316, pad_angle_deg=24.8675, pad_tpu_mm=0.436421, reach_mm=11.0821, width_mm=14.5042)",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost apple, dice, foam_brick, lemon, potted_meat_can, racquetball, strawberry, tennis_ball, wood_block_cube (potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.74 s (squeezing or pressing down); potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.98 s (squeezing or pressing down); foam_brick: fixed_jaw_on_top_face, verdict stuck; closed to 1.00 rad (fingertips 90 mm apart), moving fingertip +25 mm vs the fixed one; fixed jaw: 4 N on the pad at +25 mm fr; wood_block_cube: fixed_jaw_missed, verdict stuck; closed to 1.00 rad (fingertips 90 mm apart), moving fingertip +25 mm vs the fixed one; fixed jaw: no contact; moving jaw: no ; st)",
+     "gained": [],
+     "lost": [
+      "apple",
+      "dice",
+      "foam_brick",
+      "lemon",
+      "potted_meat_can",
+      "racquetball",
+      "strawberry",
+      "tennis_ball",
+      "wood_block_cube"
+     ],
+     "prediction": {
+      "predicted": [],
+      "hit": [],
+      "missed": [],
+      "unpredicted": [],
+      "precision": null,
+      "lost": [
+       "apple",
+       "dice",
+       "foam_brick",
+       "lemon",
+       "potted_meat_can",
+       "racquetball",
+       "strawberry",
+       "tennis_ball",
+       "wood_block_cube"
+      ]
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 9.5,
+      "lines": [
+       "m2_screw x4: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.6 g for pads: 8 machine minutes",
+       "print:TPU 0.2 g for pads: 2 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "fixed_jaw_on_top_face",
+      "force_limit",
+      "moving_jaw_missed"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "params",
+     "declared_move": "swap",
+     "edit": "pads -> pads (groove_mm=4.97882, lip_mm=0.0398182, pad_angle_deg=18.6923, pad_tpu_mm=1.09514, reach_mm=24.6812, width_mm=9.25808)",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost apple, cup, dice, foam_brick, potted_meat_can, racquetball, tennis_ball, tomato_soup_can (potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.40 s (squeezing or pressing down); potted_meat_can: knocked_on_descent, verdict wrong_behavior; the descending jaws pushed the object 63 mm before closing; closed to 1.00 rad (fingertips 97 mm apart), moving fing; foam_brick: force_limit, verdict stuck; a contact exceeded the force limit at t=0.94 s (squeezing or pressing down); foam_brick: force_limit, verdict stuck; a contact exceeded the force limit at t=1.30 s (squeezing or pressing down); tomato_soup_can: force_limit, verdict stuck; a contact exceeded t)",
+     "gained": [],
+     "lost": [
+      "apple",
+      "cup",
+      "dice",
+      "foam_brick",
+      "potted_meat_can",
+      "racquetball",
+      "tennis_ball",
+      "tomato_soup_can"
+     ],
+     "prediction": {
+      "predicted": [],
+      "hit": [],
+      "missed": [],
+      "unpredicted": [],
+      "precision": null,
+      "lost": [
+       "apple",
+       "cup",
+       "dice",
+       "foam_brick",
+       "potted_meat_can",
+       "racquetball",
+       "tennis_ball",
+       "tomato_soup_can"
+      ]
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 14.4,
+      "lines": [
+       "m2_screw x4: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.8 g for pads: 9 machine minutes",
+       "print:TPU 0.7 g for pads: 5 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_on_top_face",
+      "force_limit",
+      "knocked_on_descent",
+      "squeezed_down_out",
+      "squeezed_up_out"
+     ]
+    },
+    {
+     "k": 2,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "arm_servos -> servos_12v",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "refused before trial: buying costs $68.00; the run has $40.00 left",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 68.0,
+      "lead_days": 5.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "m2_screw x4: provided (reused)",
+       "psu_12v x1: 0 provided, buy 1 at $14 ($14.00, 3 days)",
+       "sts3215_12v x3: 0 provided, buy 3 at $18 ($54.00, 5 days)",
+       "sts3215_7v4 x3: provided (reused)"
+      ],
+      "errors": [
+       "buying costs $68.00; the run has $40.00 left"
+      ]
+     },
+     "still_failing": []
+    }
+   ],
+   "accepted": null,
+   "notes": "",
+   "llm": {
+    "tag": "iter12",
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "usd_list_price": 0.0,
+    "billing": "none"
+   },
+   "seconds": 16.4,
+   "stop": null
+  },
+  {
+   "iteration": 13,
+   "body": "arm_servos: servos_7v4; jaw: revolute; pads: pads (groove_mm=0, lip_mm=0.283, pad_angle_deg=3.095, pad_tpu_mm=1.337, reach_mm=0, width_mm=9.796)",
+   "held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "potted_meat_can",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "moving_jaw_on_top_face": 6,
+    "fixed_jaw_on_top_face": 2
+   },
+   "failing": {
+    "reg_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.92 rad (fingertips 77 mm apart), moving fingertip +19 mm vs the fixed one; fixed jaw: 4 N on the pad at -0 mm from the centre (top at +19), pushing 3 deg down; moving jaw: 20 N on the pad at +17 mm from the centre (top at +19), pushing 85 deg down; rose 0 mm, ended -0 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.87 rad (fingertips 74 mm apart), moving fingertip +17 mm vs the fixed one; fixed jaw: 3 N on the pad at +2 mm from the centre (top at +19), pushing 2 deg down; moving jaw: 18 N on the pad at +17 mm from the centre (top at +19), pushing 86 deg down; rose 0 mm, ended -0 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.87 rad (fingertips 74 mm apart), moving fingertip +17 mm vs the fixed one; fixed jaw: 5 N on the pad at +6 mm from the centre (top at +23), pushing 0 deg up; moving jaw: 18 N on the pad at +21 mm from the centre (top at +23), pushing 86 deg down; rose 1 mm, ended -0 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.80 rad (fingertips 69 mm apart), moving fingertip +13 mm vs the fixed one; fixed jaw: 8 N on the pad at +9 mm from the centre (top at +23), pushing 4 deg down; moving jaw: 19 N on the pad at +21 mm from the centre (top at +23), pushing 86 deg down; rose 1 mm, ended +1 mm; 514 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.84 rad (fingertips 72 mm apart), moving fingertip +16 mm vs the fixed one; fixed jaw: 4 N on the pad at +9 mm from the centre (top at +29), pushing 9 deg down; moving jaw: 21 N on the pad at +23 mm from the centre (top at +29), pushing 76 deg down; rose 2 mm, ended +0 mm; 431 g"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.48 rad (fingertips 45 mm apart), moving fingertip +3 mm vs the fixed one; fixed jaw: no contact; moving jaw: 23 N on the pad and stock jaw at +29 mm from the centre (top at +29), pushing 81 deg down; rose 2 mm, ended +1 mm; 431 g"
+    },
+    "reg_tuna_fish_can": {
+     "mechanism": "fixed_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.00 rad (fingertips 82 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: 4 N on the pad at +17 mm from the centre (top at +17), pushing 88 deg down; moving jaw: no contact; rose 0 mm, ended +0 mm; 171 g"
+    },
+    "rva000_tuna_fish_can": {
+     "mechanism": "fixed_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.00 rad (fingertips 82 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: 2 N on the pad at +17 mm from the centre (top at +17), pushing 88 deg down; moving jaw: no contact; rose 0 mm, ended +0 mm; 171 g"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "arm_servos -> servos_12v",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "refused before trial: buying costs $68.00; the run has $40.00 left",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 68.0,
+      "lead_days": 5.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "m2_screw x4: provided (reused)",
+       "psu_12v x1: 0 provided, buy 1 at $14 ($14.00, 3 days)",
+       "sts3215_12v x3: 0 provided, buy 3 at $18 ($54.00, 5 days)",
+       "sts3215_7v4 x3: provided (reused)"
+      ],
+      "errors": [
+       "buying costs $68.00; the run has $40.00 left"
+      ]
+     },
+     "still_failing": []
+    },
+    {
+     "k": 1,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "pads (width_mm=8.95143)",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: gained nothing; still failing: fixed_jaw_on_top_face, moving_jaw_on_top_face",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [],
+      "hit": [],
+      "missed": [],
+      "unpredicted": [],
+      "precision": null,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 3.3,
+      "lines": [
+       "m2_screw x4: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 0.4 g for pads: 2 machine minutes",
+       "print:TPU 0.2 g for pads: 1 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_on_top_face",
+      "moving_jaw_on_top_face"
+     ]
+    },
+    {
+     "k": 2,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "jaw -> parallelogram (link_mm=69.554)",
+     "base": null,
+     "mechanism": "random",
+     "principle": "random",
+     "hypothesis": "random baseline",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost apple, flat_screwdriver, gelatin_box, lemon, plum, potted_meat_can, racquetball, strawberry, tennis_ball, tomato_soup_can (gelatin_box: moving_jaw_on_top_face, verdict wrong_behavior; an arm joint stalled (load_limit reflex); closed to 0.56 rad (fingertips 44 mm apart), moving fingertip +11 mm vs th; gelatin_box: moving_jaw_on_top_face, verdict wrong_behavior; an arm joint stalled (load_limit reflex); closed to 0.27 rad (fingertips 26 mm apart), moving fingertip +3 mm vs the; potted_meat_can: squeezed_down_out, verdict wrong_behavior; closed to 0.69 rad (fingertips 51 mm apart), moving fingertip +17 mm vs the fixed one; fixed jaw: 7 N on the pad at ; potted_meat_can: squeezed_down_out, verdict wrong_behavior; clos)",
+     "gained": [],
+     "lost": [
+      "apple",
+      "flat_screwdriver",
+      "gelatin_box",
+      "lemon",
+      "plum",
+      "potted_meat_can",
+      "racquetball",
+      "strawberry",
+      "tennis_ball",
+      "tomato_soup_can"
+     ],
+     "prediction": {
+      "predicted": [],
+      "hit": [],
+      "missed": [],
+      "unpredicted": [],
+      "precision": null,
+      "lost": [
+       "apple",
+       "flat_screwdriver",
+       "gelatin_box",
+       "lemon",
+       "plum",
+       "potted_meat_can",
+       "racquetball",
+       "strawberry",
+       "tennis_ball",
+       "tomato_soup_can"
+      ]
+     },
+     "resources": {
+      "usd": 3.6,
+      "lead_days": 3.0,
+      "fab_minutes": 81.7,
+      "lines": [
+       "m2_screw x4: provided (reused)",
+       "m3_screw x4: provided (on hand)",
+       "mr63_bearing x4: 0 provided, buy 4 at $0.9 ($3.60, 3 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 16.3 g for jaw: 82 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "arm_stall_before_lift",
+      "moving_jaw_missed",
+      "moving_jaw_on_top_face",
+      "squeezed_down_out"
+     ]
+    }
+   ],
+   "accepted": null,
+   "notes": "",
+   "llm": {
+    "tag": "iter13",
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "usd_list_price": 0.0,
+    "billing": "none"
+   },
+   "seconds": 29.2,
+   "stop": null
+  },
+  {
+   "iteration": 14,
+   "body": "arm_servos: servos_7v4; jaw: revolute; pads: pads (groove_mm=0, lip_mm=0.283, pad_angle_deg=3.095, pad_tpu_mm=1.337, reach_mm=0, width_mm=9.796)",
+   "held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "potted_meat_can",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "moving_jaw_on_top_face": 6,
+    "fixed_jaw_on_top_face": 2
+   },
+   "failing": {
+    "reg_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.92 rad (fingertips 77 mm apart), moving fingertip +19 mm vs the fixed one; fixed jaw: 4 N on the pad at -0 mm from the centre (top at +19), pushing 3 deg down; moving jaw: 20 N on the pad at +17 mm from the centre (top at +19), pushing 85 deg down; rose 0 mm, ended -0 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.87 rad (fingertips 74 mm apart), moving fingertip +17 mm vs the fixed one; fixed jaw: 3 N on the pad at +2 mm from the centre (top at +19), pushing 2 deg down; moving jaw: 18 N on the pad at +17 mm from the centre (top at +19), pushing 86 deg down; rose 0 mm, ended -0 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.87 rad (fingertips 74 mm apart), moving fingertip +17 mm vs the fixed one; fixed jaw: 5 N on the pad at +6 mm from the centre (top at +23), pushing 0 deg up; moving jaw: 18 N on the pad at +21 mm from the centre (top at +23), pushing 86 deg down; rose 1 mm, ended -0 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.80 rad (fingertips 69 mm apart), moving fingertip +13 mm vs the fixed one; fixed jaw: 8 N on the pad at +9 mm from the centre (top at +23), pushing 4 deg down; moving jaw: 19 N on the pad at +21 mm from the centre (top at +23), pushing 86 deg down; rose 1 mm, ended +1 mm; 514 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.84 rad (fingertips 72 mm apart), moving fingertip +16 mm vs the fixed one; fixed jaw: 4 N on the pad at +9 mm from the centre (top at +29), pushing 9 deg down; moving jaw: 21 N on the pad at +23 mm from the centre (top at +29), pushing 76 deg down; rose 2 mm, ended +0 mm; 431 g"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.48 rad (fingertips 45 mm apart), moving fingertip +3 mm vs the fixed one; fixed jaw: no contact; moving jaw: 23 N on the pad and stock jaw at +29 mm from the centre (top at +29), pushing 81 deg down; rose 2 mm, ended +1 mm; 431 g"
+    },
+    "reg_tuna_fish_can": {
+     "mechanism": "fixed_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.00 rad (fingertips 82 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: 4 N on the pad at +17 mm from the centre (top at +17), pushing 88 deg down; moving jaw: no contact; rose 0 mm, ended +0 mm; 171 g"
+    },
+    "rva000_tuna_fish_can": {
+     "mechanism": "fixed_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.00 rad (fingertips 82 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: 2 N on the pad at +17 mm from the centre (top at +17), pushing 88 deg down; moving jaw: no contact; rose 0 mm, ended +0 mm; 171 g"
+    }
+   },
+   "proposals": [],
+   "accepted": null,
+   "notes": "",
+   "llm": {},
+   "seconds": null,
+   "stop": "iterations"
+  }
+ ],
+ "llm_calls": []
+}
