@@ -319,3 +319,21 @@ def test_disjoint_gains_are_merged(tmp_path):
     off = run(RunConfig(world="two", iterations=1, merge=False), tmp_path / "off", proposer=Scripted([batch]),
               world=Two(), log=lambda m: None)
     assert len(off["final_held_train"]) == 2
+
+
+class Wide(Gentle):
+    """Gentle's new hand with five more parameters that do nothing: tuning must not stir them all at once."""
+
+    def catalogue(self) -> list[PartType]:
+        extra = {k: Param(lo=0, hi=1, doc="inert") for k in "vwxyz"}
+        return [PartType(name="old", slot="hand", stock=True, doc="the old hand"),
+                PartType(name="new", slot="hand", doc="a new hand", params={"care": Param(lo=0, hi=1, doc="keeps a"), **extra})]
+
+
+def test_tuning_moves_one_or_two_parameters_at_a_time(tmp_path):
+    llm = Scripted([ProposalBatch(proposals=[_p("swap", [Edit(slot="hand", type="new")], gains=["b", "c"])])])
+    run(RunConfig(world="wide", iterations=1, tune_trials=6), tmp_path, proposer=llm, world=Wide(), log=lambda m: None)
+    rec = json.loads((tmp_path / "iterations.jsonl").read_text().splitlines()[0])
+    tuned = [t for t in rec["trials"] if t["move"] == "tune"]
+    vals = dict(kv.split("=") for kv in tuned[0]["edit"].split("(")[1].rstrip(")").split(", "))
+    assert len(vals) == 6 and 1 <= sum(abs(float(v) - 0.5) > 1e-9 for v in vals.values()) <= 2  # vs the midpoints

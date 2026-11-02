@@ -1200,3 +1200,8 @@ Two gripper evolve runs predate this change, and their `harness.json` records th
 
 Tests: `tests/test_grasp_table.py` and `tests/test_grasp_world.py` (updated to the new envelope);
 the golden files re-recorded from reviewed diffs.
+
+Amendment (after `gripper_s2v3_s0` iteration 1): a tuning step now moves one or two of the swap's
+parameters, not all of them. Tuning the slide with pads perturbed all seven parameters at once, and
+each of its four trials broke a different held group. A swap's values are System 2's reasoned guess,
+so a sparse step around them is the better search. Parts with a single parameter are unaffected.

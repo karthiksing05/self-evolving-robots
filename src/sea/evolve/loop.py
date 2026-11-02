@@ -294,8 +294,10 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
         return score
 
     def tune(seed: Body, seed_entry: dict[str, Any], rng: np.random.Generator):
-        """Fit the parameters of the slots a promising swap edited: a Gaussian search in each parameter's range,
-        centred on the best body so far, until one is kept-eligible or ``tune_trials`` trials have run."""
+        """Fit the parameters of the slots a promising swap edited: a Gaussian step in each parameter's range,
+        centred on the best body so far, until one is kept-eligible or ``tune_trials`` trials have run.  Each step
+        moves one or two parameters: a swap's values are System 2's reasoned guess, and moving all of them at
+        once breaks a different held group each time (gripper_s2v3_s0, iteration 1)."""
         space = [(slot, k, catalogue[seed.parts[slot].type].params[k]) for slot in seed_entry["slots"]
                  for k in sorted(catalogue[seed.parts[slot].type].params)]
         if not space:
@@ -305,7 +307,10 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
         for i in range(3 * cfg.tune_trials):
             if ran >= cfg.tune_trials:
                 break
-            xi = np.clip(best_x + rng.normal(0.0, sigma, len(space)), 0.0, 1.0)
+            step = np.zeros(len(space))
+            pick = rng.choice(len(space), size=min(len(space), int(rng.integers(1, 3))), replace=False)
+            step[pick] = rng.normal(0.0, sigma, len(pick))
+            xi = np.clip(best_x + step, 0.0, 1.0)
             edits: dict[str, dict[str, float]] = {}
             for (s, k, p), v in zip(space, xi, strict=True):
                 edits.setdefault(s, {})[k] = round(float(p.lo + v * (p.hi - p.lo)), 3)
