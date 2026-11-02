@@ -1,0 +1,48 @@
+{
+ "run": "mobile_s2_s1",
+ "world": "mobile",
+ "bodies": [
+  {
+   "id": "stock",
+   "key": "0831a2a66fa7",
+   "facts": {
+    "pack": "2 x nimh_pack",
+    "pack_v_if_series": 2.4,
+    "voltage_in_model": false,
+    "motors": 4,
+    "stall_a_each": 0.75,
+    "driver": "driver_tb6612",
+    "channel_a": 1.2,
+    "stall_over_channel": false
+   }
+  },
+  {
+   "id": "b00m",
+   "key": "7637dbeac554",
+   "facts": {
+    "pack": "6 x nimh_pack",
+    "pack_v_if_series": 7.2,
+    "voltage_in_model": false,
+    "motors": 4,
+    "stall_a_each": 0.75,
+    "driver": "driver_tb6612",
+    "channel_a": 1.2,
+    "stall_over_channel": false
+   }
+  },
+  {
+   "id": "b011",
+   "key": "2fd769e0191f",
+   "facts": {
+    "pack": "6 x nimh_pack",
+    "pack_v_if_series": 7.2,
+    "voltage_in_model": false,
+    "motors": 2,
+    "stall_a_each": 0.75,
+    "driver": "driver_tb6612",
+    "channel_a": 1.2,
+    "stall_over_channel": false
+   }
+  }
+ ]
+}

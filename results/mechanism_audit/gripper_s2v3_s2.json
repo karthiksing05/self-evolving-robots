@@ -1,0 +1,1085 @@
+{
+ "run": "gripper_s2v3_s2",
+ "world": "gripper",
+ "bodies": [
+  {
+   "id": "stock",
+   "key": "e58bdd949fb4",
+   "geometry": {
+    "jaw_range_servo_rad": [
+     -0.175,
+     1.745
+    ],
+    "clashes": {
+     "sts3215_03a_v1 / moving_jaw_so101_v1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175,
+       0.065,
+       0.305,
+       0.545,
+       0.785,
+       1.025,
+       1.265,
+       1.505,
+       1.745
+      ],
+      "crossings": [
+       4000,
+       4000,
+       4000,
+       4000,
+       4000,
+       4000,
+       4000,
+       4000,
+       4000
+      ],
+      "region_mm": [
+       20.0,
+       3.5,
+       20.0
+      ],
+      "from_axis_mm": [
+       1.6,
+       10.0
+      ]
+     }
+    },
+    "carried": {
+     "moving_jaw_so101_v1": {
+      "parent": "gripper",
+      "joint": "hinge",
+      "material": true,
+      "worst_gap_mm": 0.0,
+      "gap_by_q_mm": [
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "sim_mass_g": {
+     "moving_jaw_so101_v1": 12.0,
+     "gripper": 87.0
+    }
+   }
+  },
+  {
+   "id": "b00t1",
+   "key": "a9f8745b8a63",
+   "geometry": {
+    "jaw_range_servo_rad": [
+     -0.175,
+     1.745
+    ],
+    "clashes": {
+     "sts3215_03a_v1 / moving_jaw_so101_v1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175,
+       0.065,
+       0.305
+      ],
+      "crossings": [
+       4000,
+       4000,
+       470
+      ],
+      "region_mm": [
+       21.7,
+       38.9,
+       19.8
+      ],
+      "from_axis_mm": [
+       0.0,
+       38.6
+      ]
+     },
+     "wrist_roll_follower_so101_v1 / moving_jaw_so101_v1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       1056
+      ],
+      "region_mm": [
+       15.6,
+       46.3,
+       23.1
+      ],
+      "from_axis_mm": [
+       0.0,
+       41.4
+      ]
+     },
+     "jaw_fixed_pad0 / jaw_moving_pad1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       14
+      ],
+      "region_mm": [
+       1.5,
+       3.1,
+       9.3
+      ],
+      "from_axis_mm": [
+       74.6,
+       83.8
+      ]
+     },
+     "jaw_fixed_pad1 / jaw_moving_pad0": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       12
+      ],
+      "region_mm": [
+       1.5,
+       2.9,
+       9.3
+      ],
+      "from_axis_mm": [
+       72.3,
+       81.7
+      ]
+     }
+    },
+    "carried": {
+     "moving_jaw_so101_v1": {
+      "parent": "gripper",
+      "joint": "slide",
+      "material": true,
+      "worst_gap_mm": 84.5,
+      "gap_by_q_mm": [
+       0.0,
+       0.0,
+       0.0,
+       12.7,
+       27.0,
+       41.4,
+       55.8,
+       70.1,
+       84.5
+      ]
+     }
+    },
+    "sim_mass_g": {
+     "moving_jaw_so101_v1": 12.0,
+     "gripper": 87.0
+    }
+   }
+  },
+  {
+   "id": "b022",
+   "key": "2ffee155aa11",
+   "geometry": {
+    "jaw_range_servo_rad": [
+     -0.175,
+     1.745
+    ],
+    "clashes": {
+     "sts3215_03a_v1 / moving_jaw_so101_v1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175,
+       0.065,
+       0.305
+      ],
+      "crossings": [
+       4000,
+       4000,
+       470
+      ],
+      "region_mm": [
+       21.7,
+       38.9,
+       19.8
+      ],
+      "from_axis_mm": [
+       0.0,
+       38.6
+      ]
+     },
+     "wrist_roll_follower_so101_v1 / moving_jaw_so101_v1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       1056
+      ],
+      "region_mm": [
+       15.6,
+       46.3,
+       23.1
+      ],
+      "from_axis_mm": [
+       0.0,
+       41.4
+      ]
+     },
+     "jaw_fixed_pad0 / jaw_moving_pad1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       14
+      ],
+      "region_mm": [
+       1.5,
+       3.2,
+       12.4
+      ],
+      "from_axis_mm": [
+       74.6,
+       86.7
+      ]
+     },
+     "jaw_fixed_pad1 / jaw_moving_pad0": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       14
+      ],
+      "region_mm": [
+       1.4,
+       3.1,
+       12.4
+      ],
+      "from_axis_mm": [
+       72.3,
+       84.7
+      ]
+     }
+    },
+    "carried": {
+     "moving_jaw_so101_v1": {
+      "parent": "gripper",
+      "joint": "slide",
+      "material": true,
+      "worst_gap_mm": 84.5,
+      "gap_by_q_mm": [
+       0.0,
+       0.0,
+       0.0,
+       12.7,
+       27.0,
+       41.4,
+       55.8,
+       70.1,
+       84.5
+      ]
+     }
+    },
+    "sim_mass_g": {
+     "moving_jaw_so101_v1": 12.0,
+     "gripper": 87.0
+    }
+   }
+  },
+  {
+   "id": "b031",
+   "key": "307d79a8748c",
+   "geometry": {
+    "jaw_range_servo_rad": [
+     -0.175,
+     1.745
+    ],
+    "clashes": {
+     "sts3215_03a_v1 / moving_jaw_so101_v1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175,
+       0.065,
+       0.305
+      ],
+      "crossings": [
+       4000,
+       4000,
+       470
+      ],
+      "region_mm": [
+       21.7,
+       38.9,
+       19.8
+      ],
+      "from_axis_mm": [
+       0.0,
+       38.6
+      ]
+     },
+     "wrist_roll_follower_so101_v1 / moving_jaw_so101_v1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       1056
+      ],
+      "region_mm": [
+       15.6,
+       46.3,
+       23.1
+      ],
+      "from_axis_mm": [
+       0.0,
+       41.4
+      ]
+     },
+     "jaw_fixed_pad0 / jaw_moving_pad1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       14
+      ],
+      "region_mm": [
+       1.6,
+       4.6,
+       12.4
+      ],
+      "from_axis_mm": [
+       75.5,
+       87.5
+      ]
+     },
+     "jaw_fixed_pad1 / jaw_moving_pad0": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       12
+      ],
+      "region_mm": [
+       1.7,
+       4.7,
+       12.3
+      ],
+      "from_axis_mm": [
+       71.8,
+       84.3
+      ]
+     }
+    },
+    "carried": {
+     "moving_jaw_so101_v1": {
+      "parent": "gripper",
+      "joint": "slide",
+      "material": true,
+      "worst_gap_mm": 84.5,
+      "gap_by_q_mm": [
+       0.0,
+       0.0,
+       0.0,
+       12.7,
+       27.0,
+       41.4,
+       55.8,
+       70.1,
+       84.5
+      ]
+     }
+    },
+    "sim_mass_g": {
+     "moving_jaw_so101_v1": 12.0,
+     "gripper": 87.0
+    }
+   }
+  },
+  {
+   "id": "b050",
+   "key": "f1b12c02829a",
+   "geometry": {
+    "jaw_range_servo_rad": [
+     -0.175,
+     1.745
+    ],
+    "clashes": {
+     "sts3215_03a_v1 / moving_jaw_so101_v1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175,
+       0.065,
+       0.305
+      ],
+      "crossings": [
+       4000,
+       4000,
+       470
+      ],
+      "region_mm": [
+       21.7,
+       38.9,
+       19.8
+      ],
+      "from_axis_mm": [
+       0.0,
+       38.6
+      ]
+     },
+     "wrist_roll_follower_so101_v1 / moving_jaw_so101_v1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       1056
+      ],
+      "region_mm": [
+       15.6,
+       46.3,
+       23.1
+      ],
+      "from_axis_mm": [
+       0.0,
+       41.4
+      ]
+     },
+     "jaw_fixed_pad0 / jaw_moving_pad1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       14
+      ],
+      "region_mm": [
+       2.8,
+       6.3,
+       12.5
+      ],
+      "from_axis_mm": [
+       75.2,
+       87.6
+      ]
+     },
+     "jaw_fixed_pad1 / jaw_moving_pad0": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       14
+      ],
+      "region_mm": [
+       3.1,
+       6.9,
+       12.5
+      ],
+      "from_axis_mm": [
+       71.7,
+       84.8
+      ]
+     }
+    },
+    "carried": {
+     "moving_jaw_so101_v1": {
+      "parent": "gripper",
+      "joint": "slide",
+      "material": true,
+      "worst_gap_mm": 84.5,
+      "gap_by_q_mm": [
+       0.0,
+       0.0,
+       0.0,
+       12.7,
+       27.0,
+       41.4,
+       55.8,
+       70.1,
+       84.5
+      ]
+     }
+    },
+    "sim_mass_g": {
+     "moving_jaw_so101_v1": 12.0,
+     "gripper": 87.0
+    }
+   }
+  },
+  {
+   "id": "b072",
+   "key": "320aa7f2c913",
+   "geometry": {
+    "jaw_range_servo_rad": [
+     -0.175,
+     1.745
+    ],
+    "clashes": {
+     "sts3215_03a_v1 / moving_jaw_so101_v1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175,
+       0.065,
+       0.305
+      ],
+      "crossings": [
+       4000,
+       4000,
+       470
+      ],
+      "region_mm": [
+       21.7,
+       38.9,
+       19.8
+      ],
+      "from_axis_mm": [
+       0.0,
+       38.6
+      ]
+     },
+     "wrist_roll_follower_so101_v1 / moving_jaw_so101_v1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       1056
+      ],
+      "region_mm": [
+       15.6,
+       46.3,
+       23.1
+      ],
+      "from_axis_mm": [
+       0.0,
+       41.4
+      ]
+     },
+     "jaw_fixed_pad0 / jaw_moving_pad1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       14
+      ],
+      "region_mm": [
+       2.6,
+       5.2,
+       12.5
+      ],
+      "from_axis_mm": [
+       75.4,
+       87.8
+      ]
+     },
+     "jaw_fixed_pad1 / jaw_moving_pad0": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       14
+      ],
+      "region_mm": [
+       3.1,
+       5.1,
+       12.5
+      ],
+      "from_axis_mm": [
+       71.8,
+       84.3
+      ]
+     }
+    },
+    "carried": {
+     "moving_jaw_so101_v1": {
+      "parent": "gripper",
+      "joint": "slide",
+      "material": true,
+      "worst_gap_mm": 84.5,
+      "gap_by_q_mm": [
+       0.0,
+       0.0,
+       0.0,
+       12.7,
+       27.0,
+       41.4,
+       55.8,
+       70.1,
+       84.5
+      ]
+     }
+    },
+    "sim_mass_g": {
+     "moving_jaw_so101_v1": 12.0,
+     "gripper": 87.0
+    }
+   }
+  },
+  {
+   "id": "b081",
+   "key": "a9ae8b5811b1",
+   "geometry": {
+    "jaw_range_servo_rad": [
+     -0.175,
+     1.745
+    ],
+    "clashes": {
+     "sts3215_03a_v1 / moving_jaw_so101_v1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175,
+       0.065,
+       0.305
+      ],
+      "crossings": [
+       4000,
+       4000,
+       470
+      ],
+      "region_mm": [
+       21.7,
+       38.9,
+       19.8
+      ],
+      "from_axis_mm": [
+       0.0,
+       38.6
+      ]
+     },
+     "wrist_roll_follower_so101_v1 / moving_jaw_so101_v1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       1056
+      ],
+      "region_mm": [
+       15.6,
+       46.3,
+       23.1
+      ],
+      "from_axis_mm": [
+       0.0,
+       41.4
+      ]
+     },
+     "jaw_fixed_pad0 / jaw_moving_pad1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       14
+      ],
+      "region_mm": [
+       2.6,
+       5.1,
+       12.4
+      ],
+      "from_axis_mm": [
+       75.7,
+       88.2
+      ]
+     },
+     "jaw_fixed_pad1 / jaw_moving_pad0": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       14
+      ],
+      "region_mm": [
+       2.7,
+       5.0,
+       12.5
+      ],
+      "from_axis_mm": [
+       71.6,
+       84.1
+      ]
+     }
+    },
+    "carried": {
+     "moving_jaw_so101_v1": {
+      "parent": "gripper",
+      "joint": "slide",
+      "material": true,
+      "worst_gap_mm": 84.5,
+      "gap_by_q_mm": [
+       0.0,
+       0.0,
+       0.0,
+       12.7,
+       27.0,
+       41.4,
+       55.8,
+       70.1,
+       84.5
+      ]
+     }
+    },
+    "sim_mass_g": {
+     "moving_jaw_so101_v1": 12.0,
+     "gripper": 87.0
+    }
+   }
+  },
+  {
+   "id": "b100",
+   "key": "02d571a9cb9c",
+   "geometry": {
+    "jaw_range_servo_rad": [
+     -0.175,
+     1.745
+    ],
+    "clashes": {
+     "sts3215_03a_v1 / moving_jaw_so101_v1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175,
+       0.065,
+       0.305
+      ],
+      "crossings": [
+       4000,
+       4000,
+       470
+      ],
+      "region_mm": [
+       21.7,
+       38.9,
+       19.8
+      ],
+      "from_axis_mm": [
+       0.0,
+       38.6
+      ]
+     },
+     "wrist_roll_follower_so101_v1 / moving_jaw_so101_v1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       1056
+      ],
+      "region_mm": [
+       15.6,
+       46.3,
+       23.1
+      ],
+      "from_axis_mm": [
+       0.0,
+       41.4
+      ]
+     },
+     "jaw_fixed_pad0 / jaw_moving_pad1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       14
+      ],
+      "region_mm": [
+       2.6,
+       5.1,
+       13.0
+      ],
+      "from_axis_mm": [
+       75.7,
+       88.6
+      ]
+     },
+     "jaw_fixed_pad1 / jaw_moving_pad0": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       14
+      ],
+      "region_mm": [
+       2.7,
+       5.0,
+       13.0
+      ],
+      "from_axis_mm": [
+       71.6,
+       84.6
+      ]
+     }
+    },
+    "carried": {
+     "moving_jaw_so101_v1": {
+      "parent": "gripper",
+      "joint": "slide",
+      "material": true,
+      "worst_gap_mm": 84.5,
+      "gap_by_q_mm": [
+       0.0,
+       0.0,
+       0.0,
+       12.7,
+       27.0,
+       41.4,
+       55.8,
+       70.1,
+       84.5
+      ]
+     }
+    },
+    "sim_mass_g": {
+     "moving_jaw_so101_v1": 12.0,
+     "gripper": 87.0
+    }
+   }
+  }
+ ],
+ "contacts": [
+  {
+   "film": "01_b00t1_apple.mp4",
+   "task": "reg_apple",
+   "before": {
+    "ok": false,
+    "body": "stock",
+    "penetration": {
+     "object-robot": {
+      "peak_mm": 2.39,
+      "p95_mm": 2.37,
+      "steps": 138
+     },
+     "object-table": {
+      "peak_mm": 1.81,
+      "p95_mm": 1.79,
+      "steps": 176
+     }
+    }
+   },
+   "after": {
+    "ok": true,
+    "body": "b00t1",
+    "penetration": {
+     "object-robot": {
+      "peak_mm": 4.42,
+      "p95_mm": 4.4,
+      "steps": 203
+     },
+     "object-table": {
+      "peak_mm": 0.24,
+      "p95_mm": 0.19,
+      "steps": 151
+     }
+    }
+   }
+  },
+  {
+   "film": "01_b00t1_pudding_box.mp4",
+   "task": "reg_pudding_box",
+   "before": {
+    "ok": false,
+    "body": "stock",
+    "penetration": {
+     "object-robot": {
+      "peak_mm": 0.84,
+      "p95_mm": 0.83,
+      "steps": 43
+     },
+     "object-table": {
+      "peak_mm": 1.36,
+      "p95_mm": 0.99,
+      "steps": 174
+     }
+    }
+   },
+   "after": {
+    "ok": true,
+    "body": "b00t1",
+    "penetration": {
+     "object-robot": {
+      "peak_mm": 2.36,
+      "p95_mm": 2.05,
+      "steps": 204
+     },
+     "object-table": {
+      "peak_mm": 0.21,
+      "p95_mm": 0.21,
+      "steps": 137
+     }
+    }
+   }
+  },
+  {
+   "film": "01_b00t1_flat_screwdriver.mp4",
+   "task": "reg_flat_screwdriver",
+   "before": {
+    "ok": false,
+    "body": "stock",
+    "penetration": {
+     "object-robot": {
+      "peak_mm": 4.06,
+      "p95_mm": 2.45,
+      "steps": 89
+     },
+     "object-table": {
+      "peak_mm": 5.87,
+      "p95_mm": 0.32,
+      "steps": 205
+     }
+    }
+   },
+   "after": {
+    "ok": true,
+    "body": "b00t1",
+    "penetration": {
+     "object-robot": {
+      "peak_mm": 5.17,
+      "p95_mm": 5.11,
+      "steps": 174
+     },
+     "object-table": {
+      "peak_mm": 4.48,
+      "p95_mm": 0.19,
+      "steps": 205
+     }
+    }
+   }
+  },
+  {
+   "film": "07_b100_mustard_bottle.mp4",
+   "task": "reg_mustard_bottle",
+   "before": {
+    "ok": false,
+    "body": "b081",
+    "penetration": {
+     "object-robot": {
+      "peak_mm": 2.54,
+      "p95_mm": 2.36,
+      "steps": 127
+     },
+     "object-table": {
+      "peak_mm": 0.3,
+      "p95_mm": 0.29,
+      "steps": 163
+     }
+    }
+   },
+   "after": {
+    "ok": true,
+    "body": "b100",
+    "penetration": {
+     "object-robot": {
+      "peak_mm": 2.62,
+      "p95_mm": 2.36,
+      "steps": 156
+     },
+     "object-table": {
+      "peak_mm": 0.34,
+      "p95_mm": 0.31,
+      "steps": 170
+     }
+    }
+   }
+  }
+ ]
+}

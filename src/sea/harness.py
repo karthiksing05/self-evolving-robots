@@ -63,7 +63,9 @@ COMPONENTS: dict[str, tuple[str, tuple[str, ...]]] = {
 # Modules that read runs but never shape one; every other module under src/sea belongs to a component.
 # The CAD modules draw a run's bodies for people (D-049): a picture is not part of the ruler.
 TOOLING = ("src/sea/cli.py", "src/sea/harness.py", "src/sea/report.py", "src/sea/design/cad.py",
-           "src/sea/worlds/cad.py", "src/sea/worlds/film.py")
+           "src/sea/worlds/cad.py", "src/sea/worlds/film.py",
+           # the mechanism verifier measures and decides nothing yet (D-051); it joins the judge when its laws do
+           "src/sea/mechanism/geometry.py", "src/sea/mechanism/audit.py")
 
 
 def _hash_files(paths: tuple[str, ...]) -> str:

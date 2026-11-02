@@ -1,0 +1,448 @@
+{
+ "run": "gripper_s2v2_s0",
+ "world": "gripper",
+ "bodies": [
+  {
+   "id": "stock",
+   "key": "e58bdd949fb4",
+   "geometry": {
+    "jaw_range_servo_rad": [
+     -0.175,
+     1.745
+    ],
+    "clashes": {
+     "sts3215_03a_v1 / moving_jaw_so101_v1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175,
+       0.065,
+       0.305,
+       0.545,
+       0.785,
+       1.025,
+       1.265,
+       1.505,
+       1.745
+      ],
+      "crossings": [
+       4000,
+       4000,
+       4000,
+       4000,
+       4000,
+       4000,
+       4000,
+       4000,
+       4000
+      ],
+      "region_mm": [
+       20.0,
+       3.5,
+       20.0
+      ],
+      "from_axis_mm": [
+       1.6,
+       10.0
+      ]
+     }
+    },
+    "carried": {
+     "moving_jaw_so101_v1": {
+      "parent": "gripper",
+      "joint": "hinge",
+      "material": true,
+      "worst_gap_mm": 0.0,
+      "gap_by_q_mm": [
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "sim_mass_g": {
+     "moving_jaw_so101_v1": 12.0,
+     "gripper": 87.0
+    }
+   }
+  },
+  {
+   "id": "b002",
+   "key": "39f0a4fd36c9",
+   "geometry": {
+    "jaw_range_servo_rad": [
+     -0.175,
+     1.745
+    ],
+    "clashes": {
+     "sts3215_03a_v1 / moving_jaw_so101_v1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175,
+       0.065,
+       0.305
+      ],
+      "crossings": [
+       4000,
+       4000,
+       888
+      ],
+      "region_mm": [
+       21.6,
+       38.9,
+       19.8
+      ],
+      "from_axis_mm": [
+       0.0,
+       38.3
+      ]
+     },
+     "wrist_roll_follower_so101_v1 / moving_jaw_so101_v1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       868
+      ],
+      "region_mm": [
+       13.0,
+       7.3,
+       23.3
+      ],
+      "from_axis_mm": [
+       0.6,
+       13.8
+      ]
+     },
+     "jaw_fixed_pad0 / jaw_moving_pad1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       14
+      ],
+      "region_mm": [
+       2.5,
+       3.5,
+       9.5
+      ],
+      "from_axis_mm": [
+       74.7,
+       84.4
+      ]
+     },
+     "jaw_fixed_pad1 / jaw_moving_pad0": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       12
+      ],
+      "region_mm": [
+       2.8,
+       3.5,
+       9.5
+      ],
+      "from_axis_mm": [
+       72.0,
+       81.8
+      ]
+     }
+    },
+    "carried": {
+     "moving_jaw_so101_v1": {
+      "parent": "gripper",
+      "joint": "slide",
+      "material": true,
+      "worst_gap_mm": 75.8,
+      "gap_by_q_mm": [
+       0.0,
+       0.0,
+       0.0,
+       10.0,
+       23.1,
+       36.2,
+       49.4,
+       62.6,
+       75.8
+      ]
+     }
+    },
+    "sim_mass_g": {
+     "moving_jaw_so101_v1": 12.0,
+     "gripper": 87.0
+    }
+   }
+  },
+  {
+   "id": "b022",
+   "key": "beafd3f7c2b8",
+   "geometry": {
+    "jaw_range_servo_rad": [
+     -0.175,
+     1.745
+    ],
+    "clashes": {
+     "sts3215_03a_v1 / moving_jaw_so101_v1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175,
+       0.065,
+       0.305
+      ],
+      "crossings": [
+       4000,
+       4000,
+       888
+      ],
+      "region_mm": [
+       21.6,
+       38.9,
+       19.8
+      ],
+      "from_axis_mm": [
+       0.0,
+       38.3
+      ]
+     },
+     "wrist_roll_follower_so101_v1 / moving_jaw_so101_v1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       868
+      ],
+      "region_mm": [
+       13.0,
+       7.3,
+       23.3
+      ],
+      "from_axis_mm": [
+       0.6,
+       13.8
+      ]
+     },
+     "jaw_fixed_pad0 / jaw_moving_pad1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       14
+      ],
+      "region_mm": [
+       1.1,
+       3.7,
+       9.2
+      ],
+      "from_axis_mm": [
+       75.6,
+       84.5
+      ]
+     },
+     "jaw_fixed_pad1 / jaw_moving_pad0": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       12
+      ],
+      "region_mm": [
+       1.1,
+       3.8,
+       9.1
+      ],
+      "from_axis_mm": [
+       71.8,
+       81.1
+      ]
+     }
+    },
+    "carried": {
+     "moving_jaw_so101_v1": {
+      "parent": "gripper",
+      "joint": "slide",
+      "material": true,
+      "worst_gap_mm": 75.8,
+      "gap_by_q_mm": [
+       0.0,
+       0.0,
+       0.0,
+       10.0,
+       23.1,
+       36.2,
+       49.4,
+       62.6,
+       75.8
+      ]
+     }
+    },
+    "sim_mass_g": {
+     "moving_jaw_so101_v1": 12.0,
+     "gripper": 87.0
+    }
+   }
+  },
+  {
+   "id": "b031",
+   "key": "e2f9614f8097",
+   "geometry": {
+    "jaw_range_servo_rad": [
+     -0.175,
+     1.745
+    ],
+    "clashes": {
+     "sts3215_03a_v1 / moving_jaw_so101_v1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175,
+       0.065,
+       0.305
+      ],
+      "crossings": [
+       4000,
+       4000,
+       888
+      ],
+      "region_mm": [
+       21.6,
+       38.9,
+       19.8
+      ],
+      "from_axis_mm": [
+       0.0,
+       38.3
+      ]
+     },
+     "wrist_roll_follower_so101_v1 / moving_jaw_so101_v1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       868
+      ],
+      "region_mm": [
+       13.0,
+       7.3,
+       23.3
+      ],
+      "from_axis_mm": [
+       0.6,
+       13.8
+      ]
+     },
+     "jaw_fixed_pad0 / jaw_moving_pad1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       14
+      ],
+      "region_mm": [
+       1.1,
+       4.5,
+       9.2
+      ],
+      "from_axis_mm": [
+       76.2,
+       85.1
+      ]
+     },
+     "jaw_fixed_pad1 / jaw_moving_pad0": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       12
+      ],
+      "region_mm": [
+       1.1,
+       4.5,
+       9.1
+      ],
+      "from_axis_mm": [
+       71.5,
+       80.9
+      ]
+     }
+    },
+    "carried": {
+     "moving_jaw_so101_v1": {
+      "parent": "gripper",
+      "joint": "slide",
+      "material": true,
+      "worst_gap_mm": 75.8,
+      "gap_by_q_mm": [
+       0.0,
+       0.0,
+       0.0,
+       10.0,
+       23.1,
+       36.2,
+       49.4,
+       62.6,
+       75.8
+      ]
+     }
+    },
+    "sim_mass_g": {
+     "moving_jaw_so101_v1": 12.0,
+     "gripper": 87.0
+    }
+   }
+  }
+ ],
+ "contacts": []
+}

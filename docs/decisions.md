@@ -1286,3 +1286,59 @@ Tests: `tests/test_film.py`.
 - Silent films play together, and sounding ones in turn.
 - The script films a kept change from a run record, and skips a run with no harness.json.
 
+
+## D-051 The mechanism audit: what breaks physical law in the kept bodies (tooling)
+**Observed.** The films (D-050) show things no real robot can do:
+- Every slide jaw System 2 kept floats free of the gripper.
+- The jaws sink into objects they hold.
+- The mobile robot drives through walls.
+
+The user asked for a harness that mandates physical law: power transmitted from motor to motion, and proof that it all works. The plan has six phases:
+- an Assembly per body (parts, joints with bearings or rails, motor → transmission → joint, power);
+- laws checked before any trial;
+- an audit inside every attempt;
+- worlds rebuilt on the Assembly in the order gripper → mobile → talking robot;
+- then every campaign re-run.
+
+This entry is P0. It measures what the kept bodies break, before any law decides anything.
+
+**Method.** `scripts/audit_mechanism.py` with `sea.mechanism` (`geometry.py`, `audit.py`):
+- **Gripper geometry:**
+  - The SO-101's own STL parts and the pads are posed at 9 jaw positions across the range. Geometry runs through coal (hpp-fcl) BVHs, with a winding-number test for a part sealed inside another. The CoACD hulls are never used: they overlap by 3.4 mm where the real meshes clear.
+  - Per pair of parts on different bodies: the surface crossings, the size of their region, and its distance from the jaw axis.
+  - Per moving body: its clearance to its parent through the range.
+- **Gripper replays:** each film's replay (D-050), with the deepest penetration per kind of contact pair recorded every 20 ms tick.
+- **Mobile and talking robot:** these simulators carry no geometry, so the audit reads the facts their own models give.
+
+**Measured** (`results/mechanism_audit/`):
+- **Stock hinge:** the jaw always touches its parent. Its overlap with the servo lies 1.6–10 mm from the jaw axis: the jaw's hub on the servo horn.
+- **Every slide body (10 across 5 runs, D-042's `prismatic`):**
+  - At the open end of the range the jaw is **70.6–84.5 mm from any material that could carry it**. No rail, rack or pinion exists; `_jaw_joint` only retypes the hinge and sets the actuator gear to 1/r.
+  - When closed, it overlaps the servo body over about 22 × 39 × 20 mm, up to 39 mm from the axis (well past the horn), and overlaps the fixed jaw over up to 16 × 46 × 23 mm.
+  - The pads pass through each other at full close.
+- **Hinge-with-pads bodies (old physics):** at full close the pads pass into the fixed jaw and each other. The joint range lets the jaw close through them.
+- **Contact:** in 16 of the 18 replays that held, the object sits more than 1 mm into the jaws at the 95th percentile, from 0.74 mm (sugar box) to 5.78 mm (screwdriver). Stock failures sink 0.7–5.5 mm. Soft contact is part of why these grasps hold.
+- **Mobile:** voltage is not in the model.
+  - Under series wiring the stock pack is 2.4 V and kept packs are 6–11.1 V, while every motor is simulated at the same rated stall torque and speed.
+  - N20 stall current (0.75 A) is within the TB6612's 1.2 A per channel in every kept body.
+- **Talking robot:**
+  - No kept body places an articulator past the end of its 13.5 cm tract.
+  - The tip tongue's tip and pad share 3.25–5.0 cm of travel, so both can occupy the same section.
+  - Articulators remain free variables, with no mechanism.
+
+**Decision.** Nothing in `sea.mechanism` decides a verdict yet, so it is tooling (`harness.TOOLING`) and the judge key is unchanged. It joins the judge as the component `mechanism` when its laws refuse bodies (P2).
+
+These numbers are the baseline the later phases must remove:
+- slide jaws carried by a rail, with the rack and pinion as real bodies (P1, P3);
+- rigid-contact penetration of 1 mm or less at the 95th percentile (P1);
+- voltage and driver ratings in the mobile model (P4);
+- articulators driven through linkages (P5).
+
+**Tests.** `tests/test_mechanism.py`:
+- Overlap and clearance.
+- A part sealed inside another is caught.
+- The winding number.
+- A floating part is found.
+- Distance from an axis.
+- The penetration record.
+- The stock jaw rides its horn while a slide jaw floats more than 50 mm free.

@@ -25,6 +25,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 
@@ -45,6 +46,7 @@ class Clip:
     ok: bool
     verdict: str  # what happened, in a line
     audio: np.ndarray | None = None  # mono, at SR, as long as the frames
+    probe: Any = None  # what a step hook recorded over the filmed attempt (gripper; sea.mechanism.audit)
 
 
 # ---------------------------------------------------------------- composing and encoding
@@ -161,11 +163,13 @@ def encode(frames: list[np.ndarray], path: Path, audio: np.ndarray | None = None
 
 
 # ---------------------------------------------------------------- the gripper: the simulator itself
-def gripper(body: Body, task: Task, controls: dict[str, float], seed: int = 0, size: tuple[int, int] = (480, 360)) -> Clip:
+def gripper(body: Body, task: Task, controls: dict[str, float], seed: int = 0, size: tuple[int, int] = (480, 360),
+            probe: Callable[[Any], Callable[[Any], None]] | None = None, render: bool = True) -> Clip:
     """Replay the pick in MuJoCo with the recorded grasp parameters under the run's ``seed``, whose
     domain-randomization draw the verdict was judged on.  System 1 records {} for its first attempt and for
     its fixed retry alike (sea.control.local_search.run_system1), so for {} both are run and the one System 1
-    kept is filmed."""
+    kept is filmed.  ``probe(model)`` makes a step hook, fresh for each attempt, called with the MuJoCo data
+    every tick; the kept attempt's hook is returned on the clip.  ``render=False`` replays without filming."""
     from dataclasses import replace
 
     import mujoco
@@ -191,17 +195,22 @@ def gripper(body: Body, task: Task, controls: dict[str, float], seed: int = 0, s
     prog = next((p for _, p in progs if prims <= set(re.findall(r"[a-z_]+", str(p)))), progs[0][1])
     runner = PanelRunner(panel, cfg, 0)
     w, h = size
-    ren = mujoco.Renderer(runner.sim.model, h, w)
+    ren = mujoco.Renderer(runner.sim.model, h, w) if render else None
     opt = mujoco.MjvOption()
     opt.geomgroup[:] = [1, 1, 1, 0, 0, 0]
     cam = mujoco.MjvCamera()
     cam.distance, cam.azimuth, cam.elevation = 0.32, 150.0, -14.0
     judge = _judge(obj, panel, limits)
     shots: list[list[np.ndarray]] = []
+    hooks: list[Any] = []
     orig = X.Episode.tick
 
     def tick(ep, q):
         orig(ep, q)
+        if hooks:
+            hooks[-1](ep.sim.data)
+        if ren is None:
+            return
         p = ep.sim.data.xpos[ep.sim.controls[obj.id].body_id]
         cam.lookat[:] = [p[0], p[1], 0.05]
         ren.update_scene(ep.sim.data, cam, opt)
@@ -210,6 +219,8 @@ def gripper(body: Body, task: Task, controls: dict[str, float], seed: int = 0, s
 
     def take(ecfg, n: int):
         shots.append([])
+        if probe is not None:
+            hooks.append(probe(runner.sim.model))
         X.reset_episode(runner.sim)
         tr = X.run_program(runner.sim, prog, obj.id, ecfg, panel_id=panel.id, attempt=n)
         return tr, judge(tr)
@@ -224,7 +235,8 @@ def gripper(body: Body, task: Task, controls: dict[str, float], seed: int = 0, s
             takes.append(take(replace(ecfg, perception_offset=off), 1))
     finally:
         X.Episode.tick = orig
-        ren.close()
+        if ren is not None:
+            ren.close()
     i = 0
     if len(takes) == 2:  # run_system1: the retry if it passed or stopped structurally, else the better of the two
         travel = runner.sim.controls[obj.id].spec.travel
@@ -234,7 +246,7 @@ def gripper(body: Body, task: Task, controls: dict[str, float], seed: int = 0, s
     ok = res.verdict == "pass"
     note = (tr.note or "").replace("_", " ")
     return Clip(frames or [np.zeros((h, w, 3), np.uint8)], ok, "held for the full second" if ok else
-                f"{res.verdict.replace('_', ' ')}" + (f" ({note})" if note else ""))
+                f"{res.verdict.replace('_', ' ')}" + (f" ({note})" if note else ""), probe=hooks[i] if hooks else None)
 
 
 # ---------------------------------------------------------------- the talking robot: posture, formants, sound

@@ -1,0 +1,66 @@
+{
+ "run": "phonology_s2_s0",
+ "world": "phonology",
+ "bodies": [
+  {
+   "id": "stock",
+   "key": "fc3821f597a3",
+   "facts": {
+    "tract_cm": 13.5,
+    "controls": {
+     "tongue_place": [
+      3.25,
+      10.25
+     ],
+     "tongue_height": [
+      0.0,
+      0.95
+     ],
+     "jaw": [
+      0.0,
+      1.0
+     ]
+    },
+    "past_the_tract_cm": {}
+   }
+  },
+  {
+   "id": "b00m",
+   "key": "bd8ab8f37b8b",
+   "facts": {
+    "tract_cm": 13.5,
+    "controls": {
+     "tongue_place": [
+      3.25,
+      10.25
+     ],
+     "tongue_height": [
+      0.0,
+      1.3
+     ],
+     "tip_place": [
+      0.3,
+      5.0
+     ],
+     "tip_height": [
+      0.0,
+      1.3
+     ],
+     "lip_radius": [
+      -0.2,
+      1.45
+     ],
+     "protrusion": [
+      0.0,
+      1.6
+     ]
+    },
+    "past_the_tract_cm": {},
+    "tip_and_pad_share_cm": [
+     3.25,
+     5.0
+    ]
+   }
+  }
+ ]
+}

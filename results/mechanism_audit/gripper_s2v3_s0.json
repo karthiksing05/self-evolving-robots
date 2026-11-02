@@ -1,0 +1,491 @@
+{
+ "run": "gripper_s2v3_s0",
+ "world": "gripper",
+ "bodies": [
+  {
+   "id": "stock",
+   "key": "e58bdd949fb4",
+   "geometry": {
+    "jaw_range_servo_rad": [
+     -0.175,
+     1.745
+    ],
+    "clashes": {
+     "sts3215_03a_v1 / moving_jaw_so101_v1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175,
+       0.065,
+       0.305,
+       0.545,
+       0.785,
+       1.025,
+       1.265,
+       1.505,
+       1.745
+      ],
+      "crossings": [
+       4000,
+       4000,
+       4000,
+       4000,
+       4000,
+       4000,
+       4000,
+       4000,
+       4000
+      ],
+      "region_mm": [
+       20.0,
+       3.5,
+       20.0
+      ],
+      "from_axis_mm": [
+       1.6,
+       10.0
+      ]
+     }
+    },
+    "carried": {
+     "moving_jaw_so101_v1": {
+      "parent": "gripper",
+      "joint": "hinge",
+      "material": true,
+      "worst_gap_mm": 0.0,
+      "gap_by_q_mm": [
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "sim_mass_g": {
+     "moving_jaw_so101_v1": 12.0,
+     "gripper": 87.0
+    }
+   }
+  },
+  {
+   "id": "b021",
+   "key": "b5732b5a9a4c",
+   "geometry": {
+    "jaw_range_servo_rad": [
+     -0.175,
+     1.745
+    ],
+    "clashes": {
+     "sts3215_03a_v1 / moving_jaw_so101_v1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175,
+       0.065,
+       0.305
+      ],
+      "crossings": [
+       4000,
+       4000,
+       828
+      ],
+      "region_mm": [
+       21.6,
+       39.0,
+       19.8
+      ],
+      "from_axis_mm": [
+       0.0,
+       38.6
+      ]
+     },
+     "wrist_roll_follower_so101_v1 / moving_jaw_so101_v1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       928
+      ],
+      "region_mm": [
+       13.2,
+       7.5,
+       23.3
+      ],
+      "from_axis_mm": [
+       0.7,
+       13.9
+      ]
+     },
+     "jaw_fixed_pad0 / jaw_moving_pad0": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       15
+      ],
+      "region_mm": [
+       3.8,
+       13.6,
+       16.0
+      ],
+      "from_axis_mm": [
+       72.0,
+       90.7
+      ]
+     }
+    },
+    "carried": {
+     "moving_jaw_so101_v1": {
+      "parent": "gripper",
+      "joint": "slide",
+      "material": true,
+      "worst_gap_mm": 77.6,
+      "gap_by_q_mm": [
+       0.0,
+       0.0,
+       0.0,
+       10.5,
+       23.9,
+       37.3,
+       50.7,
+       64.1,
+       77.6
+      ]
+     }
+    },
+    "sim_mass_g": {
+     "moving_jaw_so101_v1": 12.0,
+     "gripper": 87.0
+    }
+   }
+  },
+  {
+   "id": "b031",
+   "key": "02f08f91deb0",
+   "geometry": {
+    "jaw_range_servo_rad": [
+     -0.175,
+     1.745
+    ],
+    "clashes": {
+     "sts3215_03a_v1 / moving_jaw_so101_v1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175,
+       0.065,
+       0.305
+      ],
+      "crossings": [
+       4000,
+       4000,
+       828
+      ],
+      "region_mm": [
+       21.6,
+       39.0,
+       19.8
+      ],
+      "from_axis_mm": [
+       0.0,
+       38.6
+      ]
+     },
+     "wrist_roll_follower_so101_v1 / moving_jaw_so101_v1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       928
+      ],
+      "region_mm": [
+       13.2,
+       7.5,
+       23.3
+      ],
+      "from_axis_mm": [
+       0.7,
+       13.9
+      ]
+     },
+     "jaw_fixed_pad0 / jaw_moving_pad0": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       15
+      ],
+      "region_mm": [
+       3.8,
+       13.6,
+       16.0
+      ],
+      "from_axis_mm": [
+       72.0,
+       90.7
+      ]
+     },
+     "jaw_fixed_pad0 / jaw_moving_pad1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       15
+      ],
+      "region_mm": [
+       3.7,
+       13.7,
+       2.0
+      ],
+      "from_axis_mm": [
+       86.0,
+       90.7
+      ]
+     },
+     "jaw_fixed_pad1 / jaw_moving_pad0": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       15
+      ],
+      "region_mm": [
+       4.0,
+       13.7,
+       1.5
+      ],
+      "from_axis_mm": [
+       86.4,
+       90.7
+      ]
+     },
+     "jaw_fixed_pad1 / jaw_moving_pad1": {
+      "bodies": [
+       "gripper",
+       "moving_jaw_so101_v1"
+      ],
+      "at_q": [
+       -0.175
+      ],
+      "crossings": [
+       15
+      ],
+      "region_mm": [
+       1.8,
+       13.6,
+       1.5
+      ],
+      "from_axis_mm": [
+       86.4,
+       90.7
+      ]
+     }
+    },
+    "carried": {
+     "moving_jaw_so101_v1": {
+      "parent": "gripper",
+      "joint": "slide",
+      "material": true,
+      "worst_gap_mm": 77.6,
+      "gap_by_q_mm": [
+       0.0,
+       0.0,
+       0.0,
+       10.5,
+       23.9,
+       37.3,
+       50.7,
+       64.1,
+       77.6
+      ]
+     }
+    },
+    "sim_mass_g": {
+     "moving_jaw_so101_v1": 12.0,
+     "gripper": 87.0
+    }
+   }
+  }
+ ],
+ "contacts": [
+  {
+   "film": "01_b021_apple.mp4",
+   "task": "rva000_apple",
+   "before": {
+    "ok": false,
+    "body": "stock",
+    "penetration": {
+     "object-robot": {
+      "peak_mm": 2.38,
+      "p95_mm": 2.3,
+      "steps": 95
+     },
+     "object-table": {
+      "peak_mm": 1.99,
+      "p95_mm": 1.85,
+      "steps": 162
+     }
+    }
+   },
+   "after": {
+    "ok": true,
+    "body": "b021",
+    "penetration": {
+     "object-robot": {
+      "peak_mm": 3.54,
+      "p95_mm": 3.49,
+      "steps": 203
+     },
+     "object-table": {
+      "peak_mm": 0.24,
+      "p95_mm": 0.19,
+      "steps": 146
+     }
+    }
+   }
+  },
+  {
+   "film": "01_b021_mustard_bottle.mp4",
+   "task": "reg_mustard_bottle",
+   "before": {
+    "ok": false,
+    "body": "stock",
+    "penetration": {
+     "object-robot": {
+      "peak_mm": 0.89,
+      "p95_mm": 0.7,
+      "steps": 91
+     },
+     "object-table": {
+      "peak_mm": 0.78,
+      "p95_mm": 0.74,
+      "steps": 248
+     }
+    }
+   },
+   "after": {
+    "ok": true,
+    "body": "b021",
+    "penetration": {
+     "object-robot": {
+      "peak_mm": 2.24,
+      "p95_mm": 2.24,
+      "steps": 205
+     },
+     "object-table": {
+      "peak_mm": 0.26,
+      "p95_mm": 0.26,
+      "steps": 169
+     }
+    }
+   }
+  },
+  {
+   "film": "01_b021_gelatin_box.mp4",
+   "task": "reg_gelatin_box",
+   "before": {
+    "ok": false,
+    "body": "stock",
+    "penetration": {
+     "object-robot": {
+      "peak_mm": 3.84,
+      "p95_mm": 3.49,
+      "steps": 93
+     },
+     "object-table": {
+      "peak_mm": 1.61,
+      "p95_mm": 1.39,
+      "steps": 212
+     }
+    }
+   },
+   "after": {
+    "ok": true,
+    "body": "b021",
+    "penetration": {
+     "object-robot": {
+      "peak_mm": 2.14,
+      "p95_mm": 1.84,
+      "steps": 204
+     },
+     "object-table": {
+      "peak_mm": 0.25,
+      "p95_mm": 0.25,
+      "steps": 175
+     }
+    }
+   }
+  },
+  {
+   "film": "02_b031_sugar_box.mp4",
+   "task": "reg_sugar_box",
+   "before": {
+    "ok": false,
+    "body": "b021",
+    "penetration": {
+     "object-robot": {
+      "peak_mm": 1.21,
+      "p95_mm": 0.81,
+      "steps": 203
+     },
+     "object-table": {
+      "peak_mm": 0.46,
+      "p95_mm": 0.31,
+      "steps": 171
+     }
+    }
+   },
+   "after": {
+    "ok": true,
+    "body": "b031",
+    "penetration": {
+     "object-robot": {
+      "peak_mm": 1.17,
+      "p95_mm": 0.74,
+      "steps": 165
+     },
+     "object-table": {
+      "peak_mm": 0.46,
+      "p95_mm": 0.31,
+      "steps": 145
+     }
+    }
+   }
+  }
+ ]
+}
