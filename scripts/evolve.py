@@ -29,13 +29,15 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--iterations", type=int, default=10)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--workers", type=int, default=1)
+    ap.add_argument("--tune-trials", type=int, default=RunConfig.model_fields["tune_trials"].default,
+                    help="trials per iteration spent fitting a promising swap's parameters (D-044); 0 turns it off")
     ap.add_argument("--model", default="claude-opus-5-5")
     ap.add_argument("--effort", default="high")
     ap.add_argument("--out", type=Path, default=None)
     args = ap.parse_args(argv)
     out = args.out or ROOT / "runs" / "evolve" / f"{args.world}_{args.arm}_s{args.seed}"
     cfg = RunConfig(world=args.world, arm=args.arm, iterations=args.iterations, seed=args.seed, workers=args.workers,
-                    model=args.model, effort=args.effort)
+                    tune_trials=args.tune_trials, model=args.model, effort=args.effort)
     summary = run(cfg, out, log=lambda m: print(m, flush=True))
     keep = {k: summary[k] for k in ("world", "arm", "final_held_train", "test", "spent", "llm", "wall_s", "sim_s")}
     print(json.dumps(keep, indent=1))

@@ -64,7 +64,17 @@ reaches the next prompt.
   and lost the banana and the cube (D-039). The rule caught it every time; naming what broke is what
   changed the reasoning.
 
-## 7. Resources are part of the design
+## 7. Protect a new structure until it is tuned
+
+A redesign is judged against a body whose parameters have had many iterations of tuning, so the new
+part's first guess is an unfair comparison. Two mechanisms give it a fair trial:
+- a body that gains more than it breaks stays on a frontier to be repaired;
+- the loop spends a fixed, reported allowance fitting the new part's parameters before judging it.
+
+The ratchet never weakens: what is kept still loses nothing. This is NEAT's speciation in miniature.
+- *Where:* `evolve/loop.py` (`frontier`, `tune`, `RunConfig.tune_trials`); D-043, D-044.
+
+## 8. Resources are part of the design
 
 Every part has a bill of materials. The bench's manifest says what is on hand, what can be bought
 (price, lead time) and what each machine minute costs.
@@ -75,14 +85,14 @@ Every part has a bill of materials. The bench's manifest says what is on hand, w
 - *Where:* `evolve/resources.py`, `World.bom`, `World.manifest`; sensors as resources (D-033) are the
   same principle for sensing.
 
-## 8. Predict, then let the trial decide
+## 9. Predict, then let the trial decide
 
 Every proposal states its mechanism, the principle it relies on, the groups it should gain and the
 held groups it risks. The simulator decides. Predictions are logged next to outcomes, so the reasoning
 can be scored, not just the result.
 - *Where:* `evolve.core.Proposal`; `iterations.jsonl`.
 
-## 9. Generality through contracts
+## 10. Generality through contracts
 
 The loop does not know what a gripper, a vocal tract or a rover is. A world supplies the following,
 and the same loop, prompt sections, screen, ratchet and records run on all of them:
@@ -93,13 +103,13 @@ and the same loop, prompt sections, screen, ratchet and records run on all of th
 If an idea only works in one world, it belongs in that world's module.
 - *Where:* `evolve/core.World`, `docs/evolve.md`.
 
-## 10. Measure on frozen instruments
+## 11. Measure on frozen instruments
 
 Change one fundamental at a time, and judge it by fixed batteries and gold checks, not by the evolving
 loop. A number that moved because the ruler moved is not a result.
 - *Where:* `scripts/battery.py`, `tests/golden/`, [iteration.md](iteration.md).
 
-## 11. Count in units of reality
+## 12. Count in units of reality
 
 Each proposal and trial is charged as the real build would be:
 - sim seconds;
@@ -109,7 +119,7 @@ Each proposal and trial is charged as the real build would be:
 
 A design that is cheap in simulation and impossible on the bench is not a result.
 
-## 12. Every claim has a record
+## 13. Every claim has a record
 
 Every prompt, answer, screen, trial, decision, purchase and idea is written down. A run reads back
 as a case study, and a reviewer can check any number without trusting the loop's summary.

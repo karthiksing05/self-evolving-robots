@@ -55,7 +55,10 @@ Refusal reasons go into the next prompt's record, so System 2 learns what the be
 ## Trial and acceptance: the ratchet
 
 A screened candidate solves the held groups first and stops at the first loss. Then it solves the
-failing ones. It is **kept-eligible** if it gains a group, or at least a task, and loses none. Among
+failing ones. A swap is always scored on every group, so the record shows what a redesign would gain
+as well as what it broke (`full_trials` does the same for params moves).
+
+A candidate is **kept-eligible** if it gains a group, or at least a task, and loses none. Among
 eligible candidates the loop keeps:
 1. the one gaining the most groups;
 2. then the most tasks;
@@ -63,7 +66,25 @@ eligible candidates the loop keeps:
 4. then a params move over a swap.
 
 The held set only grows, the PASS_TO_PASS rule: the robot's history comes first. Purchases and
-machine time of the kept candidate are charged to the run.
+machine time of the kept candidate are charged to the run. A body already trialled is refused with
+its earlier result, so no body is paid for twice.
+
+## Redesigns: the frontier and the tuning allowance
+
+A redesign usually breaks something before it is better. Two mechanisms let one survive that phase
+without weakening the ratchet:
+- **The frontier (D-043).** A rejected body that gains more groups than it loses is kept on a
+  frontier. The prompt lists it with what it would gain and what it broke. A proposal can build on it
+  with `base`, and the result must still keep every held group.
+- **The tuning allowance (D-044).** A swap is System 2's first guess at a new part's parameters,
+  judged against a body tuned over many iterations. The swap this iteration that gained a group but
+  broke a held one gets up to `tune_trials` more trials (default 4):
+  - a Gaussian search over the parameters of every slot it changed, in each parameter's range,
+    centred on the best tuning so far;
+  - each trial is screened, costed and scored like a proposal;
+  - it stops at the first kept-eligible body.
+  This is NEAT's protection of structural innovation, applied to parts: a new structure competes
+  only once its own parameters are fitted. The random arm gets the same allowance.
 
 ## The prompt
 
@@ -72,12 +93,19 @@ It has the same sections in every world (`prompt.py`):
 2. The world and the iteration.
 3. The current body, and its brief.
 4. The world's physics principles.
-5. The catalogue, with each part type's availability.
+5. The catalogue. Each part type shows:
+   - its parameters;
+   - what it needs, with items the current body already has marked reused;
+   - for another type, the true marginal cost of swapping it in now, or why it would be refused;
+   - its computed facts on this body (`part_facts`), when the world gives them.
 6. The resources left.
-7. The held groups.
+7. The held groups, each with its task facts.
 8. The failing tasks, each with its mechanism, its numbers and System 1's best attempt.
-9. The record of past proposals: what each gained, lost or was refused for.
+9. The record of past proposals and tuning trials: what each gained, lost (with the numbers) or was
+   refused for.
 10. A per-slot summary of what parameter-only trials have not fixed.
+11. System 2's calibration: its predicted gains and named risks against what the trials found.
+12. The frontier and the ideas recorded so far.
 
 That summary and the brief are what make a redesign arise rather than be ordered. When parameter
 moves on a slot keep failing on one mechanism, and the brief shows the part cannot reach what the
@@ -114,4 +142,9 @@ the same groups.
 Worlds so far:
 - `gripper`: the SO-101 and 21 YCB objects (D-042).
 - `phonology`: a mechanical talking robot.
-- `mobile`: an exploration robot.
+- `mobile`: a ground robot exploring a house and garden. It has ten routes and five slots
+  (locomotion, chassis, drive, battery, sensor), modelled with quasi-static vehicle mechanics:
+  - edge climbing, trenches, openings, ramps, Winkler sand, overhangs, dark corridors and energy;
+  - stock holds 4/10 groups;
+  - a gold body holds 10/10 for $16.50: tracks, a narrower tub, more cells and a sonar;
+  - no parameter setting of the stock parts holds everything.

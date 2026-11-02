@@ -94,6 +94,19 @@ The world tests check all three. A world that fails them measures nothing.
 - On the Claude plan, the limit is the usage window. `PlanLimitReached` stops a run cleanly, and run
   seeds sequentially.
 
+## Lever 8: protecting innovation
+
+A swap's parameters are a guess, while the current body's have been tuned for several iterations.
+Judging the two head to head makes the loop conservative for the wrong reason. The tools:
+- the frontier (repair a promising body with `base`);
+- the tuning allowance (`tune_trials` full trials fitting the slots a promising swap changed).
+
+Measure the allowance with `--tune-trials 0` against the default, under the same seeds.
+- *Seen so far:* no effect on the random arm in the mobile world. Over 30 seeds at 10 and 20
+  iterations, outcomes were identical (6.47 and 7.43 of 10 groups) for about 4% more trials. Blind
+  swaps rarely gain a group while breaking a held one, which is what triggers tuning. The allowance is
+  for directed swaps; System 2 runs measure it there.
+
 ## Failure modes to watch
 
 - **Repetition:** the same refused or rejected change proposed again. The record is in the prompt;
