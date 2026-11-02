@@ -1097,3 +1097,27 @@ alternatives. After its trials, the loop now merges kept-eligible candidates:
 predates this change. Seeds started later carry it in `harness.json`.
 
 Tests: `tests/test_evolve.py` (`test_disjoint_gains_are_merged`).
+
+## D-046 A spare is used once: the run keeps a ledger of what it owns (judge)
+The phonology world's author found the problem. `resources.check` counted the manifest's on-hand
+spares plus the current body's items as available. After a kept change used two spare cells, those
+cells were in the current body and still counted as spares. Every later change therefore bought less
+than it should.
+
+The run now keeps `Spent.owned`, which starts as the stock body's items. Each purchase of a kept
+change is added to it (`resources.start`, `resources.charge`, `ResourceReport.buy`). A candidate's
+pool of an item is the manifest's spares plus what the run owns:
+- a spare is counted once, whichever body holds it;
+- going back to an earlier part still costs nothing new.
+
+A check with no ledger keeps the old single-step behaviour.
+
+The gripper manifest listed the kit's six 7.4 V servos as on hand as well as in the stock arm, so it
+now lists none spare. No gripper body was affected: the only servo change replaces three of them with
+12 V servos, which is a different item. The mobile and phonology manifests already listed spares
+only.
+
+All three worlds and `resources.py` change, which re-keys the judge. Runs started before this commit
+(gripper `s2v2_s0`, the first mobile seeds) carry the earlier key in `harness.json`.
+
+Tests: `tests/test_evolve.py` (`test_a_spare_is_used_once`).

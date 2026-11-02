@@ -24,7 +24,7 @@ from sea.evolve.core import (
 from sea.evolve.llm import Scripted
 from sea.evolve.loop import RunConfig, held_groups, run
 from sea.evolve.prompt import SYSTEM, build
-from sea.evolve.resources import Spent, check
+from sea.evolve.resources import Spent, charge, check, start
 from sea.evolve.search import local_search
 
 
@@ -120,6 +120,26 @@ def test_resources_reuse_buy_refuse():
     assert not r.ok and "cannot be bought" in r.errors[0] and r.fab_minutes == 0  # the stick did not change
     r = check(tele, w.bom(tele), stock, w.bom(stock), w.manifest(), Spent(usd=8))
     assert not r.ok and "left" in r.errors[0]
+
+
+def test_a_spare_is_used_once():
+    """Two spare cells on hand and two in the stock pack: a 4-cell pack is free, then a 6-cell pack buys two."""
+    man = {"budget": {"usd": 10, "lead_days": 5}, "items": {"cell": {"on_hand": 2, "usd": 1.0, "lead_days": 1}}}
+
+    def pack(n: int) -> tuple[Body, list[BomLine]]:
+        return Body(id=f"p{n}", parts={"battery": Part(type="pack", params={"cells": n})}), [BomLine(item="cell", qty=n)]
+
+    (b2, m2), (b4, m4), (b6, m6) = pack(2), pack(4), pack(6)
+    spent = start(m2)
+    r4 = check(b4, m4, b2, m2, man, spent)
+    assert r4.ok and r4.usd == 0 and r4.buy == {}
+    spent = charge(spent, r4)
+    r6 = check(b6, m6, b4, m4, man, spent)
+    assert r6.ok and r6.usd == 2 and r6.buy == {"cell": 2}
+    assert check(b6, m6, b4, m4, man).usd == 0  # without the run's ledger the two spares would count twice
+    spent = charge(spent, r6)
+    assert spent.owned == {"cell": 4} and spent.usd == 2
+    assert check(b2, m2, b6, m6, man, spent).usd == 0  # going back needs nothing new
 
 
 def test_local_search_confirms():

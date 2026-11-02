@@ -282,7 +282,7 @@ class GripperWorld:
             "fabrication": {"print:PLA": {"minutes_per_unit": 5.0, "unit": "g", "doc": "FDM printer, 0.4 mm nozzle"},
                             "print:TPU": {"minutes_per_unit": 8.0, "unit": "g", "doc": "same printer, slower for TPU"}},
             "items": {
-                "sts3215_7v4": {"on_hand": 6, "usd": 16.0, "lead_days": 4, "doc": "the SO-101 kit's servos"},
+                "sts3215_7v4": {"on_hand": 0, "usd": 16.0, "lead_days": 4, "doc": "the kit's six are in the stock arm"},
                 "sts3215_12v": {"on_hand": 0, "usd": 18.0, "lead_days": 5},
                 "psu_12v": {"on_hand": 0, "usd": 14.0, "lead_days": 3, "doc": "12 V 5 A supply"},
                 "m2_screw": {"on_hand": 50}, "m3_screw": {"on_hand": 50},

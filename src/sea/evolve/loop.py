@@ -37,7 +37,7 @@ from pydantic import BaseModel, ConfigDict
 from sea.evolve.core import Body, Edit, Outcome, Proposal, ProposalBatch, Task, World, apply, edit_rung
 from sea.evolve.llm import Proposer
 from sea.evolve.prompt import SYSTEM, build
-from sea.evolve.resources import Spent, check
+from sea.evolve.resources import ResourceReport, charge, check, start
 
 Arm = Literal["s2", "random", "s1"]
 
@@ -237,7 +237,7 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
         proposer = RandomProposer(world, cfg.seed)
     ev = Evaluator(world, cfg.world, cfg.workers, cfg.seed)
     body = world.stock()
-    spent = Spent()
+    spent = start(world.bom(body))
     history: list[dict[str, Any]] = []
     ideas: list[dict[str, Any]] = []
     curve: list[dict[str, Any]] = []
@@ -420,9 +420,7 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
             accepted = None
             if best is not None:
                 _, cand, entry = best
-                res = entry["resources"]
-                spent = Spent(usd=spent.usd + res["usd"], fab_minutes=spent.fab_minutes + res["fab_minutes"],
-                              lead_days=max(spent.lead_days, res["lead_days"]))
+                spent = charge(spent, ResourceReport.model_validate(entry["resources"]))
                 entry["result"] = entry["result"].replace("kept-eligible", "KEPT")
                 body = cand
                 accepted = cand.id

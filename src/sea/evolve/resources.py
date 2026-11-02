@@ -5,6 +5,8 @@ fabricated material (``print:PLA``, ``cast:silicone``...) is charged in machine 
 compares a candidate body's bill of materials with the current body's:
 
 - an item the current body already has is reused, so swapping a part back costs nothing new;
+- the bench's pool of an item is what the run owns (the stock body's parts plus everything bought, in
+  ``Spent.owned``) and the spares on hand that no kept change has used, so a spare is used only once;
 - a shortfall is bought if the item has a price, and refused if it has none ("not provided");
 - fabricated lines are charged only for slots whose part changed: a changed part is a new print.
 
@@ -32,6 +34,22 @@ class Spent(BaseModel):
     usd: float = 0.0
     fab_minutes: float = 0.0
     lead_days: float = 0.0  # the longest wait so far: parts for successive changes are ordered in sequence
+    # items the run owns besides the manifest's spares: the stock body's, then every purchase; None when a
+    # single change is checked on its own (the current body's items are then the run's)
+    owned: dict[str, float] | None = None
+
+
+def start(stock_bom: Sequence[BomLine]) -> Spent:
+    """What a run owns before it changes anything: the stock body's items."""
+    return Spent(owned=dict(totals([b for b in stock_bom if not is_fab(b.item)])))
+
+
+def charge(spent: Spent, res: ResourceReport) -> Spent:
+    """``spent`` after building a kept change: its dollars, machine time and wait, and the items it bought."""
+    owned = None if spent.owned is None else {k: spent.owned.get(k, 0.0) + res.buy.get(k, 0.0)
+                                              for k in {*spent.owned, *res.buy}}
+    return Spent(usd=spent.usd + res.usd, fab_minutes=spent.fab_minutes + res.fab_minutes,
+                 lead_days=max(spent.lead_days, res.lead_days), owned=owned)
 
 
 class ResourceReport(BaseModel):
@@ -42,6 +60,7 @@ class ResourceReport(BaseModel):
     usd: float = 0.0
     lead_days: float = 0.0
     fab_minutes: float = 0.0
+    buy: dict[str, float] = {}  # item -> quantity bought
 
 
 def totals(lines: Sequence[BomLine]) -> dict[str, float]:
@@ -65,13 +84,15 @@ def check(new: Body, new_bom: Sequence[BomLine], cur: Body, cur_bom: Sequence[Bo
     lines: list[str] = []
     errors: list[str] = []
     usd = lead = minutes = 0.0
+    buy: dict[str, float] = {}
     need, have = totals([b for b in new_bom if not is_fab(b.item)]), totals([b for b in cur_bom if not is_fab(b.item)])
     for item, qty in sorted(need.items()):
         spec = items.get(item)
         if spec is None:
             errors.append(f"{item}: not in the resource manifest (nothing provides it)")
             continue
-        avail = float(spec.get("on_hand", 0)) + have.get(item, 0.0)
+        owned = have if spent.owned is None else spent.owned
+        avail = float(spec.get("on_hand", 0)) + owned.get(item, 0.0)
         short = max(0.0, qty - avail)
         if short <= 1e-9:
             lines.append(f"{item} x{qty:g}: provided ({'reused' if have.get(item) else 'on hand'})")
@@ -81,6 +102,7 @@ def check(new: Body, new_bom: Sequence[BomLine], cur: Body, cur_bom: Sequence[Bo
             continue
         cost = short * float(spec["usd"])
         usd += cost
+        buy[item] = short
         lead = max(lead, float(spec.get("lead_days", 0)))
         lines.append(f"{item} x{qty:g}: {avail:g} provided, buy {short:g} at ${float(spec['usd']):g} "
                      f"(${cost:.2f}, {float(spec.get('lead_days', 0)):g} days)")
@@ -103,4 +125,4 @@ def check(new: Body, new_bom: Sequence[BomLine], cur: Body, cur_bom: Sequence[Bo
         errors.append(f"fabrication takes {minutes:.0f} min; the run has "
                       f"{float(budget.get('fab_minutes', 0.0)) - spent.fab_minutes:.0f} left")
     return ResourceReport(ok=not errors, lines=lines, errors=errors, usd=round(usd, 2), lead_days=lead,
-                          fab_minutes=round(minutes, 1))
+                          fab_minutes=round(minutes, 1), buy=buy)
