@@ -57,6 +57,7 @@ COMPONENTS: dict[str, tuple[str, tuple[str, ...]]] = {
     # each world's tasks, physics and parts catalogue: the ruler for runs in that world (D-042)
     "world_gripper": ("judge", ("src/sea/worlds/gripper.py",)),
     "world_mobile": ("judge", ("src/sea/worlds/mobile.py",)),
+    "world_phonology": ("judge", ("src/sea/worlds/phonology.py",)),
 }
 
 # Modules that read runs but never shape one; every other module under src/sea belongs to a component.
