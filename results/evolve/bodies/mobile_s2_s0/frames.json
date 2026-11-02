@@ -52,30 +52,31 @@
   },
   {
    "iteration": 1,
-   "id": "b00m",
+   "id": "b002",
    "held": 7,
    "groups": 10,
    "changes": [
-    "battery: capacity 4.8 \u2192 14.4",
-    "chassis: width 18 \u2192 11",
-    "sensor: bump_switch \u2192 ultrasonic"
+    "battery: capacity 4.8 \u2192 12",
+    "chassis: length 20 \u2192 26, ride_height 2 \u2192 2.5, width 18 \u2192 13",
+    "locomotion: wheels4 \u2192 tracks (idler_height 6, track_length 26)"
    ],
    "body": {
-    "id": "b00m",
+    "id": "b002",
     "parent": "stock",
     "parts": {
      "chassis": {
       "type": "printed_tub",
       "params": {
-       "width": 11.0,
-       "length": 20.0,
-       "ride_height": 2.0
+       "width": 13.0,
+       "length": 26.0,
+       "ride_height": 2.5
       }
      },
      "locomotion": {
-      "type": "wheels4",
+      "type": "tracks",
       "params": {
-       "wheel_radius": 3.0
+       "track_length": 26.0,
+       "idler_height": 6.0
       }
      },
      "drive": {
@@ -87,28 +88,27 @@
      "battery": {
       "type": "nimh_pack",
       "params": {
-       "capacity": 14.4
+       "capacity": 12.0
       }
      },
      "sensor": {
-      "type": "ultrasonic",
+      "type": "bump_switch",
       "params": {}
      }
     }
    },
-   "move": "merge",
+   "move": "swap",
    "gained": [
-    "bedroom",
-    "hallway",
-    "lawn"
+    "garden",
+    "lawn",
+    "sandbox"
    ],
    "lost": [],
-   "cost": "$2.50, 102 machine min",
+   "cost": "$14.00, 204 machine min",
    "why": [
-    "Inner width 11 cm gives 16 cm overall; with 1.0 cm steering sigma at full duty it fits the 20 cm opening offset +2 cm. Six AA cells (14.4 Wh, 12.2 Wh usable, 4 extra cells on hand, free) vs ~5.7 Wh needed at 0.49 kg (resistive term rises from ~1.14 to ~1.47 J/m). No catalogue swap is needed since both ranges contain the fix.",
-    "No bump_switch parameter changes the 0 m range. HC-SR04 ranges 2 m in any light (10x body length), so the corridor can be driven near full speed: 11 m in ~12-20 s, well under 45 s. $2.50, 2 days."
+    "Wheels are ruled out across their whole range: r=4.5 still cannot climb 5.45 cm or span 9 cm. Rocker-bogie would need about 6 cm wheels and stand about 14 cm tall, failing the 9 cm sofa. Tracks with a 6 cm idler climb the 5.45 cm step, and the track's top is at 7.5 cm, under the sofa. A 26 cm contact length bridges about 11.7 cm, more than the 9 cm trench. The long patch should cut ground pressure to a few hundred Pa, about 0.4 cm of sinkage. Ride height 2.5 keeps the tub top at 6.5 cm. Inner width 13 cm tries to also pass the bedroom door and the 28 cm gate. A 12 Wh pack offsets the tracks' higher energy per metre at about 0.56 m/s, so the lawn might also pass. Cost: $14 track kit plus one $2.50 AA cell, 4 days, 57 printer minutes."
    ],
-   "file": "01_b00m.png",
+   "file": "01_b002.png",
    "views": [
     "three-quarter",
     "side"
@@ -116,31 +116,31 @@
   },
   {
    "iteration": 2,
-   "id": "b010",
+   "id": "b012",
    "held": 10,
    "groups": 10,
    "changes": [
-    "battery: nimh_pack \u2192 liion_pack (capacity 28.2)",
-    "chassis: length 20 \u2192 24, width 11 \u2192 10",
-    "locomotion: wheels4 \u2192 tracks (idler_height 6.5, track_length 24)"
+    "chassis: width 13 \u2192 10",
+    "locomotion: idler_height 6 \u2192 7",
+    "sensor: bump_switch \u2192 ultrasonic"
    ],
    "body": {
-    "id": "b010",
-    "parent": "b00m",
+    "id": "b012",
+    "parent": "b002",
     "parts": {
      "chassis": {
       "type": "printed_tub",
       "params": {
        "width": 10.0,
-       "length": 24.0,
-       "ride_height": 2.0
+       "length": 26.0,
+       "ride_height": 2.5
       }
      },
      "locomotion": {
       "type": "tracks",
       "params": {
-       "track_length": 24.0,
-       "idler_height": 6.5
+       "track_length": 26.0,
+       "idler_height": 7.0
       }
      },
      "drive": {
@@ -150,9 +150,9 @@
       }
      },
      "battery": {
-      "type": "liion_pack",
+      "type": "nimh_pack",
       "params": {
-       "capacity": 28.2
+       "capacity": 12.0
       }
      },
      "sensor": {
@@ -163,16 +163,16 @@
    },
    "move": "swap",
    "gained": [
-    "garden",
-    "porch",
-    "sandbox"
+    "bedroom",
+    "hallway",
+    "porch"
    ],
    "lost": [],
-   "cost": "$29.00, 176 machine min",
+   "cost": "$2.50, 188 machine min",
    "why": [
-    "No wheels4 value can fix these. A wheel never climbs more than its radius, and at most 4.5 cm is less than the 5.45 cm edge. A 9 cm wheel diameter is still narrower than the 9.1 cm trench. A rocker-bogie big enough for the step (r=6) stands about 14 cm and breaks under_sofa (9 cm). Tracks fix all three mechanisms. (1) Porch: an idler at 6.5 cm is above the 5.45 cm edge. (2) Garden: 0.45 x 24 cm = 10.8 cm of support, more than the 9.1 cm trench. (3) Sandbox: two long patches give roughly 100-150 cm2 of contact at about 0.7 kg, so about 0.5-0.7 kPa and under 1 cm of sinkage, below the 2 cm belly. Last time this was refused because the tub was too short for the track. Now the track is 24 cm and the tub is 24 cm, which is inside the allowed tub length of track length \u00b14 cm. Height is the idler at 6.5 cm plus 1.5 cm of track, so 8.0 cm, under the 9.0 cm sofa. Inner width drops to 10 cm to keep margin in the 20 cm bedroom door. Two things threaten the lawn survey: tracks roll harder, and the 1.8 cm sprocket cuts top speed to about 0.56 m/s at 100:1, so electronics cost about 4.6 J/m. That is about 7-9 J/m, or 35-45 kJ for 5 km, against only 44 kJ usable from the NiMH pack. So the battery moves to Li-ion at 28.2 Wh (3 cells, 138 g, lighter than the 162 g of NiMH), which roughly doubles the energy. The 100:1 N20 motors are kept: two motors on 1.8 cm sprockets give about 13 N at the ground, against about 3 N needed on the 22\u00b0 ramp. The 5000 m at about 0.5 m/s takes about 10,000 s, under the 14,400 s limit. Cost: track kit $14, 3 cells at $4.5 plus a BMS at $1.5, so $29.00 in all, 4 days lead time, about 57 g of track print plus a tub reprint."
+    "These changes do not interact. The sonar adds no height and no width, the narrower tub does not change the track contact, and the 7 cm idler leaves the overall width alone. So the combination should gain all three failing groups in one trial, for $2.50, 2 days and about 160 machine minutes of PLA."
    ],
-   "file": "02_b010.png",
+   "file": "02_b012.png",
    "views": [
     "three-quarter",
     "side"

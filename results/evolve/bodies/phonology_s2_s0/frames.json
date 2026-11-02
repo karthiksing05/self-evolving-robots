@@ -86,8 +86,8 @@
    "lost": [],
    "cost": "$24.00, 132 machine min",
    "why": [
-    "round_lips gives 0-6.6 cm2 of opening, so a full seal is possible for /p/ with the tongue lowered (airway about 1 cm2 elsewhere). With max_protrusion 1.6 cm the lip tube can grow to 2.6 cm, which lengthens the front cavity and narrows the outlet. That should pull F2 from about 1070-1140 down toward 840-1020 and bring /u/ F1 down from 418 to about 300. No params move can do this: the closure floor is fixed by the cast lip shape.",
-    "tip_tongue's blade slides 0.3-5 cm behind the teeth and can seal, which gives /t/. Setting the body stroke to 1.3 (above 1.2) lets the pad shut the velar region, which gives /k/. No value of rail_start (minimum 2.5 cm) reaches the alveolar place, so a params move cannot fix /t/. The second constriction may also start moving /\u025d/ F3 down from its 2770 Hz floor."
+    "The lowest jaw_lips opening is its rest_area, and that range is [2.5, 3.5] cm2. No value in it gets near the <0.05 cm2 seal /p/ needs, and with the lip tube fixed at 1 cm the F2 floor stays at 1067 Hz (ao needs 840, uw 870, uh 1020). A params move cannot fix this. round_lips opens 0-6.6 cm2, so it seals the lips for /p/, and protrusion up to 1.6 cm makes the lip tube 2.6 cm long. Rounding together with the tongue pad at the back (System 1's best postures had tongue_place 8-9.7, height 0.95) should lower F2 into the targets for ao, uh and uw, and it lowers F1 too: uw's F1 is +39% now.",
+    "cam_tongue's rail starts at 2.5 cm at the earliest, so nothing can reach 0-1.5 cm behind the teeth, and stroke=0.95 leaves 0.20 cm2 at the velum. tip_tongue adds a blade that slides 0.3-5 cm behind the teeth and seals the full bore, which gives /t/. Setting stroke=1.3 (>1.2) lets the body pad seal at 5.5-8.5 cm for /k/. A stroke-only params move would get /k/ but never /t/, so the swap is worth its $12. Having the tip and the body as two independent constrictions is also the first step toward the low F3 of /er/."
    ],
    "file": "01_b00m.png",
    "views": [

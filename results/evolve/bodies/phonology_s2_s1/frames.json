@@ -86,8 +86,8 @@
    "lost": [],
    "cost": "$24.00, 132 machine min",
    "why": [
-    "tip_tongue adds a blade that slides 0.3-5 cm behind the teeth and seals the full bore, which gives /t/. Setting the body pad's stroke to 1.3 lets it seal at the velar place for /k/, with 0.1 cm of margin against servo noise. The second constriction might also help /\u025d/ (F3 needs constrictions at two places at once), but I am not counting on it. Cost: a $4 pushrod kit plus one $8 servo (4 servos needed, 2 reused, 1 on hand), so $12, 3 days, 76 machine minutes. Combined with round_lips: 6 servos (2 more bought), 6 of 6 channels, about $24 in total.",
-    "round_lips opens from 0 to 6.6 cm2, which gives a full lip seal for /p/ while the tongue keeps the rest of the airway open (> 0.2 cm2). A small rounded opening plus up to 1.6 cm of protrusion (lip tube up to 2.6 cm, effective tract about 16 cm instead of 14.5) should pull F2 down to /u/ and /\u028a/ levels with a back tongue constriction, and /\u0254/ down with moderate rounding. Rounding also lowers F1, which helps uw (F1 +43%) and uh (+14%). Cost: $4 for a pushrod kit, 2 days, 57 machine minutes. The second lip servo is the one on hand."
+    "tip_tongue keeps the same body pad (rail_start 3.25 cm as now, stroke raised to 1.3 cm) and adds a tip that seals the alveolar region for /t/. The body seals the velar region for /k/. The tip plus body constriction may lower F3 for /\u025d/, though probably not to 1690 Hz without rounding as well. Cost: $12, 3 days, 76 machine minutes.",
+    "round_lips covers 0-6.6 cm2: 0 gives the /p/ seal, and a small opening plus up to 1.6 cm of protrusion (a 2.6 cm lip tube) brings F2 down toward 840-1020 Hz with the tongue back for /\u0254/ and /\u028a/, and possibly /u/. Cost: $4 for a pushrod kit, 2 days, 57 machine minutes. Servos: the current lip servo plus the one on hand."
    ],
    "file": "01_b00m.png",
    "views": [

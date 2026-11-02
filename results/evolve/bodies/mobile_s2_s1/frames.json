@@ -52,30 +52,31 @@
   },
   {
    "iteration": 1,
-   "id": "b00m",
-   "held": 7,
+   "id": "b002",
+   "held": 9,
    "groups": 10,
    "changes": [
     "battery: capacity 4.8 \u2192 14.4",
-    "chassis: width 18 \u2192 11",
-    "sensor: bump_switch \u2192 ultrasonic"
+    "chassis: length 20 \u2192 24, ride_height 2 \u2192 3, width 18 \u2192 11",
+    "locomotion: wheels4 \u2192 tracks (idler_height 6.5, track_length 24)"
    ],
    "body": {
-    "id": "b00m",
+    "id": "b002",
     "parent": "stock",
     "parts": {
      "chassis": {
       "type": "printed_tub",
       "params": {
        "width": 11.0,
-       "length": 20.0,
-       "ride_height": 2.0
+       "length": 24.0,
+       "ride_height": 3.0
       }
      },
      "locomotion": {
-      "type": "wheels4",
+      "type": "tracks",
       "params": {
-       "wheel_radius": 3.0
+       "track_length": 24.0,
+       "idler_height": 6.5
       }
      },
      "drive": {
@@ -91,24 +92,25 @@
       }
      },
      "sensor": {
-      "type": "ultrasonic",
+      "type": "bump_switch",
       "params": {}
      }
     }
    },
-   "move": "merge",
+   "move": "swap",
    "gained": [
     "bedroom",
-    "hallway",
-    "lawn"
+    "garden",
+    "lawn",
+    "porch",
+    "sandbox"
    ],
    "lost": [],
-   "cost": "$2.50, 102 machine min",
+   "cost": "$14.00, 182 machine min",
    "why": [
-    "Tub width 18->11 cm gives ~16 cm overall (+<=1.0 cm steering error) well inside 19.8 cm. Battery 4.8->14.4 Wh (6 cells: 2 in pack + 4 on hand, free) gives 12.2 Wh usable against ~6 Wh needed for 5 km even with +108 g (energy/m ~4.2 J/m). Both are within the current parts' ranges, so no swap is needed.",
-    "The bump switch has no parameters, so no params move can help. The HC-SR04 ranges 2 m in any light, so the robot can run at cruise speed through the dark corridor: 11 m at ~0.6-0.9 m/s is ~15-20 s. It adds no height and only 0.08 W. Camera only lights 0.12 m in the dark (< body length); lidar is not provided."
+    "No wheel option in the catalogue fixes these. wheels4 at r 4.5 with pushing (f 0.5, mu 0.75) climbs about 0.72r = 3.2 cm, short of 5.6. rocker_bogie6 at r 6 might reach 5.6 but stands about 14 cm tall, which breaks under_sofa (9 cm). Wheels would need about 41 cm2 of contact to stay under 0.9 kPa, and a bigger radius only lengthens the patch slightly. Tracks with a 24 cm contact length bridge 0.45 x 24 = 10.8 cm, more than the 9 cm trench. A front idler at 6.5 cm meets the 5.6 cm porch edge. The track top sits at 8.0 cm and the tub top at 3 + 4 = 7 cm, both under the 9 cm sofa. The contact area of roughly 100-150 cm2 at about 0.6 kg gives under 0.6 kPa, so it sinks about 0.6-0.8 cm against a 3 cm belly. The drive stays at gear 100 with motors on hand: two N20s on a 1.8 cm sprocket give about 13 N, against about 3 N for the gravel ramp. Top speed drops to about 0.56 m/s, so 5000 m of lawn takes about 8900 s of the 14400 s allowed. The pack goes to 14.4 Wh (all 6 cells on hand, 12.2 Wh usable) to cover the track's higher rolling resistance and the slower speed, about 9 Wh. Width 11 leaves room for the tracks' side width at the 28 cm garden gate and possibly the bedroom door. The kit costs $14, takes 4 days and 57 machine minutes."
    ],
-   "file": "01_b00m.png",
+   "file": "01_b002.png",
    "views": [
     "three-quarter",
     "side"
@@ -116,30 +118,29 @@
   },
   {
    "iteration": 2,
-   "id": "b011",
+   "id": "b010",
    "held": 10,
    "groups": 10,
    "changes": [
-    "chassis: length 20 \u2192 28",
-    "locomotion: wheels4 \u2192 tracks (idler_height 7, track_length 28)"
+    "sensor: bump_switch \u2192 ultrasonic"
    ],
    "body": {
-    "id": "b011",
-    "parent": "b00m",
+    "id": "b010",
+    "parent": "b002",
     "parts": {
      "chassis": {
       "type": "printed_tub",
       "params": {
        "width": 11.0,
-       "length": 28.0,
-       "ride_height": 2.0
+       "length": 24.0,
+       "ride_height": 3.0
       }
      },
      "locomotion": {
       "type": "tracks",
       "params": {
-       "track_length": 28.0,
-       "idler_height": 7.0
+       "track_length": 24.0,
+       "idler_height": 6.5
       }
      },
      "drive": {
@@ -162,16 +163,14 @@
    },
    "move": "swap",
    "gained": [
-    "garden",
-    "porch",
-    "sandbox"
+    "hallway"
    ],
    "lost": [],
-   "cost": "$14.00, 206 machine min",
+   "cost": "$2.50, 0 machine min",
    "why": [
-    "Cheaper variant ($14, keeps the NiMH pack): a 7 cm idler gives more margin over the 5.6 cm porch edge, and a 28 cm contact bridges ~12.6 cm over the 9 cm trench. The tub is set to 28 cm to fall within the 24-32 cm the frames require. It tests whether the lawn energy budget holds without the battery change."
+    "No bump_switch setting gives it any range, and System 1 already tried 32 times (best score 0.93), so the sensor has to be swapped. The HC-SR04 ranges 2 m in any light. That is about 8 times the 0.24 m body length, which removes both the 0.25 m/s limit and the 40 s of back-offs. With no back-offs, 11 m at most of the 0.57 m/s no-load speed takes about 20-25 s, inside 45 s. The camera would not work: in the dark its LED lights only 0.12 m, which is still under the body length. The lidar is not provided. In iteration 1 this same swap gained hallway and lost nothing on the wheeled body. Sensing is independent of the running gear, so it should carry over to the tracked body."
    ],
-   "file": "02_b011.png",
+   "file": "02_b010.png",
    "views": [
     "three-quarter",
     "side"

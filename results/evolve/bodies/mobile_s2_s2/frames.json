@@ -53,12 +53,11 @@
   {
    "iteration": 1,
    "id": "b00m",
-   "held": 8,
+   "held": 6,
    "groups": 10,
    "changes": [
     "battery: capacity 4.8 \u2192 12",
-    "chassis: width 18 \u2192 12",
-    "locomotion: wheels4 \u2192 tracks (idler_height 6, track_length 24)",
+    "chassis: width 18 \u2192 13",
     "sensor: bump_switch \u2192 ultrasonic"
    ],
    "body": {
@@ -68,16 +67,15 @@
      "chassis": {
       "type": "printed_tub",
       "params": {
-       "width": 12.0,
+       "width": 13.0,
        "length": 20.0,
        "ride_height": 2.0
       }
      },
      "locomotion": {
-      "type": "tracks",
+      "type": "wheels4",
       "params": {
-       "track_length": 24.0,
-       "idler_height": 6.0
+       "wheel_radius": 3.0
       }
      },
      "drive": {
@@ -100,17 +98,14 @@
    },
    "move": "merge",
    "gained": [
-    "garden",
     "hallway",
-    "lawn",
-    "sandbox"
+    "lawn"
    ],
    "lost": [],
-   "cost": "$16.50, 170 machine min",
+   "cost": "$2.50, 113 machine min",
    "why": [
-    "The wheels add 2.5 cm a side (18 inner, 23 overall), so a 12 cm inner width gives 17 cm overall. With 0.41-1.0 cm of steering error that is about 18 cm or less, inside the 19.7 cm opening, and the 28 cm garden gate still passes. On the lawn, 4.08 Wh got 78% of the way, so the full survey needs about 5.3 Wh usable. A 12 Wh pack (5 AA cells, all on hand, +81 g) gives about 10.2 Wh usable. That covers the roughly 10% higher J/m from the extra mass with a large margin, and also covers heavier running gear if tracks are combined in. Both changes are free, so no swap is needed.",
-    "Wheels cannot fix the porch at any setting. At the 4.5 cm maximum radius, even with the rear wheels pushing, h is about 4.5*(1-cos 73.7 deg), about 3.2 cm, short of 5.5 cm. A 4.5 cm wheel spans 9 cm, still less than the 9.2 cm trench. Rocker-bogie would need 6 cm wheels, which with the linkage stand about 14 cm tall and break under_sofa (9 cm). Tracks fix all three at once. A 6 cm idler is higher than the 5.48 cm step, and the track stands 7.5 cm tall, under the 9 cm sofa. A 24 cm contact length bridges about 10.8 cm, more than 9.2 cm. Two roughly 24 cm patches bring the ground pressure to around 0.4-0.5 kPa, so sinkage drops below 1 cm. Speed falls to about 0.56 m/s (1.8 cm sprocket), still enough for kitchen and living_room (5 m in 40 s) and for the lawn (0.35 m/s needed). Cost: $14, 4 days, 57 machine min.",
-    "No bump-switch parameter adds range, so the sensor itself has to change. The HC-SR04 sees 2 m in the dark, about 10 body lengths, so the corridor can be driven near cruise speed with no 4 s back-offs. 11 m at about 0.5 m/s takes about 22 s, inside 45 s. The camera's IR LED reaches only 0.12 m, less than the body length, and the lidar cannot be supplied. Cost: $2.50, 2 days."
+    "Narrowing the tub from 18 to 13 cm inner width brings it to 18 cm overall. With 0.41 cm steering sigma at slow duty, that leaves about 1.7 cm in the 19.7 cm opening. For the lawn the whole route needs about 5.24/0.78 = 6.7 Wh at 0.38 kg. Going to 12 Wh (5 NiMH cells, +81 g, about 0.46 kg) gives about 10.2 Wh usable against an estimated 7.5 to 8 Wh needed once the extra mass is counted. Both changes are free: 4 spare nimh_aa are on hand, and the tub is a reprint of 162 g of PLA, about 162 machine minutes. Neither needs a swap.",
+    "No parameter of bump_switch changes its 0 m range, so the part itself has to change. The HC-SR04 ranges 2 m in any light, adds no height and draws only 0.08 W. The robot can then cruise the 8 m corridor near its 0.94 m/s and steer around the obstacles instead of spending 4 s on each. The 11 m route should then take about 15 to 25 s. The camera would light only 0.12 m in the dark, and lidar is not provided. Cost: $2.50, 2 days."
    ],
    "file": "01_b00m.png",
    "views": [
@@ -120,23 +115,23 @@
   },
   {
    "iteration": 2,
-   "id": "b01m",
-   "held": 10,
+   "id": "b010",
+   "held": 9,
    "groups": 10,
    "changes": [
-    "chassis: width 12 \u2192 10",
-    "drive: n20_gearmotor \u2192 n20_encoder_gearmotor (gear_ratio 100)",
-    "locomotion: idler_height 6 \u2192 7"
+    "battery: nimh_pack \u2192 liion_pack (capacity 28.2)",
+    "chassis: length 20 \u2192 24, width 13 \u2192 10",
+    "locomotion: wheels4 \u2192 tracks (idler_height 6, track_length 24)"
    ],
    "body": {
-    "id": "b01m",
+    "id": "b010",
     "parent": "b00m",
     "parts": {
      "chassis": {
       "type": "printed_tub",
       "params": {
        "width": 10.0,
-       "length": 20.0,
+       "length": 24.0,
        "ride_height": 2.0
       }
      },
@@ -144,19 +139,19 @@
       "type": "tracks",
       "params": {
        "track_length": 24.0,
-       "idler_height": 7.0
+       "idler_height": 6.0
       }
      },
      "drive": {
-      "type": "n20_encoder_gearmotor",
+      "type": "n20_gearmotor",
       "params": {
        "gear_ratio": 100.0
       }
      },
      "battery": {
-      "type": "nimh_pack",
+      "type": "liion_pack",
       "params": {
-       "capacity": 12.0
+       "capacity": 28.2
       }
      },
      "sensor": {
@@ -165,19 +160,78 @@
      }
     }
    },
-   "move": "merge",
+   "move": "swap",
    "gained": [
     "bedroom",
+    "garden",
+    "sandbox"
+   ],
+   "lost": [],
+   "cost": "$29.00, 174 machine min",
+   "why": [
+    "No wheels4 size can fix these three. A wheel never climbs above its radius (4.5 cm max is less than 5.5 cm), and a 9 cm diameter is still under the 9.2 cm trench. Rocker-bogie with 6 cm wheels would stand about 14 cm tall and fail under_sofa's 9 cm overhang. Tracks: idler 6 cm should meet the 5.5 cm step, and the track stands 7.5 cm overall, under the 9 cm sofa. track_length 24 should bridge 0.45 x 24 = 10.8 cm, more than the 9.2 cm trench. Two 24 cm tracks give on the order of 100+ cm2 of contact, so at about 0.6-0.7 kg the pressure is about 0.5 kPa and sinkage under 1 cm, below the 2 cm belly. Last time's refusal was a track-to-tub length mismatch; tub length 24 now matches the 24 cm track. The 1.8 cm sprocket cuts top speed to about 0.56 m/s, so the lawn takes about 8,900 s (14,400 allowed). At that speed the electronics alone use about 6.4 Wh, plus a higher drive term from track rolling resistance. Three 18650 cells (28.2 Wh, 138 g, about the same mass as the current 5 NiMH cells) cover that. Width 10 also narrows the body for the bedroom door. Stall force with 2 motors on the small sprocket is about 16/2 x 3/1.8 = 13 N, still several times what the 22 deg ramp needs."
+   ],
+   "file": "02_b010.png",
+   "views": [
+    "three-quarter",
+    "side"
+   ]
+  },
+  {
+   "iteration": 3,
+   "id": "b020",
+   "held": 10,
+   "groups": 10,
+   "changes": [
+    "locomotion: idler_height 6 \u2192 6.5"
+   ],
+   "body": {
+    "id": "b020",
+    "parent": "b010",
+    "parts": {
+     "chassis": {
+      "type": "printed_tub",
+      "params": {
+       "width": 10.0,
+       "length": 24.0,
+       "ride_height": 2.0
+      }
+     },
+     "locomotion": {
+      "type": "tracks",
+      "params": {
+       "track_length": 24.0,
+       "idler_height": 6.5
+      }
+     },
+     "drive": {
+      "type": "n20_gearmotor",
+      "params": {
+       "gear_ratio": 100.0
+      }
+     },
+     "battery": {
+      "type": "liion_pack",
+      "params": {
+       "capacity": 28.2
+      }
+     },
+     "sensor": {
+      "type": "ultrasonic",
+      "params": {}
+     }
+    }
+   },
+   "move": "params",
+   "gained": [
     "porch"
    ],
    "lost": [],
-   "cost": "$12.00, 162 machine min",
+   "cost": "$0.00, 64 machine min",
    "why": [
-    "Raise idler_height from 6 to 7 cm. The climbable edge goes to about 6.3 cm, which clears the 5.48 cm porch edge with about 0.8 cm to spare. The stall force is 2.3 times the robot's weight, so pulling over the edge is not the limit. Height becomes 7 + 1.5 = 8.5 cm, which still fits under the 9.0 cm sofa. An idler at 8 cm would make the robot 9.5 cm tall and lose under_sofa, so 7 cm is the ceiling. This only needs a reprint of the track frame (about 57 g of PLA); the rubber_track_kit is reused.",
-    "Set the chassis width to 10 cm, the bottom of its range. The body goes from 18 to 16 cm overall, so the margin grows from about 0.9 cm per side to about 1.9 cm per side. That is about 2 sigma at duty 0.69 and about 4 sigma at the slowest duty (0.49 cm), and System 1 can still set the line for the +2 cm offset. This costs nothing to buy, only a smaller tub reprint (under 162 g of PLA). Steering error is not the problem, so encoders are not needed first.",
-    "This is a backup in case the narrow tub alone leaves the bedroom marginal. Encoder N20s at the same 100:1 ratio would bring sigma from 0.94 down to about 0.56 cm at duty 0.69, and from 1.20 down to 0.72 cm at full speed. Even on the 18 cm body the drift should then stay inside 0.87 cm most of the time, and on the 16 cm body it would pass comfortably. It costs $12 and 4 days, within the $43.50 and 7 days left."
+    "The ratio is 5.40/6.0 = 0.90, or equivalently an offset of 0.6 cm. Either way, an idler at 6.5 cm should meet edges up to about 5.85-5.9 cm, which clears the 5.48 cm step with about 0.4 cm to spare. Force is not the limit: stall force is 13.3 N, 2.27 times the robot's weight. A cheaper move isn't available because only idler_height sets the climbable edge, and the current part's range [2, 8] covers the fix, so no swap is needed. The cost is $0 and about 57 machine minutes to reprint the track frames (314 available). Overall height goes from 7.5 to 8.0 cm (idler + 1.5 cm)."
    ],
-   "file": "02_b01m.png",
+   "file": "03_b020.png",
    "views": [
     "three-quarter",
     "side"
