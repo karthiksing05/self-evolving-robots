@@ -129,7 +129,8 @@ class ToolSpec(_Model):
 
 
 class FingerSpec(_Model):
-    """Printed pads over the stock jaw tips (design/fingers.py, D-038).  All zero is the stock jaw."""
+    """Printed pads over the jaw tips (design/fingers.py, D-038) and the moving jaw's joint (D-042).
+    The defaults are the stock gripper."""
 
     reach_mm: float = 0.0  # pads extend this far past the stock tips
     pad_angle_deg: float = 0.0  # the moving pad's face is parallel to the fixed one at this jaw opening
@@ -137,6 +138,12 @@ class FingerSpec(_Model):
     lip_mm: float = 0.0  # inward hook at the bottom of each pad
     pad_tpu_mm: float = 0.0  # TPU skin on each face (0: bare PLA)
     width_mm: float = 0.0  # pad width across the jaw (0: the default 12 mm)
+    # The moving jaw's joint (D-042).  revolute: the stock hinge.  parallelogram: two links of length
+    # link_mm keep the finger's orientation while it swings.  prismatic: a rack and pinion slides the
+    # finger drive_mm_per_rad per servo radian.
+    jaw: Literal["revolute", "parallelogram", "prismatic"] = "revolute"
+    link_mm: float = 0.0
+    drive_mm_per_rad: float = 0.0
 
 
 class ArmSpec(_Model):

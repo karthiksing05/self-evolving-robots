@@ -914,3 +914,104 @@ places where the harness, not System 2, was the problem.
 None of these changes touches the judge or the world. The batteries do not use System 2 and are
 unchanged. The live run they come from used the harness before this entry (its `harness.json`).
 Tests: `tests/test_ladder.py`, `tests/test_llm_mock.py`.
+
+## D-040 The grasp world started some episodes inside the object (judge validity)
+Diagnosing why the potted meat can failed every gripper design showed a 1002 N contact at t = 0.
+`HOME_Q` holds the tool 80 mm up at x = 0.18 m, and the 83.5 mm can, 101 mm deep and centred at
+0.22 m, reached under it. The episode started in collision and tripped `force_limit` before any
+motion: a broken task, not a gripper limit. SWE-bench's rule applies: validate the task before you
+judge the agent on it.
+- `executor.GRASP_HOME_Q` starts grasp-world episodes with the arm's lowest point 112 mm above the
+  table over the object area. That clears the tallest object, which is 85 mm. `reset_episode` picks
+  the home pose from the panel. Every other world keeps `HOME_Q`.
+- With the stock jaws, the potted meat can is now held at all three placements. The stock jaws hold
+  6/21 objects: phase A is banana, cup, foam brick, large marker, potted meat can and wood cube
+  (`results/real_stock.json`; the old file is in `results/superseded/start_collision/`).
+- Both batteries are identical: panels 3/5/12 passes, grasp 15/16/0. Their verdicts did not move, so
+  they are re-keyed under the new judge key with D-041 and D-042.
+
+## D-041 A world-agnostic evolution core: parts, resources, and redesign as a move (judge + policy)
+The user asked for redesigns to arise from the harness, not to be hand-made, and to be general across
+domains. They also asked that every new part be grounded in what the bench actually provides.
+`sea.evolve` is a second loop alongside the panel loop. It is built on four ideas:
+- **A body is one part per slot.** Each part type has physical parameters with ranges and docs.
+  System 2 has three moves, cheapest first:
+  - `params`: new values for the current parts;
+  - `swap`: another part type in a slot, a redesign of that part;
+  - `idea`: a part no catalogue has. It is recorded with what it needs and never trialled.
+  
+  The loop labels each trial with the move it actually made, whatever the proposal claimed.
+- **Resources ground every move** (`resources.py`). A world's manifest lists items on hand, items that
+  can be bought (price, lead time) and machine time per fabricated material. The check for each
+  candidate:
+  - reuses whatever the current body already has;
+  - buys shortfalls within the run's budget;
+  - charges fabrication only for slots whose part changed;
+  - refuses anything the bench cannot provide, and says so. That refusal reaches System 2 in the next
+    prompt, so it learns what is provided.
+- **Diagnosis drives escalation.** Each world returns a mechanism label and the numbers behind it for
+  every failure, and a `brief`: computed facts about the current body, never advice. The prompt has
+  the same sections in every world: the harness's seven principles; the world, its brief, physics,
+  catalogue and resources; the held and failing groups; and the record of past proposals. The record
+  includes a per-slot summary of what parameter-only trials have not fixed. A swap is then the
+  natural next step when that summary and the brief show the current part cannot reach.
+- **A ratchet.** A candidate is kept only if it gains a task group and loses none. The held set only
+  grows, the PASS_TO_PASS rule. Held groups are trialled first, so a regression stops a trial early.
+
+Arms: `s2` (System 2 on the Claude plan through the Claude Code CLI, never API credits), `random`
+(blind catalogue edits through the same screen and trials) and `s1` (the stock body).
+- Every prompt, answer, screen, trial and decision is written to the run directory.
+- The final body and the stock body are both scored on the held-out test split.
+- Worlds register by name (`sea/worlds/__init__.py`). `scripts/evolve.py` runs one.
+
+Tests: `tests/test_evolve.py`, a toy world covering every path: a ratchet rejection, a kept params
+move, a refusal because an item is not provided, a recorded idea and a swap that buys a part.
+
+## D-042 The moving jaw's joint is a part; the gripper world (world + judge)
+For the 21 YCB objects, the diagnosis (`worlds/gripper.py: diagnose`, which replays each failed
+attempt and reads the contacts) separates three causes:
+- **Wide, low boxes** (gelatin, tuna, pudding, sugar, mustard): on the hinge, the moving fingertip
+  rises 14 mm at 75 mm and 35 mm at 95 mm. The finger presses the box's top edge or top face
+  (`moving_jaw_on_top_face`, `squeezed_down_out` with the contact 10 mm above centre, pushing 48°
+  down).
+- **Round objects:** both contacts sit above the equator and push down. On the lift, the object is
+  squeezed out (`squeezed_down_out`).
+- **The potted meat can:** start collision (D-040).
+
+No pad on a hinged jaw fixes the first cause for a box 30 mm tall. The pad would have to hang 30 mm
+below the fixed fingertip, which then hits the table on a 17 mm die.
+
+So the catalogue offers the moving jaw's joint as a part, chosen from the basic lower pairs rather
+than designed for any one object. `design/fingers.py` and `sim/build_model.py` build each:
+- `revolute`: the stock hinge;
+- `parallelogram`: a four-bar with link length `link_mm`. The finger keeps its orientation but still
+  rises by `link (1 - cos q)`. It is a coupler body held at minus the hinge angle by a joint equality,
+  with jaw-jaw contact excluded as for the hinge.
+- `prismatic`: a rack-and-pinion slide, `drive_mm_per_rad` 20–60. The gripper joint becomes a slide.
+  The actuator's gear is 1/radius, so the servo still takes radians and its torque arrives as force.
+  Damping and rotor inertia are reflected. `Sim.arm_q`, `servo_ranges` and the sensors report the
+  servo angle. The executor clips commands in servo units; it had clipped a slide's command at
+  0.096 "rad", its range in metres.
+
+`fingers.fingertips` and `tip_opening` give the fingertip gap and the moving fingertip's height
+relative to the fixed one. The brief and the diagnosis read those; the face-line `gap` of D-038 says
+where faces are parallel, and stays.
+
+The gripper world (`worlds/gripper.py`):
+- **Tasks:** 21 groups. Each has a centred table and one seeded placement to train on, and two other
+  placements to test on.
+- **Slots:** `jaw` (the three joints), `pads` (none or the D-038 family) and `arm_servos` (7.4 V, or
+  12 V on the lifting joints).
+- **Bills of materials:** printed grams at 5 min/g PLA and 8 min/g TPU, steel rods, bushings,
+  bearings, servos and a 12 V supply. The budget is $40, 7 days of lead time and 600 machine minutes.
+  The 12 V upgrade costs $68, so it cannot be bought within the run as configured. The prompt says
+  so.
+- **System 1:** `run_panel` with its search, so verdicts match the panel loop.
+
+A measurement, not a gold design: with the slide at 55 mm/rad and no pads, `measure_real` holds the
+gelatin box, tuna can, pudding box, wood cube and tennis ball at both placements tried.
+
+Revolute behaviour is unchanged: `has_pads` replaces `is_stock` where the code meant "has pads", and
+every hinge function returns what it did. The batteries are identical. The judge key changes through
+`contracts.py` (three `FingerSpec` fields) and the new judge components (`evolve`, `world_gripper`).
+Tests: `tests/test_fingers.py` (`test_jaw_mechanisms_d042`), `tests/test_world_gripper.py`.

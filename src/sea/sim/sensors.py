@@ -270,8 +270,8 @@ class Sensors:
     def read(self) -> SensorFrame:
         sim = self.sim
         d = sim.data
-        q_true = d.qpos[sim.arm_qadr].copy()
-        qd_true = d.qvel[sim.arm_dadr].copy()
+        q_true = sim.arm_q()  # the gripper as its servo angle, whatever the jaw's joint (D-042)
+        qd_true = sim.arm_qd()
         tau_true = np.array([d.actuator_force[sim.model.actuator(j).id] for j in ARM_JOINTS])
         load = self._measure("load", np.clip(tau_true / self.stall, -1.0, 1.0))
         current = self.idle_current + np.abs(load) * (self.stall_current - self.idle_current)

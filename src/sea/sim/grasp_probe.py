@@ -98,7 +98,8 @@ def jaws(design: Design, width: float, probe: Probe = PROBE) -> Jaws:
         return Jaws(probe.q_open, 0.0, STOCK_TIP_EXT)
     q_open = F.opening_for(f, width + 2 * probe.side_mm * MM + 10 * MM)
     q_obj = F.opening_for(f, width)
-    return Jaws(max(probe.q_open, q_open if q_open is not None else 1.7), F.thickness(f),
+    wide = 1.7 if f.jaw == "revolute" else F.q_range(f)[1]
+    return Jaws(max(probe.q_open, q_open if q_open is not None else wide), F.thickness(f),
                 F.below_tool(f, q_obj if q_obj is not None else probe.q_open))
 
 

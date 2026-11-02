@@ -17,6 +17,15 @@ extends ``reach_mm`` past its tip.  The parameters (``FingerSpec``, all zero for
 ``pad_geoms`` gives the boxes ``build_model`` adds to the two jaw bodies; ``gap`` and ``opening_for``
 give the distance between the pad faces at any jaw angle, which the capability numbers and the grasp
 primitive use.  Stock geometry constants were measured from the SO-101 jaw meshes (D-038).
+
+The moving jaw's joint is a part too (D-042), and every function here takes it into account:
+
+- ``revolute``: the stock hinge.  The moving finger turns by the servo angle ``q``, so its face is
+  parallel to the fixed one at one opening and its tip rises as it opens (``tip_rise``);
+- ``parallelogram``: two links of length ``link_mm`` from the servo axis carry the finger without
+  turning it; the finger still swings on a circle, so it rises by ``link (1 - cos q)``;
+- ``prismatic``: a rack and pinion slides the finger ``drive_mm_per_rad`` per servo radian along the
+  closing axis; it neither turns nor rises.  The squeeze is the servo torque over the pinion radius.
 """
 
 from __future__ import annotations
@@ -57,8 +66,16 @@ RANGES: dict[str, tuple[float, float]] = {
 }
 
 
+PAD_FIELDS = tuple(RANGES)
+Q_RANGES = {"revolute": (-0.17, 1.2), "parallelogram": (-0.17, 1.55), "prismatic": (-0.17, 1.745)}
+
+
 def is_stock(spec: FingerSpec) -> bool:
     return spec == FingerSpec()
+
+
+def has_pads(spec: FingerSpec) -> bool:
+    return any(getattr(spec, k) for k in PAD_FIELDS)
 
 
 def width(spec: FingerSpec) -> float:
@@ -67,7 +84,22 @@ def width(spec: FingerSpec) -> float:
 
 def thickness(spec: FingerSpec) -> float:
     """Pad face offset from the stock jaw face: backing plus skin."""
-    return 0.0 if is_stock(spec) else THICK + spec.pad_tpu_mm * MM
+    return THICK + spec.pad_tpu_mm * MM if has_pads(spec) else 0.0
+
+
+def q_range(spec: FingerSpec) -> tuple[float, float]:
+    """Servo angles the skills use: closed to the widest opening at which the gap still means a width."""
+    return Q_RANGES[spec.jaw]
+
+
+def link_vec(spec: FingerSpec) -> np.ndarray:
+    """Parallelogram: the link from the servo axis to the finger, in the moving jaw's frame at q = 0."""
+    return np.array([0.0, -spec.link_mm * MM, 0.0])
+
+
+def moving_body(spec: FingerSpec) -> str:
+    """The body the moving finger's geoms sit on: the jaw itself, or the parallelogram's coupler."""
+    return "jaw_coupler" if spec.jaw == "parallelogram" else "moving_jaw_so101_v1"
 
 
 def _rz(a: float) -> np.ndarray:
@@ -75,20 +107,32 @@ def _rz(a: float) -> np.ndarray:
     return np.array([[c, -s, 0.0], [s, c, 0.0], [0.0, 0.0, 1.0]])
 
 
-def moving_to_gripper(q: float, p_local: np.ndarray) -> np.ndarray:
-    return HINGE + R0 @ (_rz(q) @ p_local)
+def finger_rot(q: float, spec: FingerSpec | None = None) -> np.ndarray:
+    """Orientation of the moving finger in the gripper frame: it turns with ``q`` only on the hinge."""
+    return R0 @ _rz(q) if spec is None or spec.jaw == "revolute" else R0
 
 
-def tip_rise(q: float) -> float:
+def moving_to_gripper(q: float, p_local: np.ndarray, spec: FingerSpec | None = None) -> np.ndarray:
+    """A point fixed on the moving finger (given in the moving jaw's frame at q = 0) at servo angle ``q``."""
+    if spec is None or spec.jaw == "revolute":
+        return HINGE + R0 @ (_rz(q) @ p_local)
+    if spec.jaw == "parallelogram":
+        v = link_vec(spec)
+        return HINGE + R0 @ (p_local + _rz(q) @ v - v)
+    return HINGE + R0 @ p_local + np.array([spec.drive_mm_per_rad * MM * q, 0.0, 0.0])
+
+
+def tip_rise(q: float, spec: FingerSpec | None = None) -> float:
     """How much higher the moving jaw's tip is at opening ``q`` than closed (m)."""
     tip = np.array([MOVING_FACE_X, MOVING_TIP_Y, MOVING_MID_Z])
-    return float(moving_to_gripper(q, tip)[2] - moving_to_gripper(0.0, tip)[2])
+    return float(moving_to_gripper(q, tip, spec)[2] - moving_to_gripper(0.0, tip, spec)[2])
 
 
 def moving_reach(spec: FingerSpec) -> float:
-    """The moving pad is longer by the tip's rise at its parallel opening, so at that opening both
-    pads end at the same height."""
-    return spec.reach_mm * MM + tip_rise(math.radians(spec.pad_angle_deg))
+    """On the hinge the moving pad is longer by the tip's rise at its parallel opening, so at that
+    opening both pads end at the same height.  A finger that does not turn has no parallel opening."""
+    extra = tip_rise(math.radians(spec.pad_angle_deg)) if spec.jaw == "revolute" else 0.0
+    return spec.reach_mm * MM + extra
 
 
 @dataclass(frozen=True)
@@ -135,8 +179,8 @@ def _face_boxes(spec: FingerSpec, length: float) -> list[tuple[np.ndarray, np.nd
 
 
 def pad_geoms(spec: FingerSpec) -> list[PadGeom]:
-    """The boxes ``build_model`` adds to the jaw bodies; none for the stock jaws."""
-    if is_stock(spec):
+    """The boxes ``build_model`` adds to the jaw bodies; none without pads."""
+    if not has_pads(spec):
         return []
     mu = TPU_FRICTION if spec.pad_tpu_mm > 0 else PLA_FRICTION
     out: list[PadGeom] = []
@@ -154,9 +198,10 @@ def pad_geoms(spec: FingerSpec) -> list[PadGeom]:
     corner = np.array([MOVING_FACE_X, MOVING_TIP_Y, MOVING_MID_Z])
     lm = moving_reach(spec)
     base_m = corner + _rz(-th) @ np.array([0.0, -lm, 0.0])
+    shift = -link_vec(spec) if spec.jaw == "parallelogram" else np.zeros(3)  # the coupler's frame
     for k, (c, half, rot) in enumerate(_face_boxes(spec, lm)):
-        out.append(PadGeom("moving_jaw_so101_v1", "jaw_moving", f"jaw_moving_pad{k}", tuple(half),
-                           tuple(base_m + rm @ c), _quat(rm @ rot), mu))
+        out.append(PadGeom(moving_body(spec), "jaw_moving", f"jaw_moving_pad{k}", tuple(half),
+                           tuple(base_m + rm @ c + shift), _quat(rm @ rot), mu))
     return out
 
 
@@ -166,25 +211,25 @@ def gap(spec: FingerSpec, q: float, height: float | None = None) -> float:
     t = thickness(spec)
     z = FIXED_TIP_Z - spec.reach_mm * MM + (spec.reach_mm * MM / 2 if height is None else height)
     th = math.radians(spec.pad_angle_deg)
-    lm = moving_reach(spec) if not is_stock(spec) else 0.0
+    lm = moving_reach(spec) if has_pads(spec) else 0.0
     corner = np.array([MOVING_FACE_X, MOVING_TIP_Y, MOVING_MID_Z])
     # the moving face line (pad +x offset t toward the fixed jaw), in local coords, then gripper
     n_loc = _rz(-th) @ np.array([-1.0, 0.0, 0.0])
     up_loc = _rz(-th) @ np.array([0.0, 1.0, 0.0])
-    p0 = moving_to_gripper(q, corner + n_loc * t - up_loc * lm)
-    d = R0 @ (_rz(q) @ up_loc)
+    p0 = moving_to_gripper(q, corner + n_loc * t - up_loc * lm, spec)
+    d = finger_rot(q, spec) @ up_loc
     s = (z - p0[2]) / d[2] if abs(d[2]) > 1e-9 else 0.0
     x_moving = p0[0] + d[0] * s
     return float(x_moving - (FIXED_FACE_X + t))
 
 
-Q_RANGE = (-0.17, 1.2)  # closed to GRIP_WIDE: the openings the skills use; the gap grows monotonically
+Q_RANGE = Q_RANGES["revolute"]  # closed to GRIP_WIDE: the openings the skills use; the gap grows monotonically
 
 
 def opening_for(spec: FingerSpec, width_m: float) -> float | None:
     """The jaw angle at which the pads are ``width_m`` apart (bisection), or None past the widest opening.
-    Past about 1.2 rad the moving pad swings toward horizontal and the face-line gap stops meaning a width."""
-    lo, hi = Q_RANGE
+    Past about 1.2 rad the hinged pad swings toward horizontal and the face-line gap stops meaning a width."""
+    lo, hi = q_range(spec)
     if gap(spec, hi) < width_m:
         return None
     for _ in range(50):
@@ -208,10 +253,56 @@ def _corners(g: PadGeom) -> np.ndarray:
 
 
 def below_tool(spec: FingerSpec, q: float) -> float:
-    """How far below the tool point (m) the lowest pad corner reaches at jaw opening ``q``."""
+    """How far below the tool point (m) the lowest pad corner reaches at jaw opening ``q``; without pads,
+    the lower of the two stock tips."""
+    if not has_pads(spec):
+        tip = np.array([MOVING_FACE_X, MOVING_TIP_Y, MOVING_MID_Z])
+        return max(TOOL_Z - FIXED_TIP_Z, TOOL_Z - float(moving_to_gripper(q, tip, spec)[2]))
     low = 0.0
     for g in pad_geoms(spec):
         c = _corners(g)
-        z = c[:, 2] if g.body == "gripper" else np.array([moving_to_gripper(q, p)[2] for p in c])
+        if g.body == "gripper":
+            z = c[:, 2]
+        else:
+            shift = link_vec(spec) if spec.jaw == "parallelogram" else np.zeros(3)  # back to the jaw's frame
+            z = np.array([moving_to_gripper(q, p + shift, spec)[2] for p in c])
         low = max(low, TOOL_Z - float(z.min()))
     return low
+
+
+def squeeze_n(spec: FingerSpec, q: float, torque_nm: float) -> float:
+    """Jaw force (N) for servo torque ``torque_nm`` at opening ``q``: torque over the lever from the joint
+    to the contact, or over the pinion radius on the slide."""
+    if spec.jaw == "prismatic":
+        return torque_nm / max(spec.drive_mm_per_rad * MM, 1e-6)
+    tip = np.array([MOVING_FACE_X, MOVING_TIP_Y, MOVING_MID_Z])
+    if spec.jaw == "parallelogram":
+        return torque_nm / max(spec.link_mm * MM * math.cos(q), 1e-3)
+    p = moving_to_gripper(q, tip, spec) - HINGE
+    return torque_nm / max(float(np.hypot(p[0], p[2])), 1e-3)
+
+
+def fingertips(spec: FingerSpec, q: float) -> tuple[float, float]:
+    """(gap, offset) at servo angle ``q``: the distance from the moving fingertip's inner corner to the fixed
+    face, and how much higher that fingertip is than the fixed one (m).  The fingertip is where a low or
+    wide object is first touched, so these say what the jaws can reach, where the face-line ``gap`` says
+    where the faces are parallel."""
+    t = thickness(spec)
+    corner = np.array([MOVING_FACE_X, MOVING_TIP_Y, MOVING_MID_Z])
+    if has_pads(spec):
+        th = math.radians(spec.pad_angle_deg)
+        corner = corner + _rz(-th) @ np.array([-t, -moving_reach(spec), 0.0])
+    p = moving_to_gripper(q, corner, spec)
+    fixed_z = FIXED_TIP_Z - (spec.reach_mm * MM if has_pads(spec) else 0.0)
+    return float(p[0] - (FIXED_FACE_X + t)), float(p[2] - fixed_z)
+
+
+def tip_opening(spec: FingerSpec, width_m: float) -> float | None:
+    """The servo angle at which the fingertips are ``width_m`` apart, or None past the widest opening."""
+    lo, hi = q_range(spec)
+    if fingertips(spec, hi)[0] < width_m:
+        return None
+    for _ in range(50):
+        mid = (lo + hi) / 2
+        lo, hi = (mid, hi) if fingertips(spec, mid)[0] < width_m else (lo, mid)
+    return (lo + hi) / 2

@@ -5,7 +5,10 @@
   "groove_mm": 0.0,
   "lip_mm": 0.0,
   "pad_tpu_mm": 0.0,
-  "width_mm": 0.0
+  "width_mm": 0.0,
+  "jaw": "revolute",
+  "link_mm": 0.0,
+  "drive_mm_per_rad": 0.0
  },
  "placements": 3,
  "objects": {
@@ -22,16 +25,16 @@
     "slip"
    ],
    "attempts": 27,
-   "sim_s": 10.7,
+   "sim_s": 10.8,
    "params": [
     {
      "grasp": {
-      "side": 0.002721,
-      "close": -0.094008,
-      "close_s": 0.846754,
-      "lift": 0.046916,
-      "hold_s": 1.257983,
-      "speed": 0.054702
+      "side": 0.005025,
+      "close": -0.109178,
+      "close_s": 0.559641,
+      "lift": 0.056572,
+      "hold_s": 1.016246,
+      "speed": 0.059936
      }
     },
     {
@@ -61,15 +64,15 @@
    "verdicts": [
     "stuck",
     "stuck",
-    "stuck"
+    "wrong_behavior"
    ],
    "notes": [
     "slip",
     "load_limit",
-    "slip"
+    "load_limit"
    ],
    "attempts": 27,
-   "sim_s": 10.8,
+   "sim_s": 11.3,
    "params": [
     {
      "grasp": {
@@ -81,26 +84,8 @@
       "speed": 0.045074
      }
     },
-    {
-     "grasp": {
-      "side": 0.004059,
-      "close": -0.095922,
-      "close_s": 0.476058,
-      "lift": 0.045142,
-      "hold_s": 1.012635,
-      "speed": 0.048799
-     }
-    },
-    {
-     "grasp": {
-      "side": 0.002265,
-      "close": -0.169788,
-      "close_s": 0.599483,
-      "lift": 0.037752,
-      "hold_s": 1.260486,
-      "speed": 0.034577
-     }
-    }
+    {},
+    {}
    ]
   },
   "sugar_box": {
@@ -116,47 +101,56 @@
     "slip"
    ],
    "attempts": 27,
-   "sim_s": 12.5,
+   "sim_s": 16.4,
    "params": [
     {},
     {
      "grasp": {
-      "side": 0.003114,
-      "close": -0.168064,
-      "close_s": 0.938843,
-      "lift": 0.048017,
-      "hold_s": 1.150276,
-      "speed": 0.055609
+      "side": 8.6e-05,
+      "close": -0.143965,
+      "close_s": 0.479167,
+      "lift": 0.07,
+      "hold_s": 1.103148,
+      "speed": 0.023111
      }
     },
     {
      "grasp": {
-      "side": 2e-06,
-      "close": -0.149184,
-      "close_s": 0.597029,
-      "lift": 0.060396,
-      "hold_s": 1.371573,
-      "speed": 0.024896
+      "side": 0.001497,
+      "close": -0.104111,
+      "close_s": 0.76955,
+      "lift": 0.056103,
+      "hold_s": 1.720867,
+      "speed": 0.011713
      }
     }
    ]
   },
   "potted_meat_can": {
-   "held": false,
+   "held": true,
    "verdicts": [
-    "rule_violation",
     "pass",
-    "stuck"
+    "pass",
+    "pass"
    ],
    "notes": [
-    "force_limit",
     "",
-    "force_limit"
+    "",
+    ""
    ],
-   "attempts": 15,
-   "sim_s": 6.7,
+   "attempts": 7,
+   "sim_s": 19.9,
    "params": [
-    {},
+    {
+     "grasp": {
+      "side": 0.001275,
+      "close": -0.083907,
+      "close_s": 0.976161,
+      "lift": 0.050823,
+      "hold_s": 1.159145,
+      "speed": 0.053978
+     }
+    },
     {
      "grasp": {
       "side": 0.00574,
@@ -167,7 +161,16 @@
       "speed": 0.043
      }
     },
-    {}
+    {
+     "grasp": {
+      "side": 0.004105,
+      "close": -0.167245,
+      "close_s": 0.826471,
+      "lift": 0.065299,
+      "hold_s": 1.114305,
+      "speed": 0.027442
+     }
+    }
    ]
   },
   "mustard_bottle": {
@@ -183,7 +186,7 @@
     "slip"
    ],
    "attempts": 27,
-   "sim_s": 18.6,
+   "sim_s": 19.7,
    "params": [
     {
      "grasp": {
@@ -197,22 +200,22 @@
     },
     {
      "grasp": {
-      "side": 0.000362,
-      "close": -0.068688,
-      "close_s": 0.712206,
-      "lift": 0.060976,
-      "hold_s": 1.209942,
-      "speed": 0.048111
+      "side": 0.005288,
+      "close": -0.155279,
+      "close_s": 0.201164,
+      "lift": 0.051319,
+      "hold_s": 1.200767,
+      "speed": 0.01713
      }
     },
     {
      "grasp": {
-      "side": 0.002204,
-      "close": -0.06816,
-      "close_s": 0.436408,
-      "lift": 0.052568,
-      "hold_s": 1.27284,
-      "speed": 0.014979
+      "side": 2.5e-05,
+      "close": -0.136426,
+      "close_s": 0.304379,
+      "lift": 0.054846,
+      "hold_s": 1.822338,
+      "speed": 0.010344
      }
     }
    ]
@@ -230,7 +233,7 @@
     "slip"
    ],
    "attempts": 3,
-   "sim_s": 20.3,
+   "sim_s": 20.4,
    "params": [
     {
      "grasp": {
@@ -259,7 +262,7 @@
     "slip"
    ],
    "attempts": 3,
-   "sim_s": 22.0,
+   "sim_s": 22.6,
    "params": [
     {},
     {},
@@ -279,26 +282,17 @@
     "slip"
    ],
    "attempts": 27,
-   "sim_s": 16.2,
+   "sim_s": 18.4,
    "params": [
+    {},
     {
      "grasp": {
-      "side": 0.002328,
-      "close": -0.116191,
-      "close_s": 0.491495,
-      "lift": 0.057118,
-      "hold_s": 1.11338,
-      "speed": 0.044481
-     }
-    },
-    {
-     "grasp": {
-      "side": 0.002588,
-      "close": -0.128982,
-      "close_s": 0.33671,
-      "lift": 0.054322,
-      "hold_s": 1.786966,
-      "speed": 0.038637
+      "side": 0.001957,
+      "close": -0.109811,
+      "close_s": 0.573632,
+      "lift": 0.045989,
+      "hold_s": 1.621423,
+      "speed": 0.05217
      }
     },
     {
@@ -326,7 +320,7 @@
     ""
    ],
    "attempts": 3,
-   "sim_s": 20.3,
+   "sim_s": 20.8,
    "params": [
     {},
     {},
@@ -346,7 +340,7 @@
     "slip"
    ],
    "attempts": 27,
-   "sim_s": 14.4,
+   "sim_s": 10.9,
    "params": [
     {
      "grasp": {
@@ -360,12 +354,12 @@
     },
     {
      "grasp": {
-      "side": 0.001369,
-      "close": -0.161242,
-      "close_s": 0.78776,
-      "lift": 0.041499,
-      "hold_s": 1.134212,
-      "speed": 0.033096
+      "side": 0.000356,
+      "close": -0.132237,
+      "close_s": 0.287916,
+      "lift": 0.054367,
+      "hold_s": 1.000019,
+      "speed": 0.05886
      }
     },
     {
@@ -393,7 +387,7 @@
     "load_limit"
    ],
    "attempts": 27,
-   "sim_s": 11.1,
+   "sim_s": 11.6,
    "params": [
     {
      "grasp": {
@@ -431,7 +425,7 @@
     "slip"
    ],
    "attempts": 27,
-   "sim_s": 15.4,
+   "sim_s": 13.3,
    "params": [
     {
      "grasp": {
@@ -478,7 +472,7 @@
     "slip"
    ],
    "attempts": 27,
-   "sim_s": 15.9,
+   "sim_s": 16.1,
    "params": [
     {
      "grasp": {
@@ -525,7 +519,7 @@
     "slip"
    ],
    "attempts": 27,
-   "sim_s": 15.2,
+   "sim_s": 15.4,
    "params": [
     {
      "grasp": {
@@ -572,7 +566,7 @@
     "slip"
    ],
    "attempts": 27,
-   "sim_s": 15.1,
+   "sim_s": 15.5,
    "params": [
     {
      "grasp": {
@@ -610,16 +604,16 @@
    "held": false,
    "verdicts": [
     "stuck",
-    "wrong_behavior",
-    "stuck"
+    "pass",
+    "wrong_behavior"
    ],
    "notes": [
     "slip",
     "slip",
     "slip"
    ],
-   "attempts": 27,
-   "sim_s": 14.8,
+   "attempts": 24,
+   "sim_s": 15.0,
    "params": [
     {
      "grasp": {
@@ -663,10 +657,10 @@
    "notes": [
     "slip",
     "",
-    ""
+    "slip"
    ],
    "attempts": 27,
-   "sim_s": 17.2,
+   "sim_s": 18.1,
    "params": [
     {
      "grasp": {
@@ -713,7 +707,7 @@
     ""
    ],
    "attempts": 3,
-   "sim_s": 22.8,
+   "sim_s": 23.2,
    "params": [
     {},
     {},
@@ -723,7 +717,7 @@
   "flat_screwdriver": {
    "held": false,
    "verdicts": [
-    "stuck",
+    "wrong_behavior",
     "wrong_behavior",
     "wrong_behavior"
    ],
@@ -733,9 +727,18 @@
     "slip"
    ],
    "attempts": 27,
-   "sim_s": 14.4,
+   "sim_s": 14.1,
    "params": [
-    {},
+    {
+     "grasp": {
+      "side": 0.002382,
+      "close": -0.12156,
+      "close_s": 0.775264,
+      "lift": 0.035108,
+      "hold_s": 1.494421,
+      "speed": 0.037433
+     }
+    },
     {
      "grasp": {
       "side": 0.002598,
@@ -746,7 +749,16 @@
       "speed": 0.051915
      }
     },
-    {}
+    {
+     "grasp": {
+      "side": 0.001017,
+      "close": -0.155098,
+      "close_s": 0.909021,
+      "lift": 0.041508,
+      "hold_s": 1.356361,
+      "speed": 0.05999
+     }
+    }
    ]
   },
   "cup": {
@@ -782,7 +794,7 @@
     "slip"
    ],
    "attempts": 23,
-   "sim_s": 20.1,
+   "sim_s": 20.6,
    "params": [
     {
      "grasp": {
@@ -822,6 +834,7 @@
   "cup",
   "foam_brick",
   "large_marker",
+  "potted_meat_can",
   "wood_block_cube"
  ],
  "not_held": [
@@ -833,7 +846,6 @@
   "lemon",
   "mustard_bottle",
   "plum",
-  "potted_meat_can",
   "pudding_box",
   "racquetball",
   "strawberry",
@@ -842,5 +854,5 @@
   "tomato_soup_can",
   "tuna_fish_can"
  ],
- "wall_s": 65.3
+ "wall_s": 68.3
 }

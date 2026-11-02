@@ -49,6 +49,13 @@ COMPONENTS: dict[str, tuple[str, tuple[str, ...]]] = {
     "memory": ("policy", ("src/sea/memory/concepts.py", "src/sea/memory/embed.py", "src/sea/compose/library.py")),
     "loop": ("policy", ("src/sea/loop.py", "src/sea/sim/env.py")),
     "network": ("policy", ("src/sea/plan/network.py",)),
+    # the world-agnostic evolution core (D-041): its contracts and resource check decide what a body change
+    # is and whether the bench can build it; the loop, prompt and backends decide how boldly it searches
+    "evolve": ("judge", ("src/sea/evolve/core.py", "src/sea/evolve/resources.py")),
+    "evolve_loop": ("policy", ("src/sea/evolve/loop.py", "src/sea/evolve/prompt.py", "src/sea/evolve/llm.py",
+                               "src/sea/evolve/search.py")),
+    # each world's tasks, physics and parts catalogue: the ruler for runs in that world (D-042)
+    "world_gripper": ("judge", ("src/sea/worlds/gripper.py",)),
 }
 
 # Modules that read runs but never shape one; every other module under src/sea belongs to a component.

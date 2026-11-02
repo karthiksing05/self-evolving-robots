@@ -34,7 +34,7 @@ PADS = FingerSpec(reach_mm=10, pad_angle_deg=30, pad_tpu_mm=2)
 # ---------------------------------------------------------------- geometry
 def test_all_zero_is_the_stock_jaws():
     assert F.is_stock(FingerSpec()) and F.pad_geoms(FingerSpec()) == [] and F.thickness(FingerSpec()) == 0
-    assert set(F.RANGES) == set(FingerSpec.model_fields)
+    assert set(F.RANGES) | {"jaw", "link_mm", "drive_mm_per_rad"} == set(FingerSpec.model_fields)
     assert not F.is_stock(FingerSpec(pad_tpu_mm=1)) and F.thickness(FingerSpec(pad_tpu_mm=1)) == pytest.approx(0.004)
 
 
@@ -123,3 +123,29 @@ def test_real_tables_carry_the_scan_and_are_seeded():
     sim = build_model(Design(id="s"), a[0])
     sim.step(500)
     assert sim.control_q("obj") == pytest.approx(0.0, abs=2e-3)  # a scan rests on the table
+
+
+SLIDE = FingerSpec(jaw="prismatic", drive_mm_per_rad=40)
+LINKS = FingerSpec(jaw="parallelogram", link_mm=70)
+
+
+def test_jaw_mechanisms_d042():
+    """The moving jaw's joint is a part: the slide neither turns nor rises, the parallelogram turns not but
+    rises on its circle, the hinge does both; every gap still grows with the servo angle."""
+    tip = np.array([F.MOVING_FACE_X, F.MOVING_TIP_Y, F.MOVING_MID_Z])
+    for spec in (FingerSpec(), SLIDE, LINKS, SLIDE.model_copy(update={"pad_tpu_mm": 2, "reach_mm": 10})):
+        qs = np.linspace(*F.q_range(spec), 40)
+        gaps = [F.gap(spec, q) for q in qs]
+        assert all(b > a for a, b in zip(gaps, gaps[1:], strict=False)), spec
+        assert F.gap(spec, F.opening_for(spec, 0.06)) == pytest.approx(0.06, abs=1e-6)
+    assert F.tip_rise(1.2, SLIDE) == pytest.approx(0.0) and F.tip_rise(1.2, FingerSpec()) > 0.035
+    assert F.tip_rise(1.2, LINKS) == pytest.approx(0.070 * (1 - np.cos(1.2)), abs=1e-9)
+    assert np.allclose(F.finger_rot(0.9, LINKS), F.R0) and not np.allclose(F.finger_rot(0.9, FingerSpec()), F.R0)
+    assert F.gap(SLIDE, 1.0) - F.gap(SLIDE, 0.0) == pytest.approx(0.040)
+    assert F.opening_for(SLIDE, 0.080) is not None and F.opening_for(SLIDE, 0.090) is None  # 15.8 + 40 x 1.745 mm
+    assert F.squeeze_n(SLIDE, 0.5, 1.62) == pytest.approx(40.5) and F.squeeze_n(FingerSpec(), 0.0, 1.62) < 25
+    assert not F.has_pads(SLIDE) and F.thickness(SLIDE) == 0 and F.pad_geoms(SLIDE) == []
+    assert F.below_tool(SLIDE, 1.0) == pytest.approx(F.below_tool(SLIDE, 0.0), abs=1e-9)
+    pads = F.pad_geoms(LINKS.model_copy(update={"pad_tpu_mm": 2}))
+    assert {g.body for g in pads} == {"gripper", "jaw_coupler"}
+    assert F.moving_to_gripper(0.0, tip, LINKS) == pytest.approx(F.moving_to_gripper(0.0, tip))

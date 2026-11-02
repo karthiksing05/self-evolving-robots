@@ -233,10 +233,10 @@ def finger_estimate(design: Design) -> tuple[float, float, float, float]:
 
     Volume is the sum of the pad boxes the simulator collides with; the TPU skin is its share of it.
     """
-    from sea.design.fingers import is_stock, pad_geoms, thickness
+    from sea.design.fingers import has_pads, pad_geoms, thickness
 
     f = design.fingers
-    if is_stock(f):
+    if not has_pads(f):  # the stock pads; a jaw joint change is priced by the world that offers it (D-042)
         return 0.0, 0.0, 0.0, 0.0
     vol = sum(8 * g.half[0] * g.half[1] * g.half[2] for g in pad_geoms(f)) * 1e6  # cm^3, both pads
     tpu = vol * (f.pad_tpu_mm * 1e-3) / thickness(f)

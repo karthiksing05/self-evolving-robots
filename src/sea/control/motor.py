@@ -531,7 +531,7 @@ def grasp(ep: Episode, cid: str, depth: float | None = None, side: float = PICK_
         depth = min(depth, hgt - fingers.below_tool(fing, q_obj) - PICK_TABLE_CLEAR)
         face = fingers.thickness(fing)
         q_open = fingers.opening_for(fing, w + 2 * side + PICK_CLEAR)
-        opening = max(PICK_OPEN, q_open if q_open is not None else GRIP_WIDE)
+        opening = max(PICK_OPEN, q_open if q_open is not None else fingers.q_range(fing)[1])
         below = fingers.below_tool(fing, opening)
     down = ep.approach_dir(cid)
     roll = ep.sim.ctl_dir_world(cid, h.geo.roll_ctl)

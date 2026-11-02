@@ -16,7 +16,7 @@ import mujoco
 import numpy as np
 
 from sea.compose import checks
-from sea.contracts import ARM_JOINTS, HardLimits, Node, PrimitiveDef, Program, StepTrace
+from sea.contracts import ARM_JOINTS, GRASP_CLASS, HardLimits, Node, PrimitiveDef, Program, StepTrace
 from sea.control.frames import STOCK_URDF, rot_about
 from sea.control.ik import IK
 from sea.sim.build_model import Sim
@@ -40,6 +40,9 @@ TOOL_SWAP_S = 5.0
 CRUISE_FRACTION = 0.85  # commanded cruise speed / hard limit: margin for servo lag and catch-up (D-025)
 SWAP_TIP = np.array([0.17, 0.0, 0.14])  # stock tool point during a swap: well above any panel
 HOME_Q = np.array([0.0, -0.386, 0.369, 1.588, 0.0, 0.8])
+# The grasp world's home: the arm's lowest point 112 mm above the table over the object area, clear of
+# the tallest object (85 mm).  From HOME_Q the fixed jaw sat 73 mm up, inside the potted meat can (D-040).
+GRASP_HOME_Q = np.array([0.0, -0.45, 0.15, 1.6, 0.0, 0.8])
 GRIP_OPEN = 0.6  # moving jaw tip just behind the fixed jaw: presses lead with the fixed jaw
 GRIP_WIDE = 1.2
 GRIP_CLOSED = -0.17
@@ -241,7 +244,7 @@ class Episode:
             raise Abort("time_limit")
         sim = self.sim
         q_target = np.asarray(q_target, dtype=float)
-        jr = np.array([sim.model.jnt_range[sim.model.joint(j).id] for j in ARM_JOINTS])
+        jr = sim.servo_ranges()
         clipped = np.clip(q_target, jr[:, 0], jr[:, 1])
         for j, (a, b) in enumerate(zip(q_target, clipped, strict=True)):
             if abs(a - b) > 1e-6 and ARM_JOINTS[j] not in self.trace.joint_limit_hits:
@@ -649,8 +652,15 @@ def drive(ep: Episode, gen: Gen) -> tuple[bool, str]:
         return False, a.reason
 
 
-def reset_episode(sim: Sim, q_home: np.ndarray = HOME_Q) -> None:
+def home_q(sim: Sim) -> np.ndarray:
+    """The pose an episode starts from: ``GRASP_HOME_Q`` over a grasp table, ``HOME_Q`` elsewhere."""
+    grasp = sim.panel is not None and any(c.cls == GRASP_CLASS for c in sim.panel.controls)
+    return GRASP_HOME_Q if grasp else HOME_Q
+
+
+def reset_episode(sim: Sim, q_home: np.ndarray | None = None) -> None:
     """Arm at home, every control at rest, zero velocities."""
+    q_home = home_q(sim) if q_home is None else q_home
     mujoco.mj_resetData(sim.model, sim.data)
     for h in sim.controls.values():
         h.dyn.reset()
