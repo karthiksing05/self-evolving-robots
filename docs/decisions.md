@@ -1216,12 +1216,15 @@ from `sea/worlds/cad.py`:
   model, so they are not drawn; the bill of materials lists them.
 - **Mobile explorer:** CadQuery solids from the world's `_spec` (overall width, height, belly) and
   the catalogue's stated sizes (wheel, sprocket and idler; cells and motors at datasheet size).
-- **Talking robot:** a section view of the cast tract. Each articulator is drawn at the end of its
-  travel, and the squeezed bore follows `tract`'s radius profile. There is one MG90S block per servo
-  the rig counts.
+- **Talking robot:** a section view of the cast tract at a posture: System 1's controls, or by default
+  each articulator at the end of its travel. The squeezed bore follows `tract`'s radius profile. The
+  tract hangs between the reed housing and a face plate at the teeth, on a base plate. Every servo
+  stands on the plate, rides the tongue carriage or sits on the face plate's shelf, one MG90S block per
+  servo the rig counts.
 
 `sea/design/cad.py` renders models with VTK offscreen: orthographic, one camera per view fitted to
-all of a run's bodies, so they share a scale.
+all of a run's bodies, so they share a scale. Each picture outlines what its change added or altered (`cad.changed`): a
+part of a slot with no twin of the same name, place and size in the previous body.
 
 The CAD sits outside the world modules on purpose. Those are judge components hashed whole into the
 harness fingerprint, and a picture method there would have changed the judge key of every later run

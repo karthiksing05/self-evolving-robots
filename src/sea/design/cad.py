@@ -11,7 +11,7 @@ The pictures are for people reading a run; System 2 never sees them.
 from __future__ import annotations
 
 import io
-from collections.abc import Sequence
+from collections.abc import Collection, Sequence
 from dataclasses import dataclass, field
 
 import numpy as np
@@ -30,6 +30,7 @@ MATERIALS = {  # base colour (RGB, 0-1)
 }
 BACKGROUND = (0.955, 0.950, 0.940)
 EDGE = (0.12, 0.12, 0.13)
+OUTLINE = (0.05, 0.42, 0.95)  # the parts a change touched
 
 
 @dataclass
@@ -86,9 +87,29 @@ def _basis(view: View) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     return back, up, np.cross(up, back)
 
 
-def render(models: Sequence[CadModel], margin: float = 0.09) -> list[bytes]:
+def changed(prev: CadModel, cur: CadModel, tol: float = 0.5) -> set[int]:
+    """The parts of ``cur`` a change added or altered: a slot's part with no twin in ``prev`` of the same name,
+    place and size (to ``tol`` mm).  Structure outside every slot (a base plate that grew) is never counted."""
+    def sig(p: CadPart) -> tuple:
+        return p.slot, p.name, tuple(np.round(p.mesh.bounds.ravel() / tol).astype(int))
+
+    before: dict[tuple, int] = {}
+    for p in prev.parts:
+        before[sig(p)] = before.get(sig(p), 0) + 1
+    out = set()
+    for i, p in enumerate(cur.parts):
+        k = sig(p)
+        if before.get(k, 0):
+            before[k] -= 1
+        elif p.slot:
+            out.add(i)
+    return out
+
+
+def render(models: Sequence[CadModel], margin: float = 0.09, outline: Sequence[Collection[int]] | None = None) -> list[bytes]:
     """One PNG per model, its views side by side (the first model's views and tile size); each view's
-    camera (orthographic) is fitted to every model, so a part that grew between two bodies is drawn larger."""
+    camera (orthographic) is fitted to every model, so a part that grew between two bodies is drawn larger.
+    ``outline`` names, per model, the parts (by index) drawn with an outline: what that body's change touched."""
     import vtk
     from PIL import Image
 
@@ -108,7 +129,7 @@ def render(models: Sequence[CadModel], margin: float = 0.09) -> list[bytes]:
             kit = vtk.vtkLightKit()  # key, fill and back lights: faces square to the camera still shade
             kit.SetKeyLightIntensity(0.85)
             kit.AddLightsToRenderer(ren)
-            for part in mdl.parts:
+            for pi, part in enumerate(mdl.parts):
                 normals = vtk.vtkPolyDataNormals()
                 normals.SetInputData(_polydata(part.mesh))
                 normals.SetFeatureAngle(35.0)
@@ -141,6 +162,21 @@ def render(models: Sequence[CadModel], margin: float = 0.09) -> list[bytes]:
                 eact.GetProperty().SetLineWidth(1.0)
                 eact.GetProperty().SetOpacity(0.55)
                 ren.AddActor(eact)
+                if outline is not None and pi in outline[mi]:
+                    sil = vtk.vtkPolyDataSilhouette()
+                    sil.SetInputData(_polydata(part.mesh))
+                    sil.SetCamera(ren.GetActiveCamera())
+                    sil.SetEnableFeatureAngle(0)
+                    sil.BorderEdgesOn()
+                    smap = vtk.vtkPolyDataMapper()
+                    smap.SetInputConnection(sil.GetOutputPort())
+                    smap.SetResolveCoincidentTopologyToPolygonOffset()
+                    sact = vtk.vtkActor()
+                    sact.SetMapper(smap)
+                    sact.GetProperty().SetColor(*OUTLINE)
+                    sact.GetProperty().SetLineWidth(3.0)
+                    sact.GetProperty().SetLighting(False)
+                    ren.AddActor(sact)
             cam = ren.GetActiveCamera()
             cam.ParallelProjectionOn()
             cam.SetFocalPoint(*centre)

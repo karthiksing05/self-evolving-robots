@@ -11,7 +11,7 @@ import numpy as np
 import pytest
 from PIL import Image
 
-from sea.design.cad import CadModel, View, box, render
+from sea.design.cad import CadModel, View, box, changed, render
 from sea.evolve.core import Body, Edit, apply
 from sea.worlds.cad import CAD
 from sea.worlds.gripper import GripperWorld
@@ -58,6 +58,16 @@ def test_slide_finger_does_not_turn_as_it_opens():
     a, b = (next(p for p in CAD["gripper"](body, opening_mm=w).parts if p.name == "moving_jaw_so101_v1") for w in (40, 80))
     shift = b.mesh.vertices - a.mesh.vertices
     assert np.allclose(shift[:, 1:], 0.0, atol=1e-4) and np.ptp(shift[:, 0]) < 1e-4 and 35 < shift[0, 0] < 45
+
+
+def test_only_what_a_change_added_or_altered_is_outlined():
+    """A tongue swap outlines the tip blade and its linkage, not the rail and carriage both tongues share."""
+    world = WORLDS[2]
+    a, b = CAD["phonology"](world.stock()), CAD["phonology"](_swap(world, "tongue", "tip_tongue"))
+    names = {b.parts[i].name for i in changed(a, b)}
+    assert {"tip blade", "tip servo", "pushrod"} <= names
+    assert not names & {"rail", "carriage", "cam", "cast tract", "base plate", "upper lip"}
+    assert changed(a, a) == set()
 
 
 def test_render_shares_one_camera_across_models():

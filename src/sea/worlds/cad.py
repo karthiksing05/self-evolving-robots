@@ -198,16 +198,34 @@ def mobile(body: Body) -> CadModel:
 SERVO_MM = (23.0, 12.5, 29.0)  # an MG90S, mounting tabs left off
 
 
-def phonology(body: Body) -> CadModel:
-    """The body as solids, in millimetres: the tract runs along x from the glottis (x = -length) to the
-    teeth (x = 0), the lips in front.  The silicone tract and lips are cut on their mid-plane (a section
-    view) so the bore shows; the mechanisms are whole, one MG90S block per servo the rig counts.  Each
-    articulator is drawn at the end of its travel (the body pad mid-rail at full stroke, the tip blade sealing
-    the alveolar ridge, the lip ring fully protruded), and the squeezed bore follows ``tract``'s profile:
-    the gap left at each point is the diameter of the model's radius there."""
+def posture(body: Body) -> dict[str, float]:
+    """Each articulator at the end of its travel: the body pad mid-rail at full stroke, the tip blade sealing the
+    alveolar ridge, the lips open and fully protruded, the larynx lowered.  The default picture of a body."""
+    r = P.rig(body)
+    out = {k: hi for k, (lo, hi) in r.controls.items()}
+    if "tongue_place" in r.controls:
+        lo, hi = r.controls["tongue_place"]
+        out["tongue_place"] = (lo + hi) / 2
+    if "tip_place" in r.controls:
+        out["tip_place"] = 1.5
+    out["jaw"] = 0.5 if "jaw" in out else 0.0
+    return out
+
+
+def phonology(body: Body, ctl: dict[str, float] | None = None) -> CadModel:
+    """The body as solids, in millimetres, at a posture (``ctl``, System 1's controls; by default ``posture``).
+    The tract runs along x from the glottis to the teeth (x = 0), the lips in front, on a printed base plate:
+    the reed housing holds the glottis end, a face plate at the teeth holds the front, and every servo stands
+    on the plate, rides a carriage or sits on the face plate's shelf.  The silicone tract, the lips and the
+    face plate are cut on their mid-plane (a section view) so the bore shows; the mechanisms are whole, one
+    MG90S block per servo the rig counts.  The squeezed bore follows ``tract``'s profile: the gap left at each
+    point is the diameter of the model's radius there."""
     V = cq.Vector
     r, tr, to, li = P.rig(body), body.parts["tract"], body.parts["tongue"], body.parts["lips"]
-    R, RO, L = 10 * P.BORE, 10 * P.BORE + 4.0, 10 * r.length
+    c = posture(body) | (ctl or {})
+    R, RO = 10 * P.BORE, 10 * P.BORE + 4.0
+    L = 10 * (r.length + c.get("larynx", 0.0))
+    zp = -RO - 34.0  # top of the base plate
     cut = cq.Solid.makeBox(2000, 1000, 2000, V(-1000, -1000, -1000))  # the half toward the camera
     parts = []
 
@@ -215,12 +233,18 @@ def phonology(body: Body) -> CadModel:
         a = V(*axis).normalized()
         return cq.Solid.makeCylinder(rad, length, V(*at) - a * (length / 2), a)
 
+    def rod(p0: tuple[float, float, float], p1: tuple[float, float, float], rad: float = 1.2):
+        d = np.subtract(p1, p0)
+        return cyl(rad, float(np.linalg.norm(d)), tuple(np.add(p0, p1) / 2), tuple(d))
+
     def block(lo: tuple[float, float, float], hi: tuple[float, float, float]):
         return cq.Solid.makeBox(hi[0] - lo[0], hi[1] - lo[1], hi[2] - lo[2], V(*lo))
 
-    def servo(x: float, z: float, name: str, slot: str) -> None:
-        a, b, c = SERVO_MM
-        parts.append(solid(name, slot, block((x - a / 2, -b / 2, z - c / 2), (x + a / 2, b / 2, z + c / 2)), "servo"))
+    def servo(x: float, y: float, z0: float, name: str, slot: str, lying: bool = False) -> None:
+        """An MG90S standing on z0 (or lying on its side, shaft along y)."""
+        a, b, h = SERVO_MM
+        dy, dz = (h, b) if lying else (b, h)
+        parts.append(solid(name, slot, block((x - a / 2, y - dy / 2, z0), (x + a / 2, y + dy / 2, z0 + dz)), "servo"))
 
     def bump(place: float, height: float, k: float, half_w: float):
         """Silicone pressed into the bore from below by an articulator at ``place`` cm behind the teeth."""
@@ -233,76 +257,90 @@ def phonology(body: Body) -> CadModel:
         prof = cq.Workplane("XZ").polyline(pts).close().extrude(2 * half_w).translate((0, half_w, 0)).val()
         return prof.intersect(cyl(R, L + 2, (-L / 2, 0, 0), (1, 0, 0))).cut(cut)
 
-    # tract: the cast tube, the reed housing at the glottis, a larynx bellows on its slide
-    tube = cyl(RO, L, (-L / 2, 0, 0), (1, 0, 0)).cut(cyl(R, L + 2, (-L / 2, 0, 0), (1, 0, 0))).cut(cut)
+    # tract: the cast tube between the reed housing and the face plate; a larynx bellows lengthens it
+    base = 10 * r.length
+    tube = cyl(RO, base, (-base / 2, 0, 0), (1, 0, 0)).cut(cyl(R, base + 2, (-base / 2, 0, 0), (1, 0, 0))).cut(cut)
     parts.append(solid("cast tract", "tract", tube, "silicone"))
-    back = -L
+    back = -base
     if tr.type == "larynx_tube":
-        travel = 10 * tr.params["travel"]
-        rings = [cyl(RO if i % 2 == 0 else R + 1.5, 3.0, (back - 1.5 - 3 * i, 0, 0), (1, 0, 0))
-                 for i in range(max(2, int(travel // 3)))]
-        bellows = rings[0]
-        for ring in rings[1:]:
-            bellows = bellows.fuse(ring)
-        bellows = bellows.cut(cyl(R, travel + 10, (back - travel / 2, 0, 0), (1, 0, 0))).cut(cut)
+        ext = L - base  # the bellows' stretch: the larynx control
+        n = max(2, int((ext + 6) // 3))
+        bellows = cyl(RO, 3.0, (back - 1.5, 0, 0), (1, 0, 0))
+        for i in range(1, n):
+            bellows = bellows.fuse(cyl(RO if i % 2 == 0 else R + 1.5, (ext + 6) / n, (back - (i + 0.5) * (ext + 6) / n, 0, 0),
+                                       (1, 0, 0)))
+        bellows = bellows.cut(cyl(R, ext + 10, (back - (ext + 6) / 2, 0, 0), (1, 0, 0))).cut(cut)
         parts.append(solid("larynx bellows", "tract", bellows, "silicone"))
-        back -= 3 * len(rings)
-        parts.append(solid("larynx slide", "tract", block((back - 20, -8, -RO - 10), (back + 30, 8, -RO - 4)), "metal"))
-        servo(back - 32, -RO - 10, "larynx servo", "tract")
-    parts.append(solid("reed housing", "", block((back - 16, -RO - 2, -RO - 2), (back, RO + 2, RO + 2))))
+        back -= ext + 6
+        parts.append(solid("larynx slide", "tract", block((back - 40, -10, zp), (back + 10, 10, zp + 6)), "metal"))
+        servo(back - 56, 0, zp, "larynx servo", "tract")
+    parts.append(solid("reed housing", "", block((back - 16, -RO - 2, zp + (6 if tr.type == "larynx_tube" else 0)),
+                                                 (back, RO + 2, RO + 2))))
     parts.append(solid("air hose", "", cyl(4.0, 30.0, (back - 31, 0, 0), (1, 0, 0)), "rubber"))
+    face = block((-4, -RO - 8, zp), (0, RO + 8, RO + 8)).cut(cyl(R, 10, (-2, 0, 0), (1, 0, 0))).cut(cut)
+    parts.append(solid("face plate", "", face))
 
-    # tongue: under the tube, its rail, carriage, cam and servos; the squeezed bore above
+    # tongue: under the tube; the rail on the plate, the carriage on the rail, the cam servo on the carriage
     if to.type == "pneumatic_tongue":
-        for place in (3.0, 6.0, 9.0):
-            parts.append(solid("chamber", "tongue", bump(place, 0.55, 0.5, R), "silicone"))
-            parts.append(solid("air line", "tongue", cyl(2.0, 22.0, (-10 * place, 0, -RO - 9), (0, 0, 1)), "rubber"))
-        parts.append(solid("valve manifold", "tongue", block((-100, -15, -RO - 34), (-20, 15, -RO - 20)), "board"))
+        parts.append(solid("body chamber", "tongue", bump(c["tongue_place"], c["tongue_height"], P.K_BODY, R), "silicone"))
+        parts.append(solid("tip chamber", "tongue", bump(c["tip_place"], c["tip_height"], P.K_TIP, 6.0), "silicone"))
+        for place in (c["tongue_place"], c["tip_place"]):
+            parts.append(solid("air line", "tongue", rod((-10 * place, 0, -R), (-10 * place, 0, zp + 14), 2.0), "rubber"))
+        parts.append(solid("valve manifold", "tongue", block((-110, -15, zp), (-20, 15, zp + 14)), "board"))
     else:
         travel = 10.0 if to.type == "long_rail_tongue" else 7.0
-        start, stroke = to.params["rail_start"], to.params["stroke"]
-        place = start + travel / 2
-        xp = -10 * place
-        parts.append(solid("tongue pad", "tongue", bump(place, stroke, P.K_BODY, R), "tpu"))
-        parts.append(solid("rail", "tongue", block((-10 * (start + travel), -6, -RO - 34), (-10 * start, 6, -RO - 28)),
+        start = to.params["rail_start"]
+        xp = -10 * c["tongue_place"]
+        parts.append(solid("tongue pad", "tongue", bump(c["tongue_place"], c["tongue_height"], P.K_BODY, R), "tpu"))
+        parts.append(solid("rail", "tongue", block((-10 * (start + travel) - 12, -6, zp), (-10 * start + 12, 6, zp + 6)),
                            "metal"))
-        parts.append(solid("pad head", "tongue", block((xp - 15, -9, -RO - 8), (xp + 15, 9, -RO))))
+        parts.append(solid("carriage", "tongue", block((xp - 14, -11, zp + 6), (xp + 14, 36, zp + 12))))
         parts.append(solid("cam", "tongue", cyl(7.0, 14.0, (xp, 0, -RO - 15), (0, 1, 0)), "metal"))
-        parts.append(solid("carriage", "tongue", block((xp - 14, -11, -RO - 28), (xp + 14, 11, -RO - 22))))
-        servo(-10 * (start + travel) - 15, -RO - 31, "rail servo", "tongue")
-        servo(xp + 26, -RO - 18, "cam servo", "tongue")
+        parts.append(solid("cam post", "tongue", block((xp - 3, -3, zp + 12), (xp + 3, 3, -RO - 15))))
+        parts.append(solid("pad head", "tongue", block((xp - 15, -9, -RO - 8), (xp + 15, 9, -RO))))
+        servo(xp, 21.5, zp + 12, "cam servo", "tongue", lying=True)
+        servo(-10 * (start + travel) - 26, 0, zp, "rail servo", "tongue")
         if to.type == "tip_tongue":
-            parts.append(solid("tip blade", "tongue", bump(1.5, P.BORE + 0.1, P.K_TIP, 5.0), "tpu"))
-            for dx in (-6.0, 6.0):
-                parts.append(solid("pushrod", "tongue", cyl(1.2, 40.0, (-15 + dx, 0, -RO - 18), (0, 0, 1)), "metal"))
-            servo(-9, -RO - 52, "tip servo", "tongue")
-            servo(-33, -RO - 52, "tip servo", "tongue")
+            xt = -10 * c["tip_place"]
+            parts.append(solid("tip blade", "tongue", bump(c["tip_place"], c["tip_height"], P.K_TIP, 5.0), "tpu"))
+            for y, (sx, sy) in ((-4.0, (-18.0, 0.0)), (4.0, (-18.0, 14.0))):
+                servo(sx, sy, zp, "tip servo", "tongue")
+                parts.append(solid("pushrod", "tongue", rod((sx + 6, sy, zp + 29), (xt, y, -R + 1)), "metal"))
 
-    # lips: in front of the teeth
+    # lips: in front of the face plate
+    shelf_z = RO + 8
     if li.type == "round_lips":
-        reach = 10.0 + 10 * li.params["max_protrusion"]
-        ring_r = 10 * P.RING
-        sleeve = cyl(ring_r + 3, reach, (reach / 2, 0, 0), (1, 0, 0)).cut(cyl(ring_r, reach + 2, (reach / 2, 0, 0), (1, 0, 0)))
-        parts.append(solid("lip sleeve", "lips", sleeve.cut(cut), "silicone"))
-        ring = cq.Solid.makeTorus(ring_r + 1.5, 3.0, V(reach, 0, 0), V(1, 0, 0))
-        parts.append(solid("lip ring", "lips", ring.cut(cut), "silicone"))
-        parts.append(solid("pushrod", "lips", cyl(1.2, reach + 30, (reach / 2 - 15, 0, ring_r + 6), (1, 0, 0)), "metal"))
-        servo(-42, RO + 18, "protrusion servo", "lips")
-        servo(-70, RO + 18, "drawstring servo", "lips")
+        reach = 10.0 + 10 * c["protrusion"]
+        ring = 10 * max(c["lip_radius"], 0.0) + 2.0  # the drawstring closes the ring to a pucker
+        outer = cq.Solid.makeCone(RO, ring + 4, reach, V(0, 0, 0), V(1, 0, 0))
+        inner = cq.Solid.makeCone(R, ring, reach + 0.01, V(-0.005, 0, 0), V(1, 0, 0))
+        parts.append(solid("lip sleeve", "lips", outer.cut(inner).cut(cut), "silicone"))
+        parts.append(solid("lip ring", "lips", cq.Solid.makeTorus(ring + 2, 2.5, V(reach, 0, 0), V(1, 0, 0)).cut(cut), "silicone"))
+        parts.append(solid("servo shelf", "lips", block((-64, 0, shelf_z), (-2, 20, shelf_z + 4))))
+        servo(-50, 10, shelf_z + 4, "protrusion servo", "lips", lying=True)
+        servo(-22, 10, shelf_z + 4, "drawstring servo", "lips", lying=True)
+        parts.append(solid("pushrod", "lips", rod((-10, 4, shelf_z + 10), (reach, 4, ring + 4.5)), "metal"))
     else:
         tube_mm = 10 * P.JAW[li.type][1]
-        gap = 2 * math.sqrt(li.params["rest_area"] / math.pi) * 10
+        span = P.JAW[li.type][0]
+        rest = 2 * math.sqrt(li.params["rest_area"] / math.pi) * 10
+        drop = 2 * math.sqrt((li.params["rest_area"] + span * c.get("jaw", 0.0)) / math.pi) * 10 - rest
         lip = cyl(RO, tube_mm, (tube_mm / 2, 0, 0), (1, 0, 0))
-        for name, (z0, z1) in (("upper lip", (gap / 2, RO)), ("lower lip", (-RO, -gap / 2))):
-            parts.append(solid(name, "lips", lip.intersect(block((0, -RO, z0), (tube_mm, RO, z1))).cut(cut), "silicone"))
-        parts.append(solid("jaw", "lips", block((-2, -8, -RO - 6), (tube_mm + 6, 8, -RO))))
-        parts.append(solid("jaw arm", "lips", block((tube_mm, -4, -RO - 36), (tube_mm + 6, 4, -RO - 6))))
-        servo(tube_mm + 17, -RO - 40, "jaw servo", "lips")
+        parts.append(solid("upper lip", "lips", lip.intersect(block((0, -RO, rest / 2), (tube_mm, RO, RO))).cut(cut), "silicone"))
+        lower = lip.intersect(block((0, -RO, -RO), (tube_mm, RO, -rest / 2))).translate(V(0, 0, -drop))
+        parts.append(solid("lower lip", "lips", lower.cut(cut), "silicone"))
+        parts.append(solid("jaw", "lips", block((0, -8, -RO - 5 - drop), (tube_mm + 4, 8, -RO - drop))))
+        servo(tube_mm + 20, 0, zp, "jaw servo", "lips")
+        parts.append(solid("jaw link", "lips", rod((tube_mm + 2, 0, -RO - 5 - drop), (tube_mm + 14, 0, zp + 29), 2.0)))
         if li.type == "spread_lips":
-            parts.append(solid("corner pull", "lips", cyl(1.2, 40.0, (-14, 0, RO + 6), (1, 0, 0)), "metal"))
-            servo(-46, RO + 18, "corner servo", "lips")
-    return CadModel(parts, [View("section", (0.3, -1.0, 0.35)), View("side", (0.0, -1.0, 0.0))], tile=(420, 280))
+            parts.append(solid("servo shelf", "lips", block((-40, 0, shelf_z), (-2, 20, shelf_z + 4))))
+            servo(-22, 10, shelf_z + 4, "corner servo", "lips", lying=True)
+            parts.append(solid("corner pull", "lips", rod((-10, 4, shelf_z + 10), (tube_mm, 4, RO - 2)), "metal"))
+
+    xs = np.concatenate([p.mesh.bounds[:, 0] for p in parts])
+    parts.append(solid("base plate", "", block((xs.min() - 8, -24, zp - 6), (xs.max() + 8, 42, zp))))
+    return CadModel(parts, [View("section", (0.3, -1.0, 0.35)), View("side", (0.0, -1.0, 0.0))], tile=(420, 300))
 
 
-CAD: dict[str, Callable[[Body], CadModel]] = {"gripper": gripper, "gripper_dense": gripper, "mobile": mobile,
+CAD: dict[str, Callable[..., CadModel]] = {"gripper": gripper, "gripper_dense": gripper, "mobile": mobile,
                                               "phonology": phonology}

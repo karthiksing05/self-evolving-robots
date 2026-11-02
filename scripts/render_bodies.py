@@ -5,7 +5,8 @@
 For each run, renders the CAD of every body in order (``sea.worlds.cad``), with cameras fitted to all of them so
 they share a scale, and writes ``<out>/<run>/<k>_<body id>.png`` and ``<out>/<run>/frames.json``: per
 picture, the iteration that kept the body, the groups it held, its change from the previous body (per
-slot), what the change gained and cost, and System 2's reason for it.
+slot), what the change gained and cost, and System 2's reason for it.  The parts a change added or
+altered are outlined in its picture.
 """
 
 from __future__ import annotations
@@ -79,7 +80,7 @@ def frames(run: Path) -> tuple[str, list[dict], list[dict]]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    from sea.design.cad import render
+    from sea.design.cad import changed, render
     from sea.evolve.core import Body
     from sea.worlds.cad import CAD
 
@@ -95,7 +96,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"{run.name}: the {world_name} world has no CAD", file=sys.stderr)
             continue
         models = [CAD[world_name](Body.model_validate(b)) for b in bodies]
-        pngs = render(models)
+        pngs = render(models, outline=[set()] + [changed(a, b) for a, b in zip(models, models[1:], strict=False)])
         d = args.out / run.name
         d.mkdir(parents=True, exist_ok=True)
         for k, (f, png, mdl) in enumerate(zip(fs, pngs, models, strict=True)):
