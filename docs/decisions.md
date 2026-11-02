@@ -1438,3 +1438,28 @@ Three fixes failed on the way, each for a reason:
   - A load–deflection test on a real STS3215 horn would replace the rigid gear train.
   - The gold's payload cases (a 30 mm can at 800–1200 g) are denser than lead, which the density law in P2 will refuse.
   - Films and campaign results were judged under the old physics. `film.READS` marks the films stale, and P6 re-runs the campaigns.
+
+## D-055 Phase B re-derived on rigid contacts, with objects of real density (judge: world_grasp)
+**Observed.** Phase B (`configs/grasp.yaml`) holds objects that each fail the stock gripper for one known reason. Its five were chosen on soft contacts (D-048): cans of 60 and 65 mm, a 70 mm box, and balls of 30 and 40 mm. On D-054's physics the stock envelope reaches 70 mm for cans and boxes and 80 mm for spheres. The grasp battery's phase B then passed 3 of 5: the 60 mm can and both balls. The 65 mm can and the 70 mm box still failed with System 1's search. Train and val passed 16/16 each, as before.
+
+**Change.** Phase B is four objects, each checked with a pick forced past the aperture rule:
+
+| Object | Size | Mass | Density | Forced pick | Reason |
+|---|---|---|---|---|---|
+| `wide_can_80` | 80 mm across, 80 tall | 150 g | 0.37 g/cm³ | lifts 0 mm | wider than the stable opening |
+| `wide_can_90` | 90 mm across, 85 tall | 200 g | 0.37 g/cm³ | lifts 0 mm | wider than the stable opening |
+| `wide_box_80` | 80 mm across, 60 tall | 150 g | 1.0 g/cm³ | lifts 1 mm | wider than the stable opening |
+| `weight_1kg` | 48 mm across, 70 tall | 1000 g | 7.9 g/cm³ | lifts 5 mm, arm stalls | heavier than the stock arm lifts |
+
+- The three wide objects' tips close on air, and the aperture rule refuses them before simulation.
+- `weight_1kg` is a steel calibration weight. The jaws hold it at a 28 N squeeze while the arm stalls (`load_limit`), which the L3 arm-servo option addresses.
+- Spheres are gone. No ball under the 85 mm height limit fails the stock jaws. A 90 mm ball is refused by the aperture rule (the V1 probe's fixed pick fails at 90 mm), yet System 1's pick lifted it 40 mm and held it. The aperture rule is conservative there, and P2 revisits it.
+
+**Prediction.** The stock gets `no_applicable_primitive` on the three wide objects and `stuck` (`load_limit`) on the weight: phase B passes 0/4. Train and val are unchanged.
+
+**Measured.**
+- **Grasp battery:**
+  - train and val: 16/16 each;
+  - phase B: 0/4, with 3 `no_applicable_primitive` and 1 `stuck`.
+- **Baselines.** Both baselines are re-saved under the new judge key (061a17f63ee6). The panel baseline changes only in its key. Its val sliders read 0.40, the value recorded before D-052: D-052's force measure had moved `val_p011 c1` into `rule_violation` (0.30), and D-053 moved it back.
+- **Not yet re-measured.** The real-object phase split (`scripts/measure_real.py`, `docs/gripper-experiment.md`) was measured on soft contacts. It needs System 1's full search on the 21 YCB objects at three placements, a longer run that waits for a go-ahead.

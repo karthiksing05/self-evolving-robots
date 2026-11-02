@@ -77,15 +77,15 @@ def test_held_for_parses_and_needs_the_hold():
 
 @pytest.fixture(scope="module")
 def suite():
-    panels = grasp_panels("train", 2) + [p for p in phase_b_panels() if p.id in ("gb_wide_can_60", "gb_ball_40")]
+    panels = grasp_panels("train", 2) + [p for p in phase_b_panels() if p.id in ("gb_wide_can_80", "gb_weight_1kg")]
     return {r.result.panel_id: r for r in run_suite(panels, _cfg()).runs}
 
 
 def test_the_stock_gripper_picks_phase_a_and_escalates_phase_b(suite):
     assert suite["gtr000"].result.verdict == "pass" and suite["gtr001"].result.verdict == "pass"
-    # Phase B's objects were chosen on soft contacts, which lost cans past 55 mm and balls near the equator
-    # (D-054): on rigid contacts, the stock jaws hold both.
-    assert suite["gb_wide_can_60"].result.verdict == "pass" and suite["gb_ball_40"].result.verdict == "pass"
+    assert suite["gb_wide_can_80"].result.verdict == "no_applicable_primitive"  # aperture: before simulation
+    heavy = suite["gb_weight_1kg"]  # the jaws hold the 1 kg weight; the arm stalls lifting it (D-055)
+    assert heavy.result.verdict == "stuck" and heavy.trace.note == "load_limit"
 
 
 def test_the_squeeze_is_the_task_not_a_force_violation(suite):
