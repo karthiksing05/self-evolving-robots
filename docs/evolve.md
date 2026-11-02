@@ -32,9 +32,11 @@ it puts at risk. There are three moves, cheapest first:
 1. **`params`**: new values for the current parts' parameters.
 2. **`swap`**: another part type in a slot, which redesigns that part. Its parameters default to the
    middle of their ranges.
-3. **`idea`**: a part the catalogue does not have. It is recorded with what it would need from the
-   manifest and is never trialled, because nothing can build it in the simulator. Ideas are the
-   outer loop's input: candidates for new catalogue parts.
+3. **`idea`**: a part the catalogue does not have. It names a slot and a bill of materials
+   (`Need`: an item and quantity, with System 2's estimated price and lead time for any item the
+   manifest lacks). `resources.cost_idea` costs it against the bench, as for a part, and says whether
+   it fits what is left (D-047). It is never trialled, because nothing can build it in the simulator.
+   Ideas are the outer loop's input: candidates for new catalogue parts, each with a price.
 
 The loop records the move a proposal actually makes (`edit_rung`), not the one it declares.
 
@@ -44,6 +46,8 @@ The loop records the move a proposal actually makes (`edit_rung`), not the one i
 2. **Build:** `world.check(body)`.
 3. **Resources** (`resources.check`): the candidate's bill of materials against the current body's.
    - Items the current body already has are reused.
+   - The bench's pool is the manifest's spares plus what the run owns: the stock body's items and
+     every purchase, in `Spent.owned`. A spare is counted once (D-046).
    - Shortfalls are bought if they have a price and the budget allows (dollars, lead time).
    - Anything else is refused as "not provided".
    - Fabricated material is charged only for slots whose part changed: a changed part is a new
@@ -69,6 +73,16 @@ The held set only grows, the PASS_TO_PASS rule: the robot's history comes first.
 machine time of the kept candidate are charged to the run. A body already trialled is refused with
 its earlier result, so no body is paid for twice.
 
+## Merging gains in different slots
+
+Kept-eligible proposals that change disjoint slots are not alternatives. After the proposals' trials,
+the loop builds one more body: the best candidate, plus every other kept-eligible candidate whose
+changed slots it does not touch. If that joins at least two, the union is screened, costed and
+trialled once, and kept if it scores higher (D-045).
+
+In `phonology_s2_s0`, rounded lips and a tongue tip were each kept-eligible on their own. Their union
+also produced /ɝ/, which neither gained alone, and held all 13 groups in one iteration.
+
 ## Redesigns: the frontier and the tuning allowance
 
 A redesign usually breaks something before it is better. Two mechanisms let one survive that phase
@@ -82,7 +96,9 @@ without weakening the ratchet:
   - a Gaussian search over the parameters of every slot it changed, in each parameter's range,
     centred on the best tuning so far;
   - each trial is screened, costed and scored like a proposal;
-  - it stops at the first kept-eligible body.
+  - it stops at the first kept-eligible body;
+  - it runs only if the swap gained more groups than the best kept-eligible candidate, since otherwise
+    it could not change the decision.
   This is NEAT's protection of structural innovation, applied to parts: a new structure competes
   only once its own parameters are fitted. The random arm gets the same allowance.
 
@@ -105,7 +121,7 @@ It has the same sections in every world (`prompt.py`):
    refused for.
 10. A per-slot summary of what parameter-only trials have not fixed.
 11. System 2's calibration: its predicted gains and named risks against what the trials found.
-12. The frontier and the ideas recorded so far.
+12. The frontier, and the ideas recorded so far with their costing.
 
 That summary and the brief are what make a redesign arise rather than be ordered. When parameter
 moves on a slot keep failing on one mechanism, and the brief shows the part cannot reach what the
