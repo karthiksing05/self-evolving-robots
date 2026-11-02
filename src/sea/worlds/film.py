@@ -582,5 +582,8 @@ FILM: dict[str, Callable[..., Clip]] = {"gripper": gripper, "gripper_dense": gri
 # filmed, since today's replay would show what the run never saw.
 _GRIPPER = ("world_gripper", "physics", "tools", "grasp_world", "verifier", "contracts", "limits", "kinematics",
             "primitives", "sensors", "build")
-READS: dict[str, tuple[str, ...]] = {"gripper": _GRIPPER, "gripper_dense": _GRIPPER, "mobile": ("world_mobile", "evolve"),
-                                     "phonology": ("world_phonology", "evolve")}
+# A mobile or talking-robot attempt is its world's own calculation: the evolution core gives it only data types
+# (Body, Part, Task), and what changes there (costs, ledgers, proposal rules: D-043..D-047) never reaches a
+# replay.  A replay that still disagrees with the run's record is not filmed (scripts/film_bodies.py).
+READS: dict[str, tuple[str, ...]] = {"gripper": _GRIPPER, "gripper_dense": _GRIPPER, "mobile": ("world_mobile",),
+                                     "phonology": ("world_phonology",)}

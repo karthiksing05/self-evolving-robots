@@ -4,13 +4,14 @@
  "films": [
   {
    "frame": 1,
-   "id": "b00m",
+   "id": "b002",
    "group": "bedroom",
    "task": "bedroom_train0",
-   "file": "01_b00m_bedroom.mp4",
-   "poster": "01_b00m_bedroom.jpg",
-   "seconds": 5.0,
+   "file": "01_b002_bedroom.mp4",
+   "poster": "01_b002_bedroom.jpg",
+   "seconds": 4.8,
    "sound": false,
+   "clipping_mm": 0.0,
    "before": {
     "ok": false,
     "verdict": "chassis wider than gap: the robot is 23.0 cm wide overall; the opening is 20.0 cm",
@@ -18,59 +19,20 @@
    },
    "after": {
     "ok": true,
-    "verdict": "reached in 11 s of 60, using 0.008 Wh",
+    "verdict": "reached in 18 s of 60, using 0.014 Wh",
     "recorded": true
    }
   },
   {
    "frame": 1,
-   "id": "b00m",
-   "group": "hallway",
-   "task": "hallway_train0",
-   "file": "01_b00m_hallway.mp4",
-   "poster": "01_b00m_hallway.jpg",
-   "seconds": 6.0,
-   "sound": false,
-   "before": {
-    "ok": false,
-    "verdict": "sensing range short: reached the end in 78 s (75 s at best); 45 s allowed; in the dark it sees 0.00 m ahead, less than its 0.20 m length, so it touches each of 10 obstacles at <= 0.25 m/s and backs off (40 s)",
-    "recorded": "sensing_range_short"
-   },
-   "after": {
-    "ok": true,
-    "verdict": "reached in 22 s of 45, using 0.017 Wh",
-    "recorded": true
-   }
-  },
-  {
-   "frame": 1,
-   "id": "b00m",
-   "group": "lawn",
-   "task": "lawn_train0",
-   "file": "01_b00m_lawn.mp4",
-   "poster": "01_b00m_lawn.jpg",
-   "seconds": 4.5,
-   "sound": false,
-   "before": {
-    "ok": false,
-    "verdict": "battery exhausted: the 4.8 Wh pack (4.08 Wh usable) ran out 77% of the way; at full speed it spends 5.27 Wh to here (3.80 J/m on grass at 0.38 kg)",
-    "recorded": "battery_exhausted"
-   },
-   "after": {
-    "ok": true,
-    "verdict": "reached in 9370 s of 14400, using 8.480 Wh",
-    "recorded": true
-   }
-  },
-  {
-   "frame": 2,
-   "id": "b011",
+   "id": "b002",
    "group": "garden",
    "task": "garden_train0",
-   "file": "02_b011_garden.mp4",
-   "poster": "02_b011_garden.jpg",
-   "seconds": 5.3,
+   "file": "01_b002_garden.mp4",
+   "poster": "01_b002_garden.jpg",
+   "seconds": 5.4,
    "sound": false,
+   "clipping_mm": 0.0,
    "before": {
     "ok": false,
     "verdict": "gap longer than support: each 3.0 cm wheel spans 6.0 cm, drops 5.00 cm into the 9.0 cm trench and climbs out of at most 2.16 cm",
@@ -78,47 +40,49 @@
    },
    "after": {
     "ok": true,
-    "verdict": "reached in 18 s of 60, using 0.015 Wh",
+    "verdict": "reached in 18 s of 60, using 0.014 Wh",
+    "recorded": true
+   }
+  },
+  {
+   "frame": 1,
+   "id": "b002",
+   "group": "lawn",
+   "task": "lawn_train0",
+   "file": "01_b002_lawn.mp4",
+   "poster": "01_b002_lawn.jpg",
+   "seconds": 4.3,
+   "sound": false,
+   "clipping_mm": 0.0,
+   "before": {
+    "ok": false,
+    "verdict": "battery exhausted: the 4.8 Wh pack (4.08 Wh usable) ran out 77% of the way; at full speed it spends 5.27 Wh to here (3.80 J/m on grass at 0.38 kg)",
+    "recorded": "battery_exhausted"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "reached in 12259 s of 14400, using 10.995 Wh",
     "recorded": true
    }
   },
   {
    "frame": 2,
-   "id": "b011",
-   "group": "porch",
-   "task": "porch_train0",
-   "file": "02_b011_porch.mp4",
-   "poster": "02_b011_porch.jpg",
-   "seconds": 4.1,
+   "id": "b010",
+   "group": "hallway",
+   "task": "hallway_train0",
+   "file": "02_b010_hallway.mp4",
+   "poster": "02_b010_hallway.jpg",
+   "seconds": 5.7,
    "sound": false,
+   "clipping_mm": 0.0,
    "before": {
     "ok": false,
-    "verdict": "step higher than climbable: the edge is 5.50 cm; its 3.0 cm wheels climb at most 2.16 cm at edge mu 0.75",
-    "recorded": "step_higher_than_climbable"
+    "verdict": "sensing range short: reached the end in 80 s (77 s at best); 45 s allowed; in the dark it sees 0.00 m ahead, less than its 0.24 m length, so it touches each of 10 obstacles at <= 0.25 m/s and backs off (40 s)",
+    "recorded": "sensing_range_short"
    },
    "after": {
     "ok": true,
-    "verdict": "reached in 12 s of 40, using 0.009 Wh",
-    "recorded": true
-   }
-  },
-  {
-   "frame": 2,
-   "id": "b011",
-   "group": "sandbox",
-   "task": "sandbox_train0",
-   "file": "02_b011_sandbox.mp4",
-   "poster": "02_b011_sandbox.jpg",
-   "seconds": 5.6,
-   "sound": false,
-   "before": {
-    "ok": false,
-    "verdict": "sinks in sand: ground pressure 2.97 kPa on 15 cm2 of contact sinks it 3.95 cm; it climbs out of 1.20 cm (belly clearance 2.0 cm)",
-    "recorded": "sinks_in_sand"
-   },
-   "after": {
-    "ok": true,
-    "verdict": "reached in 17 s of 60, using 0.015 Wh",
+    "verdict": "reached in 39 s of 45, using 0.031 Wh",
     "recorded": true
    }
   }
