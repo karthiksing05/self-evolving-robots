@@ -142,8 +142,13 @@ three System 2 seeds, 30 random-arm seeds and the stock body:
   - None of the tuning trials was kept, but they were the cheapest experiments in the run.
 - **Generalization:** seed 0 fitted its fingertip reach to the train placements. It lost the potted
   meat can and the tuna can at one test placement each: a force limit, and a jaw landing on top.
-  `gripper_dense` (four train placements per object, same test) measures whether denser training
-  closes that gap.
+  `gripper_dense` (four train placements per object, same test) measured whether denser training
+  closes that gap. With one seed it is inconclusive:
+  - it reached 21/21 on all four placements by iteration 8, with 8 calls;
+  - it held 20/21 on test, missing the mustard bottle at one placement;
+  - that is inside the 19–21 range of the two-placement seeds.
+
+  Separating the two would take several seeds of each.
 
 ## Failure modes to watch
 
