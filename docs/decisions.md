@@ -1463,3 +1463,19 @@ Three fixes failed on the way, each for a reason:
   - phase B: 0/4, with 3 `no_applicable_primitive` and 1 `stuck`.
 - **Baselines.** Both baselines are re-saved under the new judge key (061a17f63ee6). The panel baseline changes only in its key. Its val sliders read 0.40, the value recorded before D-052: D-052's force measure had moved `val_p011 c1` into `rule_violation` (0.30), and D-053 moved it back.
 - **Not yet re-measured.** The real-object phase split (`scripts/measure_real.py`, `docs/gripper-experiment.md`) was measured on soft contacts. It needs System 1's full search on the 21 YCB objects at three placements, a longer run that waits for a go-ahead.
+
+## D-056 The servo horn rides the jaw (world: physics)
+**Observed.** The SO-101 model draws the STS3215's horn as part of the gripper servo's mesh. The stock jaw is screwed to that horn and turns about it, so in the mechanism audit (D-051) the jaw cut through the horn at all 9 jaw positions: a disc 20 mm across and 3.5 mm thick around the hinge axis. Every film showed a finger turning through a part that should turn with it.
+
+**Change.**
+- **The servo.** The gripper body carries the model's own horn-less servo mesh (`sts3215_03a_no_horn_v1`).
+- **The horn.** The horn rides the moving jaw. It is extracted as the faces of the servo mesh that the horn-less mesh lacks: 1,908 faces, 20 × 20 × 3.9 mm, coaxial with the hinge. It is drawn only (`gripper_horn`, no contact).
+- **The slide's horn stays put.** On a slide the horn turns a pinion, which the simulator does not have yet.
+- **Collision.** The servo's collision hull shrinks from 40.16 to 39.81 cm³.
+
+**Prediction.** The stock grasps do not move, and the stock's remaining overlaps with the jaw are its bearing seats at the axis.
+
+**Measured.**
+- The gold does not move: 0 of 46 picks changed (`scripts/measure_grasp.py`).
+- On the stock, the horn now meets the servo only at the spline (a 6 mm region within 3 mm of the axis).
+- The jaw meets the servo only at the rear hub, 3 mm deep and within 10 mm of the axis, the same at every angle. That is where the jaw's back plate bears on the servo's rear boss, the contact the plan's interference law allows across a revolute joint.

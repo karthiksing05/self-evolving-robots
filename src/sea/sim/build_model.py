@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass, field
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Literal
 
@@ -392,6 +393,42 @@ def _finger_flex(spec: mujoco.MjSpec) -> None:
                        damping=[2 * FINGER_DAMPING_RATIO * float(np.sqrt(k * inertia)), 0.0, 0.0], armature=inertia)
 
 
+HORN_MESH, HORNLESS_MESH = "sts3215_03a_v1", "sts3215_03a_no_horn_v1"
+
+
+@lru_cache(maxsize=1)
+def _horn_mesh() -> tuple[np.ndarray, np.ndarray]:
+    """The STS3215's horn, in the servo mesh's frame (m): the faces of the servo mesh that its horn-less twin lacks."""
+    import trimesh
+    from scipy.spatial import cKDTree
+
+    whole = trimesh.load(STOCK_MJCF.parent / "assets" / f"{HORN_MESH}.stl")
+    bare = trimesh.load(STOCK_MJCF.parent / "assets" / f"{HORNLESS_MESH}.stl")
+    new = cKDTree(bare.vertices).query(whole.vertices)[0] > 1e-6
+    horn = trimesh.Trimesh(whole.vertices, whole.faces[new[whole.faces].any(axis=1)], process=True)
+    return np.asarray(horn.vertices), np.asarray(horn.faces)
+
+
+def _horn(spec: mujoco.MjSpec, f) -> None:
+    """The gripper servo's horn turns with its output (D-056).  The SO-101 model draws the horn on the servo, so the
+    hinged jaw, screwed to the horn, cut through it at every angle; the horn-less servo stays on the gripper and
+    the horn rides the jaw.  The slide's horn turns its pinion, which the slide does not model yet: it stays put."""
+    if f.jaw == "prismatic":
+        return
+    servo = [g for g in spec.geoms if g.parent.name == "gripper" and g.meshname == HORN_MESH]
+    for g in servo:
+        g.meshname = HORNLESS_MESH
+    g = next(g for g in servo if g.contype == 0 and g.conaffinity == 0)  # the drawn one
+    jaw = spec.body("moving_jaw_so101_v1")
+    r_s, r_j = quat_wxyz_to_mat(np.asarray(g.quat)), quat_wxyz_to_mat(np.asarray(jaw.quat))
+    verts, faces = _horn_mesh()
+    local = (np.asarray(g.pos) + verts @ r_s.T - np.asarray(jaw.pos)) @ r_j  # servo frame -> jaw frame at q = 0
+    spec.add_mesh(name="sts3215_horn", uservert=local.ravel().tolist(), userface=faces.ravel().tolist(),
+                  inertia=mujoco.mjtMeshInertia.mjMESH_INERTIA_SHELL)
+    jaw.add_geom(name="gripper_horn", type=mujoco.mjtGeom.mjGEOM_MESH, meshname="sts3215_horn", contype=0,
+                 conaffinity=0, group=2, mass=0.0, material=g.material)
+
+
 def _jaw_joint(spec: mujoco.MjSpec, f) -> float:
     """Rebuild the moving jaw's joint for the jaw part (D-042); returns the gripper joint's units per servo
     radian.  The servo stays a position servo in radians: a slide's actuator gear is 1 / pinion radius, so
@@ -448,6 +485,7 @@ def build_model(design: Design, panel: PanelSpec | None = None, tools: list | No
         tau = STALL_TORQUE[float(volts)]
         act.forcerange = [-tau, tau]
     grip_scale = _jaw_joint(spec, design.fingers)
+    _horn(spec, design.fingers)
     # Stock jaw geoms get the names the verifier maps (Appendix B).  The jaw meshes collide through
     # their CoACD parts instead of one convex hull (D-013); other arm meshes keep their hulls.
     counters = {"jaw_fixed": 0, "jaw_moving": 0}
