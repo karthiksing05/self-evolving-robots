@@ -76,7 +76,9 @@ def test_diagnose_names_the_mechanism():
     assert mech == "squeezed_down_out" and "pushing 30 deg down" in detail
     missed = descent + [_row(1 + 0.1 * k, -0.17, 0.015, side, []) for k in range(30)]
     assert diagnose(missed, "", f, 0.03, 97)[0] == "moving_jaw_missed"
-    assert diagnose(on_top, "load_limit", f, 0.03, 514)[0] == "arm_stall"
+    assert diagnose(on_top, "load_limit", f, 0.03, 514)[0] == "moving_jaw_on_top_face"  # pressing, not payload
+    lifted = descent + [_row(1 + 0.1 * k, -0.17, 0.015 + 0.002 * k, side, side) for k in range(30)]
+    assert diagnose(lifted, "load_limit", f, 0.03, 514)[0] == "arm_stall"
 
 
 def test_solve_reads_the_failure():

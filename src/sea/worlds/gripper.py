@@ -126,9 +126,8 @@ def _jaw_summary(cs: list[tuple[float, float, float, str]]) -> tuple[float, floa
 
 
 def diagnose(rows: list[dict[str, Any]], note: str, fing: FingerSpec, height_m: float, mass_g: float) -> tuple[str, str]:
-    """(mechanism, detail) for one failed pick, from the replayed contacts."""
-    if note == "load_limit":
-        return "arm_stall", f"an arm joint stalled carrying {mass_g:g} g (load_limit reflex)"
+    """(mechanism, detail) for one failed pick, from the replayed contacts.  A stalled arm joint is labelled by
+    what the jaws were doing: pressing on the object's top stalls the arm without any payload."""
     if not rows:
         return "no_trace", note
     z0, xy0 = rows[0]["z"], rows[0]["xy"]
@@ -165,14 +164,19 @@ def diagnose(rows: list[dict[str, Any]], note: str, fing: FingerSpec, height_m: 
     detail = (f"closed to {q:.2f} rad (fingertips {gap:.0f} mm apart), moving fingertip {rise:+.0f} mm vs the fixed one; "
               f"{jaw('fixed', fx, zfx, nfx, pfx)}; {jaw('moving', fm, zm, nm, pm)}; "
               f"rose {lifted * 1000:.0f} mm, ended {end * 1000:+.0f} mm; {mass_g:g} g")
+    on_top = [name for name, f, n in (("moving", fm, nm), ("fixed", fx, nfx)) if f >= 0.2 and n < -0.8]
+    if note == "load_limit":
+        detail = "an arm joint stalled (load_limit reflex); " + detail
+        if on_top:
+            return f"{on_top[0]}_jaw_on_top_face", detail
+        return ("arm_stall" if lifted > 0.01 else "arm_stall_before_lift"), detail
     if knocked > 8:
         return "knocked_on_descent", f"the descending jaws pushed the object {knocked:.0f} mm before closing; " + detail
+    if on_top:
+        return f"{on_top[0]}_jaw_on_top_face", detail
     if fx < 0.2 or fm < 0.2:
         which = "fixed" if fx < 0.2 else "moving"
         return f"{which}_jaw_missed", detail
-    if min(nfx, nm) < -0.8:
-        which = "moving" if nm < nfx else "fixed"
-        return f"{which}_jaw_on_top_face", detail
     if (nfx + nm) / 2 < -0.12 or min(nfx, nm) < -0.3:
         return "squeezed_down_out", detail
     if (nfx + nm) / 2 > 0.12:
