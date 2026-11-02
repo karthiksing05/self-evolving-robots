@@ -344,7 +344,7 @@ Hardware for V5:
 | Live gripper experiment (`configs/exp/gripper_live.yaml`) and its System-1-only control | first run done (D-039) |
 | Evolution core: the gripper as a world (jaw joints, pads and arm servos as parts with bills of materials), frontier, tuning, merging (D-040–D-047) | built; `gripper_s2_s0` 6→13/21, `gripper_s2v2_s0` 6→19/21 in 4 iterations (old physics) |
 | Grasp-scene `impratio` 10, every grasp ruler re-measured (D-048) | built |
-| **21/21 on the corrected physics** (`results/evolve/gripper_s2v3_s{0,1,2}.json`): all three System 2 seeds redesigned the jaw into the slide ($5.40 of rods and bushings) and tuned its pads; train 21/21 in 4, 2 and 11 iterations; test 19, 20 and 21 of 21 against stock 15, 14 and 13; the random arm at the same commit reached 17 train, 15 test | done |
+| **21/21 on the corrected physics** (`results/evolve/gripper_s2v3_s{0,1,2}.json`): all three System 2 seeds redesigned the jaw into the slide ($5.40 of rods and bushings) and tuned its pads; train 21/21 in 4, 2 and 11 iterations; test 19, 20 and 21 of 21 against stock 15, 14 and 13; the random arm at the same commit (three seeds) reached 17, 20 and 16 train, 15, 20 and 15 test | done |
 | Finger CAD export (STEP/STL for printing), difficulty check (V3) | design |
 | `sea-arm` MCP server over the sim: sense, analyze and goal tools, call log and replay, agentic `s2_agent` over the task network | design |
 | `design/arm.py` (L2), actuator (L3), phase C fault injection | design |

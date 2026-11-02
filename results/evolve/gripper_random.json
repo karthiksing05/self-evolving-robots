@@ -1,0 +1,1047 @@
+[
+ {
+  "run": "gripper_random_s0",
+  "world": "gripper",
+  "arm": "random",
+  "seed": 0,
+  "final_body": {
+   "id": "b05t1",
+   "parent": "b050",
+   "parts": {
+    "jaw": {
+     "type": "revolute",
+     "params": {}
+    },
+    "pads": {
+     "type": "pads",
+     "params": {
+      "reach_mm": 0.0,
+      "pad_angle_deg": 3.095,
+      "groove_mm": 0.0,
+      "lip_mm": 0.283,
+      "pad_tpu_mm": 1.337,
+      "width_mm": 9.796
+     }
+    },
+    "arm_servos": {
+     "type": "servos_7v4",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 14,
+    "tasks_passed": 30,
+    "sim_s": 803.3,
+    "wall_s": 15.8
+   },
+   {
+    "iteration": 1,
+    "body": "stock",
+    "held_groups": 14,
+    "tasks_passed": 30,
+    "sim_s": 5611.0,
+    "wall_s": 78.3
+   },
+   {
+    "iteration": 2,
+    "body": "stock",
+    "held_groups": 14,
+    "tasks_passed": 30,
+    "sim_s": 5611.0,
+    "wall_s": 78.4
+   },
+   {
+    "iteration": 3,
+    "body": "stock",
+    "held_groups": 14,
+    "tasks_passed": 30,
+    "sim_s": 6774.8,
+    "wall_s": 91.3
+   },
+   {
+    "iteration": 4,
+    "body": "stock",
+    "held_groups": 14,
+    "tasks_passed": 30,
+    "sim_s": 11714.3,
+    "wall_s": 178.6
+   },
+   {
+    "iteration": 5,
+    "body": "stock",
+    "held_groups": 14,
+    "tasks_passed": 30,
+    "sim_s": 15973.3,
+    "wall_s": 238.2
+   },
+   {
+    "iteration": 6,
+    "body": "b05t1",
+    "held_groups": 17,
+    "tasks_passed": 34,
+    "sim_s": 19835.8,
+    "wall_s": 310.7
+   },
+   {
+    "iteration": 7,
+    "body": "b05t1",
+    "held_groups": 17,
+    "tasks_passed": 34,
+    "sim_s": 21315.1,
+    "wall_s": 334.0
+   },
+   {
+    "iteration": 8,
+    "body": "b05t1",
+    "held_groups": 17,
+    "tasks_passed": 34,
+    "sim_s": 21971.1,
+    "wall_s": 357.2
+   },
+   {
+    "iteration": 9,
+    "body": "b05t1",
+    "held_groups": 17,
+    "tasks_passed": 34,
+    "sim_s": 23116.0,
+    "wall_s": 378.5
+   },
+   {
+    "iteration": 10,
+    "body": "b05t1",
+    "held_groups": 17,
+    "tasks_passed": 34,
+    "sim_s": 23698.6,
+    "wall_s": 384.6
+   },
+   {
+    "iteration": 11,
+    "body": "b05t1",
+    "held_groups": 17,
+    "tasks_passed": 34,
+    "sim_s": 25793.0,
+    "wall_s": 413.1
+   },
+   {
+    "iteration": 12,
+    "body": "b05t1",
+    "held_groups": 17,
+    "tasks_passed": 34,
+    "sim_s": 25793.0,
+    "wall_s": 413.2
+   },
+   {
+    "iteration": 13,
+    "body": "b05t1",
+    "held_groups": 17,
+    "tasks_passed": 34,
+    "sim_s": 26942.4,
+    "wall_s": 429.5
+   },
+   {
+    "iteration": 14,
+    "body": "b05t1",
+    "held_groups": 17,
+    "tasks_passed": 34,
+    "sim_s": 28963.2,
+    "wall_s": 458.8
+   }
+  ],
+  "train_groups": 21,
+  "final_held_train": [
+   "apple",
+   "banana",
+   "cup",
+   "dice",
+   "flat_screwdriver",
+   "foam_brick",
+   "gelatin_box",
+   "golf_ball",
+   "large_marker",
+   "lemon",
+   "plum",
+   "potted_meat_can",
+   "racquetball",
+   "strawberry",
+   "tennis_ball",
+   "tomato_soup_can",
+   "wood_block_cube"
+  ],
+  "test": {
+   "final_held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "foam_brick",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "potted_meat_can",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "stock_held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "foam_brick",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "potted_meat_can",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "final_tasks": 32,
+   "stock_tasks": 30,
+   "n": 42
+  },
+  "spent": {
+   "usd": 0.0,
+   "fab_minutes": 3.7,
+   "lead_days": 0.0,
+   "owned": {
+    "sts3215_7v4": 6.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 30642.5,
+  "attempts": 6775,
+  "proposals": {
+   "total": 56,
+   "tried": 36,
+   "refused": 20,
+   "ideas": 0,
+   "kept": 1,
+   "rejected_regression": 34,
+   "moves": {
+    "params": 15,
+    "swap": 27,
+    "idea": 0,
+    "tune": 14,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [
+   {
+    "id": "b001",
+    "body": "arm_servos: servos_7v4; jaw: parallelogram (link_mm=82.6341); pads: none",
+    "gained": [
+     "apple",
+     "strawberry"
+    ],
+    "lost": [
+     "flat_screwdriver"
+    ],
+    "why_lost": "lost flat_screwdriver (flat_screwdriver: slipped_under_load, verdict wrong_behavior; closed to 0.09 rad (fingertips 23 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 21 N on the stock j; flat_screwdriver: squeezed_down_out, verdict wrong_behavior; closed to 0.08 rad (fingertips 23 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 26 N on the stock j)",
+    "iteration": 0,
+    "edit": "jaw -> parallelogram (link_mm=82.6341)"
+   },
+   {
+    "id": "b00t0",
+    "body": "arm_servos: servos_7v4; jaw: parallelogram (link_mm=83.891); pads: none",
+    "gained": [
+     "apple",
+     "strawberry"
+    ],
+    "lost": [
+     "flat_screwdriver"
+    ],
+    "why_lost": "lost flat_screwdriver (flat_screwdriver: never_lifted, verdict wrong_behavior; closed to 0.04 rad (fingertips 19 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 40 N on the stock j)",
+    "iteration": 0,
+    "edit": "jaw (link_mm=83.891)"
+   },
+   {
+    "id": "b00t1",
+    "body": "arm_servos: servos_7v4; jaw: parallelogram (link_mm=82.835); pads: none",
+    "gained": [
+     "apple",
+     "strawberry"
+    ],
+    "lost": [
+     "flat_screwdriver"
+    ],
+    "why_lost": "lost flat_screwdriver (flat_screwdriver: squeezed_down_out, verdict wrong_behavior; closed to 0.08 rad (fingertips 23 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 25 N on the stock j)",
+    "iteration": 0,
+    "edit": "jaw (link_mm=82.835)"
+   },
+   {
+    "id": "b00t2",
+    "body": "arm_servos: servos_7v4; jaw: parallelogram (link_mm=87.99); pads: none",
+    "gained": [
+     "apple",
+     "strawberry"
+    ],
+    "lost": [
+     "flat_screwdriver"
+    ],
+    "why_lost": "lost flat_screwdriver (flat_screwdriver: slipped_under_load, verdict wrong_behavior; closed to 0.05 rad (fingertips 20 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 33 N on the stock j)",
+    "iteration": 0,
+    "edit": "jaw (link_mm=87.99)"
+   },
+   {
+    "id": "b00t3",
+    "body": "arm_servos: servos_7v4; jaw: parallelogram (link_mm=88.527); pads: none",
+    "gained": [
+     "apple",
+     "gelatin_box",
+     "strawberry"
+    ],
+    "lost": [
+     "flat_screwdriver"
+    ],
+    "why_lost": "lost flat_screwdriver (flat_screwdriver: slipped_under_load, verdict wrong_behavior; closed to 0.05 rad (fingertips 21 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 28 N on the stock j)",
+    "iteration": 0,
+    "edit": "jaw (link_mm=88.527)"
+   },
+   {
+    "id": "b03t2",
+    "body": "arm_servos: servos_7v4; jaw: prismatic (drive_mm_per_rad=48.57); pads: none",
+    "gained": [
+     "apple",
+     "gelatin_box",
+     "pudding_box",
+     "tuna_fish_can"
+    ],
+    "lost": [
+     "cup",
+     "flat_screwdriver",
+     "tomato_soup_can"
+    ],
+    "why_lost": "lost cup, flat_screwdriver, tomato_soup_can (tomato_soup_can: slipped_under_load, verdict rule_violation; closed to 1.01 rad (fingertips 65 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 36 N on the stock j; flat_screwdriver: slipped_under_load, verdict wrong_behavior; closed to 0.05 rad (fingertips 18 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 43 N on the stock j; flat_screwdriver: never_lifted, verdict wrong_behavior; closed to 0.08 rad (fingertips 19 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 49 N on the stock j; cup: never_lifted, verdict wrong_behavior; closed to 0.45 rad (fing)",
+    "iteration": 3,
+    "edit": "jaw (drive_mm_per_rad=48.57)"
+   },
+   {
+    "id": "b03t3",
+    "body": "arm_servos: servos_7v4; jaw: prismatic (drive_mm_per_rad=51.791); pads: none",
+    "gained": [
+     "apple",
+     "gelatin_box",
+     "pudding_box",
+     "tuna_fish_can"
+    ],
+    "lost": [
+     "flat_screwdriver",
+     "tomato_soup_can"
+    ],
+    "why_lost": "lost flat_screwdriver, tomato_soup_can (tomato_soup_can: slipped_under_load, verdict rule_violation; closed to 0.95 rad (fingertips 65 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 34 N on the stock j; flat_screwdriver: slipped_under_load, verdict wrong_behavior; closed to 0.06 rad (fingertips 19 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 38 N on the stock j; flat_screwdriver: slipped_under_load, verdict wrong_behavior; closed to 0.09 rad (fingertips 21 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 44 N on the stock j)",
+    "iteration": 3,
+    "edit": "jaw (drive_mm_per_rad=51.791)"
+   },
+   {
+    "id": "b050",
+    "body": "arm_servos: servos_7v4; jaw: revolute; pads: pads (groove_mm=1.19108, lip_mm=0.363012, pad_angle_deg=18.2048, pad_tpu_mm=1.741, reach_mm=1.56064, width_mm=12.7791)",
+    "gained": [
+     "apple",
+     "gelatin_box",
+     "strawberry"
+    ],
+    "lost": [
+     "racquetball"
+    ],
+    "why_lost": "lost racquetball (racquetball: fixed_jaw_missed, verdict stuck; closed to 1.00 rad (fingertips 82 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: no contact; moving jaw: no )",
+    "iteration": 5,
+    "edit": "pads -> pads (groove_mm=1.19108, lip_mm=0.363012, pad_angle_deg=18.2048, pad_tpu_mm=1.741, reach_mm=1.56064, width_mm=12.7791)"
+   },
+   {
+    "id": "b05t0",
+    "body": "arm_servos: servos_7v4; jaw: revolute; pads: pads (groove_mm=1.049, lip_mm=0, pad_angle_deg=21.599, pad_tpu_mm=0, reach_mm=3.14, width_mm=8)",
+    "gained": [
+     "apple",
+     "gelatin_box",
+     "strawberry"
+    ],
+    "lost": [
+     "dice",
+     "tomato_soup_can"
+    ],
+    "why_lost": "lost dice, tomato_soup_can (tomato_soup_can: squeezed_down_out, verdict rule_violation; closed to 0.70 rad (fingertips 66 mm apart), moving fingertip +10 mm vs the fixed one; fixed jaw: 23 N on the pad at; dice: slipped_under_load, verdict wrong_behavior; closed to -0.07 rad (fingertips 3 mm apart), moving fingertip +2 mm vs the fixed one; fixed jaw: 10 N on the pad and; dice: never_lifted, verdict wrong_behavior; closed to -0.14 rad (fingertips -3 mm apart), moving fingertip +4 mm vs the fixed one; fixed jaw: 9 N on the pad and)",
+    "iteration": 5,
+    "edit": "pads (groove_mm=1.049, lip_mm=0, pad_angle_deg=21.599, pad_tpu_mm=0, reach_mm=3.14, width_mm=8)"
+   }
+  ],
+  "wall_s": 484.9,
+  "llm": {
+   "calls": 14,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "gripper_random_s1",
+  "world": "gripper",
+  "arm": "random",
+  "seed": 1,
+  "final_body": {
+   "id": "b12t0",
+   "parent": "b121",
+   "parts": {
+    "jaw": {
+     "type": "prismatic",
+     "params": {
+      "drive_mm_per_rad": 56.69190819163611
+     }
+    },
+    "pads": {
+     "type": "pads",
+     "params": {
+      "reach_mm": 0.0,
+      "pad_angle_deg": 22.23,
+      "groove_mm": 1.864,
+      "lip_mm": 0.0,
+      "pad_tpu_mm": 0.539,
+      "width_mm": 14.379
+     }
+    },
+    "arm_servos": {
+     "type": "servos_7v4",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 12,
+    "tasks_passed": 27,
+    "sim_s": 1250.5,
+    "wall_s": 21.0
+   },
+   {
+    "iteration": 1,
+    "body": "stock",
+    "held_groups": 12,
+    "tasks_passed": 27,
+    "sim_s": 6579.5,
+    "wall_s": 104.2
+   },
+   {
+    "iteration": 2,
+    "body": "stock",
+    "held_groups": 12,
+    "tasks_passed": 27,
+    "sim_s": 6579.5,
+    "wall_s": 104.2
+   },
+   {
+    "iteration": 3,
+    "body": "stock",
+    "held_groups": 12,
+    "tasks_passed": 27,
+    "sim_s": 6579.5,
+    "wall_s": 104.3
+   },
+   {
+    "iteration": 4,
+    "body": "b031",
+    "held_groups": 17,
+    "tasks_passed": 35,
+    "sim_s": 7078.1,
+    "wall_s": 114.0
+   },
+   {
+    "iteration": 5,
+    "body": "b031",
+    "held_groups": 17,
+    "tasks_passed": 35,
+    "sim_s": 7932.9,
+    "wall_s": 128.7
+   },
+   {
+    "iteration": 6,
+    "body": "b031",
+    "held_groups": 17,
+    "tasks_passed": 35,
+    "sim_s": 8694.3,
+    "wall_s": 145.3
+   },
+   {
+    "iteration": 7,
+    "body": "b031",
+    "held_groups": 17,
+    "tasks_passed": 35,
+    "sim_s": 13019.6,
+    "wall_s": 246.4
+   },
+   {
+    "iteration": 8,
+    "body": "b031",
+    "held_groups": 17,
+    "tasks_passed": 35,
+    "sim_s": 16675.2,
+    "wall_s": 304.6
+   },
+   {
+    "iteration": 9,
+    "body": "b031",
+    "held_groups": 17,
+    "tasks_passed": 35,
+    "sim_s": 19321.1,
+    "wall_s": 359.1
+   },
+   {
+    "iteration": 10,
+    "body": "b031",
+    "held_groups": 17,
+    "tasks_passed": 35,
+    "sim_s": 20219.1,
+    "wall_s": 382.2
+   },
+   {
+    "iteration": 11,
+    "body": "b031",
+    "held_groups": 17,
+    "tasks_passed": 35,
+    "sim_s": 20471.6,
+    "wall_s": 387.5
+   },
+   {
+    "iteration": 12,
+    "body": "b031",
+    "held_groups": 17,
+    "tasks_passed": 35,
+    "sim_s": 20471.6,
+    "wall_s": 387.5
+   },
+   {
+    "iteration": 13,
+    "body": "b12t0",
+    "held_groups": 20,
+    "tasks_passed": 40,
+    "sim_s": 22130.7,
+    "wall_s": 419.1
+   },
+   {
+    "iteration": 14,
+    "body": "b12t0",
+    "held_groups": 20,
+    "tasks_passed": 40,
+    "sim_s": 22730.5,
+    "wall_s": 432.5
+   }
+  ],
+  "train_groups": 21,
+  "final_held_train": [
+   "apple",
+   "banana",
+   "cup",
+   "dice",
+   "flat_screwdriver",
+   "foam_brick",
+   "gelatin_box",
+   "golf_ball",
+   "large_marker",
+   "lemon",
+   "plum",
+   "potted_meat_can",
+   "pudding_box",
+   "racquetball",
+   "strawberry",
+   "sugar_box",
+   "tennis_ball",
+   "tomato_soup_can",
+   "tuna_fish_can",
+   "wood_block_cube"
+  ],
+  "test": {
+   "final_held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "potted_meat_can",
+    "pudding_box",
+    "racquetball",
+    "strawberry",
+    "sugar_box",
+    "tennis_ball",
+    "tomato_soup_can",
+    "tuna_fish_can",
+    "wood_block_cube"
+   ],
+   "stock_held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "foam_brick",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "potted_meat_can",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "final_tasks": 40,
+   "stock_tasks": 30,
+   "n": 42
+  },
+  "spent": {
+   "usd": 5.4,
+   "fab_minutes": 192.7,
+   "lead_days": 3.0,
+   "owned": {
+    "sts3215_7v4": 6.0,
+    "steel_rod_3x100": 2.0,
+    "lm3uu_bearing": 2.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 23775.1,
+  "attempts": 6068,
+  "proposals": {
+   "total": 59,
+   "tried": 34,
+   "refused": 25,
+   "ideas": 0,
+   "kept": 2,
+   "rejected_regression": 31,
+   "moves": {
+    "params": 25,
+    "swap": 17,
+    "idea": 0,
+    "tune": 17,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [
+   {
+    "id": "b00t0",
+    "body": "arm_servos: servos_7v4; jaw: revolute; pads: pads (groove_mm=3.239, lip_mm=1.358, pad_angle_deg=17.361, pad_tpu_mm=0.232, reach_mm=30, width_mm=13.041)",
+    "gained": [
+     "flat_screwdriver",
+     "gelatin_box",
+     "mustard_bottle",
+     "pudding_box",
+     "strawberry",
+     "sugar_box",
+     "tuna_fish_can"
+    ],
+    "lost": [
+     "cup",
+     "dice",
+     "foam_brick",
+     "racquetball",
+     "tennis_ball",
+     "tomato_soup_can"
+    ],
+    "why_lost": "lost cup, dice, foam_brick, racquetball, tennis_ball, tomato_soup_can (foam_brick: force_limit, verdict stuck; a contact exceeded the force limit at t=0.92 s (squeezing or pressing down); foam_brick: force_limit, verdict stuck; a contact exceeded the force limit at t=1.20 s (squeezing or pressing down); tomato_soup_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.76 s (squeezing or pressing down); tomato_soup_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.76 s (squeezing or pressing down); tennis_ball: knocked_on_descent, verdict stuck; the descending jaws pushed the object 11 mm before closing; closed to 1.00)",
+    "iteration": 0,
+    "edit": "pads (groove_mm=3.239, lip_mm=1.358, pad_angle_deg=17.361, pad_tpu_mm=0.232, reach_mm=30, width_mm=13.041)"
+   },
+   {
+    "id": "b00t3",
+    "body": "arm_servos: servos_7v4; jaw: revolute; pads: pads (groove_mm=2.639, lip_mm=1.226, pad_angle_deg=17.408, pad_tpu_mm=0.126, reach_mm=30, width_mm=15.103)",
+    "gained": [
+     "flat_screwdriver",
+     "gelatin_box",
+     "mustard_bottle",
+     "pudding_box",
+     "strawberry",
+     "sugar_box",
+     "tuna_fish_can"
+    ],
+    "lost": [
+     "cup",
+     "dice",
+     "foam_brick",
+     "racquetball",
+     "tennis_ball",
+     "tomato_soup_can"
+    ],
+    "why_lost": "lost cup, dice, foam_brick, racquetball, tennis_ball, tomato_soup_can (foam_brick: force_limit, verdict stuck; a contact exceeded the force limit at t=0.92 s (squeezing or pressing down); foam_brick: force_limit, verdict stuck; a contact exceeded the force limit at t=1.20 s (squeezing or pressing down); tomato_soup_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.76 s (squeezing or pressing down); tomato_soup_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.76 s (squeezing or pressing down); tennis_ball: force_limit, verdict stuck; a contact exceeded the force limit at t=0.82 s (squeezing or pressing down); tenn)",
+    "iteration": 0,
+    "edit": "pads (groove_mm=2.639, lip_mm=1.226, pad_angle_deg=17.408, pad_tpu_mm=0.126, reach_mm=30, width_mm=15.103)"
+   },
+   {
+    "id": "b08t0",
+    "body": "arm_servos: servos_7v4; jaw: prismatic (drive_mm_per_rad=56.6919); pads: pads (groove_mm=3.83, lip_mm=0, pad_angle_deg=6.858, pad_tpu_mm=0.062, reach_mm=9.341, width_mm=11.521)",
+    "gained": [
+     "flat_screwdriver",
+     "mustard_bottle",
+     "strawberry",
+     "sugar_box"
+    ],
+    "lost": [
+     "potted_meat_can"
+    ],
+    "why_lost": "lost potted_meat_can (potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=1.02 s (squeezing or pressing down))",
+    "iteration": 8,
+    "edit": "pads (groove_mm=3.83, lip_mm=0, pad_angle_deg=6.858, pad_tpu_mm=0.062, reach_mm=9.341, width_mm=11.521)"
+   },
+   {
+    "id": "b08t1",
+    "body": "arm_servos: servos_7v4; jaw: prismatic (drive_mm_per_rad=56.6919); pads: pads (groove_mm=4.664, lip_mm=0.522, pad_angle_deg=20.652, pad_tpu_mm=0.453, reach_mm=6.812, width_mm=16.265)",
+    "gained": [
+     "flat_screwdriver",
+     "mustard_bottle",
+     "strawberry",
+     "sugar_box"
+    ],
+    "lost": [
+     "potted_meat_can"
+    ],
+    "why_lost": "lost potted_meat_can (potted_meat_can: fixed_jaw_on_top_face, verdict stuck; closed to 1.18 rad (fingertips 74 mm apart), moving fingertip +2 mm vs the fixed one; fixed jaw: 13 N on the pad at +39 mm fr)",
+    "iteration": 8,
+    "edit": "pads (groove_mm=4.664, lip_mm=0.522, pad_angle_deg=20.652, pad_tpu_mm=0.453, reach_mm=6.812, width_mm=16.265)"
+   },
+   {
+    "id": "b08t2",
+    "body": "arm_servos: servos_7v4; jaw: prismatic (drive_mm_per_rad=56.6919); pads: pads (groove_mm=4.101, lip_mm=0.057, pad_angle_deg=2.429, pad_tpu_mm=0, reach_mm=11.091, width_mm=8.442)",
+    "gained": [
+     "mustard_bottle",
+     "strawberry"
+    ],
+    "lost": [
+     "potted_meat_can"
+    ],
+    "why_lost": "lost potted_meat_can (potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.72 s (squeezing or pressing down); potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.92 s (squeezing or pressing down))",
+    "iteration": 8,
+    "edit": "pads (groove_mm=4.101, lip_mm=0.057, pad_angle_deg=2.429, pad_tpu_mm=0, reach_mm=11.091, width_mm=8.442)"
+   },
+   {
+    "id": "b08t3",
+    "body": "arm_servos: servos_7v4; jaw: prismatic (drive_mm_per_rad=56.6919); pads: pads (groove_mm=3.773, lip_mm=0.855, pad_angle_deg=9.332, pad_tpu_mm=0, reach_mm=12.168, width_mm=9.876)",
+    "gained": [
+     "flat_screwdriver",
+     "mustard_bottle",
+     "strawberry",
+     "sugar_box"
+    ],
+    "lost": [
+     "apple",
+     "potted_meat_can"
+    ],
+    "why_lost": "lost apple, potted_meat_can (potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.72 s (squeezing or pressing down); potted_meat_can: force_limit, verdict stuck; a contact exceeded the force limit at t=0.90 s (squeezing or pressing down); apple: fixed_jaw_missed, verdict stuck; closed to 1.46 rad (fingertips 91 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no c)",
+    "iteration": 8,
+    "edit": "pads (groove_mm=3.773, lip_mm=0.855, pad_angle_deg=9.332, pad_tpu_mm=0, reach_mm=12.168, width_mm=9.876)"
+   }
+  ],
+  "wall_s": 453.4,
+  "llm": {
+   "calls": 14,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "gripper_random_s2",
+  "world": "gripper",
+  "arm": "random",
+  "seed": 2,
+  "final_body": {
+   "id": "b01t2",
+   "parent": "b011",
+   "parts": {
+    "jaw": {
+     "type": "parallelogram",
+     "params": {
+      "link_mm": 89.136
+     }
+    },
+    "pads": {
+     "type": "none",
+     "params": {}
+    },
+    "arm_servos": {
+     "type": "servos_7v4",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 13,
+    "tasks_passed": 27,
+    "sim_s": 866.2,
+    "wall_s": 21.6
+   },
+   {
+    "iteration": 1,
+    "body": "stock",
+    "held_groups": 13,
+    "tasks_passed": 27,
+    "sim_s": 4998.1,
+    "wall_s": 105.2
+   },
+   {
+    "iteration": 2,
+    "body": "b01t2",
+    "held_groups": 16,
+    "tasks_passed": 32,
+    "sim_s": 9004.8,
+    "wall_s": 170.8
+   },
+   {
+    "iteration": 3,
+    "body": "b01t2",
+    "held_groups": 16,
+    "tasks_passed": 32,
+    "sim_s": 9004.8,
+    "wall_s": 170.8
+   },
+   {
+    "iteration": 4,
+    "body": "b01t2",
+    "held_groups": 16,
+    "tasks_passed": 32,
+    "sim_s": 12599.0,
+    "wall_s": 243.8
+   },
+   {
+    "iteration": 5,
+    "body": "b01t2",
+    "held_groups": 16,
+    "tasks_passed": 32,
+    "sim_s": 18760.7,
+    "wall_s": 327.0
+   },
+   {
+    "iteration": 6,
+    "body": "b01t2",
+    "held_groups": 16,
+    "tasks_passed": 32,
+    "sim_s": 19948.7,
+    "wall_s": 346.7
+   },
+   {
+    "iteration": 7,
+    "body": "b01t2",
+    "held_groups": 16,
+    "tasks_passed": 32,
+    "sim_s": 21616.4,
+    "wall_s": 371.1
+   },
+   {
+    "iteration": 8,
+    "body": "b01t2",
+    "held_groups": 16,
+    "tasks_passed": 32,
+    "sim_s": 25638.6,
+    "wall_s": 438.9
+   },
+   {
+    "iteration": 9,
+    "body": "b01t2",
+    "held_groups": 16,
+    "tasks_passed": 32,
+    "sim_s": 27135.9,
+    "wall_s": 462.7
+   },
+   {
+    "iteration": 10,
+    "body": "b01t2",
+    "held_groups": 16,
+    "tasks_passed": 32,
+    "sim_s": 27920.4,
+    "wall_s": 474.6
+   },
+   {
+    "iteration": 11,
+    "body": "b01t2",
+    "held_groups": 16,
+    "tasks_passed": 32,
+    "sim_s": 34832.9,
+    "wall_s": 565.9
+   },
+   {
+    "iteration": 12,
+    "body": "b01t2",
+    "held_groups": 16,
+    "tasks_passed": 32,
+    "sim_s": 40361.7,
+    "wall_s": 639.4
+   },
+   {
+    "iteration": 13,
+    "body": "b01t2",
+    "held_groups": 16,
+    "tasks_passed": 32,
+    "sim_s": 47843.2,
+    "wall_s": 744.1
+   },
+   {
+    "iteration": 14,
+    "body": "b01t2",
+    "held_groups": 16,
+    "tasks_passed": 32,
+    "sim_s": 52194.4,
+    "wall_s": 813.6
+   }
+  ],
+  "train_groups": 21,
+  "final_held_train": [
+   "apple",
+   "banana",
+   "cup",
+   "dice",
+   "foam_brick",
+   "gelatin_box",
+   "golf_ball",
+   "large_marker",
+   "lemon",
+   "plum",
+   "potted_meat_can",
+   "racquetball",
+   "strawberry",
+   "tennis_ball",
+   "tomato_soup_can",
+   "wood_block_cube"
+  ],
+  "test": {
+   "final_held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "potted_meat_can",
+    "racquetball",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "stock_held": [
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "racquetball",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "final_tasks": 32,
+   "stock_tasks": 29,
+   "n": 42
+  },
+  "spent": {
+   "usd": 3.6,
+   "fab_minutes": 93.5,
+   "lead_days": 3.0,
+   "owned": {
+    "mr63_bearing": 4.0,
+    "sts3215_7v4": 6.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 53677.4,
+  "attempts": 10982,
+  "proposals": {
+   "total": 77,
+   "tried": 60,
+   "refused": 17,
+   "ideas": 0,
+   "kept": 1,
+   "rejected_regression": 59,
+   "moves": {
+    "params": 21,
+    "swap": 21,
+    "idea": 0,
+    "tune": 35,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [
+   {
+    "id": "b00t0",
+    "body": "arm_servos: servos_7v4; jaw: prismatic (drive_mm_per_rad=45.895); pads: none",
+    "gained": [
+     "apple",
+     "gelatin_box",
+     "potted_meat_can",
+     "pudding_box",
+     "sugar_box",
+     "tuna_fish_can"
+    ],
+    "lost": [
+     "cup",
+     "racquetball",
+     "strawberry",
+     "tomato_soup_can"
+    ],
+    "why_lost": "lost cup, racquetball, strawberry, tomato_soup_can (strawberry: squeezed_down_out, verdict wrong_behavior; closed to 0.16 rad (fingertips 23 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 40 N on the stock j; strawberry: squeezed_down_out, verdict wrong_behavior; closed to 0.17 rad (fingertips 24 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 43 N on the stock j; tomato_soup_can: slipped_under_load, verdict rule_violation; closed to 1.07 rad (fingertips 65 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 38 N on the stock j; tomato_soup_can: slipped_under_load, verdict rule_violation; closed to 1.07)",
+    "iteration": 0,
+    "edit": "jaw (drive_mm_per_rad=45.895)"
+   },
+   {
+    "id": "b011",
+    "body": "arm_servos: servos_7v4; jaw: parallelogram (link_mm=81.0226); pads: none",
+    "gained": [
+     "apple",
+     "potted_meat_can"
+    ],
+    "lost": [
+     "strawberry"
+    ],
+    "why_lost": "lost strawberry (strawberry: slipped_under_load, verdict wrong_behavior; closed to 0.24 rad (fingertips 35 mm apart), moving fingertip +3 mm vs the fixed one; fixed jaw: 19 N on the stock j)",
+    "iteration": 1,
+    "edit": "jaw -> parallelogram (link_mm=81.0226)"
+   },
+   {
+    "id": "b01t0",
+    "body": "arm_servos: servos_7v4; jaw: parallelogram (link_mm=83.001); pads: none",
+    "gained": [
+     "apple",
+     "potted_meat_can"
+    ],
+    "lost": [
+     "strawberry"
+    ],
+    "why_lost": "lost strawberry (strawberry: slipped_under_load, verdict wrong_behavior; closed to 0.25 rad (fingertips 36 mm apart), moving fingertip +3 mm vs the fixed one; fixed jaw: 19 N on the stock j)",
+    "iteration": 1,
+    "edit": "jaw (link_mm=83.001)"
+   }
+  ],
+  "wall_s": 841.3,
+  "llm": {
+   "calls": 14,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ }
+]

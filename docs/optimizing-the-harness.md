@@ -133,8 +133,11 @@ three System 2 seeds, 30 random-arm seeds and the stock body:
   (`gripper_s2_s0`) reached 13/21 in 10.
 - **On the corrected physics** (commit `61129fd`), all three System 2 seeds held 21/21 train groups.
   They took 4, 2 and 11 iterations and 4, 2 and 11 calls, and reached 19, 20 and 21 of 21 on test.
-  The stock body held 13–15 on test. The random arm, given the same screen and trials, reached 17
-  train and 15 test.
+  The stock body held 13–15 on test. The random arm, given the same screen and trials, ran three seeds
+  of 14 iterations: 17, 20 and 16 train, and 15, 20 and 15 test. Its 20 came from a seed that
+  happened onto the slide. The gripper's catalogue is small, so blind search can find the redesign.
+  What reasoning bought was reaching all 21 every time, in 2–11 iterations, and about 3 more test
+  groups on average.
   - Every seed arrived at the same redesign, a slide with flat TPU pads.
   - In seed 0, System 2 built from a tuned frontier body. It also read the tuning trials as a
     sensitivity map ("potted meat held at reach ≤ 5 mm, lost at ≥ 8; the mustard bottle needed ≥ 8")
