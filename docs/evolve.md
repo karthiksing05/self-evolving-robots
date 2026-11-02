@@ -162,6 +162,19 @@ world's own model:
 
 That module is not a judge component, so a change to a picture never changes the ruler.
 
+`scripts/film_bodies.py` films each kept change (D-050): the body before it failing and the body after
+it passing, side by side, on up to three of the groups the change gained (distinct failure mechanisms
+first). Each film replays one train task with the controls the run recorded, so nothing is searched
+again. `sea/worlds/film.py` holds one filmer per world:
+- **Gripper:** the MuJoCo replay itself.
+- **Talking robot:** the CAD at the recorded posture, the formants the simulator computes, and the sound
+  through the simulator's transfer function.
+- **Mobile explorer:** an animation of the simulator's verdict over terrain built from the route.
+
+A run is filmed only if the harness components its world's replay reads are unchanged since it was
+recorded. Replays run under the run's seed, and for `{}` they reproduce System 1's fixed retry. A film
+whose replay disagrees with the run's record is not written.
+
 ## Adding a world
 
 1. Write `src/sea/worlds/<name>.py` with a class satisfying `World`, and register it in

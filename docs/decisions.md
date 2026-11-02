@@ -1235,3 +1235,54 @@ Tests: `tests/test_cad.py`. Every part is a closed shape in a slot of the body, 
 slot's CAD. The slide's finger shifts along the closing axis without turning. Renders share one camera.
 The script records each kept change with its reason.
 
+## D-050 Films of each kept change, replayed from the run's records (report)
+A picture shows what a body is; it does not show the body failing and then working. For each change a
+run kept, `scripts/film_bodies.py` films the previous body failing and the new body passing, side by
+side. It films up to three of the groups the change gained, distinct failure mechanisms first.
+
+Nothing is searched again. Each side replays one train task with the controls the run recorded:
+- before: System 1's best failing controls, from `failing` in the iteration record;
+- after: the controls the kept trial passed with.
+
+A replay must also reproduce everything else the verdict was judged on, which the controls alone do not
+carry:
+- **The run's seed.** The gripper's domain-randomization draw depends on it. Replayed under seed 0, a
+  seed-2 run's grooved slide slips on the screwdriver it held.
+- **System 1's fixed retry.** System 1 records `{}` both for its first attempt and for the retry that
+  re-localizes the object by 1 mm. So for `{}` the film runs both and keeps the one System 1 kept: the
+  retry if it passed or stopped structurally, otherwise the one with the better objective.
+
+Each world has one filmer in `sea/worlds/film.py`:
+- **Gripper:** the simulator itself. The pick is replayed in MuJoCo with a camera following the object.
+  The verdict shown is the judge's on that replay, beside the run's diagnosis of the failure.
+- **Talking robot:** the CAD (D-049) at the recorded posture, the formants the simulator computes for
+  it, and for a vowel the sound. The sound is a pulse train at about 120 Hz, shaped by the simulator's
+  own transfer function, the glottal source slope and the lips' radiation. A stop is silent. With
+  sound, the two sides play in turn so each can be heard.
+- **Mobile explorer:** an animation of the simulator's verdict, not physics. The world is quasi-static,
+  so the CAD is posed over terrain built from the route's features. A small solver rests the body with
+  its centre of mass lowest wherever its wheels or tracks touch. The robot stops at the feature where
+  the replayed attempt failed, at the route's nominal dimensions, and the frame says why.
+
+A replay is only honest if what it reads has not changed since the run. `film.READS` names the harness
+components each world's replay depends on, and a run recorded when any of them differed is skipped. For
+example, the gripper runs before D-048's friction change are not filmed. A run with no harness.json is
+skipped too, because what it was judged by is unknown. The frozen mobile and phonology campaign (c1)
+differs from today only in gripper components, so it is filmed.
+
+The script also checks each film against the record: a film whose replay disagrees with the run (a
+"before" that passes, or an "after" whose verdict differs) is not written. Before the seed and the retry
+were replayed, this check caught 2 of 20 gripper films. Now every film agrees: 44 films across 10 runs.
+
+The module is harness tooling (`harness.TOOLING`), like the CAD.
+
+Tests: `tests/test_film.py`.
+- The stock hinge on the tuna can, with the recorded controls, stalls as recorded.
+- A seed-2 success replays under seed 2 and not under seed 0.
+- A `{}` success that came from the retry replays as held.
+- The stock tract's /ɔ/ posture misses as recorded (F1 +24%), and the evolved body's passes.
+- The mobile film stops at the porch step for wheels and reaches the end with tracks.
+- The voice's energy sits at the tract's resonance.
+- Silent films play together, and sounding ones in turn.
+- The script films a kept change from a run record, and skips a run with no harness.json.
+

@@ -1,0 +1,66 @@
+{
+ "run": "phonology_s2_s1",
+ "world": "phonology",
+ "films": [
+  {
+   "frame": 1,
+   "id": "b00m",
+   "group": "ao",
+   "task": "ao_train0",
+   "file": "01_b00m_ao.mp4",
+   "poster": "01_b00m_ao.jpg",
+   "seconds": 5.6,
+   "sound": true,
+   "before": {
+    "ok": false,
+    "verdict": "F 688/1067 Hz vs target 570/840 (F1 +21%, F2 +27%)",
+    "recorded": "f2_floor_too_high"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "F 580/854 Hz vs target 570/840",
+    "recorded": true
+   }
+  },
+  {
+   "frame": 1,
+   "id": "b00m",
+   "group": "er",
+   "task": "er_train0",
+   "file": "01_b00m_er.mp4",
+   "poster": "01_b00m_er.jpg",
+   "seconds": 5.6,
+   "sound": true,
+   "before": {
+    "ok": false,
+    "verdict": "F 686/1484/2769 Hz vs target 490/1350/1690 (F1 +40%, F3 +64%)",
+    "recorded": "f3_floor_too_high"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "F 500/1307/1696 Hz vs target 490/1350/1690",
+    "recorded": true
+   }
+  },
+  {
+   "frame": 1,
+   "id": "b00m",
+   "group": "k",
+   "task": "k_train0",
+   "file": "01_b00m_k.mp4",
+   "poster": "01_b00m_k.jpg",
+   "seconds": 5.6,
+   "sound": true,
+   "before": {
+    "ok": false,
+    "verdict": "narrowest 0.20 cm2 at 3.7 cm behind the teeth, airway elsewhere 1.20 cm2",
+    "recorded": "no_closure_at_velar"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "narrowest 0.00 cm2 at 8.2 cm behind the teeth, airway elsewhere 0.72 cm2",
+    "recorded": true
+   }
+  }
+ ]
+}

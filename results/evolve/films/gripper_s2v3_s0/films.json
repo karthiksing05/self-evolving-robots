@@ -1,0 +1,86 @@
+{
+ "run": "gripper_s2v3_s0",
+ "world": "gripper",
+ "films": [
+  {
+   "frame": 1,
+   "id": "b021",
+   "group": "apple",
+   "task": "rva000_apple",
+   "file": "01_b021_apple.mp4",
+   "poster": "01_b021_apple.jpg",
+   "seconds": 15.5,
+   "sound": false,
+   "before": {
+    "ok": false,
+    "verdict": "squeezed down out (wrong behavior (slip))",
+    "recorded": "squeezed_down_out"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "recorded": true
+   }
+  },
+  {
+   "frame": 1,
+   "id": "b021",
+   "group": "mustard_bottle",
+   "task": "reg_mustard_bottle",
+   "file": "01_b021_mustard_bottle.mp4",
+   "poster": "01_b021_mustard_bottle.jpg",
+   "seconds": 14.9,
+   "sound": false,
+   "before": {
+    "ok": false,
+    "verdict": "moving jaw on top face (stuck (slip))",
+    "recorded": "moving_jaw_on_top_face"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "recorded": true
+   }
+  },
+  {
+   "frame": 1,
+   "id": "b021",
+   "group": "gelatin_box",
+   "task": "reg_gelatin_box",
+   "file": "01_b021_gelatin_box.mp4",
+   "poster": "01_b021_gelatin_box.jpg",
+   "seconds": 15.2,
+   "sound": false,
+   "before": {
+    "ok": false,
+    "verdict": "squeezed down out (stuck (slip))",
+    "recorded": "squeezed_down_out"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "recorded": true
+   }
+  },
+  {
+   "frame": 2,
+   "id": "b031",
+   "group": "sugar_box",
+   "task": "reg_sugar_box",
+   "file": "02_b031_sugar_box.mp4",
+   "poster": "02_b031_sugar_box.jpg",
+   "seconds": 15.0,
+   "sound": false,
+   "before": {
+    "ok": false,
+    "verdict": "slipped under load (rule violation)",
+    "recorded": "slipped_under_load"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "recorded": true
+   }
+  }
+ ]
+}

@@ -252,7 +252,7 @@ def phonology(body: Body, ctl: dict[str, float] | None = None) -> CadModel:
         span = math.sqrt(1.0 / k)
         d = np.linspace(place - span, place + span, 41)
         rad = np.minimum(P.BORE, r0 + k * (P.BORE - r0) * (d - place) ** 2)
-        top = np.minimum(R - 0.01, 10 * (-P.BORE + 2 * (P.BORE - rad)))
+        top = np.clip(10 * (-P.BORE + 2 * (P.BORE - rad)), -R + 0.5, R - 0.01)  # at rest a pad still touches the bore
         pts = [(-10 * a, z) for a, z in zip(d, top, strict=True)] + [(-10 * d[-1], -R - 1), (-10 * d[0], -R - 1)]
         prof = cq.Workplane("XZ").polyline(pts).close().extrude(2 * half_w).translate((0, half_w, 0)).val()
         return prof.intersect(cyl(R, L + 2, (-L / 2, 0, 0), (1, 0, 0))).cut(cut)
