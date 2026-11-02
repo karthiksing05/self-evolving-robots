@@ -59,8 +59,8 @@ def to_design(body: Body) -> Design:
     kw: dict[str, Any] = {"jaw": jaw.type}
     if jaw.type == "parallelogram":
         kw["link_mm"] = jaw.params["link_mm"]
-    if jaw.type == "prismatic":
-        kw["drive_mm_per_rad"] = jaw.params["drive_mm_per_rad"]
+    if jaw.type == "prismatic":  # a module-1 pinion: pitch radius teeth/2 mm (sim/jaws.py builds it, D-058)
+        kw["drive_mm_per_rad"] = round(jaw.params["pinion_teeth"]) / 2
     if pads.type == "pads":
         kw.update({k: float(v) for k, v in pads.params.items()})
     volts = {j: (12.0 if servos.type == "servos_12v" and j in LIFT_JOINTS else 7.4) for j in ARM_JOINTS}
@@ -233,10 +233,13 @@ class GripperWorld:
                                               "circular path; longer opens wider per radian and squeezes less")},
                      provides="a finger face that keeps its orientation at every opening"),
             PartType(name="prismatic", slot="jaw",
-                     doc="a printed rack and pinion on two steel rods slides the finger straight along the closing axis",
-                     params={"drive_mm_per_rad": Param(lo=20, hi=60, unit="mm/rad", doc="finger travel per servo "
-                                                       "radian (pinion pitch radius): the opening grows with it, the "
-                                                       "squeeze falls with it (servo torque / radius)")},
+                     doc="a printed module-1 pinion on the servo horn drives a rack on a carriage that rides two "
+                         "3 x 100 mm steel rods; the finger slides straight along the closing axis",
+                     params={"pinion_teeth": Param(lo=17, hi=60, unit="teeth", doc="teeth on the pinion (whole teeth): "
+                                                   "its pitch radius is teeth/2 mm, so the finger travels teeth/2 mm "
+                                                   "per servo radian; the opening grows with it, the squeeze falls "
+                                                   "with it (servo torque / radius), and the pinion is teeth + 2 mm "
+                                                   "across")},
                      provides="a finger that neither turns nor rises as it opens"),
             PartType(name="none", slot="pads", stock=True, doc="the bare stock jaw faces (PLA)"),
             PartType(name="pads", slot="pads", doc="printed pads over the bottom of each jaw face (design/fingers.py)",
@@ -259,7 +262,7 @@ class GripperWorld:
             out += [BomLine(item="print:PLA", qty=8 + 0.12 * jaw.params["link_mm"], slot="jaw", note="links, coupler"),
                     BomLine(item="m3_screw", qty=4, slot="jaw"), BomLine(item="mr63_bearing", qty=4, slot="jaw")]
         if jaw.type == "prismatic":
-            out += [BomLine(item="print:PLA", qty=18 + 0.35 * jaw.params["drive_mm_per_rad"], slot="jaw",
+            out += [BomLine(item="print:PLA", qty=18 + 0.175 * round(jaw.params["pinion_teeth"]), slot="jaw",
                             note="carriage, rack, pinion, rod clamps"),
                     BomLine(item="steel_rod_3x100", qty=2, slot="jaw"), BomLine(item="lm3uu_bearing", qty=2, slot="jaw"),
                     BomLine(item="m3_screw", qty=6, slot="jaw")]
@@ -294,13 +297,16 @@ class GripperWorld:
         }
 
     def check(self, body: Body) -> list[str]:
+        """What stops this body being built: the build rules (design/build.py), then the mechanism laws its jaw
+        breaks on the real part meshes (mechanism/gripper.py, D-059)."""
         from sea.design.build import build
+        from sea.mechanism.gripper import laws
 
         try:
             built = build(to_design(body), _limits())
         except (ValueError, ZeroDivisionError) as exc:
             return [f"cannot build: {exc}"]
-        return list(built.errors)
+        return list(built.errors) + laws(body)
 
     # facts and physics
     def brief(self, body: Body, tasks: Sequence[Task]) -> str:
@@ -320,7 +326,8 @@ class GripperWorld:
                         f"moving fingertip {rise:+.0f} mm vs the fixed one; squeeze {F.squeeze_n(f, q, GRIP_TORQUE_NM):.0f} N")
         jaw = {"revolute": "hinged moving jaw (the stock part)",
                "parallelogram": f"parallelogram linkage, link {f.link_mm:g} mm",
-               "prismatic": f"rack-and-pinion slide, {f.drive_mm_per_rad:g} mm per servo radian"}[f.jaw]
+               "prismatic": f"rack-and-pinion slide, {2 * f.drive_mm_per_rad:g}-tooth pinion, "
+                            f"{f.drive_mm_per_rad:g} mm per servo radian"}[f.jaw]
         widest = F.fingertips(f, hi)[0] * 1000
         pads = ("bare stock faces, PLA friction 0.45" if not F.has_pads(f) else
                 f"pads {F.thickness(f) * 1000:.0f} mm thick per face, friction {0.9 if f.pad_tpu_mm > 0 else 0.45}, "

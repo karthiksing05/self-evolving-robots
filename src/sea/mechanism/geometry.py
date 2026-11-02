@@ -80,24 +80,21 @@ def winding(mesh: trimesh.Trimesh, pts: np.ndarray, chunk: int = 8) -> np.ndarra
 
 
 def _inside(a: Solid, pa: np.ndarray, b: Solid, pb: np.ndarray, n: int) -> np.ndarray:
-    """Up to ``n`` of a's vertices (world frame) that lie inside b."""
+    """All of a's vertices (world frame) if a lies sealed inside b, else none.  Called only when the
+    surfaces do not cross, so a is wholly inside b or wholly outside it: ``n`` of its vertices decide."""
     va = np.asarray(a.mesh.vertices, dtype=float)
-    if len(va) > n:
-        va = va[np.linspace(0, len(va) - 1, n).astype(int)]
     world = va @ pa[:3, :3].T + pa[:3, 3]
     local = (world - pb[:3, 3]) @ pb[:3, :3]
     lo, hi = b.mesh.bounds
-    near = np.all((local >= lo) & (local <= hi), axis=1)
-    if not near.any():
+    if not np.all((local >= lo) & (local <= hi)):  # some vertex outside b's box: a is not inside b
         return np.zeros((0, 3))
-    hit = np.zeros(len(local), dtype=bool)
-    hit[near] = winding(b.mesh, local[near]) > 0.5
-    return world[hit]
+    pick = np.linspace(0, len(local) - 1, min(n, len(local))).astype(int)
+    return world if np.median(winding(b.mesh, local[pick])) > 0.5 else np.zeros((0, 3))
 
 
-def overlap(a: Solid, pa: np.ndarray, b: Solid, pb: np.ndarray, samples: int = 400) -> np.ndarray:
+def overlap(a: Solid, pa: np.ndarray, b: Solid, pb: np.ndarray, samples: int = 9) -> np.ndarray:
     """Points marking where two parts occupy the same space: their surface crossings, or, if a part is
-    sealed inside the other, its vertices that lie within."""
+    sealed inside the other, all its vertices."""
     pts = crossings(a, pa, b, pb)
     if len(pts):
         return pts

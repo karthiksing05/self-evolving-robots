@@ -58,14 +58,16 @@ COMPONENTS: dict[str, tuple[str, tuple[str, ...]]] = {
     "world_gripper": ("judge", ("src/sea/worlds/gripper.py",)),
     "world_mobile": ("judge", ("src/sea/worlds/mobile.py",)),
     "world_phonology": ("judge", ("src/sea/worlds/phonology.py",)),
+    # the mechanism laws a body must keep before any trial (D-059): geometry on the real part meshes
+    "mechanism": ("judge", ("src/sea/mechanism/geometry.py", "src/sea/mechanism/gripper.py")),
 }
 
 # Modules that read runs but never shape one; every other module under src/sea belongs to a component.
 # The CAD modules draw a run's bodies for people (D-049): a picture is not part of the ruler.
 TOOLING = ("src/sea/cli.py", "src/sea/harness.py", "src/sea/report.py", "src/sea/design/cad.py",
            "src/sea/worlds/cad.py", "src/sea/worlds/film.py",
-           # the mechanism verifier measures and decides nothing yet (D-051); it joins the judge when its laws do
-           "src/sea/mechanism/geometry.py", "src/sea/mechanism/audit.py")
+           # contact penetration over a replay: measured for the audit (D-051), it decides nothing yet
+           "src/sea/mechanism/audit.py")
 
 
 def _hash_files(paths: tuple[str, ...]) -> str:

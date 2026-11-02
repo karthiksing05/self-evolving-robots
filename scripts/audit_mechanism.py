@@ -25,133 +25,15 @@ import json
 import sys
 from pathlib import Path
 
-import numpy as np
 from render_bodies import frames
 
-HAND = ("gripper", "moving_jaw_so101_v1", "jaw_coupler", "jaw_follower", "jaw_carriage")
-OBSTACLES = ("wrist",)  # what the jaw mechanism must clear beyond the gripper (a pinion can reach it, D-058)
+from sea.mechanism.gripper import HAND, SAMPLES
+from sea.mechanism.gripper import geometry as gripper_geometry
+
 ROBOT = {"base", "shoulder", "upper_arm", "lower_arm", "wrist", *HAND}
-SAMPLES = 9  # jaw positions, ends included
-ROLLS = 13  # wrist roll positions, ends included
 # Datasheet ratings per H-bridge channel (A, continuous): Toshiba TB6612FNG 1.2 A (3.2 A peak); ST L298 2 A.
 CHANNEL_A = {"driver_tb6612": 1.2, "driver_l298n": 2.0}
 CELL_V = {"nimh_pack": 1.2, "liion_pack": 3.7}  # nominal volts per cell: NiMH AA, 18650 Li-ion
-
-
-# ---------------------------------------------------------------- gripper geometry
-def _hand(model):
-    import mujoco
-    import trimesh
-
-    from sea.mechanism.geometry import Solid
-
-    out = []
-    for i in range(model.ngeom):
-        body = model.body(model.geom_bodyid[i]).name
-        if model.geom_group[i] != 2 or body not in HAND + OBSTACLES:
-            continue
-        if model.geom_type[i] == mujoco.mjtGeom.mjGEOM_MESH:
-            k = model.geom_dataid[i]
-            v0, nv, f0, nf = model.mesh_vertadr[k], model.mesh_vertnum[k], model.mesh_faceadr[k], model.mesh_facenum[k]
-            mesh = trimesh.Trimesh(model.mesh_vert[v0:v0 + nv].copy(), model.mesh_face[f0:f0 + nf].copy(), process=False)
-            name = model.mesh(k).name
-        elif model.geom_type[i] == mujoco.mjtGeom.mjGEOM_BOX:
-            mesh = trimesh.creation.box(extents=2 * model.geom_size[i])
-            name = model.geom(i).name
-        elif model.geom_type[i] == mujoco.mjtGeom.mjGEOM_CYLINDER:
-            mesh = trimesh.creation.cylinder(radius=model.geom_size[i][0], height=2 * model.geom_size[i][1], sections=48)
-            name = model.geom(i).name
-        else:
-            continue
-        rot = np.zeros(9)
-        mujoco.mju_quat2Mat(rot, model.geom_quat[i])
-        pose = np.eye(4)
-        pose[:3, :3], pose[:3, 3] = rot.reshape(3, 3), model.geom_pos[i]
-        mesh.apply_transform(pose)
-        mesh.apply_scale(1000.0)
-        out.append(Solid(name, body, mesh))
-    return out
-
-
-def gripper_geometry(body) -> dict:
-    import mujoco
-
-    from sea.contracts import ARM_JOINTS
-    from sea.control.executor import HOME_Q
-    from sea.mechanism.geometry import clearance, extent, from_axis, overlap
-    from sea.sim.build_model import build_model
-    from sea.worlds.gripper import to_design
-
-    sim = build_model(to_design(body))
-    m, d = sim.model, sim.data
-    solids = _hand(m)
-    jid = m.joint("gripper").id
-    lo, hi = m.jnt_range[jid]
-    bodies = {s.body for s in solids}
-    clashes: dict[str, dict] = {}
-    names = {m.body(i).name for i in range(m.nbody)}
-    support: dict[str, list[float]] = {b: [] for b in HAND[1:] if b in names}
-
-    def pose(b: str) -> np.ndarray:  # in the gripper's frame, mm
-        rot, at = d.xmat[m.body("gripper").id].reshape(3, 3), d.xpos[m.body("gripper").id]
-        t = np.eye(4)
-        t[:3, :3], t[:3, 3] = rot.T @ d.xmat[m.body(b).id].reshape(3, 3), 1000 * rot.T @ (d.xpos[m.body(b).id] - at)
-        return t
-
-    roll = ARM_JOINTS.index("wrist_roll")
-    wrists = []  # the wrist seen from the gripper over the wrist's roll range: a jaw part must clear it at every roll
-    for r in np.linspace(*m.jnt_range[m.joint("wrist_roll").id], ROLLS):
-        qa = HOME_Q.copy()
-        qa[roll] = r
-        sim.set_arm_q(qa)
-        wrists.append((round(float(r), 2), pose("wrist")))
-    for q in np.linspace(lo, hi, SAMPLES):
-        qa = HOME_Q.copy()
-        qa[-1] = q
-        sim.set_arm_q(qa)  # the jaw mechanism's linked joints follow (Sim.linked)
-        poses = {b: pose(b) for b in (bodies | set(support)) - set(OBSTACLES)}
-        rot = d.xmat[m.body("gripper").id].reshape(3, 3)
-        axis_o = rot.T @ (1000 * (d.xanchor[jid] - d.xpos[m.body("gripper").id]))
-        axis_u = rot.T @ d.xaxis[jid]
-        for i, a in enumerate(solids):
-            for b in solids[i + 1:]:
-                if a.body == b.body or {a.body, b.body} == {"wrist", "gripper"}:  # the wrist carries the gripper
-                    continue
-                if a.body in OBSTACLES or b.body in OBSTACLES:
-                    tries = [(rl, {**poses, "wrist": w}) for rl, w in wrists]
-                else:
-                    tries = [(None, poses)]
-                for rl, ps in tries:
-                    pts = overlap(a, ps[a.body], b, ps[b.body])
-                    if not len(pts):
-                        continue
-                    r = from_axis(pts, axis_o, axis_u)
-                    c = clashes.setdefault(f"{a.name} / {b.name}", {"bodies": [a.body, b.body], "at_q": [], "crossings": [],
-                                                                    "region_mm": [0.0, 0.0, 0.0], "from_axis_mm": [1e9, 0.0]})
-                    if rl is not None:
-                        c.setdefault("at_roll", []).append(rl)
-                    c["at_q"].append(round(float(q), 3))
-                    c["crossings"].append(int(len(pts)))
-                    c["region_mm"] = [max(x, y) for x, y in zip(c["region_mm"], extent(pts), strict=True)]
-                    c["from_axis_mm"] = [round(min(c["from_axis_mm"][0], float(r.min())), 1),
-                                         round(max(c["from_axis_mm"][1], float(r.max())), 1)]
-        for child in support:
-            parent = m.body(m.body_parentid[m.body(child).id]).name
-            mine = [s for s in solids if s.body == child]
-            theirs = [s for s in solids if s.body == parent]
-            gap = min((clearance(a, poses[child], b, poses[parent]) for a in mine for b in theirs), default=float("nan"))
-            support[child].append(round(float(gap), 1))
-    carried = {}
-    for child, gaps in support.items():
-        parent = m.body(m.body_parentid[m.body(child).id]).name
-        no_material = not any(s.body == child for s in solids)
-        own = m.jnt_type[m.body_jntadr[m.body(child).id]]
-        carried[child] = {"parent": parent, "joint": "slide" if own == mujoco.mjtJoint.mjJNT_SLIDE else "hinge",
-                          "material": not no_material,
-                          "worst_gap_mm": None if no_material else max(gaps), "gap_by_q_mm": None if no_material else gaps}
-    mass = {b: round(1000 * float(m.body_mass[m.body(b).id]), 1) for b in [*support, "gripper"]}
-    return {"jaw_range_servo_rad": [round(float(lo), 3), round(float(hi), 3)], "clashes": clashes, "carried": carried,
-            "sim_mass_g": mass}
 
 
 # ---------------------------------------------------------------- gripper replays

@@ -26,12 +26,12 @@ def test_tasks_and_protocol():
 
 def test_parts_map_to_the_design():
     cat = {p.name: p for p in W.catalogue()}
-    b = apply(W.stock(), [Edit(slot="jaw", type="prismatic", params={"drive_mm_per_rad": 50}),
+    b = apply(W.stock(), [Edit(slot="jaw", type="prismatic", params={"pinion_teeth": 40}),
                           Edit(slot="pads", type="pads", params={"pad_tpu_mm": 2, "pad_angle_deg": 0, "reach_mm": 5,
                                                                  "groove_mm": 0, "lip_mm": 0, "width_mm": 12}),
                           Edit(slot="arm_servos", type="servos_12v")], cat, "x")
     d = to_design(b)
-    assert d.fingers.jaw == "prismatic" and d.fingers.drive_mm_per_rad == 50 and d.fingers.pad_tpu_mm == 2
+    assert d.fingers.jaw == "prismatic" and d.fingers.drive_mm_per_rad == 20 and d.fingers.pad_tpu_mm == 2
     assert d.arm.servo_voltage["shoulder_lift"] == 12.0 and d.arm.servo_voltage["gripper"] == 7.4
     assert to_design(W.stock()).fingers == to_design(W.stock()).fingers.__class__()
     assert W.check(b) == []
@@ -41,10 +41,10 @@ def test_resources_ground_each_redesign():
     m, stock = W.manifest(), W.stock()
     r = check(stock, W.bom(stock), stock, W.bom(stock), m)
     assert r.ok and r.usd == 0 and r.fab_minutes == 0
-    slide = _body(jaw=Part(type="prismatic", params={"drive_mm_per_rad": 50}))
+    slide = _body(jaw=Part(type="prismatic", params={"pinion_teeth": 40}))
     r = check(slide, W.bom(slide), stock, W.bom(stock), m)
     assert r.ok and r.usd == pytest.approx(2 * 1.5 + 2 * 1.2) and r.lead_days == 3
-    assert r.fab_minutes == pytest.approx((18 + 0.35 * 50) * 5.0)
+    assert r.fab_minutes == pytest.approx((18 + 0.175 * 40) * 5.0)
     volts = _body(arm_servos=Part(type="servos_12v"))
     r = check(volts, W.bom(volts), stock, W.bom(stock), m)
     assert not r.ok and "$68.00" in r.errors[0]  # three 12 V servos and a supply cost more than the run has
@@ -53,7 +53,7 @@ def test_resources_ground_each_redesign():
 def test_brief_states_the_jaw_kinematics():
     hinge = W.brief(W.stock(), W.tasks())
     assert "hinged moving jaw" in hinge and "85 mm: servo" in hinge and "off parallel" in hinge
-    slide = W.brief(_body(jaw=Part(type="prismatic", params={"drive_mm_per_rad": 50})), W.tasks())
+    slide = W.brief(_body(jaw=Part(type="prismatic", params={"pinion_teeth": 40})), W.tasks())
     assert "moving face parallel to the fixed face" in slide and "+1 mm vs the fixed one" in slide
     assert "swap" not in hinge.lower()  # facts, not advice
 
@@ -92,7 +92,7 @@ def test_solve_reads_the_failure():
 def test_part_facts_show_each_joint_on_this_body():
     cat = {p.name: p for p in W.catalogue()}
     slide = W.part_facts(W.stock(), cat["prismatic"])
-    assert len(slide) == 2 and "fingertips up to 51 mm apart" in slide[0] and "85 mm out of reach" in slide[0]
-    assert "tip +1 mm" in slide[1]
+    assert len(slide) == 2 and "pinion_teeth=17" in slide[0] and "fingertips up to 31 mm apart" in slide[0]
+    assert "fingertips up to 68 mm apart" in slide[1] and "tip +1 mm" in slide[1] and "85 mm out of reach" in slide[1]
     links = W.part_facts(W.stock(), cat["parallelogram"])[1]
     assert "85 mm: face -0 deg, tip +33 mm" in links

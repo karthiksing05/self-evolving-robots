@@ -1579,3 +1579,33 @@ Three fixes failed on the way, each for a reason:
 - Every slide body System 2 kept (52–60 mm/rad) is a mechanism the simulator now draws as unbuildable. Its successes so far rest on parts that cannot be assembled.
 - Turning these audit findings into refusals before trial is the mechanism law of P2.
 - Making the catalogue mechanical (module, teeth and a stocked rod length, with the servo's full turn as an option only if its datasheet supports it) is P3.
+
+## D-059 The gripper's mechanism laws refuse a body before trial; the slide's part is its pinion's teeth (judge: world_gripper, mechanism)
+**Observed.** D-057 and D-058 build every jaw from its parts, and the audit shows what cannot be assembled. Every slide System 2 kept is one of these. But nothing refused them: `GripperWorld.check` ran only the build rules, so an unbuildable body was still trialled and could still be kept.
+
+**Change.**
+- **`sea.mechanism.gripper` holds the laws.** It is a new judge component, `mechanism`, together with `mechanism/geometry.py`. `check` returns the build rules' errors plus the laws' violations, and the violations reach System 2 through the existing "refused before trial" channel. The laws read the simulator's own build on the real meshes, at 9 jaw angles, and for the wrist at 13 roll angles.
+  - **Carried:** every moving body stays within 0.5 mm of the body that carries it (a pin's or a bushing's clearance).
+  - **No interference:** no two parts share material, except where the hinge body bears on the servo within 10 mm of the hinge axis (the stock's own rear-hub seat, D-056). A shared region thinner than 0.1 mm is two faces in contact, not interference.
+  - **Transmission:** a four-bar's links stay at least 30° from toggle.
+  - **How violations are reported:** each names the parts, the size of the shared region and the jaw and roll angles, merged per pair of named parts.
+- **The audit is faster.** The script's geometry moves into the module. When two surfaces do not cross, one part is either wholly inside the other or wholly outside, so 9 vertices decide containment instead of 400. That cut a law check from about 30 s to 4–9 s. Results are cached per body.
+- **The slide's catalogue parameter is mechanical.** `drive_mm_per_rad` (20–60 mm/rad) becomes `pinion_teeth`: 17–60 whole teeth on the module-1 pinion that `sim/jaws.py` builds, so the pitch radius is teeth/2 mm. Seventeen is the fewest teeth a 20° gear cuts without undercut.
+- **Not a law:** tooth bending. No measured allowable stress exists for printed PLA gear teeth. A Lewis check at the servo's stall torque gives about 35 MPa at the root of a 40-tooth, 6 mm-wide tooth, against printed PLA's 40–60 MPa tensile strength. Deferred with beam stress (plan, "Deferred").
+
+**Prediction** (from D-058's measured envelope, before the laws ran):
+- The stock and every four-bar (50–90 mm) pass.
+- Slides up to about 42 teeth (22 mm/rad) pass.
+- From about 44 teeth the pinion meets the rolled wrist.
+- b021's 56 mm/rad (112 teeth, outside the new range) breaks interference (clamp and carriage, bracket and pinion, pinion and wrist) and carried.
+
+**Measured.**
+- The stock and four-bars at 50, 89 and 90 mm: no violations.
+- Slides at 17 and 40 teeth: none.
+- 44 and 46 teeth: one, the wrist and the pinion share material when the wrist rolls past +2.38 rad.
+- 50 and 60 teeth: also the wrist's servo.
+- 112 teeth: the pinion with the wrist and the wrist servo; the clamp bracket with the pinion and its hub; the clamp with the carriage; and the carriage carried 0.9 mm from the gripper when closed.
+- The prediction held.
+- Tests: `test_mechanism.py`, with each refusal paired with a passing twin and a planted toggle for the transmission law, and `test_world_gripper.py`.
+
+**Consequence.** The gripper campaign's slide bodies cannot be proposed again as they were, and runs judged before this key cannot be pooled with runs after it (invariant 10). Re-running the gripper campaign under this ruler is the next step, after asking.

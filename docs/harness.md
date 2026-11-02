@@ -100,7 +100,8 @@ any of these files, run the listed test before anything else.
       model).
     - A part that cannot be modelled this way yet is not offered, or is listed in "Where the
       harness is still thin" until it is.
-    - Tests: `test_mechanism.py` (the audit of each jaw mechanism: carried, seats only).
+    - A part that breaks a mechanism law is refused before trial (`GripperWorld.check`, `mechanism/gripper.py`).
+    - Tests: `test_mechanism.py` (each jaw mechanism carried, seats only; each law's refusal and its passing twin).
 
 ## The run directory is the source of truth
 
@@ -150,7 +151,7 @@ These are known gaps. Each one makes a verdict less trustworthy in a specific wa
 | Toggle reaches about 2/3 of its throw | Toggles read `stuck` or `wrong_behavior` | decisions.md D-013 |
 | L1 fingers and L2 kinematics | Proposals are rejected until `design/arm.py` lands (M9) | decisions.md D-019 |
 | World model (3.6) | Not built (M10, optional) | — |
-| Mechanism audits do not refuse yet | A slide past about 22 mm/rad cannot be assembled (its pinion meets the wrist; past 35 mm/rad the rods run out, D-058), but it is still trialled; the laws become refusals in P2 | decisions.md D-058 |
+| Gripper laws are geometric only | Interference, carried and transmission angle refuse a body (D-059); tooth bending, pin shear, torque and power are not laws yet | decisions.md D-059 |
 | Long four-bar links outreach the finger | Above about 78 mm the coupler's pins hang below the stock fingertip and meet the table first; the finger's mount is not yet a part parameter | decisions.md D-057 |
 | Mobile and talking-robot bodies are not mechanisms yet | The mobile world is analytic with drawn tracks; the talking robot's articulators are free positions | plan P4, P5 |
 

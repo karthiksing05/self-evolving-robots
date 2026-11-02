@@ -10,7 +10,7 @@ import numpy as np
 import pytest
 import trimesh
 
-from sea.evolve.core import Edit, apply
+from sea.evolve.core import Body, Edit, Part, apply
 from sea.mechanism.audit import Penetration
 from sea.mechanism.geometry import Solid, clearance, crossings, extent, from_axis, grounded, overlap, winding
 from sea.worlds.gripper import GripperWorld
@@ -73,23 +73,28 @@ def test_penetration_keeps_the_deepest_per_kind_of_pair_each_step():
 
 
 def _jaw(world: GripperWorld, type_: str, **params: float):
-    return apply(world.stock(), [Edit(slot="jaw", type=type_, params=params)], {p.name: p for p in world.catalogue()}, "t")
+    """A jaw part as System 2 would fit it, or past the catalogue's range (built directly) for an old body."""
+    try:
+        return apply(world.stock(), [Edit(slot="jaw", type=type_, params=params)], {p.name: p for p in world.catalogue()},
+                     "t")
+    except ValueError:
+        return Body(parts={**world.stock().parts, "jaw": Part(type=type_, params=params)})
 
 
 def test_the_stock_jaw_rides_its_horn_and_a_slide_rides_its_rods():
-    """D-058: a 20 mm/rad slide is a pinion on the horn and a carriage on two rods, sharing material with
-    nothing but the servo's spline at any wrist roll.  b021's 56 mm/rad (gripper_s2v3_s0) cannot be built
-    on the catalogue's 100 mm rods: the carriage runs into the rods' clamp, the clamp's bracket has no way
-    past a pinion 112 mm across, and the pinion meets the wrist."""
+    """D-058: a 40-tooth slide (20 mm/rad) is a pinion on the horn and a carriage on two rods, sharing material
+    with nothing but the servo's spline at any wrist roll.  b021's 56 mm/rad (gripper_s2v3_s0, a 112-tooth
+    pinion) cannot be built on the catalogue's 100 mm rods: the carriage runs into the rods' clamp, the
+    clamp's bracket has no way past a pinion 112 mm across, and the pinion meets the wrist."""
     world = GripperWorld()
     stock = audit_mechanism.gripper_geometry(world.stock())["carried"]["moving_jaw_so101_v1"]
     assert stock["joint"] == "hinge" and stock["worst_gap_mm"] == 0.0
-    geo = audit_mechanism.gripper_geometry(_jaw(world, "prismatic", drive_mm_per_rad=20.0))
+    geo = audit_mechanism.gripper_geometry(_jaw(world, "prismatic", pinion_teeth=40))
     assert geo["carried"]["jaw_carriage"]["joint"] == "slide" and geo["carried"]["jaw_carriage"]["worst_gap_mm"] <= 0.1
     assert all(c["from_axis_mm"][1] <= 3.0 for c in geo["clashes"].values())
-    b021 = audit_mechanism.gripper_geometry(_jaw(world, "prismatic", drive_mm_per_rad=56.0))["clashes"]
+    b021 = audit_mechanism.gripper_geometry(_jaw(world, "prismatic", pinion_teeth=112))["clashes"]
     assert any(k.startswith("jaw_clamp / jaw_carriage") for k in b021) and "jaw_clamp_bracket / jaw_pinion" in b021
-    assert any(c["bodies"][0] == "wrist" and c.get("at_roll") for c in b021.values())
+    assert any("wrist" in c["bodies"] and c.get("at_roll") for c in b021.values())
 
 
 def test_the_four_bar_is_built_from_parts_that_carry_each_other():
@@ -153,3 +158,29 @@ def test_the_slide_follows_its_pinion_and_carries_the_finger_and_pads():
         c = m.body("jaw_carriage").id
         at = d.xmat[g].reshape(3, 3).T @ (d.xpos[c] + d.xmat[c].reshape(3, 3) @ tip - d.xpos[g])
         assert at == pytest.approx(F.moving_to_gripper(q, tip, spec), abs=1e-6)  # the facts' finger is the simulated one
+
+
+def test_the_mechanism_laws_refuse_what_cannot_be_assembled_and_pass_what_can():
+    """D-059: GripperWorld.check refuses a body whose jaw breaks a mechanism law, naming the parts and the
+    numbers; each refusal has a twin that passes."""
+    world = GripperWorld()
+    assert world.check(world.stock()) == []
+    assert world.check(_jaw(world, "parallelogram", link_mm=89.136)) == []
+    assert world.check(_jaw(world, "prismatic", pinion_teeth=40)) == []
+    wrist = world.check(_jaw(world, "prismatic", pinion_teeth=44))  # a pinion 46 mm across reaches the rolled wrist
+    assert len(wrist) == 1 and "the wrist and the pinion share material" in wrist[0] and "wrist rolled" in wrist[0]
+    b021 = "\n".join(world.check(_jaw(world, "prismatic", pinion_teeth=112)))
+    assert "the clamp and the carriage share material" in b021 and "the clamp bracket and the pinion" in b021
+    assert "mechanism law (carried): the carriage" in b021
+
+
+def test_a_four_bar_near_toggle_breaks_the_transmission_law(monkeypatch):
+    from sea.mechanism import gripper as G
+    from sea.sim import jaws
+
+    world = GripperWorld()
+    body = _jaw(world, "parallelogram", link_mm=70.0)
+    assert G.laws(body) == []
+    monkeypatch.setattr(jaws, "transmission_deg", lambda q: 20.0)
+    assert G.laws(body) == ["mechanism law (transmission): the four-bar's links come within 20 deg of toggle; they "
+                            "must stay 30 deg away"]
