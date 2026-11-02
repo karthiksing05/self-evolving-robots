@@ -1348,13 +1348,30 @@ These numbers are the baseline the later phases must remove:
 - the two jaws push in opposite directions, so a squeeze counts once per jaw;
 - a jaw meets the object in several convex pieces (CoACD, D-013), so it counts once per contact point.
 
-V-005 recorded the same inflation for wedged tools. While working on D-053, stiffer contacts (the physical change it records) turned stock grasps into `rule_violation`. One banana pick read 222 N of "force" while each single contact carried at most 54 N.
+V-005 recorded the same inflation for wedged tools. While working on D-054, stiffer contacts (the physical change it records) turned stock grasps into `rule_violation`. One banana pick read 222 N of "force" while each single contact carried at most 54 N.
 
 **Change.** Per robot body, the target force is the magnitude of the vector sum of that body's contact forces on the target. The largest such body is the force the robot applies. Contact forces are rotated from the contact frame to the world, with their sign set by which geom is the robot's.
 - For a single pushing tool, this equals the old sum when its contacts are aligned.
 - For a squeeze, it is the force one jaw applies.
 - The hard limit on every other contact (`total`) is unchanged.
 
-**Prediction.** Under the current physics no verdict moves: the planted faults, their twins, the golden verdicts and the grasp tests stay as they are. The measure only matters once contacts are stiff (D-053).
+**Prediction.** Under the current physics no verdict moves: the planted faults, their twins, the golden verdicts and the grasp tests stay as they are. The measure only matters once contacts are stiff (D-054).
 
 **Measured.** Under the current physics everything holds: the 10 planted faults keep their declared verdicts (the knob xfail as before) and the twins pass; the golden verdicts are unchanged; the grasp and reflex tests pass.
+
+## D-053 The class cap reads the squeeze the servo sustains, not an impact (skill; read by the judge)
+**Observed.** D-052 made the target force the per-body vector sum of contact forces, taken at every 2 ms physics step. A closing jaw meets the object with the momentum of the servo's rotor: armature 0.028 kg·m², the identified value in the SO-101 model. How hard that momentum lands depends on the compliance between rotor and object, ω·√(k·J). With the contacts made rigid (D-054), the only spring is the finger, and a stock pick read 129–277 N for one to five steps. The squeeze those picks then held was 25–50 N.
+
+The stiffness that decides the impact is mostly the gear train's, and the STS3215 has none published: its datasheet gives only a backlash of 0.5° or less, and no measured value was found. A verdict should not turn on a number nobody has measured.
+
+**Change.** The class cap reads the force held on the target for a whole control tick: the largest, over the run, of the smallest force within any window of 10 physics steps (20 ms, one 50 Hz servo command). A shorter pulse is an impact. The servo does not command it, and the episode keeps it separately as `peak_ctl_impact` for the mechanism audit's laws (P2). The hard limit on every other contact is unchanged. `no_actuation` now needs force held for a tick, so a graze is not actuation.
+
+**Prediction.** Under the committed physics (soft contacts), a contact absorbs an impact over about 20 ms, so the sustained force and the per-step peak differ by a few newtons. No verdict moves: the planted faults keep their declared verdicts, the golden verdicts and the B-battery are unchanged, and the grasp tests pass.
+
+**Measured.** Under the committed physics, the suite passes: 609 tests, including the 10 planted faults with their declared verdicts (the knob xfail as before), their twins, the golden verdicts and the grasp and reflex tests. No battery class moved beyond its interval.
+
+One verdict did move, against the prediction. The validation slider `val_p011 c1` went from `rule_violation` to `pass`, which moves the val sliders from 0.30 to 0.40:
+- its push peaked at 11.3 N, over the slider's 10 N cap, for less than a tick;
+- the force it held for a tick was 9.0 N.
+
+A soft contact's overshoot had decided that verdict, and an overshoot is not a push the robot commanded. The audit's impact law (P2) is where such a pulse will be judged, against the energy it carries rather than an unmeasured stiffness.

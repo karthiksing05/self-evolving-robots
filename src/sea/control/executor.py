@@ -9,6 +9,7 @@ workspace), runs the servo thermal model, and evaluates the control's success ch
 
 from __future__ import annotations
 
+from collections import deque
 from collections.abc import Generator, Iterator
 from dataclasses import dataclass, field
 
@@ -140,7 +141,12 @@ class Episode:
         self.t_offset = 0.0  # tool swaps advance the clock without physics
         self.q_cmd = sim.arm_q()
         self.last_force = 0.0
+        # The force on the target the class cap reads is the one held for a whole control tick (D-053).
+        # A shorter pulse is an impact: the rotor's momentum meeting the drivetrain's compliance, which the
+        # servo does not command and which the gear train's unpublished stiffness decides.
         self.peak_ctl_force = 0.0
+        self.peak_ctl_impact = 0.0  # the largest single-step force
+        self._ctl_window: deque[float] = deque(maxlen=TICK_STEPS)
         self.banned_seen = False
         self.contact_types: set[str] = set()
         self.jaw_touch: dict[tuple[str, str], float] = {}
@@ -261,7 +267,10 @@ class Episode:
             sim.step(1)
             f, fc = self._process_contacts()
             fmax = max(fmax, f)
-            self.peak_ctl_force = max(self.peak_ctl_force, fc)
+            self.peak_ctl_impact = max(self.peak_ctl_impact, fc)
+            self._ctl_window.append(fc)
+            if len(self._ctl_window) == TICK_STEPS:
+                self.peak_ctl_force = max(self.peak_ctl_force, min(self._ctl_window))
             if self.cfg.thermal is not None:
                 paused = self.cfg.thermal.step(np.abs(sim.data.actuator_force), 0.002) or paused  # type: ignore[attr-defined]
         unstable = sum(int(sim.data.warning[w].number) for w in bad) > getattr(self, "_bad0", 0)
@@ -371,7 +380,7 @@ class Episode:
 
     def _touching(self) -> bool:
         return any(k[0] == self.cid and abs(v - self.t) < TICK_DT + 1e-9 for k, v in self.jaw_touch.items()) or (
-            self.peak_ctl_force > 0 and self.last_ctl_contact())
+            self.peak_ctl_impact > 0 and self.last_ctl_contact())
 
     def last_ctl_contact(self) -> bool:
         d, sim = self.sim.data, self.sim
