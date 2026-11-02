@@ -148,7 +148,8 @@ def test_loop_ratchet_swap_and_ideas(tmp_path):
         ]),
         ProposalBatch(proposals=[
             _p("idea", idea=Idea(name="jet pack", description="fly to it", needs=["rail", "jet"])),
-            _p("swap", [Edit(slot="stick", type="telescopic", params={"length": 0.5})]),  # gains d0.45 with a bought rail
+            _p("swap", [Edit(slot="stick", type="telescopic", params={"length": 0.5})], gains=["d0.45", "d0.15"]),
+            _p("params", [Edit(slot="stick", params={"length": 0.1})]),  # the body rejected in iteration 1
         ]),
     ]
     llm = Scripted(batches)
@@ -163,6 +164,11 @@ def test_loop_ratchet_swap_and_ideas(tmp_path):
     assert results[0].startswith("rejected: lost d0.15") and results[1].startswith("KEPT")
     assert "cannot be bought" in results[2]
     assert recs[1]["trials"][1]["move"] == "swap" and recs[-1]["stop"] == "all groups held"
+    assert "already trialled" in recs[1]["trials"][2]["result"]
+    assert recs[1]["trials"][1]["prediction"]["hit"] == ["d0.45"] and recs[1]["trials"][1]["prediction"]["precision"] == 0.5
+    st = s["proposals"]
+    assert st["kept"] == 2 and st["refused"] == 2 and st["ideas"] == 1 and st["rejected_regression"] == 1
+    assert (tmp_path / "harness.json").exists()
     assert len(llm.prompts) == 2
     p2 = llm.prompts[1]
     for section in ("# Brief", "# Catalogue", "# Resources", "# Held task groups", "# Record of past proposals",
@@ -183,3 +189,43 @@ def test_prompt_and_random_arm(tmp_path):
     assert s["arm"] == "random" and len(s["curve"]) >= 2
     s1 = run(RunConfig(world="toy", arm="s1", iterations=3), tmp_path / "s1", world=Reach(), log=lambda m: None)
     assert s1["final_held_train"] == ["d0.15"] and len(s1["curve"]) == 1
+
+
+class Trade(Reach):
+    """A swap that gains two groups and breaks one; a parameter of the new part repairs it."""
+
+    def tasks(self) -> list[Task]:
+        return [Task(id=f"{g}_train", group=g, data={"g": g}) for g in ("a", "b", "c")]
+
+    def catalogue(self) -> list[PartType]:
+        return [PartType(name="old", slot="hand", stock=True, doc="the old hand"),
+                PartType(name="new", slot="hand", doc="a new hand",
+                         params={"care": Param(lo=0, hi=1, doc="keeps a working")})]
+
+    def stock(self) -> Body:
+        return Body(parts={"hand": Part(type="old")})
+
+    def solve(self, body: Body, task: Task, seed: int = 0) -> Outcome:
+        h = body.parts["hand"]
+        ok = (task.data["g"] == "a") if h.type == "old" else (task.data["g"] != "a" or h.params["care"] > 0.9)
+        return Outcome(task=task.id, success=ok, score=float(ok), mechanism="" if ok else "wrong_hand")
+
+    def bom(self, body: Body) -> list[BomLine]:
+        return []
+
+    def brief(self, body: Body, tasks: Sequence[Task]) -> str:
+        return body.describe()
+
+
+def test_frontier_lets_a_redesign_be_repaired(tmp_path):
+    batches = [ProposalBatch(proposals=[_p("swap", [Edit(slot="hand", type="new")])]),
+               ProposalBatch(proposals=[_p("params", [Edit(slot="hand", params={"care": 1.0})], base="b000"),
+                                        _p("params", [Edit(slot="hand", params={"care": 1.0})], base="nope")])]
+    llm = Scripted(batches)
+    s = run(RunConfig(world="trade", iterations=3), tmp_path, proposer=llm, world=Trade(), log=lambda m: None)
+    recs = [json.loads(x) for x in (tmp_path / "iterations.jsonl").read_text().splitlines()]
+    first = recs[0]["trials"][0]["result"]
+    assert first.startswith("rejected: lost a") and "would gain b, c" in first and "frontier as b000" in first
+    assert "# Promising bodies not kept" in llm.prompts[1] and "b000" in llm.prompts[1]
+    assert recs[1]["trials"][0]["result"].startswith("KEPT") and "no promising body 'nope'" in recs[1]["trials"][1]["result"]
+    assert s["final_held_train"] == ["a", "b", "c"] and len(s["frontier"]) == 1

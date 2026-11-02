@@ -53,6 +53,9 @@ def _catalogue_text(world: World, body: Body, manifest: dict[str, Any]) -> str:
             for k, p in pt.params.items():
                 out.append(f"      {k} [{p.lo:g}, {p.hi:g}] {p.unit}: {p.doc}")
             out.append(f"      needs (at mid-range): {needs or 'nothing'}")
+            facts = getattr(world, "part_facts", None)
+            if facts is not None:  # what the part would do on this body, computed, at its parameters' ranges
+                out.extend(f"      {line}" for line in facts(body, pt))
     return "\n".join(out)
 
 
@@ -70,7 +73,7 @@ def _outcome_line(task: Task, o: Outcome) -> str:
 
 def build(world: World, body: Body, tasks: Sequence[Task], outcomes: dict[str, Outcome], held: set[str],
           history: Sequence[dict[str, Any]], ideas: Sequence[dict[str, Any]], spent: Spent, manifest: dict[str, Any],
-          iteration: int, iterations: int, max_proposals: int = 3) -> str:
+          iteration: int, iterations: int, max_proposals: int = 3, frontier: Sequence[dict[str, Any]] = ()) -> str:
     by_id = {t.id: t for t in tasks}
     groups = sorted({t.group for t in tasks})
     failing = [t for t in tasks if not outcomes[t.id].success]
@@ -96,6 +99,12 @@ def build(world: World, body: Body, tasks: Sequence[Task], outcomes: dict[str, O
         tried = _exhaustion(history)
         if tried:
             sec.append("# What parameter moves have not fixed\n" + tried)
+    if frontier:
+        sec.append("# Promising bodies not kept (they gained more groups than they lost)\n" + "\n".join(
+            f"- {f['id']} (iteration {f['iteration'] + 1}): {f['body'].describe()}\n    would gain {', '.join(f['gained'])}"
+            f"\n    {f['why_lost'][:400]}" for f in frontier) +
+            "\nTo build on one, set `base` to its id: your edits apply to that body, and the result must still keep "
+            "every held group.")
     if ideas:
         sec.append("# Ideas recorded so far (untested: no builder in the simulator)\n" +
                    "\n".join(f"- {i['name']}: needs {', '.join(i['needs']) or 'nothing listed'}" for i in ideas[-6:]))

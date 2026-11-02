@@ -36,6 +36,13 @@ change how it is judged.
 - [docs/goals.md](docs/goals.md) is the goal and sub-goal design: System 2 as a planner over a
   hierarchical task network that assigns sub-goals to System 1, grounded in HTN planning, Soar,
   TOTE and hierarchical task analysis.
+- [docs/evolve.md](docs/evolve.md) is the world-agnostic evolution core. A body is a set of parts,
+  each with a bill of materials checked against what the bench provides. System 2 changes parameters,
+  swaps a part for another type (a redesign), or records an idea for a part that does not exist yet.
+  It runs on three worlds: the gripper, a talking robot (phonology) and a mobile explorer.
+- [docs/philosophy.md](docs/philosophy.md) is the design philosophy in twelve rules, and
+  [docs/optimizing-the-harness.md](docs/optimizing-the-harness.md) covers the levers for making the
+  loop stronger without moving the ruler.
 
 ## Quick start
 
@@ -49,6 +56,8 @@ export ANTHROPIC_API_KEY=...                     # then a real System 2 run:
 uv run sea run configs/exp/e1_s2.yaml
 uv run sea eval runs/e1_s2_s1 --split compose    # frozen design + library on another split
 uv run sea replay runs/e1_s2_s1 --iter 5 --panel train_p012 --control c3   # MuJoCo viewer
+uv run python scripts/evolve.py --world gripper --arm s2 --iterations 10 --workers 8   # body evolution, plan-billed
+uv run python scripts/collect_evolve.py runs/evolve/gripper_s2_s0                    # tracked record
 ```
 
 Tests:

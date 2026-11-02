@@ -85,3 +85,12 @@ def test_solve_reads_the_failure():
     o = W.solve(W.stock(), tasks["reg_gelatin_box"])
     assert not o.success and o.mechanism in {"squeezed_down_out", "moving_jaw_on_top_face"}
     assert "moving jaw" in o.detail and o.attempts > 1
+
+
+def test_part_facts_show_each_joint_on_this_body():
+    cat = {p.name: p for p in W.catalogue()}
+    slide = W.part_facts(W.stock(), cat["prismatic"])
+    assert len(slide) == 2 and "fingertips up to 51 mm apart" in slide[0] and "85 mm out of reach" in slide[0]
+    assert "tip +1 mm" in slide[1]
+    links = W.part_facts(W.stock(), cat["parallelogram"])[1]
+    assert "85 mm: face -0 deg, tip +33 mm" in links

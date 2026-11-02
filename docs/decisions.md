@@ -1015,3 +1015,30 @@ Revolute behaviour is unchanged: `has_pads` replaces `is_stock` where the code m
 every hinge function returns what it did. The batteries are identical. The judge key changes through
 `contracts.py` (three `FingerSpec` fields) and the new judge components (`evolve`, `world_gripper`).
 Tests: `tests/test_fingers.py` (`test_jaw_mechanisms_d042`), `tests/test_world_gripper.py`.
+
+## D-043 What the first evolve run on the gripper showed the core was missing (policy + judge)
+Iteration 0 of `runs/evolve/gripper_s2_s0` (System 2 on the plan) proposed three things at once:
+- pads tilted 20°: kept, gaining the golf ball and the screwdriver;
+- a 60 mm/rad slide with flat TPU pads: rejected, it lost the potted meat can;
+- an 80 mm parallelogram: rejected, it lost the banana.
+
+So the jaw redesigns arose from the brief without any prompt to make them. The record exposed four
+gaps, fixed for the next runs (that run keeps the code it started with):
+- **A redesign was judged only on what it broke.** The trial stopped at the first loss, so nobody
+  learned what the slide would have gained. A swap is now always scored on every group, and
+  `full_trials` does the same for params moves.
+- **There was nowhere to stand while repairing a redesign.** A body that gains more groups than it
+  loses goes on a **frontier**. The prompt lists it with what it would gain and why it lost, and a
+  proposal can build on it with `base`. The ratchet still applies: the result must keep every held
+  group. That is the usual shape of a redesign: break one thing, then repair it.
+- **Part types showed their docs, not their numbers.** System 2 assumed the slide had the hinge's
+  servo range. `World.part_facts` (optional) now gives each part type fitted to the current body at
+  the ends of its parameter ranges. For the gripper that is its servo range, widest fingertip gap,
+  and face tilt, fingertip rise and squeeze at 35, 55 and 85 mm.
+- **A body could be paid for twice, and a run recorded no fingerprint.** A body already trialled is
+  refused with its earlier result. `harness.json` is written at the start of every run. Each trial
+  scores its predicted gains against the actual ones (`prediction`), and `summary.json` aggregates
+  moves, refusals, regressions and mean prediction precision.
+
+Tests: `tests/test_evolve.py` (`test_frontier_lets_a_redesign_be_repaired`, repeat refusal,
+prediction scoring) and `tests/test_world_gripper.py` (`test_part_facts_show_each_joint_on_this_body`).

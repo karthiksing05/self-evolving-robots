@@ -331,6 +331,35 @@ class GripperWorld:
         return "\n".join([f"jaw: {jaw}; servo range {lo:.2f} to {hi:.2f} rad; fingertips at most {widest:.0f} mm apart",
                           f"faces: {pads}", "by object width (the fingertips that far apart):", *rows, f"arm: {arm}"])
 
+    def part_facts(self, body: Body, pt: PartType) -> list[str]:
+        """Each part type fitted to this body, at the ends of its parameter ranges: what it reaches."""
+        if pt.slot == "arm_servos":
+            return [f"lifting joints stall at {2.94 if pt.name == 'servos_12v' else 1.62} N*m"]
+        variants = [{}] if not pt.params else [
+            {k: (p.lo if end == 0 else p.hi) for k, p in pt.params.items()} for end in (0, 1)]
+        out = []
+        for v in variants:
+            if pt.slot == "pads" and pt.name == "pads":
+                v = {**{k: 0.0 for k in pt.params}, "pad_tpu_mm": 2.0, "width_mm": 12.0,
+                     "pad_angle_deg": v.get("pad_angle_deg", 0.0)}
+            b = Body(parts={**body.parts, pt.slot: Part(type=pt.name, params=v)})
+            f = to_design(b).fingers
+            lo, hi = F.q_range(f)
+            cells = []
+            for w in (35, 55, 85):
+                q = F.tip_opening(f, w / 1000)
+                if q is None:
+                    cells.append(f"{w} mm out of reach")
+                    continue
+                tilt = math.degrees(q) - f.pad_angle_deg if f.jaw == "revolute" else -f.pad_angle_deg
+                cells.append(f"{w} mm: face {tilt:+.0f} deg, tip {F.fingertips(f, q)[1] * 1000:+.0f} mm, "
+                             f"{F.squeeze_n(f, q, GRIP_TORQUE_NM):.0f} N")
+            label = ", ".join(f"{k}={x:g}" for k, x in v.items() if k in pt.params and (pt.slot != "pads" or k ==
+                                                                                       "pad_angle_deg")) or "as is"
+            out.append(f"on this body, {label}: servo {lo:.2f}..{hi:.2f} rad, fingertips up to "
+                       f"{F.fingertips(f, hi)[0] * 1000:.0f} mm apart; " + "; ".join(cells))
+        return out
+
     def principles(self) -> list[str]:
         return [
             "Two contacts hold an object when their normals are horizontal and opposed (antipodal).  A contact whose "

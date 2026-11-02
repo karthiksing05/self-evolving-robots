@@ -126,6 +126,8 @@ Move = Literal["params", "swap", "idea"]
 
 class Proposal(_Model):
     move: Move
+    base: str | None = Field(default=None, description="build on a promising body from the record by its id; "
+                             "omit to change the current body")
     edits: list[Edit] = Field(default_factory=list)
     idea: Idea | None = None
     mechanism: str = Field(description="the failure mechanism this addresses, as the diagnosis names it")
@@ -200,3 +202,6 @@ class World(Protocol):
     def check(self, body: Body) -> list[str]: ...
 
     def manifest(self) -> dict[str, Any]: ...
+
+    # Optional: ``part_facts(body, part_type) -> list[str]``, computed facts about a part type fitted to this
+    # body (its reach, force, range at the ends of its parameters), shown in the catalogue.  Facts, not advice.

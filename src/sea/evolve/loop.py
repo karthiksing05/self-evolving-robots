@@ -44,6 +44,7 @@ class RunConfig(BaseModel):
     iterations: int = 10
     seed: int = 0
     max_proposals: int = 3
+    full_trials: bool = False  # score every group even after a loss; swaps always are (the frontier needs it)
     workers: int = 1
     budget: dict[str, float] = {}  # overrides the manifest's budget
     model: str = "claude-opus-5-5"
@@ -158,6 +159,25 @@ def _edit_text(edits: Sequence[Edit]) -> str:
                      for e in edits)
 
 
+def _score_prediction(predicted: Sequence[str], gained: Sequence[str], lost: Sequence[str]) -> dict[str, Any]:
+    """How the proposal's predicted gains compare with what the trial found (groups)."""
+    p, g = set(predicted), set(gained)
+    return {"predicted": sorted(p), "hit": sorted(p & g), "missed": sorted(p - g), "unpredicted": sorted(g - p),
+            "precision": round(len(p & g) / len(p), 3) if p else None, "lost": sorted(lost)}
+
+
+def _proposal_stats(history: Sequence[dict[str, Any]]) -> dict[str, Any]:
+    tried = [h for h in history if h.get("tried")]
+    refused = [h for h in history if h.get("result", "").startswith("refused")]
+    prec = [h["prediction"]["precision"] for h in tried if h.get("prediction", {}).get("precision") is not None]
+    return {"total": len(history), "tried": len(tried), "refused": len(refused),
+            "ideas": sum(h["result"].startswith("idea") for h in history),
+            "kept": sum(h["result"].startswith("KEPT") for h in history),
+            "rejected_regression": sum(bool(h.get("lost")) for h in tried),
+            "moves": {m: sum(h.get("move") == m for h in history) for m in ("params", "swap", "idea")},
+            "mean_prediction_precision": round(sum(prec) / len(prec), 3) if prec else None}
+
+
 def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: World | None = None,
         log: Callable[[str], None] = print) -> dict[str, Any]:
     world = world or make_world(cfg.world)
@@ -167,6 +187,10 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
     out.mkdir(parents=True, exist_ok=True)
     (out / "config.json").write_text(cfg.model_dump_json(indent=1))
     (out / "manifest.json").write_text(json.dumps(manifest, indent=1))
+    from sea.harness import fingerprint, judge_key
+
+    fp = fingerprint()
+    (out / "harness.json").write_text(json.dumps({"judge_key": judge_key(fp), "components": fp}, indent=1))
     catalogue = {p.name: p for p in world.catalogue()}
     all_tasks = world.tasks()
     train = [t for t in all_tasks if t.split == "train"]
@@ -183,6 +207,8 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
     history: list[dict[str, Any]] = []
     ideas: list[dict[str, Any]] = []
     curve: list[dict[str, Any]] = []
+    tried: dict[str, str] = {}  # body key -> what its trial found: a body is never paid for twice
+    frontier: dict[str, dict[str, Any]] = {}  # promising bodies not kept: they gained more groups than they lost
     t_start = time.time()
     records = (out / "iterations.jsonl").open("w")
     try:
@@ -205,8 +231,9 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                 break
             if isinstance(proposer, RandomProposer):
                 proposer.body = body
+            front = sorted(frontier.values(), key=lambda f: (-(len(f["gained"]) - len(f["lost"])), f["iteration"]))
             prompt = build(world, body, train, outcomes, held, history, ideas, spent, manifest, it, cfg.iterations,
-                           cfg.max_proposals)
+                           cfg.max_proposals, frontier=front[:5])
             batch = proposer.propose(SYSTEM, prompt, tag=f"iter{it:02d}")
             rec["llm"] = proposer.calls[-1] if getattr(proposer, "calls", None) else {}
             rec["notes"] = batch.notes
@@ -225,7 +252,10 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                     history.append(entry)
                     continue
                 try:
-                    cand = apply(body, prop.edits, catalogue, new_id=f"b{it:02d}{k}")
+                    if prop.base is not None and prop.base not in frontier:
+                        raise ValueError(f"no promising body {prop.base!r} in the record; ids: {sorted(frontier)}")
+                    base = body if prop.base is None else frontier[prop.base]["body"]
+                    cand = apply(base, prop.edits, catalogue, new_id=f"b{it:02d}{k}")
                 except ValueError as exc:
                     entry.update(result=f"refused before trial: {exc}", tried=False)
                     trials.append(entry)
@@ -238,6 +268,8 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                 entry["resources"] = res.model_dump()
                 if cand.key() == body.key():
                     errs = ["the edit leaves the body unchanged", *errs]
+                elif cand.key() in tried:
+                    errs = [f"this exact body was already trialled: {tried[cand.key()]}", *errs]
                 if errs or not res.ok:
                     entry.update(result="refused before trial: " + "; ".join([*errs, *res.errors]), tried=False)
                     trials.append(entry)
@@ -246,11 +278,12 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                 held_tasks = [t for t in train if t.group in held]
                 cand_out = ev.solve(cand, held_tasks)
                 lost = sorted({t.group for t in held_tasks if not cand_out[t.id].success})
-                if not lost:
+                full = not lost or cfg.full_trials or entry["move"] == "swap"  # a redesign is always scored whole
+                if full:
                     cand_out.update(ev.solve(cand, [t for t in train if t.group not in held]))
-                cand_held = held_groups(train, cand_out) if not lost else held - set(lost)
-                gained = sorted(cand_held - held) if not lost else []
-                n_new = sum(cand_out[t.id].success for t in train if t.group not in held) if not lost else 0
+                cand_held = held_groups(train, cand_out) if full else held - set(lost)
+                gained = sorted(cand_held - held)
+                n_new = sum(cand_out[t.id].success for t in train if t.group not in held) if full else 0
                 still = sorted({cand_out[t.id].mechanism for t in train if t.id in cand_out and not cand_out[t.id].success})
                 entry.update(tried=True, gained=gained, lost=lost, new_tasks=n_new, still_failing=still,
                              outcomes={t: o.model_dump() for t, o in cand_out.items()})
@@ -258,7 +291,11 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                                                                for t in held_tasks if t.group in lost
                                                                and not cand_out[t.id].success)[:300] + ")") if lost else ""
                 if lost:
-                    entry["result"] = f"rejected: {why}"
+                    entry["result"] = f"rejected: {why}" + (f"; it would gain {', '.join(gained)}" if gained else "")
+                    if len(gained) > len(lost):
+                        frontier[cand.id] = {"id": cand.id, "body": cand, "gained": gained, "lost": lost,
+                                             "why_lost": why, "iteration": it, "edit": entry["edit"]}
+                        entry["result"] += f"; kept on the frontier as {cand.id}"
                 elif not gained and n_new == 0:
                     entry["result"] = "rejected: gained nothing; still failing: " + ", ".join(still[:6])
                 else:
@@ -267,6 +304,8 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                     score = (len(gained), n_new, -res.usd - res.fab_minutes / 60, -int(entry["move"] == "swap"))
                     if best is None or score > best[0]:
                         best = (score, cand, entry)
+                tried[cand.key()] = f"iteration {it + 1}: {entry['result'][:200]}"
+                entry["prediction"] = _score_prediction(prop.gains, gained, lost)
                 trials.append(entry)
                 history.append(entry)
                 log(f"    proposal {k} [{entry['move']}] {entry['edit']}: {entry['result'][:160]}")
@@ -300,6 +339,8 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                  "final_tasks": sum(o.success for o in final_test.values()),
                  "stock_tasks": sum(o.success for o in stock_test.values()), "n": len(test)},
         "spent": spent.model_dump(), "ideas": ideas, "sim_s": round(ev.sim_s, 1), "attempts": ev.attempts,
+        "proposals": _proposal_stats(history),
+        "frontier": [{k: (v.describe() if k == "body" else v) for k, v in f.items()} for f in frontier.values()],
         "wall_s": round(time.time() - t_start, 1),
         "llm": {"calls": len(getattr(proposer, "calls", []) or []),
                 "tokens_in": sum(c.get("tokens_in", 0) for c in getattr(proposer, "calls", []) or []),
