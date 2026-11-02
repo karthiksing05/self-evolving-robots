@@ -80,10 +80,13 @@ def test_the_pads_are_jaw_geoms_with_their_material_friction():
     assert len(pads) == 2 and {sim.geom_kind[i] for i in pads} == {"jaw_fixed", "jaw_moving"}
     names = {(m.geom(int(a)).name, m.geom(int(b)).name): k for k, (a, b) in enumerate(zip(m.pair_geom1, m.pair_geom2,
                                                                                           strict=True))}
-    k = next(v for (a, _), v in names.items() if a == "jaw_fixed_pad0")
+    on_box = {(a, b): k for (a, b), k in names.items() if not b.startswith("jaw_")}  # not the fingers' own (D-060)
+    k = next(v for (a, _), v in on_box.items() if a == "jaw_fixed_pad0")
     assert m.pair_friction[k, 0] == pytest.approx(pair_friction(F.TPU_FRICTION, 0.6))
-    stock = next(v for (a, _), v in names.items() if "_pad" not in a)
+    stock = next(v for (a, _), v in on_box.items() if "_pad" not in a)
     assert m.pair_friction[stock, 0] == pytest.approx(pair_friction(JAW_FRICTION, 0.6))
+    finger = names[("jaw_fixed_pad0", "jaw_moving_pad0")]
+    assert m.pair_friction[finger, 0] == pytest.approx(pair_friction(F.TPU_FRICTION, F.TPU_FRICTION))
 
 
 # ---------------------------------------------------------------- capability

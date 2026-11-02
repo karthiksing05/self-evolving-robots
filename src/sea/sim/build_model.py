@@ -422,6 +422,38 @@ def _horn(spec: mujoco.MjSpec, f) -> None:
                  conaffinity=0, group=2, mass=0.0, material=g.material)
 
 
+_STOPS: dict[str, list[tuple[str, str]]] = {}
+STOP_SAMPLES = 256  # jaw positions: 120 mm from the axis, under 1 mm of travel between two
+STOP_SLACK = 0.001  # m: more than half the travel between samples
+STOP_OVER = 0.05  # rad past each end of the range: a jaw pressed on its (soft) limit goes a little past it
+
+
+def _stops(model: mujoco.MjModel, linked: list[tuple[str, float]]) -> list[tuple[str, str]]:
+    """The fixed- and moving-finger geoms that can meet: they come within ``STOP_SLACK`` of each other
+    somewhere in the jaw's range.  Only these get a pair (D-060): a pair costs about 2 us a step while its
+    bounding spheres overlap, and all 256 of the stock's slowed a pick by a quarter."""
+    data = mujoco.MjData(model)
+    jid = model.joint("gripper").id
+    others = [(model.jnt_qposadr[model.joint(n).id], r) for n, r in linked]
+    fixed = [g for g in range(model.ngeom) if model.geom(g).name.startswith("jaw_fixed")]
+    moving = [g for g in range(model.ngeom) if model.geom(g).name.startswith("jaw_moving")]
+    reach = model.geom_rbound[fixed][:, None] + model.geom_rbound[moving][None, :] + STOP_SLACK
+    near: set[tuple[int, int]] = set()
+    fromto = np.zeros(6)
+    lo, hi = model.jnt_range[jid]
+    for q in np.linspace(lo - STOP_OVER, hi + STOP_OVER, STOP_SAMPLES):
+        data.qpos[model.jnt_qposadr[jid]] = q
+        for adr, ratio in others:
+            data.qpos[adr] = q * ratio
+        mujoco.mj_kinematics(model, data)
+        centres = np.linalg.norm(data.geom_xpos[fixed][:, None] - data.geom_xpos[moving][None, :], axis=-1)
+        for i, j in zip(*np.nonzero(centres < reach), strict=True):  # bounding spheres first, then the hulls
+            a, b = fixed[i], moving[j]
+            if (a, b) not in near and mujoco.mj_geomDistance(model, data, a, b, STOP_SLACK, fromto) < STOP_SLACK:
+                near.add((a, b))
+    return [(model.geom(a).name, model.geom(b).name) for a, b in sorted(near)]
+
+
 def _jaw_joint(spec: mujoco.MjSpec, f) -> list[tuple[str, float]]:
     """Rebuild the moving jaw as its part's mechanism (D-042, ``sim/jaws.py``); returns the mechanism's other
     joints with their units per servo radian.  The gripper joint stays the servo's output, a hinge in
@@ -568,6 +600,16 @@ def build_model(design: Design, panel: PanelSpec | None = None, tools: list | No
                 mu = pair_friction(jaw_mu.get(j, JAW_FRICTION), friction)
                 spec.add_pair(geomname1=j, geomname2=name, condim=4, friction=[mu, mu, 0.005, 0.0001, 0.0001],
                               solref=list(GRASP_SOLREF), solimp=list(GRASP_SOLIMP))
+    # The fingers stop on each other (D-060).  The gripper and its jaw are parent and child (excluded, on a
+    # four-bar), so MuJoCo drops their contacts and a jaw closing on nothing went through the other finger
+    # to its joint limit (12.7 mm, with 32 degree pads); explicit pairs bypass that filter.
+    key = design.fingers.model_dump_json()
+    if key not in _STOPS:
+        _STOPS[key] = _stops(spec.compile(), linked)
+    for a, b in _STOPS[key]:
+        mu = pair_friction(jaw_mu.get(a, JAW_FRICTION), jaw_mu.get(b, JAW_FRICTION))
+        spec.add_pair(geomname1=a, geomname2=b, condim=3, friction=[mu, mu, 0.005, 0.0001, 0.0001],
+                      solref=list(GRASP_SOLREF), solimp=list(GRASP_SOLIMP))
 
     model = spec.compile()
     data = mujoco.MjData(model)

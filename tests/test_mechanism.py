@@ -184,3 +184,26 @@ def test_a_four_bar_near_toggle_breaks_the_transmission_law(monkeypatch):
     monkeypatch.setattr(jaws, "transmission_deg", lambda q: 20.0)
     assert G.laws(body) == ["mechanism law (transmission): the four-bar's links come within 20 deg of toggle; they "
                             "must stay 30 deg away"]
+
+
+@pytest.mark.parametrize("fingers", [{"pad_tpu_mm": 2.0, "pad_angle_deg": 32.0, "width_mm": 12.0},
+                                     {"jaw": "parallelogram", "link_mm": 70.0, "pad_tpu_mm": 2.0, "reach_mm": 3.0}])
+def test_a_jaw_closing_on_nothing_stops_on_the_other_finger(fingers):
+    """D-060: the gripper and its jaw are parent and child, so MuJoCo drops their contacts; without the
+    finger pairs a padded jaw closed 12.7 mm through the fixed finger to its joint limit."""
+    from sea.contracts import Design, FingerSpec
+    from sea.control.executor import HOME_Q
+    from sea.design import fingers as F
+    from sea.sim.build_model import build_model
+
+    spec = FingerSpec(**fingers)
+    sim = build_model(Design(id="p", fingers=spec))
+    q = HOME_Q.copy()
+    q[-1] = 0.5
+    sim.set_arm_q(q)
+    q[-1] = -0.17
+    for _ in range(500):
+        sim.data.ctrl[:] = q
+        sim.step(1)
+    closed = float(sim.data.qpos[sim.model.jnt_qposadr[sim.model.joint("gripper").id]])
+    assert closed > -0.15 and F.gap(spec, closed) > -0.5e-3

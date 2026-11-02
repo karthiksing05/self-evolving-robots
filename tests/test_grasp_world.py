@@ -48,7 +48,9 @@ def test_an_object_is_a_free_body_whose_coordinate_is_its_height():
     h = sim.controls["obj"]
     assert sim.model.body_parentid[h.body_id] == 0  # MuJoCo allows free joints on top-level bodies only
     assert sim.control_q("obj") == pytest.approx(0.030, abs=1e-6)
-    assert np.allclose(sim.model.pair_friction[:, 0], pair_friction(JAW_FRICTION, 0.6))
+    m = sim.model
+    on_object = [k for k, g in enumerate(m.pair_geom2) if not m.geom(int(g)).name.startswith("jaw_")]  # not D-060's
+    assert on_object and np.allclose(m.pair_friction[on_object, 0], pair_friction(JAW_FRICTION, 0.6))
     sim.step(250)
     assert sim.control_q("obj") == pytest.approx(0.030, abs=5e-4)  # rests on the table, nothing pushes it
 

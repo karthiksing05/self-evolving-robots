@@ -68,7 +68,8 @@ def test_jaw_contacts_mix_both_surfaces_and_panels_are_untouched():
     sim = build_model(Design(id="stock"), objects=[scene_object("cylinder", 30, 50, 0.3)], table_z=0.0)
     m = sim.model
     jaws = [g for g, k in sim.geom_kind.items() if k.startswith("jaw")]
-    assert m.npair == len(jaws) > 0
-    assert np.allclose(m.pair_friction[:, 0], pair_friction(JAW_FRICTION, 0.3))
+    finger = [k for k, g in enumerate(m.pair_geom2) if m.geom(int(g)).name.startswith("jaw_")]  # their stop (D-060)
+    assert m.npair - len(finger) == len(jaws) > 0
+    assert np.allclose(np.delete(m.pair_friction[:, 0], finger), pair_friction(JAW_FRICTION, 0.3))
     plain = build_model(Design(id="stock"))
-    assert plain.model.npair == 0 and {int(plain.model.geom_conaffinity[g]) for g in plain.geom_kind} == {1}
+    assert plain.model.npair == len(finger) and {int(plain.model.geom_conaffinity[g]) for g in plain.geom_kind} == {1}

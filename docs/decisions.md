@@ -1609,3 +1609,32 @@ Three fixes failed on the way, each for a reason:
 - Tests: `test_mechanism.py`, with each refusal paired with a passing twin and a planted toggle for the transmission law, and `test_world_gripper.py`.
 
 **Consequence.** The gripper campaign's slide bodies cannot be proposed again as they were, and runs judged before this key cannot be pooled with runs after it (invariant 10). Re-running the gripper campaign under this ruler is the next step, after asking.
+
+## D-060 The fingers stop on each other (world: physics)
+**Observed.** The first iteration of the D-059 gripper campaign refused System 2's pads (32° and 45°) because the moving pad met the gripper frame at the closed end of the jaw's range. Checking the simulator showed a deeper problem. The gripper and its jaw are parent and child in MuJoCo, and on a four-bar the gripper and coupler are excluded. MuJoCo drops contacts between those pairs, so a jaw closing on nothing went through the other finger to its joint limit. With 32° pads, that meant 12.7 mm through it. A film of an empty close would show it.
+
+**Change.** Explicit contact pairs join the fixed-finger geoms (the `jaw_fixed` parts and pads) to the moving-finger geoms (the `jaw_moving` parts and pads) that can meet. Pairs bypass the parent filter. A pair is added when its two geoms come within 1 mm of each other over the jaw's range, widened by 0.05 rad at each end for a jaw pressed past its soft limit. The check runs once per finger spec: bounding spheres first, then the hull distance at 256 jaw positions (`build_model._stops`). The friction is the two faces' combined friction, and the contacts are rigid like grasp contacts (D-054). The pairs are robot-robot contacts, so the jaw sensors and the force limit ignore them, as before.
+
+**Prediction.**
+- A padded jaw closing on nothing stops where the faces meet.
+- The stock's fingers never meet: they stay 1.7 mm apart at the limit. So the gold does not move.
+- Grasps do not change, because the fingers meet only with nothing between them.
+
+**Measured.**
+- Closing on nothing:
+  - Stock: the limit, q = −0.17, with a 1.7 mm gap.
+  - 32° pads: stops at q = −0.049, gap 0.0 mm.
+  - Four-bar (70 mm) with pads: stops at −0.083, gap 0.0 mm.
+  - 20 mm/rad slide with pads: the limit, with a 2.4 mm gap.
+- Pairs added:
+  - stock: 2;
+  - 32° and 45° pads: 5;
+  - four-bars: 3–5;
+  - 20 mm/rad slides: 0.
+- Cost of a stock pick (median of 5):
+  - all 256 fixed×moving pairs: 0.203 s;
+  - no finger pairs: 0.164 s;
+  - the 2 that can meet: 0.176 s.
+- The pairs are in every model, including the panel world's, since a padded jaw stops on its other finger there too. The stock fingers never meet, so the golden verdicts hold (`tests/golden/` passes unchanged).
+- The stock pick is unchanged.
+- Test: `test_mechanism.py::test_a_jaw_closing_on_nothing_stops_on_the_other_finger`.
