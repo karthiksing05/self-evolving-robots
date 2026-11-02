@@ -1638,3 +1638,16 @@ Three fixes failed on the way, each for a reason:
 - The pairs are in every model, including the panel world's, since a padded jaw stops on its other finger there too. The stock fingers never meet, so the golden verdicts hold (`tests/golden/` passes unchanged).
 - The stock pick is unchanged.
 - Test: `test_mechanism.py::test_a_jaw_closing_on_nothing_stops_on_the_other_finger`.
+
+## D-061 The jaw closing on its other finger is its stop, not interference (judge: mechanism)
+**Observed.** D-059's interference law swept the jaw over its whole joint range. A finger that meets the other only below the angle where the faces touch was refused, even though the jaw stops there (D-060). Three of System 2's first three proposals were refused this way: pads at 32° and 45°, 12 and 20 mm wide.
+
+**Change.** A shared region between a moving finger part (the stock jaw, the blade, the moving pads) and a fixed one (the gripper frame, the fixed pads) is the jaw's stop when it occurs only over the closed end of the swept range: the first jaw positions, with no gap. The same parts meeting with the jaw further open are still interference.
+
+**Prediction.** The three refused pad proposals pass. Nothing that passed before is refused. The other laws do not change.
+
+**Measured.**
+- The three proposals now pass. Their only finger contacts were at q = −0.175, the first sample.
+- Padded four-bars and slides pass.
+- Test: `test_mechanism.py::test_the_fingers_meeting_as_the_jaw_closes_is_its_stop_not_interference`, which also checks the open-jaw twin.
+- The aborted campaign start (seed 0, iteration 0, three refusals) was set aside and the campaign restarted under this key.

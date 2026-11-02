@@ -29,6 +29,9 @@ CARRY_MM = 0.5
 TOUCH_MM = 0.1  # a shared region thinner than this is two faces in contact, not material in both parts
 SEAT_MM = 10.0  # the stock jaw's back plate bears on the servo's rear boss within 10 mm of the axis (D-056)
 MIN_TRANSMISSION_DEG = 30.0
+# the fingers' faces: the moving one meeting the fixed one as the jaw closes is the jaw's stop (D-061)
+FIXED_FINGER = ("wrist_roll_follower_so101_v1", "jaw_fixed_pad")
+MOVING_FINGER = ("moving_jaw_so101_v1", "jaw_blade", "jaw_moving_pad")
 _CACHE: dict[str, dict[str, Any]] = {}
 
 
@@ -184,6 +187,18 @@ def _label(name: str, body: str) -> str:
     return "the " + part.rstrip("0123456789").replace("_", " ").strip()
 
 
+def _stop(c: dict[str, Any], a: str, b: str, qs: list[float]) -> bool:
+    """The jaw closing on its other finger: a moving finger part meets a fixed one only over the closed end of
+    the range (the first jaw positions, without a gap).  The jaw stops there; the simulator holds the fingers
+    apart with contact pairs (D-060)."""
+    fingers = {a.startswith(FIXED_FINGER), b.startswith(FIXED_FINGER)}, {a.startswith(MOVING_FINGER),
+                                                                           b.startswith(MOVING_FINGER)}
+    if fingers != ({True, False}, {True, False}) or a.startswith(FIXED_FINGER) == b.startswith(FIXED_FINGER):
+        return False
+    at = sorted(set(c["at_q"]))
+    return at == qs[:len(at)]
+
+
 def _seat(c: dict[str, Any], a: str, b: str) -> bool:
     """A bearing seat: the hinge body on the servo, close around the hinge axis."""
     return set(c["bodies"]) == {"gripper", "moving_jaw_so101_v1"} and SERVO in (a, b) and c["from_axis_mm"][1] <= SEAT_MM
@@ -195,11 +210,12 @@ def laws(body) -> list[str]:
     from sea.worlds.gripper import to_design
 
     geo = geometry(body)
+    qs = [round(float(q), 3) for q in np.linspace(*geo["jaw_range_servo_rad"], SAMPLES)]
     out = []
     shared: dict[tuple[str, str], dict[str, Any]] = {}  # per pair of named parts: the worst region, where
     for pair, c in geo["clashes"].items():
         a, b = pair.split(" / ")
-        if _seat(c, a, b) or min(c["region_mm"]) < TOUCH_MM:
+        if _seat(c, a, b) or _stop(c, a, b, qs) or min(c["region_mm"]) < TOUCH_MM:
             continue
         g = shared.setdefault((_label(a, c["bodies"][0]), _label(b, c["bodies"][1])),
                               {"region": [0.0, 0.0, 0.0], "q": set(), "roll": set()})

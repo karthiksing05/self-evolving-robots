@@ -207,3 +207,20 @@ def test_a_jaw_closing_on_nothing_stops_on_the_other_finger(fingers):
         sim.step(1)
     closed = float(sim.data.qpos[sim.model.jnt_qposadr[sim.model.joint("gripper").id]])
     assert closed > -0.15 and F.gap(spec, closed) > -0.5e-3
+
+
+def test_the_fingers_meeting_as_the_jaw_closes_is_its_stop_not_interference():
+    """D-061: a moving finger part on a fixed one over the closed end of the range is the jaw's stop; the
+    same parts meeting with the jaw open are interference."""
+    from sea.mechanism import gripper as G
+
+    qs = [-0.175, 0.065, 0.305, 0.545]
+    closing = {"bodies": ["gripper", "moving_jaw_so101_v1"], "at_q": [-0.175, 0.065], "from_axis_mm": [60.0, 80.0]}
+    assert G._stop(closing, "jaw_fixed_pad0", "jaw_moving_pad0", qs)
+    assert G._stop(closing, "wrist_roll_follower_so101_v1", "jaw_blade", qs)
+    assert not G._stop({**closing, "at_q": [0.305]}, "jaw_fixed_pad0", "jaw_moving_pad0", qs)  # open: a clash
+    assert not G._stop(closing, "jaw_fixed_pad0", "jaw_rack", qs)  # not a finger
+    world = GripperWorld()
+    pads = Part(type="pads", params={"groove_mm": 0, "lip_mm": 0, "pad_angle_deg": 45, "pad_tpu_mm": 2, "reach_mm": 0,
+                                     "width_mm": 12})
+    assert world.check(Body(parts={**world.stock().parts, "pads": pads})) == []
