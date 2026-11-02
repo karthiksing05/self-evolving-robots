@@ -13,7 +13,7 @@ It has two halves:
   between them) with the coal geometry in `mechanism/geometry.py`.
 
 All of it is TOOLING (`harness.TOOLING`). It shapes pictures and reports, and no verdict reads it. The laws are written
-so they could later join the judge in the same way the mechanism verifier's laws will (D-051).
+so they could later join the judge, as the gripper's mechanism laws did (D-059).
 
 ## The numbers
 
@@ -88,3 +88,33 @@ both ends of every control's range. It writes `results/design_language/audit.md`
 - `src/sea/design/callouts.py`: labelled pictures, with numbered callouts and a legend of what each part does.
 - `tests/test_design_language.py`: the lands, the frames, the audits, the refusals and the posture.
 - `scripts/design_language.py`: before-and-after renders and the audit, in `results/design_language/`.
+
+## Simulated geometry the language cannot build
+
+Drawing every body to these rules showed six places where the simulated geometry differs from anything that
+could be built. None is fixed yet. Each is a world-tier or judge-tier change, so each needs a decision entry and,
+for the gripper, a gold re-record.
+
+1. **V-groove boxes reach into the jaw.** The groove half-boxes extend behind the jaw face by up to the groove
+   depth. The jaw collides with nothing in the simulator, so the physics does not notice. But a groove deeper than
+   about 1.6 mm leaves no printable backing behind it. So `grooved40` (a 3 mm groove) cannot be built as simulated,
+   and `pad_cad.refusals` refuses it.
+2. **The tilted moving pad is partly buried.** Past about atan(thickness / 10 mm) of pad angle, the top of the
+   moving pad's box is inside the jaw. The simulator still counts that part of the face as contact surface,
+   though nothing can reach it.
+3. **The lip box sticks out half a pad thickness too far.** It protrudes lip + t/2 beyond the land, not lip.
+4. **The tip tongue's ranges overlap the body pad's.** The tip's range (0.3–5 cm) overlaps the body pad's
+   (3.25–10.25 cm). At tongue_place 3.25 or tip_place 5, the tongue pad and the tip blade share up to about
+   61 × 26 × 9 mm. The acoustics allow a posture the hardware cannot reach. This should become a range
+   constraint or a proposal-tier law.
+5. **A flat-topped constriction feathers.** The simulated constriction has a flat top across a round bore, so a
+   solid pad drawn exactly to it thins to nothing where the flat meets the wall. The membranes fix this wherever
+   the top is below the bore's centre line. Above it, a thin edge remains.
+6. **The tip sits too close to the face plate.** With tip_place below about 1 cm, the tip mechanism would be inside
+   the face plate. The drawing keeps the stem at least 10 mm behind the teeth and lets the blade reach forward to
+   the commanded place.
+
+The drawn pads also carry material the simulator does not have: the shoe that wraps the jaw and its screws, a
+few grams and a few millimetres around the finger. The mechanism laws (D-059) read the simulated boxes, not the
+shoe. Under invariant 11 the shoe belongs in the simulator as well; until then it is listed in
+[harness.md](harness.md) under "Where the harness is still thin".
