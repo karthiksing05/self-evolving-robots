@@ -25,3 +25,15 @@
   - addresses: squeezed_down_out on the lying mustard: the moving pad's bottom edge meets the oval at +8 mm, above its widest point, so the contact normal tilts 15 deg down. s; open then: squeezed_down_out x2, slipped_under_load x1
   - needs: m2_screw x4 (on hand), print:PLA ~3 g (~15 min), print:TPU ~2 g (~16 min)
 
+## three-tine comb pad (1 times, 1 runs)
+- **three-tine comb pad** (gripper_s2v3_s2, iteration 10, slot `pads`): A printed PLA pad carrying three TPU-skinned grooved tines, 8 mm wide, at -20, 0 and +20 mm along the jaw width. Its vertical profile is the same as the current pad (reach 3 mm, tilt 8.8 deg, groove 6 mm). The centre tine keeps the current contact for small objects. On a long object the outer tines add 40 mm of contact spacing, which resists twisting about the closing axis.
+  - addresses: slipped_under_load: gravity twists a long, heavy, off-centre-gripped object (mustard bottle, 191 mm deep, 431 g) about the closing axis, and the twist exceeds t; open then: slipped_under_load x1
+  - needs: print:PLA x5, print:TPU x2, m2_screw x4
+  - costed: $0.00 from the manifest, 0 days, 41 machine min; within the budget left
+
+## 12 V gripper servo only (1 times, 1 runs)
+- **12 V gripper servo only** (gripper_s2v3_s2, iteration 11, slot `arm_servos`): Replace only the gripper's STS3215 (7.4 V, 1.62 N*m) with an STS3215 12 V (2.94 N*m), powered from a separate 12 V supply. Its power lead is split from the 7.4 V bus while it shares the TTL data line with the other five servos. The rack-and-pinion jaw and pads are unchanged, so the squeeze rises from about 27 N to about 49 N at every opening. Per-object force can be capped through the servo's torq
+  - addresses: slipped_under_load on reg_mustard_bottle: 26 N per jaw is marginal against the heaviest long object's pitch and slide once the contact sits above the equator. S; open then: slipped_under_load x1
+  - needs: sts3215_12v x1, psu_12v x1, m3_screw x4
+  - costed: $32.00 from the manifest, 5 days, 0 machine min; within the budget left
+
