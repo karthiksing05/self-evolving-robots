@@ -81,3 +81,43 @@ def test_the_stock_jaw_rides_its_horn_and_the_slide_jaw_floats_free():
                   {p.name: p for p in world.catalogue()}, "t")
     carried = audit_mechanism.gripper_geometry(slide)["carried"]["moving_jaw_so101_v1"]
     assert carried["joint"] == "slide" and carried["worst_gap_mm"] > 50.0
+
+
+def test_the_four_bar_is_built_from_parts_that_carry_each_other():
+    """D-057: the parallelogram is links, pins and a coupler.  Every moving body is carried with no gap,
+    and the only material shared across a joint is the servo's spline and rear pin, inside 3 mm of the axis.
+    The kept bodies' 89 mm links outreach the finger, so a strut carries the blade from the pins."""
+    world = GripperWorld()
+    body = apply(world.stock(), [Edit(slot="jaw", type="parallelogram", params={"link_mm": 89.136})],
+                 {p.name: p for p in world.catalogue()}, "t")
+    geo = audit_mechanism.gripper_geometry(body)
+    assert set(geo["carried"]) == {"moving_jaw_so101_v1", "jaw_coupler", "jaw_follower"}
+    assert all(c["material"] and c["worst_gap_mm"] <= 0.3 for c in geo["carried"].values())
+    assert geo["clashes"] and all(c["from_axis_mm"][1] <= 3.0 and "gripper" in c["bodies"]
+                                  for c in geo["clashes"].values())
+    assert all(geo["sim_mass_g"][b] > 5.0 for b in geo["carried"])
+    from sea.sim import jaws
+
+    assert jaws.blade_gap(np.array([0.0, -0.050])) == 0.0 and jaws.blade_gap(np.array([0.0, -0.089])) > jaws.BOSS_R
+
+
+def test_the_four_bar_loop_closes_and_keeps_the_finger_upright():
+    from sea.contracts import Design, FingerSpec
+    from sea.control.executor import HOME_Q
+    from sea.sim import jaws
+    from sea.sim.build_model import build_model
+
+    sim = build_model(Design(id="p", fingers=FingerSpec(jaw="parallelogram", link_mm=70.0)))
+    m, d = sim.model, sim.data
+    f, c = m.body("jaw_follower").id, m.body("jaw_coupler").id
+    turns = []
+    for q in np.linspace(-0.17, 1.7, 12):
+        qa = HOME_Q.copy()
+        qa[-1] = q
+        sim.set_arm_q(qa)
+        at_f = d.xpos[f] + d.xmat[f].reshape(3, 3) @ m.eq_data[0][:3]
+        at_c = d.xpos[c] + d.xmat[c].reshape(3, 3) @ m.eq_data[0][3:6]
+        assert np.linalg.norm(at_f - at_c) < 1e-4  # the connect constraint is satisfied where the servo puts it
+        turns.append(d.xmat[c].reshape(3, 3) @ d.xmat[m.body("gripper").id].reshape(3, 3).T)
+        assert jaws.transmission_deg(q) >= 35.0
+    assert all(np.allclose(t, turns[0], atol=1e-9) for t in turns)

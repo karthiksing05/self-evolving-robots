@@ -1479,3 +1479,47 @@ Three fixes failed on the way, each for a reason:
 - The gold does not move: 0 of 46 picks changed (`scripts/measure_grasp.py`).
 - On the stock, the horn now meets the servo only at the spline (a 6 mm region within 3 mm of the axis).
 - The jaw meets the servo only at the rear hub, 3 mm deep and within 10 mm of the axis, the same at every angle. That is where the jaw's back plate bears on the servo's rear boss, the contact the plan's interference law allows across a revolute joint.
+
+## D-057 The parallelogram jaw is a real four-bar (world: physics)
+**Observed.** D-042's parallelogram was an ideal mechanism. A coupler body was held at minus the hinge angle by a joint equality, with no links, pins or follower, and the whole stock finger mesh, hub included, was drawn on it. In the films a finger translated with nothing holding it. System 2's kept parallelogram bodies use long links: 15 of the 31 recorded `link_mm` values are 89.1 mm, and none is under 72 mm.
+
+**Change.** `sim/jaws.py` builds the jaw from parts (docs/harness.md, invariant 11). Every solid is drawn and takes part in contact. Masses come from volume at 1,240 kg/m³ (PLA).
+- **Driver.**
+  - Two 4 mm PLA plates, 9 mm wide with round ends, lie in the stock finger's own wall planes: one on the horn's face, one on the rear hub.
+  - A steel pin through their lower ends ties them together.
+  - 5.6–9.2 g.
+- **Follower.**
+  - The same pair of plates, on a fixed pin held by a printed bracket on the servo's end.
+  - The pin sits 22 mm from the hinge at 45° up from the closing axis, so the transmission angle stays at or above 35° over the jaw's range.
+- **Coupler.**
+  - It carries the stock finger's blade: the jaw below z = −55 mm in the gripper frame, where the finger is under 13 mm thick. The blade weighs 10.6 g.
+  - Two hubs span between the plates, joined by a web.
+  - When the links outreach the finger, a strut carries the blade from the lower pin. This applies when the pin's hub would overlap the blade by less than 1 mm, which happens above about 78 mm.
+  - 23–25 g.
+- **Closure.**
+  - A connect constraint joins the follower's lower pin to the coupler.
+  - The finger stays upright because the links are parallel; no constraint holds its angle.
+  - `Sim.set_arm_q` poses the dependent joints (`Sim.linked`).
+  - Excludes apply only between bodies pinned to each other.
+- **Drawing.** `worlds/cad.py` draws the follower, the pins and the bracket. `jaws.py` joins the `physics` component.
+- **Unchanged.** The finger's kinematics: it moves on a circle of radius `link_mm` and keeps its orientation, so `design/fingers.py` does not change.
+
+**Prediction.** This was made before the picks were run and is entered here with their results.
+- The verdicts are the same as the ideal linkage's.
+- The jaw angle moves by no more than 0.02 rad.
+- Squeeze changes by no more than 25%.
+- The reason: the finger's path is unchanged, and only the path the force takes through the mechanism changes.
+
+**Measured.**
+- **Geometry audit** (`scripts/audit_mechanism.py`, link 50, 70, 80 and 90 mm, 9 jaw angles):
+  - Every moving body is carried, with gaps of 0.3 mm or less (the pin clearances).
+  - The only material shared across a joint is the servo's spline in the horn and driver plate (within 3 mm of the axis, 0.3 mm deep) and its rear pin (within 2.6 mm, 0.6 mm deep). These are the bearing seats.
+  - The first build put the plates inside the servo and the blade. Their planes had been measured from the servo's mid-plane rather than the jaw frame's origin, which sits 18.8 mm away along the axis. The audit caught it.
+- **Loop closure** during held picks: 0.009–0.061 mm (the plan's limit is 0.1 mm).
+- **Picks against the ideal linkage at HEAD:** 12 picks (links of 50, 70 and 90 mm, each on a 30 mm can at 50 g and 400 g, a 50 mm can and a 40 mm box).
+  - All held, as before.
+  - The jaw angle moved by 0.013 rad or less.
+  - Squeeze changed by −8% to +23%. The largest change was at 90 mm on the 30 mm can, from 36.8 to 45.3 N.
+- **The gold** has no parallelogram picks, so it does not move.
+
+**Consequence, open (judge tier, P3).** The finger stays where the stock puts it, so links longer than about 78 mm hang the coupler's pins below the fingertip. At System 2's 89 mm, the lower pin is 7 mm below the tip and its hub reaches 13 mm below. The pins meet the table or the object first. Two judge-tier options remain for P3: make the finger's mount on the coupler a part parameter, or narrow `link_mm`. Until then, the simulator builds the long links as they are, with this cost.

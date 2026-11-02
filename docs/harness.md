@@ -89,6 +89,18 @@ any of these files, run the listed test before anything else.
     - `runs/<id>/harness.json` holds a per-component fingerprint plus a `judge_key`.
     - `sea report` refuses to pool runs with different judge keys (`--allow-mixed` overrides
       this, on purpose).
+11. **Every part is a real mechanism.**
+    - A part a world offers System 2 exists in the simulator as the parts that make it work:
+      bodies with mass from their volume or datasheet, joints something carries (a horn, a pin
+      in a bore, a carriage on a rail), and a transmission with real dimensions from the motor
+      to the motion. A gear ratio or a constraint does not stand in for a part.
+    - Nothing floats and nothing interpenetrates, except at a declared bearing seat: material
+      shared across a revolute joint only inside a small cylinder around its axis.
+    - Pictures and films draw the mechanism the simulator runs (`worlds/cad.py` reads the MuJoCo
+      model).
+    - A part that cannot be modelled this way yet is not offered, or is listed in "Where the
+      harness is still thin" until it is.
+    - Tests: `test_mechanism.py` (the audit of each jaw mechanism: carried, seats only).
 
 ## The run directory is the source of truth
 
@@ -138,6 +150,9 @@ These are known gaps. Each one makes a verdict less trustworthy in a specific wa
 | Toggle reaches about 2/3 of its throw | Toggles read `stuck` or `wrong_behavior` | decisions.md D-013 |
 | L1 fingers and L2 kinematics | Proposals are rejected until `design/arm.py` lands (M9) | decisions.md D-019 |
 | World model (3.6) | Not built (M10, optional) | — |
+| The slide jaw is still an ideal slide | The prismatic jaw has no rail, rack or pinion; its travel is a ratio, so it can reach 98 mm (invariant 11) | decisions.md D-057 |
+| Long four-bar links outreach the finger | Above about 78 mm the coupler's pins hang below the stock fingertip and meet the table first; the finger's mount is not yet a part parameter | decisions.md D-057 |
+| Mobile and talking-robot bodies are not mechanisms yet | The mobile world is analytic with drawn tracks; the talking robot's articulators are free positions | plan P4, P5 |
 
 Fixing physics gaps changes the *world* tier, so it moves the golden verdicts. Follow the
 procedure in [iteration.md](iteration.md) §4.2.

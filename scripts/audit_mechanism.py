@@ -28,7 +28,7 @@ from pathlib import Path
 import numpy as np
 from render_bodies import frames
 
-HAND = ("gripper", "moving_jaw_so101_v1", "jaw_coupler")
+HAND = ("gripper", "moving_jaw_so101_v1", "jaw_coupler", "jaw_follower", "jaw_carriage")
 ROBOT = {"base", "shoulder", "upper_arm", "lower_arm", "wrist", *HAND}
 SAMPLES = 9  # jaw positions, ends included
 # Datasheet ratings per H-bridge channel (A, continuous): Toshiba TB6612FNG 1.2 A (3.2 A peak); ST L298 2 A.
@@ -56,6 +56,9 @@ def _hand(model):
         elif model.geom_type[i] == mujoco.mjtGeom.mjGEOM_BOX:
             mesh = trimesh.creation.box(extents=2 * model.geom_size[i])
             name = model.geom(i).name
+        elif model.geom_type[i] == mujoco.mjtGeom.mjGEOM_CYLINDER:
+            mesh = trimesh.creation.cylinder(radius=model.geom_size[i][0], height=2 * model.geom_size[i][1], sections=48)
+            name = model.geom(i).name
         else:
             continue
         rot = np.zeros(9)
@@ -81,7 +84,6 @@ def gripper_geometry(body) -> dict:
     solids = _hand(m)
     jid = m.joint("gripper").id
     lo, hi = m.jnt_range[jid] / sim.grip_scale
-    coupler = m.joint("jaw_coupler_q").id if any(m.joint(j).name == "jaw_coupler_q" for j in range(m.njnt)) else None
     bodies = {s.body for s in solids}
     clashes: dict[str, dict] = {}
     names = {m.body(i).name for i in range(m.nbody)}
@@ -89,10 +91,7 @@ def gripper_geometry(body) -> dict:
     for q in np.linspace(lo, hi, SAMPLES):
         qa = HOME_Q.copy()
         qa[-1] = q
-        sim.set_arm_q(qa)
-        if coupler is not None:
-            d.qpos[m.jnt_qposadr[coupler]] = -q
-            mujoco.mj_forward(m, d)
+        sim.set_arm_q(qa)  # the jaw mechanism's linked joints follow (Sim.linked)
         poses = {}
         for b in bodies | set(support):
             t = np.eye(4)
