@@ -150,7 +150,7 @@ These are known gaps. Each one makes a verdict less trustworthy in a specific wa
 | Toggle reaches about 2/3 of its throw | Toggles read `stuck` or `wrong_behavior` | decisions.md D-013 |
 | L1 fingers and L2 kinematics | Proposals are rejected until `design/arm.py` lands (M9) | decisions.md D-019 |
 | World model (3.6) | Not built (M10, optional) | — |
-| The slide jaw is still an ideal slide | The prismatic jaw has no rail, rack or pinion; its travel is a ratio, so it can reach 98 mm (invariant 11) | decisions.md D-057 |
+| Mechanism audits do not refuse yet | A slide past about 22 mm/rad cannot be assembled (its pinion meets the wrist; past 35 mm/rad the rods run out, D-058), but it is still trialled; the laws become refusals in P2 | decisions.md D-058 |
 | Long four-bar links outreach the finger | Above about 78 mm the coupler's pins hang below the stock fingertip and meet the table first; the finger's mount is not yet a part parameter | decisions.md D-057 |
 | Mobile and talking-robot bodies are not mechanisms yet | The mobile world is analytic with drawn tracks; the talking robot's articulators are free positions | plan P4, P5 |
 

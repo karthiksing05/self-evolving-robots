@@ -40,7 +40,7 @@ from sea.sim.controls import (
     MovingPart,
     build_geometry,
 )
-from sea.sim.jaws import four_bar
+from sea.sim.jaws import BODIES, four_bar, slide
 
 TIMESTEP = 0.002
 STALL_TORQUE = {7.4: 1.62, 12.0: 2.94}
@@ -174,7 +174,6 @@ class Sim:
     panel_body: int = -1
     objects: dict[str, int] = field(default_factory=dict)  # scene object name -> body id
     object_geoms: dict[str, int] = field(default_factory=dict)  # scene object name -> geom id
-    grip_scale: float = 1.0  # gripper joint units per servo radian: m/rad on a slide jaw (D-042), else 1
     linked: list[tuple[int, float]] = field(default_factory=list)  # (qpos address, units per servo radian)
     _limit_type: int = int(mujoco.mjtConstraint.mjCNSTR_LIMIT_JOINT)
 
@@ -197,25 +196,18 @@ class Sim:
 
     # ---------------------------------------------------------------- state
     def arm_q(self) -> np.ndarray:
-        """Joint angles, the gripper as its servo angle whatever the jaw's joint."""
-        q = self.data.qpos[self.arm_qadr].copy()
-        q[-1] /= self.grip_scale
-        return q
+        """Joint angles; the gripper joint is the servo's output on every jaw (D-058)."""
+        return self.data.qpos[self.arm_qadr].copy()
 
     def servo_ranges(self) -> np.ndarray:
-        """(lo, hi) per arm joint in servo units: the gripper's in radians even on a slide jaw."""
-        jr = np.array([self.model.jnt_range[self.model.joint(j).id] for j in ARM_JOINTS], dtype=float)
-        jr[-1] /= self.grip_scale
-        return jr
+        """(lo, hi) per arm joint in servo units (radians)."""
+        return np.array([self.model.jnt_range[self.model.joint(j).id] for j in ARM_JOINTS], dtype=float)
 
     def arm_qd(self) -> np.ndarray:
-        qd = self.data.qvel[self.arm_dadr].copy()
-        qd[-1] /= self.grip_scale
-        return qd
+        return self.data.qvel[self.arm_dadr].copy()
 
     def set_arm_q(self, q: np.ndarray) -> None:
         self.data.qpos[self.arm_qadr] = q
-        self.data.qpos[self.arm_qadr[-1]] = q[-1] * self.grip_scale
         for adr, ratio in self.linked:  # the jaw mechanism's other joints, where the servo angle puts them
             self.data.qpos[adr] = q[-1] * ratio
         self.data.qvel[self.arm_dadr] = 0.0
@@ -386,10 +378,10 @@ FINGER_DAMPING_RATIO = 1.0
 
 
 def _finger_flex(spec: mujoco.MjSpec) -> None:
-    """A spring joint in series with the gripper joint, on the same axis: the rotor drives the gripper joint
-    and the finger deflects on this one.  Its inertia keeps the flex mode at one radian per timestep, the
-    fastest the integrator follows."""
-    j = spec.joint("gripper")
+    """A spring joint in series with the joint that carries the finger, on the same axis: the rotor drives
+    the gripper joint (and through the pinion a slide's carriage) and the finger deflects on this one.  Its
+    inertia keeps the flex mode at one radian per timestep, the fastest the integrator follows."""
+    j = spec.joint("jaw_slide") or spec.joint("gripper")
     k = FINGER_STIFFNESS_NM_PER_RAD if j.type == mujoco.mjtJoint.mjJNT_HINGE else FINGER_STIFFNESS_NM_PER_RAD / FINGER_LEVER_M**2
     inertia = k * TIMESTEP**2
     j.parent.add_joint(name="jaw_flex", type=j.type, axis=list(j.axis), pos=list(j.pos), stiffness=[k, 0.0, 0.0],
@@ -415,9 +407,7 @@ def _horn_mesh() -> tuple[np.ndarray, np.ndarray]:
 def _horn(spec: mujoco.MjSpec, f) -> None:
     """The gripper servo's horn turns with its output (D-056).  The SO-101 model draws the horn on the servo, so the
     hinged jaw, screwed to the horn, cut through it at every angle; the horn-less servo stays on the gripper and
-    the horn rides the jaw.  The slide's horn turns its pinion, which the slide does not model yet: it stays put."""
-    if f.jaw == "prismatic":
-        return
+    the horn rides the jaw (on a slide, the pinion's body)."""
     servo = [g for g in spec.geoms if g.parent.name == "gripper" and g.meshname == HORN_MESH]
     for g in servo:
         g.meshname = HORNLESS_MESH
@@ -432,29 +422,15 @@ def _horn(spec: mujoco.MjSpec, f) -> None:
                  conaffinity=0, group=2, mass=0.0, material=g.material)
 
 
-def _jaw_joint(spec: mujoco.MjSpec, f) -> tuple[float, list[tuple[str, float]]]:
-    """Rebuild the moving jaw's joint for the jaw part (D-042); returns the gripper joint's units per servo
-    radian and the mechanism's other joints with theirs.  The servo stays a position servo in radians: a
-    slide's actuator gear is 1 / pinion radius, so its torque reaches the jaw as force, and its damping and
-    rotor inertia are reflected through the pinion.  A parallelogram keeps the hinge as the driving link
-    of the four-bar ``sim/jaws.py`` builds (D-057)."""
+def _jaw_joint(spec: mujoco.MjSpec, f) -> list[tuple[str, float]]:
+    """Rebuild the moving jaw as its part's mechanism (D-042, ``sim/jaws.py``); returns the mechanism's other
+    joints with their units per servo radian.  The gripper joint stays the servo's output, a hinge in
+    radians: the slide's pinion turns on it (D-058), and the parallelogram's driving links (D-057)."""
     if f.jaw == "prismatic":
-        r = f.drive_mm_per_rad * MM
-        j = spec.joint("gripper")
-        lo, hi = j.range
-        j.type = mujoco.mjtJoint.mjJNT_SLIDE
-        j.axis = [1.0, 0.0, 0.0]
-        j.range = [lo * r, hi * r]
-        j.damping = [float(j.damping[0]) / r**2, 0.0, 0.0]
-        j.armature = float(j.armature) / r**2
-        j.frictionloss = float(j.frictionloss) / r
-        for act in spec.actuators:
-            if act.name == "gripper":
-                act.gear = [1.0 / r, 0.0, 0.0, 0.0, 0.0, 0.0]
-        return r, []
+        return slide(spec, f.drive_mm_per_rad * MM)
     if f.jaw == "parallelogram":
-        return 1.0, four_bar(spec, f.link_mm)
-    return 1.0, []
+        return four_bar(spec, f.link_mm)
+    return []
 
 
 def build_model(design: Design, panel: PanelSpec | None = None, tools: list | None = None,
@@ -475,7 +451,7 @@ def build_model(design: Design, panel: PanelSpec | None = None, tools: list | No
         volts = design.arm.servo_voltage.get(act.name, 7.4)
         tau = STALL_TORQUE[float(volts)]
         act.forcerange = [-tau, tau]
-    grip_scale, linked = _jaw_joint(spec, design.fingers)
+    linked = _jaw_joint(spec, design.fingers)
     _horn(spec, design.fingers)
     # Stock jaw geoms get the names the verifier maps (Appendix B).  The jaw meshes collide through
     # their CoACD parts instead of one convex hull (D-013); other arm meshes keep their hulls.
@@ -519,9 +495,8 @@ def build_model(design: Design, panel: PanelSpec | None = None, tools: list | No
         _, names = _tool_body(gripper, np.asarray(site.pos), np.asarray(site.quat), slot, tool, gidx, spec)
         tool_names[slot] = names
         spec.add_exclude(bodyname1="moving_jaw_so101_v1", bodyname2=f"tool_slot{slot}")
-        if design.fingers.jaw == "parallelogram":
-            for b in ("jaw_coupler", "jaw_follower"):
-                spec.add_exclude(bodyname1=b, bodyname2=f"tool_slot{slot}")
+        for b in BODIES[design.fingers.jaw]:
+            spec.add_exclude(bodyname1=b, bodyname2=f"tool_slot{slot}")
 
     faults = faults or {}
     handles_pre: dict[str, tuple] = {}
@@ -601,9 +576,7 @@ def build_model(design: Design, panel: PanelSpec | None = None, tools: list | No
     geom_kind: dict[int, str] = {}
     geom_contact: dict[int, ContactType] = {}
     robot_bodies = {model.body(n).id for n in ("base", "shoulder", "upper_arm", "lower_arm", "wrist", "gripper",
-                                                "moving_jaw_so101_v1")}
-    if design.fingers.jaw == "parallelogram":
-        robot_bodies |= {model.body("jaw_coupler").id, model.body("jaw_follower").id}
+                                                "moving_jaw_so101_v1", *BODIES[design.fingers.jaw])}
     for g in range(model.ngeom):
         name = model.geom(g).name
         if name.startswith("jaw_fixed"):
@@ -641,7 +614,7 @@ def build_model(design: Design, panel: PanelSpec | None = None, tools: list | No
               geom_kind, geom_contact, body_to_control=body_to_control,
               panel_body=model.body("panel").id if panel is not None else -1,
               objects={ob.name: model.body(f"obj_{ob.name}").id for ob in objects},
-              object_geoms={ob.name: model.geom(f"obj_{ob.name}_geom").id for ob in objects}, grip_scale=grip_scale,
+              object_geoms={ob.name: model.geom(f"obj_{ob.name}_geom").id for ob in objects},
               linked=[(int(model.jnt_qposadr[model.joint(n).id]), r) for n, r in linked])
     for slot, names in tool_names.items():
         sim.tool_geoms[slot] = [model.geom(n).id for n in names]

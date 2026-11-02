@@ -31,8 +31,7 @@ def gripper(body: Body, opening_mm: float = 80.0) -> CadModel:
     """The jaws as the simulator holds them, open to ``opening_mm`` (or as wide as the jaw goes): the
     SO-101's own CAD (its STL exports) for the servo, the fixed jaw and the moving finger, posed by the
     jaw part's joint, the jaw mechanism's links and pins as ``sim/jaws.py`` builds them, and the printed pads
-    as the boxes ``design/fingers.py`` builds.  The slide's rods and bushings are bought items the simulator
-    does not draw; the bill of materials lists them."""
+    as the boxes ``design/fingers.py`` builds."""
     des = G.to_design(body)
     sim = build_model(des)
     m, d = sim.model, sim.data
@@ -41,7 +40,7 @@ def gripper(body: Body, opening_mm: float = 80.0) -> CadModel:
     sim.set_arm_q(qa)
     g = m.body("gripper").id
     rot, origin = d.xmat[g].reshape(3, 3), d.xpos[g]
-    moving = {"moving_jaw_so101_v1", "jaw_coupler", "jaw_follower"}
+    moving = {"moving_jaw_so101_v1", "jaw_coupler", "jaw_follower", "jaw_carriage"}
     parts = []
     for i in range(m.ngeom):
         name = m.body(m.geom_bodyid[i]).name
@@ -67,8 +66,9 @@ def gripper(body: Body, opening_mm: float = 80.0) -> CadModel:
         mesh.apply_scale(1000.0)
         pad = "_pad" in label
         servo = label.startswith("sts3215")
-        slot = "pads" if pad else ("jaw" if name in moving or label.startswith("jaw_bracket") else "")
-        material = "tpu" if pad else "servo" if servo else "metal" if label.endswith("_pin") else "printed"
+        slot = "pads" if pad else ("jaw" if name in moving or label.startswith("jaw_") else "")
+        steel = label.endswith("_pin") or label[:-1] == "jaw_rod"
+        material = "tpu" if pad else "servo" if servo else "metal" if steel else "printed"
         parts.append(CadPart(label, slot, mesh, material))
     # the gripper frame: x closes the jaws, the fingertips point down -z
     return CadModel(parts, [View("side", (0.0, -1.0, 0.0)), View("three-quarter", (0.55, -1.0, -0.45))])

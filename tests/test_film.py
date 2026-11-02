@@ -121,13 +121,19 @@ def test_gripper_film_replays_under_the_runs_seed():
 
 
 def test_gripper_film_replays_system1s_fixed_retry_when_the_record_says_defaults():
-    """gripper_s2v3_s2, iteration 10: held the mustard bottle on the retry, recorded as {} after 1 attempt."""
+    """The stock body slips on the banana's first attempt and holds it on System 1's fixed retry; both are
+    recorded as {}, so the film runs both and keeps the one that held.  (The case this test used before,
+    gripper_s2v3_s2's 60 mm/rad slide on the mustard bottle, held only on the ideal slide: on the real rack
+    and pinion its 120 mm pinion jams against the wrist, D-058.)"""
     world = GripperWorld()
-    slide = _body(world, Edit(slot="jaw", type="prismatic", params={"drive_mm_per_rad": 60.0}),
-                  Edit(slot="pads", type="pads", params={"reach_mm": 3.5, "pad_angle_deg": 8.798, "groove_mm": 6.0,
-                                                         "lip_mm": 0.0, "pad_tpu_mm": 2.0, "width_mm": 18.0}))
-    clip = F.gripper(slide, _task(world, "reg_mustard_bottle"), {}, 2, size=(160, 120))
-    assert clip.ok
+    attempts: list[int] = []
+
+    def probe(model):
+        attempts.append(len(attempts))
+        return lambda data: None
+
+    clip = F.gripper(world.stock(), _task(world, "reg_banana"), {}, 2, size=(160, 120), probe=probe)
+    assert clip.ok and len(attempts) == 2
 
 
 @pytest.mark.skipif(shutil.which("ffmpeg") is None, reason="films need ffmpeg")

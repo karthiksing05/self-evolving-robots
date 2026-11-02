@@ -72,25 +72,31 @@ def test_penetration_keeps_the_deepest_per_kind_of_pair_each_step():
     assert s["object-table"]["peak_mm"] == 1.0  # the clear contact on step 1 is not penetration
 
 
-def test_the_stock_jaw_rides_its_horn_and_the_slide_jaw_floats_free():
-    """b021's slide (gripper_s2v3_s0): nothing carries the jaw once it leaves the servo."""
+def _jaw(world: GripperWorld, type_: str, **params: float):
+    return apply(world.stock(), [Edit(slot="jaw", type=type_, params=params)], {p.name: p for p in world.catalogue()}, "t")
+
+
+def test_the_stock_jaw_rides_its_horn_and_a_slide_rides_its_rods():
+    """D-058: a 20 mm/rad slide is a pinion on the horn and a carriage on two rods, sharing material with
+    nothing but the servo's spline at any wrist roll.  b021's 56 mm/rad (gripper_s2v3_s0) cannot be built
+    on the catalogue's 100 mm rods: the carriage runs into the rods' clamp, the clamp's bracket has no way
+    past a pinion 112 mm across, and the pinion meets the wrist."""
     world = GripperWorld()
     stock = audit_mechanism.gripper_geometry(world.stock())["carried"]["moving_jaw_so101_v1"]
     assert stock["joint"] == "hinge" and stock["worst_gap_mm"] == 0.0
-    slide = apply(world.stock(), [Edit(slot="jaw", type="prismatic", params={"drive_mm_per_rad": 56.0})],
-                  {p.name: p for p in world.catalogue()}, "t")
-    carried = audit_mechanism.gripper_geometry(slide)["carried"]["moving_jaw_so101_v1"]
-    assert carried["joint"] == "slide" and carried["worst_gap_mm"] > 50.0
+    geo = audit_mechanism.gripper_geometry(_jaw(world, "prismatic", drive_mm_per_rad=20.0))
+    assert geo["carried"]["jaw_carriage"]["joint"] == "slide" and geo["carried"]["jaw_carriage"]["worst_gap_mm"] <= 0.1
+    assert all(c["from_axis_mm"][1] <= 3.0 for c in geo["clashes"].values())
+    b021 = audit_mechanism.gripper_geometry(_jaw(world, "prismatic", drive_mm_per_rad=56.0))["clashes"]
+    assert any(k.startswith("jaw_clamp / jaw_carriage") for k in b021) and "jaw_clamp_bracket / jaw_pinion" in b021
+    assert any(c["bodies"][0] == "wrist" and c.get("at_roll") for c in b021.values())
 
 
 def test_the_four_bar_is_built_from_parts_that_carry_each_other():
     """D-057: the parallelogram is links, pins and a coupler.  Every moving body is carried with no gap,
     and the only material shared across a joint is the servo's spline and rear pin, inside 3 mm of the axis.
     The kept bodies' 89 mm links outreach the finger, so a strut carries the blade from the pins."""
-    world = GripperWorld()
-    body = apply(world.stock(), [Edit(slot="jaw", type="parallelogram", params={"link_mm": 89.136})],
-                 {p.name: p for p in world.catalogue()}, "t")
-    geo = audit_mechanism.gripper_geometry(body)
+    geo = audit_mechanism.gripper_geometry(_jaw(GripperWorld(), "parallelogram", link_mm=89.136))
     assert set(geo["carried"]) == {"moving_jaw_so101_v1", "jaw_coupler", "jaw_follower"}
     assert all(c["material"] and c["worst_gap_mm"] <= 0.3 for c in geo["carried"].values())
     assert geo["clashes"] and all(c["from_axis_mm"][1] <= 3.0 and "gripper" in c["bodies"]
@@ -121,3 +127,29 @@ def test_the_four_bar_loop_closes_and_keeps_the_finger_upright():
         turns.append(d.xmat[c].reshape(3, 3) @ d.xmat[m.body("gripper").id].reshape(3, 3).T)
         assert jaws.transmission_deg(q) >= 35.0
     assert all(np.allclose(t, turns[0], atol=1e-9) for t in turns)
+
+
+def test_the_slide_follows_its_pinion_and_carries_the_finger_and_pads():
+    from sea.contracts import Design, FingerSpec
+    from sea.control.executor import HOME_Q
+    from sea.design import fingers as F
+    from sea.sim import jaws
+    from sea.sim.build_model import build_model
+
+    spec = FingerSpec(jaw="prismatic", drive_mm_per_rad=30.0, pad_tpu_mm=2.0, reach_mm=5.0)
+    sim = build_model(Design(id="s", fingers=spec))
+    m, d = sim.model, sim.data
+    assert F.moving_body(spec) == "jaw_carriage" and {m.body(m.geom_bodyid[m.geom(f"jaw_moving_pad{k}").id]).name
+                                                      for k in range(1)} == {"jaw_carriage"}
+    assert jaws.module_for(0.030) == (60, pytest.approx(0.001))
+    tip = np.array([F.MOVING_FACE_X, F.MOVING_TIP_Y, F.MOVING_MID_Z])
+    g = m.body("gripper").id
+    for q in (-0.17, 0.0, 0.8, 1.7):
+        qa = HOME_Q.copy()
+        qa[-1] = q
+        sim.set_arm_q(qa)
+        assert sim.arm_q()[-1] == pytest.approx(q)
+        assert d.qpos[m.jnt_qposadr[m.joint("jaw_slide").id]] == pytest.approx(0.030 * q)
+        c = m.body("jaw_carriage").id
+        at = d.xmat[g].reshape(3, 3).T @ (d.xpos[c] + d.xmat[c].reshape(3, 3) @ tip - d.xpos[g])
+        assert at == pytest.approx(F.moving_to_gripper(q, tip, spec), abs=1e-6)  # the facts' finger is the simulated one

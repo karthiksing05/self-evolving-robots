@@ -98,8 +98,9 @@ def link_vec(spec: FingerSpec) -> np.ndarray:
 
 
 def moving_body(spec: FingerSpec) -> str:
-    """The body the moving finger's geoms sit on: the jaw itself, or the parallelogram's coupler."""
-    return "jaw_coupler" if spec.jaw == "parallelogram" else "moving_jaw_so101_v1"
+    """The body the moving finger's geoms sit on: the jaw itself, the parallelogram's coupler or the slide's
+    carriage (whose frame is the jaw's at q = 0)."""
+    return {"parallelogram": "jaw_coupler", "prismatic": "jaw_carriage"}.get(spec.jaw, "moving_jaw_so101_v1")
 
 
 def _rz(a: float) -> np.ndarray:

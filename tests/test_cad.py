@@ -55,7 +55,7 @@ def test_a_swapped_part_changes_the_cad_of_its_slot(world, slot, type_):
 def test_slide_finger_does_not_turn_as_it_opens():
     """The prismatic jaw's finger keeps its orientation: at two openings its mesh differs by a shift along x."""
     body = _swap(WORLDS[0], "jaw", "prismatic")
-    a, b = (next(p for p in CAD["gripper"](body, opening_mm=w).parts if p.name == "moving_jaw_so101_v1") for w in (40, 80))
+    a, b = (next(p for p in CAD["gripper"](body, opening_mm=w).parts if p.name == "jaw_blade") for w in (40, 80))
     shift = b.mesh.vertices - a.mesh.vertices
     assert np.allclose(shift[:, 1:], 0.0, atol=1e-4) and np.ptp(shift[:, 0]) < 1e-4 and 35 < shift[0, 0] < 45
 

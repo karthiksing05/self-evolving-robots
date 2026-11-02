@@ -1523,3 +1523,59 @@ Three fixes failed on the way, each for a reason:
 - **The gold** has no parallelogram picks, so it does not move.
 
 **Consequence, open (judge tier, P3).** The finger stays where the stock puts it, so links longer than about 78 mm hang the coupler's pins below the fingertip. At System 2's 89 mm, the lower pin is 7 mm below the tip and its hub reaches 13 mm below. The pins meet the table or the object first. Two judge-tier options remain for P3: make the finger's mount on the coupler a part parameter, or narrow `link_mm`. Until then, the simulator builds the long links as they are, with this cost.
+
+## D-058 The slide jaw is a real rack and pinion on two rods (world: physics)
+**Observed.**
+- **The old slide was an ideal joint.** D-042's slide turned the gripper hinge itself into a slide joint and set the actuator gear to 1/r. It had no pinion, rack, rods or carriage: the stock finger's whole mesh, hub included, slid along x.
+- **Its catalogue entry names real parts.** The entry reads "a printed rack and pinion on two steel rods", and the bill of materials lists two 3 × 100 mm steel rods and two LM3UU bushings.
+- **System 2 always took a large pinion.** Every recorded slide body uses 52–60 mm/rad (134 records), a pinion 104–120 mm across.
+
+**Change.** `sim/jaws.slide` builds the mechanism from those parts.
+- **The gripper joint stays the servo's output**, a hinge in radians, for every jaw. `Sim.grip_scale` is gone.
+- **Pinion.**
+  - A printed spur gear on a hub screwed to the horn, 6 mm thick.
+  - The hub reaches through the frame's cut-out around the horn (clear to 12 mm), so the gear runs outboard of the frame at y = −28.5 to −34.5 mm.
+  - Whole teeth at about module 1: the tooth count nearest 2r/1 mm, with the module that makes the pitch radius exactly `drive_mm_per_rad`. Backlash is 0.6 mm.
+- **Rack.**
+  - In the pinion's plane, with its pitch line on the pinion's pitch circle.
+  - Long enough to stay in mesh over the whole travel, with a tooth centred under the pinion at q = 0.
+- **Carriage.**
+  - A printed block under the rack with a square bore for each rod (the bushings: 3 mm bore, 0.1 mm clearance).
+  - An arm across to the stock finger's blade (the same blade as D-057).
+  - Its frame is the jaw's at q = 0, so the blade and pads sit on it as on the stock jaw. `fingers.moving_body` names it. The finger's kinematics in `design/fingers.py` do not change: x moves by r·q.
+- **Rods.**
+  - Two 3 × 100 mm steel rods on the gripper. Their front end is 2 mm past the carriage fully open.
+  - A printed clamp holds them at their back end. A bracket runs from the clamp to the frame's horn side, crossing the gear plane behind the pinion.
+- **The teeth are a joint equality**, slide = r·q. Tooth contact itself is too fine for a 2 ms step. Its impedance (0.999–0.9999) puts the mesh compliance near printed teeth: about 0.07 mm at 110 N, against an estimated 0.1 mm at 160 N for PLA teeth on a 6 mm face.
+- **Flex.** The finger's flex spring (D-054) moves from the gripper joint to the carriage, in series with the slide.
+- **Masses** come from volume (PLA 1,240 kg/m³, steel 7,850 kg/m³) plus the bushings' datasheet mass.
+  - Parts fixed to the gripper join its mass, because the SO-101's gripper inertial ignores geom masses: rods and clamp here, and D-057's bracket and pin hub.
+  - A 30 mm/rad pinion weighs 24 g and the carriage 28 g.
+
+**Prediction.**
+- **Picks.** The same verdicts and the same squeeze within 5%. The finger's path and the force ratio τ/r are unchanged; only the reflected inertia (now the carriage's real mass through the pinion) and the teeth's compliance are new.
+- **Geometry.** The catalogue's 100 mm rods cannot hold System 2's slides: travel 1.9 r against 100 mm of rod less the carriage and clamp.
+
+**Measured.**
+- **Picks against the ideal slide at HEAD.** 15 picks: 20, 30 and 40 mm/rad, each on 30 mm cans at 50 g and 400 g, a 50 mm can, a 40 mm box and a 70 mm can.
+  - Every verdict is the same.
+  - Squeeze is within 4%.
+  - Rack-to-pinion error is 0.05–0.10 mm under 70–160 N.
+- **Geometry audit** (9 jaw angles).
+  - The audit now also checks the jaw's parts against the wrist over the wrist's whole roll range (13 rolls). A film found this first: a 60 mm/rad pinion jammed against the wrist at 161 N.
+  - **20 mm/rad:**
+    - The carriage is carried on its rods at every angle, with 0.1 mm gaps (the bushing clearance).
+    - The only material shared across a joint is the servo's spline in the horn and hub (within 3 mm of the axis).
+    - After the tooth phase and backlash were set, the teeth mesh with no interference.
+  - **25 and 30 mm/rad:** clean except that the pinion meets the wrist's roll housing when the wrist rolls past 2.4 rad (both) or −2.7 rad (30 mm/rad).
+  - **40 mm/rad:**
+    - The carriage runs into the rods' clamp when closed.
+    - The bracket's path past the pinion is gone.
+  - **b021's 56 mm/rad:** all three failures, with a pinion of 112 mm and 76 g. This prediction held.
+- **The real envelope** is about 22 mm/rad: a pinion about 44 mm across, about 42 mm of travel, and a widest opening of about 54 mm. The wrist sets it. The rods would allow about 35 mm/rad.
+- **One film test changed case.** `test_film`'s retry case was gripper_s2v3_s2's 60 mm/rad slide holding the mustard bottle. It held only on the ideal slide: on the real one, its 120 mm pinion jams against the wrist. The test now uses the stock body on the banana, which slips on the first attempt and holds on System 1's retry.
+
+**Consequence, open (judge tier, P2/P3).**
+- Every slide body System 2 kept (52–60 mm/rad) is a mechanism the simulator now draws as unbuildable. Its successes so far rest on parts that cannot be assembled.
+- Turning these audit findings into refusals before trial is the mechanism law of P2.
+- Making the catalogue mechanical (module, teeth and a stocked rod length, with the servo's full turn as an option only if its datasheet supports it) is P3.
