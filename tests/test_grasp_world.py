@@ -55,7 +55,7 @@ def test_an_object_is_a_free_body_whose_coordinate_is_its_height():
 
 def test_the_aperture_rule_makes_wide_objects_structural():
     lib = Library.seed()
-    for width, ok in ((40, True), (45, True), (55, False)):
+    for width, ok in ((45, True), (55, True), (60, False)):  # the stock envelope: cans to 55 mm (D-048)
         c = object_spec("cylinder", width, 70, 100, 0.8)
         errs = typecheck(lib.prims["pick_up"].body, Design(id="stock"), lib.prims, LIMITS, control=c)
         assert (not errs) == ok and {e.code for e in errs} <= {"aperture"}
@@ -77,13 +77,13 @@ def test_held_for_parses_and_needs_the_hold():
 
 @pytest.fixture(scope="module")
 def suite():
-    panels = grasp_panels("train", 2) + [p for p in phase_b_panels() if p.id in ("gb_wide_can_55", "gb_ball_40")]
+    panels = grasp_panels("train", 2) + [p for p in phase_b_panels() if p.id in ("gb_wide_can_60", "gb_ball_40")]
     return {r.result.panel_id: r for r in run_suite(panels, _cfg()).runs}
 
 
 def test_the_stock_gripper_picks_phase_a_and_escalates_phase_b(suite):
     assert suite["gtr000"].result.verdict == "pass" and suite["gtr001"].result.verdict == "pass"
-    assert suite["gb_wide_can_55"].result.verdict == "no_applicable_primitive"  # aperture: before simulation
+    assert suite["gb_wide_can_60"].result.verdict == "no_applicable_primitive"  # aperture: before simulation
     assert suite["gb_ball_40"].result.verdict in ("stuck", "wrong_behavior")  # an equator grip loses the ball
 
 
@@ -94,9 +94,9 @@ def test_the_squeeze_is_the_task_not_a_force_violation(suite):
 
 
 def test_a_lift_that_falls_back_is_not_a_pass():
-    # A 50 mm can lifts about 35 mm and then slides out (V1).  Skip the aperture rule and run the pick:
-    # the object passed its travel for a moment, but held_for needs the full hold.
-    panel = table_panel("t50", "train", 0, object_spec("cylinder", 50, 60, 50, 0.8))
+    # A 60 mm can lifts about 20 mm and then slides out (V1, D-048).  Skip the aperture rule and run the
+    # pick: the object passed its travel for a moment, but held_for needs the full hold.
+    panel = table_panel("t60", "train", 0, object_spec("cylinder", 60, 60, 50, 0.8))
     (can,) = panel.controls
     runner = PanelRunner(panel, _cfg(), 0)
     trace = runner.attempt(can, Library.seed().prims["pick_up"].body, {})

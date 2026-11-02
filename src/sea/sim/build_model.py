@@ -50,6 +50,11 @@ CONTROL_BITS = (4, 1)
 OBJECT_BIT = 8
 OBJECT_BITS = (OBJECT_BIT, PANEL_BITS[0] | OBJECT_BIT)
 JAW_FRICTION = 0.45  # bare printed PLA jaw face (D-032)
+# Frictional-to-normal impedance for elliptic cones in scenes where the jaws hold a free object (D-048).  At
+# MuJoCo's default of 1, soft friction lets a pinched object creep out under a steady load: a 50 g plum
+# squeezed at 30 N slid out.  Values above 1 stiffen friction without raising mu ("preventing slip", MuJoCo
+# XML reference, option/impratio); MuJoCo Menagerie's gripper scenes use 10.
+GRASP_IMPRATIO = 10.0
 
 
 def pair_friction(a: float, b: float) -> float:
@@ -520,6 +525,7 @@ def build_model(design: Design, panel: PanelSpec | None = None, tools: list | No
                        mass=ob.mass_kg, friction=[ob.friction, 0.005, 0.0001], rgba=[0.3, 0.5, 0.8, 1.0],
                        contype=OBJECT_BITS[0], conaffinity=OBJECT_BITS[1], condim=4)
     if surfaces:
+        spec.option.impratio = GRASP_IMPRATIO
         jaws = [g.name for g in spec.geoms if g.name.startswith(("jaw_fixed", "jaw_moving"))]
         for g in spec.geoms:
             if g.contype == ROBOT_BITS[0] and not g.name.startswith(("jaw_fixed", "jaw_moving")):

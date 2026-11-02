@@ -1152,3 +1152,51 @@ Also noted: the phonology world's gold path costs $24, not $16, once the spare s
 
 Tests: `tests/test_evolve.py` (the jet-pack idea: a $4 rail from the manifest, a $50 jet at System 2's
 estimate, 30 machine minutes, over budget).
+
+## D-048 Friction that does not creep: impratio 10 in grasp scenes (world + judge)
+In `gripper_s2v2_s0` a 50 g plum, squeezed at about 30 N by each jaw, "slipped under load". With
+friction near 0.5 that is about 60 times the force needed to hold it. The same body and tasks were
+run at MuJoCo's default `impratio` of 1 and at 10:
+- at 1, the lemon, the plum and the apple each lost a placement to `slipped_under_load`;
+- at 10, all 16 tasks held.
+
+MuJoCo's soft contacts let friction yield under a steady load unless frictional impedance is raised.
+The XML reference describes `impratio` > 1 as preventing slip without raising the friction
+coefficient. MuJoCo Menagerie's gripper scenes use 10. So the slip was the simulator, not the
+design, and no proposal could have fixed it (rule 2).
+
+`build_model` now sets `impratio = GRASP_IMPRATIO = 10` in every scene where the jaws pair with a
+free object. Panel scenes are unchanged, and the B3 panel battery is identical at 3/5/12. Every
+instrument built on the old physics was re-measured, and the old records are kept:
+
+| Instrument | Before | After |
+|---|---|---|
+| V1 stock table (`tests/golden/stock_grasp.json`) | cans to 45 mm, boxes to 50, spheres to 40 (tips 12 mm low) | cans to 55 mm, boxes to 60, spheres to 50 |
+| V1 hold height of held picks | scattered from −13 to +73 mm | 39 to 55 mm, the commanded 45 mm lift |
+| Grasp battery (train / val / phase B) | 15/16, 16/16, 0/5 | 16/16, 16/16, 1/5 |
+| Stock jaws on the 21 real objects (`measure_real`) | 6/21 | 13/21 |
+
+Two readings of the old table were wrong:
+- *"The 50 mm can fails at every friction, so it is geometry."* A failure that does not move with
+  friction is also the mark of creep. The can now holds at friction 0.3, 0.8 and 1.5 alike.
+- *"Hold height noise."* The scatter was objects creeping out mid-hold.
+
+What changed with the physics:
+- **Typecheck:** the aperture rule reads the re-measured widths, `grip.STOCK_WIDEST_MM` = 55 / 60 /
+  50 mm.
+- **Phase B:** its wide objects moved just past the new envelope. `wide_can_55` became
+  `wide_can_60`, and `wide_box_60` became `wide_box_70`.
+- **The ball:** System 1 alone now holds `ball_30` with a below-equator grip. So phase B has four
+  objects the stock fails, not five. The analytic world is left at that rather than redesigned.
+- **Stock record:** `results/real_stock.json` is re-measured, and the old one is in
+  `results/superseded/impratio1/`.
+- **Stock failures that remain** are the wide boxes and the bottle (the splayed stock faces), the
+  tuna can (an arm stall) and three marginal fruit placements.
+
+Two gripper evolve runs predate this change, and their `harness.json` records the old code:
+- `gripper_s2_s0` (13/21);
+- `gripper_s2v2_s0`, stopped at iteration 7 with 19/21 held. Its last two groups were failing on the
+  creep.
+
+Tests: `tests/test_grasp_table.py` and `tests/test_grasp_world.py` (updated to the new envelope);
+the golden files re-recorded from reviewed diffs.

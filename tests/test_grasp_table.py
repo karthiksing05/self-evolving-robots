@@ -30,11 +30,13 @@ def _held(table: dict, shape: str, width: float, mass: float = 50.0, mu: float =
 
 def test_the_table_supports_the_scenario(table):
     # Phase A's object set and phase B's incompatible objects (docs/gripper-experiment.md section 1).
-    assert all(_held(table, "cylinder", w) for w in (25, 30, 35, 40, 45))
-    assert not any(_held(table, "cylinder", w) for w in (50, 55, 60, 70))
-    assert all(_held(table, "box", w) for w in (20, 30, 40, 50)) and not _held(table, "box", 60)
-    # The wide-can failure does not move with friction, so it is geometry (pad angle), not slip.
-    assert not any(_held(table, "cylinder", 50, mu=mu) for mu in (0.3, 0.8, 1.5))
+    # With friction that does not creep (D-048), the splayed stock faces hold cans to 55 mm and boxes to 60 mm.
+    assert all(_held(table, "cylinder", w) for w in (25, 30, 35, 40, 45, 50, 55))
+    assert not any(_held(table, "cylinder", w) for w in (60, 70))
+    assert all(_held(table, "box", w) for w in (20, 30, 40, 50, 60))
+    # The 50 mm can holds at every friction tried: before D-048 it failed at every friction alike, the mark
+    # of soft-contact creep rather than of a friction cone.
+    assert all(_held(table, "cylinder", 50, mu=mu) for mu in (0.3, 0.8, 1.5))
     # Mass: the 30 mm can holds to 800 g; at 1200 g the shoulder stalls and the payload reading saturates.
     assert _held(table, "cylinder", 30, 800) and _held(table, "cylinder", 30, 800, mu=0.3)
     heavy = next(r for r in table["picks"] if r["mass_g"] == 1200)
@@ -43,7 +45,7 @@ def test_the_table_supports_the_scenario(table):
     # whatever the friction: a profile problem (V-groove or concave pads), not a pad-material one.
     assert not any(_held(table, "sphere", w, past=5.0) for w in (20, 30, 40, 50))
     assert all(_held(table, "sphere", 40, mu=mu, past=12.0) for mu in (0.3, 0.8, 1.5))
-    assert table["envelope"]["cylinder_widest_held_mm"] == 45.0
+    assert table["envelope"]["cylinder_widest_held_mm"] == 55.0
 
 
 def test_held_picks_read_like_a_held_object(table):
@@ -54,7 +56,7 @@ def test_held_picks_read_like_a_held_object(table):
             assert max(r["pads_n"]) < 1 and abs(r["payload_g"]) < 25, r  # dropped: empty jaws, no payload
 
 
-@pytest.mark.parametrize("shape,width,past", [("cylinder", 30, None), ("cylinder", 50, None), ("sphere", 40, 12.0)])
+@pytest.mark.parametrize("shape,width,past", [("cylinder", 30, None), ("cylinder", 60, None), ("sphere", 40, 12.0)])
 def test_the_probe_reproduces_the_table(table, shape, width, past):
     probe = replace(PROBE, sphere_past_mm=past) if past is not None else PROBE
     got = pick(scene_object(shape, width, 50.0, 0.8, probe), probe=probe)

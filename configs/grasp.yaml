@@ -13,11 +13,13 @@ friction: [0.5, 1.0]  # object surface friction; jaw contacts mix it with the PL
 phase_a:
   cylinder: {width_mm: [25, 45], height_mm: [50, 80], mass_g: [50, 400]}
   box: {width_mm: [20, 50], height_mm: [40, 70], mass_g: [50, 400]}
-# Phase B: each object fails the stock gripper for one known reason (gold designs come in V2).
+# Phase B: each object fails the stock gripper for one known reason (gold designs come in V2).  The wide
+# objects sit just past the stock envelope re-measured with grasp-scene impratio (D-048: cans to 55 mm,
+# boxes to 60 mm); they were 55 mm and 60 mm, inside it once friction stopped creeping.
 phase_b:
-  - {id: wide_can_55, shape: cylinder, width_mm: 55, height_mm: 80, mass_g: 150, why: wider than the stable opening}
+  - {id: wide_can_60, shape: cylinder, width_mm: 60, height_mm: 80, mass_g: 150, why: wider than the stable opening}
   - {id: wide_can_65, shape: cylinder, width_mm: 65, height_mm: 90, mass_g: 200, why: wider than the stable opening}
-  - {id: wide_box_60, shape: box, width_mm: 60, height_mm: 60, mass_g: 150, why: wider than the stable opening}
+  - {id: wide_box_70, shape: box, width_mm: 70, height_mm: 60, mass_g: 150, why: wider than the stable opening}
   - {id: ball_30, shape: sphere, width_mm: 30, height_mm: 30, mass_g: 50, why: rolls out of a flat grip}
   - {id: ball_40, shape: sphere, width_mm: 40, height_mm: 40, mass_g: 60, why: rolls out of a flat grip}
 

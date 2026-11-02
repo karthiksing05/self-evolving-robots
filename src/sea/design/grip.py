@@ -18,9 +18,10 @@ from pathlib import Path
 
 from sea.contracts import Design, FingerSpec
 
-# Widest object held 30 mm up after a 1 s hold, at 50 g and friction 0.8 (V1).  Spheres hold only with
-# the jaw tips about 12 mm below the equator; System 1 has to find that grip.
-STOCK_WIDEST_MM = {"cylinder": 45.0, "box": 50.0, "sphere": 40.0}
+# Widest object held 30 mm up after a 1 s hold, at 50 g and friction 0.8 (V1, re-measured with grasp-scene
+# impratio, D-048).  Spheres hold only with the jaw tips about 12 mm below the equator; System 1 has to find
+# that grip.
+STOCK_WIDEST_MM = {"cylinder": 55.0, "box": 60.0, "sphere": 50.0}
 PROBE_WIDTHS_MM = tuple(range(20, 95, 5))
 SRC = Path(__file__).resolve().parents[1]
 CACHE = SRC.parents[1] / ".cache" / "grip"

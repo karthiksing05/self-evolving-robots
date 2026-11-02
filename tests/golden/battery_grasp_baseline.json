@@ -1,14 +1,14 @@
 {
- "judge_key": "72d21c9d1604",
+ "judge_key": "a4eda72d936f",
  "m": 2,
  "n": 16,
  "rack": [],
  "splits": {
   "phase_b": {
    "all": [
+    0.2,
     0.0,
-    0.0,
-    0.0
+    0.6
    ],
    "by_class": {
     "box": [
@@ -22,21 +22,21 @@
      0.0
     ],
     "sphere": [
+     0.5,
      0.0,
-     0.0,
-     0.0
+     1.0
     ]
    },
    "verdicts": {
     "no_applicable_primitive": 3,
-    "stuck": 1,
+    "pass": 1,
     "wrong_behavior": 1
    }
   },
   "train": {
    "all": [
-    0.9375,
-    0.8125,
+    1.0,
+    1.0,
     1.0
    ],
    "by_class": {
@@ -46,14 +46,13 @@
      1.0
     ],
     "cylinder": [
-     0.875,
-     0.625,
+     1.0,
+     1.0,
      1.0
     ]
    },
    "verdicts": {
-    "pass": 15,
-    "wrong_behavior": 1
+    "pass": 16
    }
   },
   "val": {
