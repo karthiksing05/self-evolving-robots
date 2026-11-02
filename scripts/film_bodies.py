@@ -12,7 +12,8 @@ film, the change, the task, and each side's verdict on the replay beside the run
 
 A run recorded when any harness component its world's replay reads differed from today's (``film.READS``),
 or with no harness.json to tell, is skipped: the replay would show something the run never saw.  Replays
-run under the run's seed, and a film whose replay disagrees with the run's record is not written.
+run under the run's seed, and a film whose replay disagrees with the run's record is not written; nor is one
+whose drawn robot goes more than ``film.CLIP_MM`` into the object or the ground (``Clip.clipping_mm``).
 """
 
 from __future__ import annotations
@@ -33,7 +34,7 @@ def main(argv: list[str] | None = None) -> int:
     from sea.evolve.core import Body
     from sea.evolve.loop import make_world
     from sea.harness import fingerprint
-    from sea.worlds.film import FILM, READS, encode, pair
+    from sea.worlds.film import CLIP_MM, FILM, READS, encode, pair
 
     ap = argparse.ArgumentParser()
     ap.add_argument("runs", nargs="+", type=Path)
@@ -82,6 +83,11 @@ def main(argv: list[str] | None = None) -> int:
                     print(f"{run.name} {f['id']} {tid}: the replay ({b.verdict} / {a.verdict}) disagrees with the "
                           f"record; not filmed", file=sys.stderr)
                     continue
+                deep = max(b.clipping_mm, a.clipping_mm)
+                if deep > CLIP_MM:  # a film must not show parts inside what they touch
+                    print(f"{run.name} {f['id']} {tid}: a drawn part goes {deep:.1f} mm into what it touches "
+                          f"(limit {CLIP_MM} mm); not filmed", file=sys.stderr)
+                    continue
                 if not b.ok and before.get("mechanism"):
                     b.verdict = f"{_human(before['mechanism'])} ({b.verdict})" if world_name.startswith("gripper") else b.verdict
                 title = tasks[tid].facts if len(tasks[tid].facts) <= 110 else tasks[tid].facts[:107] + "…"
@@ -90,7 +96,7 @@ def main(argv: list[str] | None = None) -> int:
                 encode(film, d / name, audio)
                 out.append({"frame": k, "id": f["id"], "group": g, "task": tid, "file": name,
                             "poster": name.replace(".mp4", ".jpg"), "seconds": round(len(film) / 25, 1),
-                            "sound": audio is not None,
+                            "sound": audio is not None, "clipping_mm": round(deep, 2),
                             "before": {"ok": b.ok, "verdict": b.verdict, "recorded": before.get("mechanism", "")},
                             "after": {"ok": a.ok, "verdict": a.verdict, "recorded": after.get("success")}})
                 print(f"{run.name} {name}: before {'pass' if b.ok else 'fail'}, after {'pass' if a.ok else 'fail'}")

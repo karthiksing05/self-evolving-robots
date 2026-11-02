@@ -161,3 +161,26 @@ def test_film_bodies_films_each_kept_change(tmp_path):
     films = json.loads((tmp_path / "out" / "mobile_x" / "films.json").read_text())["films"]
     assert [(f["group"], f["before"]["ok"], f["after"]["ok"]) for f in films] == [("porch", False, True)]
     assert (tmp_path / "out" / "mobile_x" / films[0]["file"]).stat().st_size > 1000
+
+
+@pytest.mark.parametrize("locomotion", [None, {"type": "tracks", "params": {"track_length": 26.0, "idler_height": 7.0}}])
+@pytest.mark.parametrize("route", ["porch_train0", "garden_train0"])
+def test_mobile_film_never_draws_the_robot_inside_the_ground(route, locomotion):
+    """Settling on only the lowest 12% of the drawn points let a wheel's front and a track's leading run pass
+    through a step's riser; the whole side outline now rests on the terrain."""
+    from sea.evolve.core import Part
+
+    w = MobileWorld()
+    body = w.stock()
+    if locomotion:
+        body = Body(parts={**body.parts, "locomotion": Part(**locomotion)})
+    drive = F.drive(body, next(t for t in w.tasks() if t.id == route), {})
+    assert drive.clipping_mm() <= 0.5
+
+
+def test_gripper_film_measures_how_deep_the_drawn_hand_goes_into_the_object():
+    """A film shows the drawn meshes, which differ from the simulated hulls by about a millimetre; a film
+    deeper than CLIP_MM is not written (film_bodies)."""
+    w = GripperWorld()
+    clip = F.gripper(w.stock(), next(t for t in w.tasks() if "gelatin" in t.id), {}, seed=0, size=(96, 72))
+    assert 0.0 <= clip.clipping_mm <= F.CLIP_MM

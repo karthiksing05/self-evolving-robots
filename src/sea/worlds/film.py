@@ -47,6 +47,59 @@ class Clip:
     verdict: str  # what happened, in a line
     audio: np.ndarray | None = None  # mono, at SR, as long as the frames
     probe: Any = None  # what a step hook recorded over the filmed attempt (gripper; sea.mechanism.audit)
+    clipping_mm: float = 0.0  # deepest a drawn robot part sits inside the object or the ground (CLIP_MM)
+
+
+CLIP_MM = 1.5  # a film whose drawn robot goes deeper than this into what it touches is not written
+
+
+def _robot_points(m, bodies: set[int], n: int = 3000) -> dict[int, np.ndarray]:
+    """Points on the drawn robot surfaces (groups 0-2: meshes and pad boxes) of ``bodies``, per geom, in its frame."""
+    import trimesh
+
+    out = {}
+    for g in range(m.ngeom):
+        if m.geom_bodyid[g] not in bodies or m.geom_group[g] > 2:
+            continue
+        if m.geom_type[g] == 7:
+            mid = m.geom_dataid[g]
+            v, f = m.mesh_vertadr[mid], m.mesh_faceadr[mid]
+            mesh = trimesh.Trimesh(m.mesh_vert[v:v + m.mesh_vertnum[mid]], m.mesh_face[f:f + m.mesh_facenum[mid]], process=False)
+        elif m.geom_type[g] == 6:
+            mesh = trimesh.creation.box(2 * m.geom_size[g])
+        else:
+            continue
+        out[g] = mesh.sample(n, seed=1) if len(mesh.faces) else mesh.vertices
+    return out
+
+
+def _depth_hook(m, obj_body: int):
+    """A step hook: how deep the drawn hand goes into the object's convex collision parts (m), every 5 ticks."""
+    import trimesh
+
+    names = {m.body(i).name for i in range(m.nbody)}
+    hand = {m.body(b).id for b in ("gripper", "moving_jaw_so101_v1", "jaw_coupler", "jaw_follower", "jaw_carriage") if b in names}
+    pts = _robot_points(m, hand)
+    planes = []
+    for g in range(m.ngeom):
+        if m.geom_bodyid[g] == obj_body and m.geom_group[g] == 3 and m.geom_type[g] == 7:
+            mid = m.geom_dataid[g]
+            v, f = m.mesh_vertadr[mid], m.mesh_faceadr[mid]
+            hull = trimesh.Trimesh(m.mesh_vert[v:v + m.mesh_vertnum[mid]], m.mesh_face[f:f + m.mesh_facenum[mid]]).convex_hull
+            planes.append((g, hull.face_normals, np.einsum("ij,ij->i", hull.face_normals, hull.triangles[:, 0])))
+    state = {"n": 0, "deepest": 0.0}
+
+    def hook(d):
+        state["n"] += 1
+        if state["n"] % 5:
+            return
+        for g, normal, off in planes:
+            ro, to = d.geom_xmat[g].reshape(3, 3), d.geom_xpos[g]
+            for r, p in pts.items():
+                local = (p @ d.geom_xmat[r].reshape(3, 3).T + d.geom_xpos[r] - to) @ ro
+                state["deepest"] = max(state["deepest"], 1000 * float((off[None, :] - local @ normal.T).min(axis=1).max()))
+    hook.state = state
+    return hook
 
 
 # ---------------------------------------------------------------- composing and encoding
@@ -203,12 +256,15 @@ def gripper(body: Body, task: Task, controls: dict[str, float], seed: int = 0, s
     judge = _judge(obj, panel, limits)
     shots: list[list[np.ndarray]] = []
     hooks: list[Any] = []
+    depths: list[Any] = []
     orig = X.Episode.tick
 
     def tick(ep, q):
         orig(ep, q)
         if hooks:
             hooks[-1](ep.sim.data)
+        if depths:
+            depths[-1](ep.sim.data)
         if ren is None:
             return
         p = ep.sim.data.xpos[ep.sim.controls[obj.id].body_id]
@@ -221,6 +277,8 @@ def gripper(body: Body, task: Task, controls: dict[str, float], seed: int = 0, s
         shots.append([])
         if probe is not None:
             hooks.append(probe(runner.sim.model))
+        if render:
+            depths.append(_depth_hook(runner.sim.model, runner.sim.controls[obj.id].body_id))
         X.reset_episode(runner.sim)
         tr = X.run_program(runner.sim, prog, obj.id, ecfg, panel_id=panel.id, attempt=n)
         return tr, judge(tr)
@@ -246,7 +304,8 @@ def gripper(body: Body, task: Task, controls: dict[str, float], seed: int = 0, s
     ok = res.verdict == "pass"
     note = (tr.note or "").replace("_", " ")
     return Clip(frames or [np.zeros((h, w, 3), np.uint8)], ok, "held for the full second" if ok else
-                f"{res.verdict.replace('_', ' ')}" + (f" ({note})" if note else ""), probe=hooks[i] if hooks else None)
+                f"{res.verdict.replace('_', ' ')}" + (f" ({note})" if note else ""), probe=hooks[i] if hooks else None,
+                clipping_mm=depths[i].state["deepest"] if depths else 0.0)
 
 
 # ---------------------------------------------------------------- the talking robot: posture, formants, sound
@@ -335,8 +394,10 @@ def _terrain(route: list[dict]) -> tuple[list[tuple[str, float, float, dict]], n
 
 
 def _settle(bottom: np.ndarray, com: np.ndarray, gx: np.ndarray, gz: np.ndarray, x0: float, sink: float = 0.0) -> tuple[float, float]:
-    """Pitch (rad) and lift (mm) that rest a body's bottom outline, shifted ``x0`` along the ground, on the
-    terrain with its centre of mass lowest (quasi-static)."""
+    """Pitch (rad) and lift (mm) that rest a body's side outline, shifted ``x0`` along the ground, on the
+    terrain with its centre of mass lowest (quasi-static).  The outline is every drawn point, not only the
+    lowest: a wheel's front or a track's leading run meets a step's riser above the body's bottom, and with
+    only the bottom points it was drawn through the riser."""
     best = (math.inf, 0.0, 0.0)
     for th in np.radians(np.arange(-40, 41, 1.0)):
         c, s = math.cos(th), math.sin(th)
@@ -349,14 +410,35 @@ def _settle(bottom: np.ndarray, com: np.ndarray, gx: np.ndarray, gz: np.ndarray,
     return best[1], best[2]
 
 
-def mobile(body: Body, task: Task, controls: dict[str, float], seed: int = 0, size: tuple[int, int] = (480, 300)) -> Clip:
-    """The robot driven along its route as the simulator's verdict says: it stops where the replayed attempt
-    (at the route's nominal dimensions, so ``seed`` is unused) failed, and says why."""
-    import vtk
-    from vtk.util.numpy_support import vtk_to_numpy
+@dataclass
+class Drive:
+    """A mobile film's course: the drawn body, the terrain, and the body's pose (x, pitch, lift) per frame."""
 
-    from sea.design.cad import MATERIALS, _polydata
+    model: Any
+    feats: list[tuple[str, float, float, dict]]
+    gx: np.ndarray
+    gz: np.ndarray
+    poses: list[tuple[float, float, float]]
+    detail: str
+    ok: bool
+    mech: str
+    front: float
+    sink: float = 0.0  # mm the last pose sinks into sand: the verdict, drawn
 
+    def clipping_mm(self) -> float:
+        """Deepest a drawn point goes below the ground over the course, beyond the sand's sinkage."""
+        pts = np.vstack([p.mesh.vertices for p in self.model.parts])[:, [0, 2]]
+        deepest = 0.0
+        for x0, th, lift in self.poses:
+            c, s = math.cos(th), math.sin(th)
+            px, pz = x0 + pts[:, 0] * c - pts[:, 1] * s, pts[:, 0] * s + pts[:, 1] * c + lift
+            deepest = max(deepest, float(np.max(np.interp(px, self.gx, self.gz) - pz)))
+        return max(0.0, deepest - self.sink)
+
+
+def drive(body: Body, task: Task, controls: dict[str, float]) -> Drive:
+    """Where the robot is in each frame: driven along its route as the simulator's verdict says, stopping
+    where the replayed attempt (at the route's nominal dimensions) failed."""
     s = M._spec(body)
     route, secs = task.data["route"], float(task.data["secs"])
     ctl = {**M.PROBE, **controls}
@@ -366,8 +448,8 @@ def mobile(body: Body, task: Task, controls: dict[str, float], seed: int = 0, si
     feats, gx, gz = _terrain(route)
     model = C.mobile(body)
     verts = np.vstack([p.mesh.vertices for p in model.parts])
-    bottom = verts[verts[:, 2] < np.percentile(verts[:, 2], 12)][:, [0, 2]]
-    bottom = bottom[:: max(1, len(bottom) // 400)]
+    outline = verts[:, [0, 2]]
+    outline = outline[:: max(1, len(outline) // 4000)]
     com = verts[:, [0, 2]].mean(0)
     front = float(verts[:, 0].max())
     sink = 0.0
@@ -381,6 +463,22 @@ def mobile(body: Body, task: Task, controls: dict[str, float], seed: int = 0, si
         if detail.find("ran out") >= 0:
             x_end = (a + b) / 2 - front
     xs = np.linspace(0.0, max(x_end, 0.0), max(12, int(abs(x_end) / 12)))
+    poses = [(float(x0), *_settle(outline, com, gx, gz, x0, sink if (i == len(xs) - 1 and sink) else 0.0))
+             for i, x0 in enumerate(xs)]
+    return Drive(model, feats, gx, gz, poses, detail, ok, mech, front, sink)
+
+
+def mobile(body: Body, task: Task, controls: dict[str, float], seed: int = 0, size: tuple[int, int] = (480, 300)) -> Clip:
+    """The robot driven along its route as the simulator's verdict says (``drive``): it stops where the
+    replayed attempt (at the route's nominal dimensions, so ``seed`` is unused) failed, and says why."""
+    import vtk
+    from vtk.util.numpy_support import vtk_to_numpy
+
+    from sea.design.cad import MATERIALS, _polydata
+
+    s = M._spec(body)
+    d = drive(body, task, controls)
+    model, feats, gx, gz, front, ok, detail, mech = d.model, d.feats, d.gx, d.gz, d.front, d.ok, d.detail, d.mech
 
     ren = vtk.vtkRenderer()
     ren.SetBackground(0.955, 0.95, 0.94)
@@ -398,6 +496,9 @@ def mobile(body: Body, task: Task, controls: dict[str, float], seed: int = 0, si
     surf = {"grass": (0.55, 0.72, 0.45), "sand": (0.86, 0.78, 0.55), "concrete": (0.72, 0.72, 0.70),
             "gravel": (0.62, 0.60, 0.56), "carpet": (0.66, 0.58, 0.70), "tile": (0.85, 0.84, 0.80)}
     width = max(400.0, 10 * s.width + 200)
+    # the ground is cut away 15 mm outside the robot's near side, as a section: a step or a trench wall in front
+    # of the robot hid its lower half, which read as it sinking into the ground
+    near = float(min(p.mesh.vertices[:, 1].min() for p in model.parts)) - 15.0
 
     def slab(x0, x1, z0, z1, y0, y1, rgb):
         src = vtk.vtkCubeSource()
@@ -423,7 +524,7 @@ def mobile(body: Body, task: Task, controls: dict[str, float], seed: int = 0, si
             xa = gx[i] + (gx[i + 1] - gx[i]) * j / n
             xb = gx[i] + (gx[i + 1] - gx[i]) * (j + 1) / n
             za = np.interp((xa + xb) / 2, gx, gz)
-            slab(xa, xb, min(gz.min(), 0) - 40, za, -width / 2, width / 2, rgb)
+            slab(xa, xb, min(gz.min(), 0) - 40, za, near, width / 2, rgb)
     for k, a, b, f in feats:
         z = float(np.interp(a, gx, gz))
         if k == "gap":  # a door left ajar: two leaves, the opening offset from the robot's line
@@ -449,8 +550,7 @@ def mobile(body: Body, task: Task, controls: dict[str, float], seed: int = 0, si
     grab.SetInput(win)
     grab.ReadFrontBufferOff()
     frames = []
-    for i, x0 in enumerate(xs):
-        th, lift = _settle(bottom, com, gx, gz, x0, sink if (i == len(xs) - 1 and sink) else 0.0)
+    for x0, th, lift in d.poses:
         tf = vtk.vtkTransform()
         tf.PostMultiply()
         tf.RotateY(-math.degrees(th))
@@ -460,7 +560,9 @@ def mobile(body: Body, task: Task, controls: dict[str, float], seed: int = 0, si
         cx = x0 + front / 2
         cz = float(np.interp(cx, gx, gz)) + 60
         cam.SetFocalPoint(cx, 0, cz)
-        cam.SetPosition(cx + 900, -1700, cz + 900)
+        # nearly side-on: from ahead of the robot, a step or a ramp between the camera and the robot hid its
+        # rear, which read as the body sinking into the ground
+        cam.SetPosition(cx + 250, -1900, cz + 650)
         cam.SetViewUp(0, 0, 1)
         ren.ResetCameraClippingRange()
         win.Render()
@@ -471,7 +573,7 @@ def mobile(body: Body, task: Task, controls: dict[str, float], seed: int = 0, si
         frames.append(caption(img, bottom=here))
     win.Finalize()
     verdict = detail.split(": ", 1)[1] if (not ok and ": " in detail) else detail
-    return Clip(frames, ok, verdict if ok else f"{mech.replace('_', ' ')}: {verdict}")
+    return Clip(frames, ok, verdict if ok else f"{mech.replace('_', ' ')}: {verdict}", clipping_mm=d.clipping_mm())
 
 
 FILM: dict[str, Callable[..., Clip]] = {"gripper": gripper, "gripper_dense": gripper, "mobile": mobile,
