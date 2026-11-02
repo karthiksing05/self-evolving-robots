@@ -1,0 +1,187 @@
+{
+ "run": "mobile_s2_s2",
+ "world": "mobile",
+ "frames": [
+  {
+   "iteration": 0,
+   "id": "stock",
+   "held": 4,
+   "groups": 10,
+   "changes": [],
+   "body": {
+    "id": "stock",
+    "parent": null,
+    "parts": {
+     "chassis": {
+      "type": "printed_tub",
+      "params": {
+       "width": 18.0,
+       "length": 20.0,
+       "ride_height": 2.0
+      }
+     },
+     "locomotion": {
+      "type": "wheels4",
+      "params": {
+       "wheel_radius": 3.0
+      }
+     },
+     "drive": {
+      "type": "n20_gearmotor",
+      "params": {
+       "gear_ratio": 100.0
+      }
+     },
+     "battery": {
+      "type": "nimh_pack",
+      "params": {
+       "capacity": 4.8
+      }
+     },
+     "sensor": {
+      "type": "bump_switch",
+      "params": {}
+     }
+    }
+   },
+   "file": "00_stock.png",
+   "views": [
+    "three-quarter",
+    "side"
+   ]
+  },
+  {
+   "iteration": 1,
+   "id": "b00m",
+   "held": 8,
+   "groups": 10,
+   "changes": [
+    "battery: capacity 4.8 \u2192 12",
+    "chassis: width 18 \u2192 12",
+    "locomotion: wheels4 \u2192 tracks (idler_height 6, track_length 24)",
+    "sensor: bump_switch \u2192 ultrasonic"
+   ],
+   "body": {
+    "id": "b00m",
+    "parent": "stock",
+    "parts": {
+     "chassis": {
+      "type": "printed_tub",
+      "params": {
+       "width": 12.0,
+       "length": 20.0,
+       "ride_height": 2.0
+      }
+     },
+     "locomotion": {
+      "type": "tracks",
+      "params": {
+       "track_length": 24.0,
+       "idler_height": 6.0
+      }
+     },
+     "drive": {
+      "type": "n20_gearmotor",
+      "params": {
+       "gear_ratio": 100.0
+      }
+     },
+     "battery": {
+      "type": "nimh_pack",
+      "params": {
+       "capacity": 12.0
+      }
+     },
+     "sensor": {
+      "type": "ultrasonic",
+      "params": {}
+     }
+    }
+   },
+   "move": "merge",
+   "gained": [
+    "garden",
+    "hallway",
+    "lawn",
+    "sandbox"
+   ],
+   "lost": [],
+   "cost": "$16.50, 170 machine min",
+   "why": [
+    "The wheels add 2.5 cm a side (18 inner, 23 overall), so a 12 cm inner width gives 17 cm overall. With 0.41-1.0 cm of steering error that is about 18 cm or less, inside the 19.7 cm opening, and the 28 cm garden gate still passes. On the lawn, 4.08 Wh got 78% of the way, so the full survey needs about 5.3 Wh usable. A 12 Wh pack (5 AA cells, all on hand, +81 g) gives about 10.2 Wh usable. That covers the roughly 10% higher J/m from the extra mass with a large margin, and also covers heavier running gear if tracks are combined in. Both changes are free, so no swap is needed.",
+    "Wheels cannot fix the porch at any setting. At the 4.5 cm maximum radius, even with the rear wheels pushing, h is about 4.5*(1-cos 73.7 deg), about 3.2 cm, short of 5.5 cm. A 4.5 cm wheel spans 9 cm, still less than the 9.2 cm trench. Rocker-bogie would need 6 cm wheels, which with the linkage stand about 14 cm tall and break under_sofa (9 cm). Tracks fix all three at once. A 6 cm idler is higher than the 5.48 cm step, and the track stands 7.5 cm tall, under the 9 cm sofa. A 24 cm contact length bridges about 10.8 cm, more than 9.2 cm. Two roughly 24 cm patches bring the ground pressure to around 0.4-0.5 kPa, so sinkage drops below 1 cm. Speed falls to about 0.56 m/s (1.8 cm sprocket), still enough for kitchen and living_room (5 m in 40 s) and for the lawn (0.35 m/s needed). Cost: $14, 4 days, 57 machine min.",
+    "No bump-switch parameter adds range, so the sensor itself has to change. The HC-SR04 sees 2 m in the dark, about 10 body lengths, so the corridor can be driven near cruise speed with no 4 s back-offs. 11 m at about 0.5 m/s takes about 22 s, inside 45 s. The camera's IR LED reaches only 0.12 m, less than the body length, and the lidar cannot be supplied. Cost: $2.50, 2 days."
+   ],
+   "file": "01_b00m.png",
+   "views": [
+    "three-quarter",
+    "side"
+   ]
+  },
+  {
+   "iteration": 2,
+   "id": "b01m",
+   "held": 10,
+   "groups": 10,
+   "changes": [
+    "chassis: width 12 \u2192 10",
+    "drive: n20_gearmotor \u2192 n20_encoder_gearmotor (gear_ratio 100)",
+    "locomotion: idler_height 6 \u2192 7"
+   ],
+   "body": {
+    "id": "b01m",
+    "parent": "b00m",
+    "parts": {
+     "chassis": {
+      "type": "printed_tub",
+      "params": {
+       "width": 10.0,
+       "length": 20.0,
+       "ride_height": 2.0
+      }
+     },
+     "locomotion": {
+      "type": "tracks",
+      "params": {
+       "track_length": 24.0,
+       "idler_height": 7.0
+      }
+     },
+     "drive": {
+      "type": "n20_encoder_gearmotor",
+      "params": {
+       "gear_ratio": 100.0
+      }
+     },
+     "battery": {
+      "type": "nimh_pack",
+      "params": {
+       "capacity": 12.0
+      }
+     },
+     "sensor": {
+      "type": "ultrasonic",
+      "params": {}
+     }
+    }
+   },
+   "move": "merge",
+   "gained": [
+    "bedroom",
+    "porch"
+   ],
+   "lost": [],
+   "cost": "$12.00, 162 machine min",
+   "why": [
+    "Raise idler_height from 6 to 7 cm. The climbable edge goes to about 6.3 cm, which clears the 5.48 cm porch edge with about 0.8 cm to spare. The stall force is 2.3 times the robot's weight, so pulling over the edge is not the limit. Height becomes 7 + 1.5 = 8.5 cm, which still fits under the 9.0 cm sofa. An idler at 8 cm would make the robot 9.5 cm tall and lose under_sofa, so 7 cm is the ceiling. This only needs a reprint of the track frame (about 57 g of PLA); the rubber_track_kit is reused.",
+    "Set the chassis width to 10 cm, the bottom of its range. The body goes from 18 to 16 cm overall, so the margin grows from about 0.9 cm per side to about 1.9 cm per side. That is about 2 sigma at duty 0.69 and about 4 sigma at the slowest duty (0.49 cm), and System 1 can still set the line for the +2 cm offset. This costs nothing to buy, only a smaller tub reprint (under 162 g of PLA). Steering error is not the problem, so encoders are not needed first.",
+    "This is a backup in case the narrow tub alone leaves the bedroom marginal. Encoder N20s at the same 100:1 ratio would bring sigma from 0.94 down to about 0.56 cm at duty 0.69, and from 1.20 down to 0.72 cm at full speed. Even on the 18 cm body the drift should then stay inside 0.87 cm most of the time, and on the 16 cm body it would pass comfortably. It costs $12 and 4 days, within the $43.50 and 7 days left."
+   ],
+   "file": "02_b01m.png",
+   "views": [
+    "three-quarter",
+    "side"
+   ]
+  }
+ ]
+}

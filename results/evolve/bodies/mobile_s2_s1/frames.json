@@ -1,0 +1,181 @@
+{
+ "run": "mobile_s2_s1",
+ "world": "mobile",
+ "frames": [
+  {
+   "iteration": 0,
+   "id": "stock",
+   "held": 4,
+   "groups": 10,
+   "changes": [],
+   "body": {
+    "id": "stock",
+    "parent": null,
+    "parts": {
+     "chassis": {
+      "type": "printed_tub",
+      "params": {
+       "width": 18.0,
+       "length": 20.0,
+       "ride_height": 2.0
+      }
+     },
+     "locomotion": {
+      "type": "wheels4",
+      "params": {
+       "wheel_radius": 3.0
+      }
+     },
+     "drive": {
+      "type": "n20_gearmotor",
+      "params": {
+       "gear_ratio": 100.0
+      }
+     },
+     "battery": {
+      "type": "nimh_pack",
+      "params": {
+       "capacity": 4.8
+      }
+     },
+     "sensor": {
+      "type": "bump_switch",
+      "params": {}
+     }
+    }
+   },
+   "file": "00_stock.png",
+   "views": [
+    "three-quarter",
+    "side"
+   ]
+  },
+  {
+   "iteration": 1,
+   "id": "b00m",
+   "held": 7,
+   "groups": 10,
+   "changes": [
+    "battery: capacity 4.8 \u2192 14.4",
+    "chassis: width 18 \u2192 11",
+    "sensor: bump_switch \u2192 ultrasonic"
+   ],
+   "body": {
+    "id": "b00m",
+    "parent": "stock",
+    "parts": {
+     "chassis": {
+      "type": "printed_tub",
+      "params": {
+       "width": 11.0,
+       "length": 20.0,
+       "ride_height": 2.0
+      }
+     },
+     "locomotion": {
+      "type": "wheels4",
+      "params": {
+       "wheel_radius": 3.0
+      }
+     },
+     "drive": {
+      "type": "n20_gearmotor",
+      "params": {
+       "gear_ratio": 100.0
+      }
+     },
+     "battery": {
+      "type": "nimh_pack",
+      "params": {
+       "capacity": 14.4
+      }
+     },
+     "sensor": {
+      "type": "ultrasonic",
+      "params": {}
+     }
+    }
+   },
+   "move": "merge",
+   "gained": [
+    "bedroom",
+    "hallway",
+    "lawn"
+   ],
+   "lost": [],
+   "cost": "$2.50, 102 machine min",
+   "why": [
+    "Tub width 18->11 cm gives ~16 cm overall (+<=1.0 cm steering error) well inside 19.8 cm. Battery 4.8->14.4 Wh (6 cells: 2 in pack + 4 on hand, free) gives 12.2 Wh usable against ~6 Wh needed for 5 km even with +108 g (energy/m ~4.2 J/m). Both are within the current parts' ranges, so no swap is needed.",
+    "The bump switch has no parameters, so no params move can help. The HC-SR04 ranges 2 m in any light, so the robot can run at cruise speed through the dark corridor: 11 m at ~0.6-0.9 m/s is ~15-20 s. It adds no height and only 0.08 W. Camera only lights 0.12 m in the dark (< body length); lidar is not provided."
+   ],
+   "file": "01_b00m.png",
+   "views": [
+    "three-quarter",
+    "side"
+   ]
+  },
+  {
+   "iteration": 2,
+   "id": "b011",
+   "held": 10,
+   "groups": 10,
+   "changes": [
+    "chassis: length 20 \u2192 28",
+    "locomotion: wheels4 \u2192 tracks (idler_height 7, track_length 28)"
+   ],
+   "body": {
+    "id": "b011",
+    "parent": "b00m",
+    "parts": {
+     "chassis": {
+      "type": "printed_tub",
+      "params": {
+       "width": 11.0,
+       "length": 28.0,
+       "ride_height": 2.0
+      }
+     },
+     "locomotion": {
+      "type": "tracks",
+      "params": {
+       "track_length": 28.0,
+       "idler_height": 7.0
+      }
+     },
+     "drive": {
+      "type": "n20_gearmotor",
+      "params": {
+       "gear_ratio": 100.0
+      }
+     },
+     "battery": {
+      "type": "nimh_pack",
+      "params": {
+       "capacity": 14.4
+      }
+     },
+     "sensor": {
+      "type": "ultrasonic",
+      "params": {}
+     }
+    }
+   },
+   "move": "swap",
+   "gained": [
+    "garden",
+    "porch",
+    "sandbox"
+   ],
+   "lost": [],
+   "cost": "$14.00, 206 machine min",
+   "why": [
+    "Cheaper variant ($14, keeps the NiMH pack): a 7 cm idler gives more margin over the 5.6 cm porch edge, and a 28 cm contact bridges ~12.6 cm over the 9 cm trench. The tub is set to 28 cm to fall within the 24-32 cm the frames require. It tests whether the lawn energy budget holds without the battery change."
+   ],
+   "file": "02_b011.png",
+   "views": [
+    "three-quarter",
+    "side"
+   ]
+  }
+ ]
+}

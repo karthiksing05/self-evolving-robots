@@ -1,0 +1,383 @@
+{
+ "run": "gripper_s2v3_s2",
+ "world": "gripper",
+ "frames": [
+  {
+   "iteration": 0,
+   "id": "stock",
+   "held": 13,
+   "groups": 21,
+   "changes": [],
+   "body": {
+    "id": "stock",
+    "parent": null,
+    "parts": {
+     "jaw": {
+      "type": "revolute",
+      "params": {}
+     },
+     "pads": {
+      "type": "none",
+      "params": {}
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "file": "00_stock.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 1,
+   "id": "b00t1",
+   "held": 20,
+   "groups": 21,
+   "changes": [
+    "jaw: revolute \u2192 prismatic (drive_mm_per_rad 60)",
+    "pads: none \u2192 pads (groove_mm 3.34, lip_mm 0, pad_angle_deg 8.8, pad_tpu_mm 1.31, reach_mm 0, width_mm 9.46)"
+   ],
+   "body": {
+    "id": "b00t1",
+    "parent": "b001",
+    "parts": {
+     "jaw": {
+      "type": "prismatic",
+      "params": {
+       "drive_mm_per_rad": 60.0
+      }
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 0.0,
+       "pad_angle_deg": 8.798,
+       "groove_mm": 3.337,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 1.314,
+       "width_mm": 9.465
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "tune",
+   "gained": [
+    "apple",
+    "flat_screwdriver",
+    "gelatin_box",
+    "potted_meat_can",
+    "pudding_box",
+    "sugar_box",
+    "tuna_fish_can"
+   ],
+   "lost": [],
+   "cost": "$5.40, 199 machine min",
+   "why": [
+    "the loop fits b001's new jaw, pads before judging it (tuning trial 2 of 4)"
+   ],
+   "file": "01_b00t1.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 3,
+   "id": "b022",
+   "held": 20,
+   "groups": 21,
+   "changes": [
+    "pads: reach_mm 0 \u2192 3"
+   ],
+   "body": {
+    "id": "b022",
+    "parent": "b00t1",
+    "parts": {
+     "jaw": {
+      "type": "prismatic",
+      "params": {
+       "drive_mm_per_rad": 60.0
+      }
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 3.0,
+       "pad_angle_deg": 8.798,
+       "groove_mm": 3.337,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 1.314,
+       "width_mm": 9.465
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "params",
+   "gained": [],
+   "lost": [],
+   "cost": "$0.00, 5 machine min",
+   "why": [
+    "The lowest-risk point on the reach axis. 3 mm brings the contacts to about +5-7 mm, cutting the down-push from about 9 N to about 5-6 N against the 0.4-friction capacity. The failure was a slow 6 mm sag rather than an outright drop, so this margin may suffice, while the extension stays a third of the 9 mm that broke the dice and potted meat."
+   ],
+   "file": "02_b022.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 4,
+   "id": "b031",
+   "held": 20,
+   "groups": 21,
+   "changes": [
+    "pads: width_mm 9.46 \u2192 16"
+   ],
+   "body": {
+    "id": "b031",
+    "parent": "b022",
+    "parts": {
+     "jaw": {
+      "type": "prismatic",
+      "params": {
+       "drive_mm_per_rad": 60.0
+      }
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 3.0,
+       "pad_angle_deg": 8.798,
+       "groove_mm": 3.337,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 1.314,
+       "width_mm": 16.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "params",
+   "gained": [],
+   "lost": [],
+   "cost": "$0.00, 7 machine min",
+   "why": [
+    "Widen the pads from 9.465 to 16 mm and keep pad_angle 8.8, TPU 1.31, groove 3.34 and reach 3, the values that hold the dice. Width is the one pad parameter not tied to the reach/tilt trade-off that cost the dice and potted meat in earlier trials. The pads are 4 mm thick per face, so the moving mass barely changes."
+   ],
+   "file": "03_b031.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 6,
+   "id": "b050",
+   "held": 20,
+   "groups": 21,
+   "changes": [
+    "pads: pad_tpu_mm 1.31 \u2192 2"
+   ],
+   "body": {
+    "id": "b050",
+    "parent": "b031",
+    "parts": {
+     "jaw": {
+      "type": "prismatic",
+      "params": {
+       "drive_mm_per_rad": 60.0
+      }
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 3.0,
+       "pad_angle_deg": 8.798,
+       "groove_mm": 3.337,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 2.0,
+       "width_mm": 16.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "params",
+   "gained": [],
+   "lost": [],
+   "cost": "$0.00, 9 machine min",
+   "why": [
+    "Raise pad_tpu_mm from 1.314 to 2.0 and keep width 16, which is kept and does not trigger the squeezed_down_out seen at widths 20 and 24. Keep reach 3, angle 8.8 and groove 3.34, the values that hold the dice. A thicker skin enlarges the patch height on the curved bottle, which adds pitch resistance without moving the contact or the opening. TPU 2.0 was only ever tried at width 24, where width itself changed the failure mode. Squeeze, opening and tip offset are untouched (27 N, 111 mm, +1 mm), so the 2 mm shortfall should close."
+   ],
+   "file": "04_b050.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 8,
+   "id": "b072",
+   "held": 20,
+   "groups": 21,
+   "changes": [
+    "pads: groove_mm 3.34 \u2192 5"
+   ],
+   "body": {
+    "id": "b072",
+    "parent": "b050",
+    "parts": {
+     "jaw": {
+      "type": "prismatic",
+      "params": {
+       "drive_mm_per_rad": 60.0
+      }
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 3.0,
+       "pad_angle_deg": 8.798,
+       "groove_mm": 5.0,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 2.0,
+       "width_mm": 16.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "params",
+   "gained": [],
+   "lost": [],
+   "cost": "$0.00, 9 machine min",
+   "why": [
+    "groove_mm is the other pad parameter that has never been changed (3.337 in every trial). It shapes the face across the pad width, not up its height, so it does not add the vertical tilt that cost the dice when pad_angle, reach or TPU changed. The lying bottle's shoulder curves along its 191 mm length, so a deeper groove (5 mm) pulls more of the surface into the wedge and increases the friction that holds the vertical load. Flat-faced small objects such as the dice and the wood cube still bear on the groove edges, which are unchanged. It costs $0 and about 8 machine minutes."
+   ],
+   "file": "05_b072.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 9,
+   "id": "b081",
+   "held": 20,
+   "groups": 21,
+   "changes": [
+    "pads: groove_mm 5 \u2192 6, width_mm 16 \u2192 18"
+   ],
+   "body": {
+    "id": "b081",
+    "parent": "b072",
+    "parts": {
+     "jaw": {
+      "type": "prismatic",
+      "params": {
+       "drive_mm_per_rad": 60.0
+      }
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 3.0,
+       "pad_angle_deg": 8.798,
+       "groove_mm": 6.0,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 2.0,
+       "width_mm": 18.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "params",
+   "gained": [],
+   "lost": [],
+   "cost": "$0.00, 11 machine min",
+   "why": [
+    "Width 18 with TPU 1.7 was kept-eligible in iteration 6 (gained a task, lost none) and was only displaced by TPU 2.0. Widths 20 and 24 lost nothing, so pad width is independent of the dice. Combining the kept groove trend (6 mm) with width 18 gives a longer and deeper wedge along the bottle together. If groove alone falls short, this adds the extra margin."
+   ],
+   "file": "06_b081.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 11,
+   "id": "b100",
+   "held": 21,
+   "groups": 21,
+   "changes": [
+    "pads: reach_mm 3 \u2192 3.5"
+   ],
+   "body": {
+    "id": "b100",
+    "parent": "b081",
+    "parts": {
+     "jaw": {
+      "type": "prismatic",
+      "params": {
+       "drive_mm_per_rad": 60.0
+      }
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 3.5,
+       "pad_angle_deg": 8.798,
+       "groove_mm": 6.0,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 2.0,
+       "width_mm": 18.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "params",
+   "gained": [
+    "mustard_bottle"
+   ],
+   "lost": [],
+   "cost": "$0.00, 11 machine min",
+   "why": [
+    "The record shows reach is the lever that lowers the contact: b00t0 (reach 8.6) held the mustard, and b001 (reach 0) did not. Reach of 4 mm or more loses the dice, but 3.5 has never been tried. A 0.5 mm deeper pad brings the contact from +5 toward +4.5 mm and reduces the down component by about 10%. The best score is 0.50 and the bottle ends only about 5 mm short, so a small margin may be enough. Cheaper moves are exhausted: tilt, TPU, groove and width have all been run to their limits in the record."
+   ],
+   "file": "07_b100.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  }
+ ]
+}

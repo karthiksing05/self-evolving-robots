@@ -1,0 +1,145 @@
+{
+ "run": "gripper_dense_s2_s0",
+ "world": "gripper_dense",
+ "frames": [
+  {
+   "iteration": 0,
+   "id": "stock",
+   "held": 12,
+   "groups": 21,
+   "changes": [],
+   "body": {
+    "id": "stock",
+    "parent": null,
+    "parts": {
+     "jaw": {
+      "type": "revolute",
+      "params": {}
+     },
+     "pads": {
+      "type": "none",
+      "params": {}
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "file": "00_stock.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 2,
+   "id": "b01t2",
+   "held": 20,
+   "groups": 21,
+   "changes": [
+    "jaw: revolute \u2192 prismatic (drive_mm_per_rad 59.8)",
+    "pads: none \u2192 pads (groove_mm 2.03, lip_mm 0, pad_angle_deg 4.13, pad_tpu_mm 1.31, reach_mm 0, width_mm 12.8)"
+   ],
+   "body": {
+    "id": "b01t2",
+    "parent": "b011",
+    "parts": {
+     "jaw": {
+      "type": "prismatic",
+      "params": {
+       "drive_mm_per_rad": 59.817
+      }
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 0.0,
+       "pad_angle_deg": 4.13,
+       "groove_mm": 2.03,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 1.315,
+       "width_mm": 12.776
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "tune",
+   "gained": [
+    "apple",
+    "flat_screwdriver",
+    "gelatin_box",
+    "plum",
+    "pudding_box",
+    "strawberry",
+    "sugar_box",
+    "tuna_fish_can"
+   ],
+   "lost": [],
+   "cost": "$5.40, 199 machine min",
+   "why": [
+    "the loop fits b011's new jaw, pads before judging it (tuning trial 3 of 4)"
+   ],
+   "file": "01_b01t2.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 8,
+   "id": "b071",
+   "held": 21,
+   "groups": 21,
+   "changes": [
+    "jaw: drive_mm_per_rad 59.8 \u2192 52",
+    "pads: groove_mm 2.03 \u2192 2, pad_angle_deg 4.13 \u2192 0, pad_tpu_mm 1.31 \u2192 0.95, reach_mm 0 \u2192 4, width_mm 12.8 \u2192 15"
+   ],
+   "body": {
+    "id": "b071",
+    "parent": "b001",
+    "parts": {
+     "jaw": {
+      "type": "prismatic",
+      "params": {
+       "drive_mm_per_rad": 52.0
+      }
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 4.0,
+       "pad_angle_deg": 0.0,
+       "groove_mm": 2.0,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 0.95,
+       "width_mm": 15.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "params",
+   "gained": [
+    "mustard_bottle"
+   ],
+   "lost": [],
+   "cost": "$0.00, 187 machine min",
+   "why": [
+    "This hedges proposal 1 toward the dice. A 0.95 mm skin sits nearer the 0.6 to 0.9 mm skins that kept the dice in iteration 7. Thinning the skin cost the bottle and the sugar box there, so each loss gets its own fix. Reach goes from 3 to 4 mm, which lowers both bottle contacts about 1 mm further toward the equator. This replaces the wrapping a thick skin gave, and with the face untilted the lower contact is more horizontal. Width goes from 12 to 15 mm: width 24 held sugar_box at reach 3 (iteration 4a), and staying well under 18 mm avoids the tuna loss seen at 24."
+   ],
+   "file": "02_b071.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  }
+ ]
+}

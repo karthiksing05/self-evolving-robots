@@ -1,0 +1,144 @@
+{
+ "run": "gripper_s2v3_s1",
+ "world": "gripper",
+ "frames": [
+  {
+   "iteration": 0,
+   "id": "stock",
+   "held": 12,
+   "groups": 21,
+   "changes": [],
+   "body": {
+    "id": "stock",
+    "parent": null,
+    "parts": {
+     "jaw": {
+      "type": "revolute",
+      "params": {}
+     },
+     "pads": {
+      "type": "none",
+      "params": {}
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "file": "00_stock.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 1,
+   "id": "b001",
+   "held": 18,
+   "groups": 21,
+   "changes": [
+    "jaw: revolute \u2192 prismatic (drive_mm_per_rad 55)",
+    "pads: none \u2192 pads (groove_mm 3, lip_mm 0, pad_angle_deg 0, pad_tpu_mm 2, reach_mm 15, width_mm 20)"
+   ],
+   "body": {
+    "id": "b001",
+    "parent": "stock",
+    "parts": {
+     "jaw": {
+      "type": "prismatic",
+      "params": {
+       "drive_mm_per_rad": 55.0
+      }
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 15.0,
+       "pad_angle_deg": 0.0,
+       "groove_mm": 3.0,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 2.0,
+       "width_mm": 20.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "swap",
+   "gained": [
+    "flat_screwdriver",
+    "gelatin_box",
+    "mustard_bottle",
+    "pudding_box",
+    "strawberry",
+    "tuna_fish_can"
+   ],
+   "lost": [],
+   "cost": "$5.40, 206 machine min",
+   "why": [
+    "The pads cost $0 and 16 machine minutes (m2 screws on hand, 2 g PLA, 1 g TPU), so pairing them with the slide hedges the rolling-object risk of proposal 1 and targets the two failures the slide alone does not touch. 15 mm of reach leaves table clearance for the 17 mm dice, since System 1 sets grasp height. A 3 mm groove centres 42-75 mm spheres without wedging flat boxes, because flat faces still meet the groove lands. Total cost $5.40, 3 days, 176 machine minutes."
+   ],
+   "file": "01_b001.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 2,
+   "id": "b010",
+   "held": 21,
+   "groups": 21,
+   "changes": [
+    "pads: reach_mm 15 \u2192 5"
+   ],
+   "body": {
+    "id": "b010",
+    "parent": "b001",
+    "parts": {
+     "jaw": {
+      "type": "prismatic",
+      "params": {
+       "drive_mm_per_rad": 55.0
+      }
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 5.0,
+       "pad_angle_deg": 0.0,
+       "groove_mm": 3.0,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 2.0,
+       "width_mm": 20.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "params",
+   "gained": [
+    "apple",
+    "potted_meat_can",
+    "sugar_box"
+   ],
+   "lost": [],
+   "cost": "$0.00, 12 machine min",
+   "why": [
+    "The record isolates reach. Prismatic with no pads (reach 0) gained apple and potted meat can. Pads with reach 5 on the stock hinge jaw gained apple. Pads with reach 15 lose both. Going back to reach 5 keeps the groove (centres the rolling plum and strawberry) and the TPU (friction 0.9, gained mustard and screwdriver), which are the pad features that held the extra groups. Settings only: $0 and about 16 machine min, so no swap or purchase is needed."
+   ],
+   "file": "02_b010.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  }
+ ]
+}

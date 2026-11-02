@@ -150,6 +150,18 @@ a baseline arm. `scripts/ideas.py` lists every idea recorded across runs, with i
 mechanisms open when it was proposed. That list is the outer loop's input, for example
 `results/evolve/ideas_gripper.md`.
 
+`scripts/render_bodies.py` draws a run's bodies for people reading it (D-049): the CAD of the stock
+body and of each body the run kept, every picture under the same cameras so a part that grew is drawn
+larger, written to `results/evolve/bodies/<run>/` with `frames.json`. Each frame records the
+iteration that kept the body, the groups it held, its change per slot, what the change gained and cost,
+and System 2's reason. The CAD comes from `sea/worlds/cad.py`, which reads each body through its
+world's own model:
+- the gripper: the SO-101's STL exports posed by the jaw part's joint, and the pad boxes;
+- the mobile explorer: CadQuery solids from `_spec` and the catalogue's sizes;
+- the talking robot: a section of the cast tract with each articulator at the end of its travel.
+
+That module is not a judge component, so a change to a picture never changes the ruler.
+
 ## Adding a world
 
 1. Write `src/sea/worlds/<name>.py` with a class satisfying `World`, and register it in

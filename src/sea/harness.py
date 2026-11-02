@@ -61,7 +61,9 @@ COMPONENTS: dict[str, tuple[str, tuple[str, ...]]] = {
 }
 
 # Modules that read runs but never shape one; every other module under src/sea belongs to a component.
-TOOLING = ("src/sea/cli.py", "src/sea/harness.py", "src/sea/report.py")
+# The CAD modules draw a run's bodies for people (D-049): a picture is not part of the ruler.
+TOOLING = ("src/sea/cli.py", "src/sea/harness.py", "src/sea/report.py", "src/sea/design/cad.py",
+           "src/sea/worlds/cad.py")
 
 
 def _hash_files(paths: tuple[str, ...]) -> str:

@@ -1,0 +1,142 @@
+{
+ "run": "gripper_s2v3_s0",
+ "world": "gripper",
+ "frames": [
+  {
+   "iteration": 0,
+   "id": "stock",
+   "held": 14,
+   "groups": 21,
+   "changes": [],
+   "body": {
+    "id": "stock",
+    "parent": null,
+    "parts": {
+     "jaw": {
+      "type": "revolute",
+      "params": {}
+     },
+     "pads": {
+      "type": "none",
+      "params": {}
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "file": "00_stock.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 3,
+   "id": "b021",
+   "held": 20,
+   "groups": 21,
+   "changes": [
+    "jaw: revolute \u2192 prismatic (drive_mm_per_rad 56)",
+    "pads: none \u2192 pads (groove_mm 0, lip_mm 0, pad_angle_deg 0, pad_tpu_mm 1.6, reach_mm 6.5, width_mm 13.6)"
+   ],
+   "body": {
+    "id": "b021",
+    "parent": "b01t0",
+    "parts": {
+     "jaw": {
+      "type": "prismatic",
+      "params": {
+       "drive_mm_per_rad": 56.0
+      }
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 6.5,
+       "pad_angle_deg": 0.0,
+       "groove_mm": 0.0,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 1.6,
+       "width_mm": 13.6
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "swap",
+   "gained": [
+    "apple",
+    "gelatin_box",
+    "mustard_bottle",
+    "pudding_box",
+    "strawberry",
+    "tuna_fish_can"
+   ],
+   "lost": [],
+   "cost": "$5.40, 196 machine min",
+   "why": [
+    "b01t0 kept dice, banana and racquetball and lost only potted_meat_can (force limit at reach 15). Potted_meat_can held at reach 5 mm or less and was lost at 8 mm or more. Mustard_bottle was gained only at reach 8 mm or more. Reach 6.5 sits in the gap and should keep potted_meat_can, while possibly still reaching below the mustard bottle's top."
+   ],
+   "file": "01_b021.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 4,
+   "id": "b031",
+   "held": 21,
+   "groups": 21,
+   "changes": [
+    "pads: lip_mm 0 \u2192 0.25"
+   ],
+   "body": {
+    "id": "b031",
+    "parent": "b021",
+    "parts": {
+     "jaw": {
+      "type": "prismatic",
+      "params": {
+       "drive_mm_per_rad": 56.0
+      }
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 6.5,
+       "pad_angle_deg": 0.0,
+       "groove_mm": 0.0,
+       "lip_mm": 0.25,
+       "pad_tpu_mm": 1.6,
+       "width_mm": 13.6
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "params",
+   "gained": [
+    "sugar_box"
+   ],
+   "lost": [],
+   "cost": "$0.00, 9 machine min",
+   "why": [
+    "A small lip (0.25 mm, near b00t3's 0.18 that already gained sugar) at the current 6.5 mm reach. No lip has been tested at this reach. Every past lip body that lost racquetball had a reach of 0\u20132.7 mm, except b01t1 at reach 15. The deeper fingertip may let the small hook sit below the ball's lower curve, so it doesn't jam against the ball. If racquetball is lost, the 4-trial fitting can search lip and reach together. Costs about 3 g print, nothing bought."
+   ],
+   "file": "02_b031.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  }
+ ]
+}

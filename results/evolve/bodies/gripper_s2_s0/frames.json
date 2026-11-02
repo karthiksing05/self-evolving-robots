@@ -1,0 +1,231 @@
+{
+ "run": "gripper_s2_s0",
+ "world": "gripper",
+ "frames": [
+  {
+   "iteration": 0,
+   "id": "stock",
+   "held": 6,
+   "groups": 21,
+   "changes": [],
+   "body": {
+    "id": "stock",
+    "parent": null,
+    "parts": {
+     "jaw": {
+      "type": "revolute",
+      "params": {}
+     },
+     "pads": {
+      "type": "none",
+      "params": {}
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "file": "00_stock.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 1,
+   "id": "b000",
+   "held": 8,
+   "groups": 21,
+   "changes": [
+    "pads: none \u2192 pads (groove_mm 3, lip_mm 0, pad_angle_deg 20, pad_tpu_mm 2, reach_mm 0, width_mm 12)"
+   ],
+   "body": {
+    "id": "b000",
+    "parent": "stock",
+    "parts": {
+     "jaw": {
+      "type": "revolute",
+      "params": {}
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 0.0,
+       "pad_angle_deg": 20.0,
+       "groove_mm": 3.0,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 2.0,
+       "width_mm": 12.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "swap",
+   "gained": [
+    "flat_screwdriver",
+    "golf_ball"
+   ],
+   "lost": [],
+   "cost": "$0.00, 5 machine min",
+   "why": [
+    "This is the cheapest fix. All items are on hand: m2 screws and about 18 machine minutes of PLA+TPU printing, so $0 and no lead time. With a 20 deg pad, the leftover tilt is about 28 deg on the gelatin box (tan 0.53, well under 0.9) and about 10-12 deg on the tennis ball and apple. At 17 mm the pad is about 19 deg off the other way (bottom in). tan(19 deg) = 0.34, still far under 0.9, so small objects stay held. No params move can do this: System 1 already searched every grasp setting, and the face tilt is set by geometry at each width."
+   ],
+   "file": "01_b000.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 4,
+   "id": "b031",
+   "held": 9,
+   "groups": 21,
+   "changes": [
+    "pads: groove_mm 3 \u2192 5, pad_tpu_mm 2 \u2192 3, width_mm 12 \u2192 20"
+   ],
+   "body": {
+    "id": "b031",
+    "parent": "b000",
+    "parts": {
+     "jaw": {
+      "type": "revolute",
+      "params": {}
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 0.0,
+       "pad_angle_deg": 20.0,
+       "groove_mm": 5.0,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 3.0,
+       "width_mm": 20.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "params",
+   "gained": [
+    "dice"
+   ],
+   "lost": [],
+   "cost": "$0.00, 11 machine min",
+   "why": [
+    "No trial has changed groove and width alone. The two trials that touched them also changed pad_angle (lost the banana) or added a lip (lost almost everything to moving_jaw_missed). Those losses are explained by the angle and the lip, not by the groove. Keeping pad_angle at 20 and lip at 0 leaves the tilt profile the banana depends on unchanged. A 5 mm groove on a 20 mm pad gives two flank contacts per jaw that cradle a 47-59 mm sphere across the pad, so it cannot roll out sideways. The thicker 3 mm TPU skin adds compliance. Cost is $0: m2 screws on hand, about 25 machine minutes."
+   ],
+   "file": "02_b031.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 7,
+   "id": "b060",
+   "held": 11,
+   "groups": 21,
+   "changes": [
+    "pads: pad_angle_deg 20 \u2192 23"
+   ],
+   "body": {
+    "id": "b060",
+    "parent": "b031",
+    "parts": {
+     "jaw": {
+      "type": "revolute",
+      "params": {}
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 0.0,
+       "pad_angle_deg": 23.0,
+       "groove_mm": 5.0,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 3.0,
+       "width_mm": 20.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "params",
+   "gained": [
+    "strawberry",
+    "tomato_soup_can"
+   ],
+   "lost": [],
+   "cost": "$0.00, 12 machine min",
+   "why": [
+    "A 3 deg shift moves the parallel point from about 0.35 rad (about 33 mm) to about 0.40 rad (about 36-37 mm). Expected tilts: strawberry 33 mm about 2 deg down (now 5), plum 40-42 mm about 5 deg (now 8-9), racquetball and lemon 46-47 mm about 6-9 deg (now 9-14). Every pad_angle tried so far was 20 or 29-33 (or 18 together with reach 25). The 29 trial with no lip or reach lost only the banana, which means the other held groups tolerate a 9 deg shift. Banana at 35 mm goes from about 2 deg bottom-out to about 1 deg bottom-in, well short of the about 7 deg bottom-in that made it never_lifted at 29. Larger moves cannot be justified: the slide and four-bar jaws (vertical or bottom-in faces) lost the banana every time, and reach lost the potted meat can and the dice. Only the hinge's pad_angle can still move the tilt curve. Cost $0. The reprint takes about 18 machine minutes (2 g PLA plus 1 g TPU per pad set)."
+   ],
+   "file": "03_b060.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 9,
+   "id": "b080",
+   "held": 13,
+   "groups": 21,
+   "changes": [
+    "pads: pad_angle_deg 23 \u2192 27"
+   ],
+   "body": {
+    "id": "b080",
+    "parent": "b060",
+    "parts": {
+     "jaw": {
+      "type": "revolute",
+      "params": {}
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 0.0,
+       "pad_angle_deg": 27.0,
+       "groove_mm": 5.0,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 3.0,
+       "width_mm": 20.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "params",
+   "gained": [
+    "plum",
+    "racquetball"
+   ],
+   "lost": [],
+   "cost": "$0.00, 12 machine min",
+   "why": [
+    "At pad_angle 23 the brief puts the face 1 deg off parallel at 35 mm and 6 deg off at 45 mm. Raising pad_angle to 27 moves the parallel point to about 0.47 rad (about 41-42 mm). The plum then closes about parallel, and the racquetball and lemon close about 1-3 deg off instead of 7-9. The bracket is already measured. pad_angle 25 kept every held group in iteration 7, gaining the same strawberry and tomato_soup_can as 23. pad_angle 29 lost the banana (squeezed_up_out). 27 is the untested midpoint, and the cheapest move left that targets this mechanism: no cost and about 18 machine minutes for the reprint. The jaw swaps that remain (prismatic twice, parallelogram three times) have all lost the banana or flat_screwdriver, so I am not repeating them. The 12 V servos would cost $68, over the $40 budget."
+   ],
+   "file": "04_b080.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  }
+ ]
+}

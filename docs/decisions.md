@@ -1205,3 +1205,30 @@ Amendment (after `gripper_s2v3_s0` iteration 1): a tuning step now moves one or 
 parameters, not all of them. Tuning the slide with pads perturbed all seven parameters at once, and
 each of its four trials broke a different held group. A swap's values are System 2's reasoned guess,
 so a sparse step around them is the better search. Parts with a single parameter are unaffected.
+
+## D-049 Pictures of a run come from CAD, outside the ruler (report)
+A run's record said what changed in words: `jaw -> prismatic (drive_mm_per_rad=56)`. People reading
+a run need to see the part. `scripts/render_bodies.py` renders the CAD of every body a run kept,
+from `sea/worlds/cad.py`:
+- **Gripper:** the SO-101's own CAD (its STL exports) for the servo, the fixed jaw and the moving
+  finger, posed by the jaw part's joint in the compiled MuJoCo model, and the pads as the boxes
+  `design/fingers.py` builds. The slide's rods and bushings are bought items the simulator does not
+  model, so they are not drawn; the bill of materials lists them.
+- **Mobile explorer:** CadQuery solids from the world's `_spec` (overall width, height, belly) and
+  the catalogue's stated sizes (wheel, sprocket and idler; cells and motors at datasheet size).
+- **Talking robot:** a section view of the cast tract. Each articulator is drawn at the end of its
+  travel, and the squeezed bore follows `tract`'s radius profile. There is one MG90S block per servo
+  the rig counts.
+
+`sea/design/cad.py` renders models with VTK offscreen: orthographic, one camera per view fitted to
+all of a run's bodies, so they share a scale.
+
+The CAD sits outside the world modules on purpose. Those are judge components hashed whole into the
+harness fingerprint, and a picture method there would have changed the judge key of every later run
+without changing the ruler. Both CAD modules are listed in `harness.TOOLING`, the modules that read runs
+but never shape one. System 2 never sees the pictures.
+
+Tests: `tests/test_cad.py`. Every part is a closed shape in a slot of the body, and a swap changes its
+slot's CAD. The slide's finger shifts along the closing axis without turning. Renders share one camera.
+The script records each kept change with its reason.
+

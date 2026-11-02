@@ -1,0 +1,99 @@
+{
+ "run": "phonology_s2_s0",
+ "world": "phonology",
+ "frames": [
+  {
+   "iteration": 0,
+   "id": "stock",
+   "held": 6,
+   "groups": 13,
+   "changes": [],
+   "body": {
+    "id": "stock",
+    "parent": null,
+    "parts": {
+     "tract": {
+      "type": "short_cast",
+      "params": {
+       "length": 13.5
+      }
+     },
+     "tongue": {
+      "type": "cam_tongue",
+      "params": {
+       "rail_start": 3.25,
+       "stroke": 0.95
+      }
+     },
+     "lips": {
+      "type": "jaw_lips",
+      "params": {
+       "rest_area": 3.0
+      }
+     }
+    }
+   },
+   "file": "00_stock.png",
+   "views": [
+    "section",
+    "side"
+   ]
+  },
+  {
+   "iteration": 1,
+   "id": "b00m",
+   "held": 13,
+   "groups": 13,
+   "changes": [
+    "lips: jaw_lips \u2192 round_lips (max_protrusion 1.6)",
+    "tongue: cam_tongue \u2192 tip_tongue (rail_start 3.25, stroke 1.3)"
+   ],
+   "body": {
+    "id": "b00m",
+    "parent": "stock",
+    "parts": {
+     "tract": {
+      "type": "short_cast",
+      "params": {
+       "length": 13.5
+      }
+     },
+     "tongue": {
+      "type": "tip_tongue",
+      "params": {
+       "rail_start": 3.25,
+       "stroke": 1.3
+      }
+     },
+     "lips": {
+      "type": "round_lips",
+      "params": {
+       "max_protrusion": 1.6
+      }
+     }
+    }
+   },
+   "move": "merge",
+   "gained": [
+    "ao",
+    "er",
+    "k",
+    "p",
+    "t",
+    "uh",
+    "uw"
+   ],
+   "lost": [],
+   "cost": "$24.00, 132 machine min",
+   "why": [
+    "round_lips gives 0-6.6 cm2 of opening, so a full seal is possible for /p/ with the tongue lowered (airway about 1 cm2 elsewhere). With max_protrusion 1.6 cm the lip tube can grow to 2.6 cm, which lengthens the front cavity and narrows the outlet. That should pull F2 from about 1070-1140 down toward 840-1020 and bring /u/ F1 down from 418 to about 300. No params move can do this: the closure floor is fixed by the cast lip shape.",
+    "tip_tongue's blade slides 0.3-5 cm behind the teeth and can seal, which gives /t/. Setting the body stroke to 1.3 (above 1.2) lets the pad shut the velar region, which gives /k/. No value of rail_start (minimum 2.5 cm) reaches the alveolar place, so a params move cannot fix /t/. The second constriction may also start moving /\u025d/ F3 down from its 2770 Hz floor."
+   ],
+   "file": "01_b00m.png",
+   "views": [
+    "section",
+    "side"
+   ]
+  }
+ ]
+}
