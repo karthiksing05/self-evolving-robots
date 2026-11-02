@@ -1342,3 +1342,19 @@ These numbers are the baseline the later phases must remove:
 - Distance from an axis.
 - The penetration record.
 - The stock jaw rides its horn while a slide jaw floats more than 50 mm free.
+
+## D-052 The force on the target is per robot body, as a vector sum (skill; read by the judge)
+**Observed.** The class cap (`verify/verdicts.py`, rule 1) compares a force with the cap. That force was `peak_control_force`, the sum of the absolute normal force over every robot–target contact (`control/executor.py: _process_contacts`). In a grasp this double-counts:
+- the two jaws push in opposite directions, so a squeeze counts once per jaw;
+- a jaw meets the object in several convex pieces (CoACD, D-013), so it counts once per contact point.
+
+V-005 recorded the same inflation for wedged tools. While working on D-053, stiffer contacts (the physical change it records) turned stock grasps into `rule_violation`. One banana pick read 222 N of "force" while each single contact carried at most 54 N.
+
+**Change.** Per robot body, the target force is the magnitude of the vector sum of that body's contact forces on the target. The largest such body is the force the robot applies. Contact forces are rotated from the contact frame to the world, with their sign set by which geom is the robot's.
+- For a single pushing tool, this equals the old sum when its contacts are aligned.
+- For a squeeze, it is the force one jaw applies.
+- The hard limit on every other contact (`total`) is unchanged.
+
+**Prediction.** Under the current physics no verdict moves: the planted faults, their twins, the golden verdicts and the grasp tests stay as they are. The measure only matters once contacts are stiff (D-053).
+
+**Measured.** Under the current physics everything holds: the 10 planted faults keep their declared verdicts (the knob xfail as before) and the twins pass; the golden verdicts are unchanged; the grasp and reflex tests pass.

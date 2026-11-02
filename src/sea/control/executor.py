@@ -302,9 +302,13 @@ class Episode:
                 raise Abort("slip")
 
     def _process_contacts(self) -> tuple[float, float]:
+        """The step's robot-vs-world normal force (summed), and the force the robot applies to its target: per
+        robot body, the magnitude of the vector sum of its contact forces on the target, at the largest body.
+        Summing magnitudes instead would count a squeeze once per jaw and once per contact point, so an object
+        resting in several convex pieces of one jaw would read several times the force that jaw applies."""
         sim, d, m = self.sim, self.sim.data, self.sim.model
         total = 0.0
-        ctl_force = 0.0
+        on_target: dict[int, np.ndarray] = {}
         f6 = np.zeros(6)
         now = self.t
         for i in range(d.ncon):
@@ -335,12 +339,14 @@ class Episode:
             else:
                 ctype = "edge"
             if cid == self.cid:
-                ctl_force += fn
+                f_world = c.frame.reshape(3, 3).T @ f6[:3]  # on geom2, from geom1 (MuJoCo's contact frame)
+                body = int(m.geom_bodyid[rg])
+                on_target[body] = on_target.get(body, np.zeros(3)) + (f_world if rg == g1 else -f_world)
                 self.contact_types.add(ctype)
                 if ctype in self.cfg.banned:
                     self.banned_seen = True
             self._log_contact(ctype, cid)
-        return total, ctl_force
+        return total, max((float(np.linalg.norm(v)) for v in on_target.values()), default=0.0)
 
     def _log_contact(self, ctype: str, cid: str) -> None:
         key = (ctype, cid)
