@@ -1,0 +1,260 @@
+{
+ "run": "mobile_s1_s0",
+ "summary": {
+  "world": "mobile",
+  "arm": "s1",
+  "seed": 0,
+  "final_body": {
+   "id": "stock",
+   "parent": null,
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 18.0,
+      "length": 20.0,
+      "ride_height": 2.0
+     }
+    },
+    "locomotion": {
+     "type": "wheels4",
+     "params": {
+      "wheel_radius": 3.0
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 100.0
+     }
+    },
+    "battery": {
+     "type": "nimh_pack",
+     "params": {
+      "capacity": 4.8
+     }
+    },
+    "sensor": {
+     "type": "bump_switch",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "kitchen",
+   "living_room",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 8,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 0.0,
+   "fab_minutes": 0.0,
+   "lead_days": 0.0,
+   "owned": {
+    "tire_oring": 4.0,
+    "n20_gearmotor_100": 4.0,
+    "driver_tb6612": 2.0,
+    "nimh_aa": 2.0,
+    "bump_switch": 2.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.0,
+  "attempts": 612,
+  "proposals": {
+   "total": 0,
+   "tried": 0,
+   "refused": 0,
+   "ideas": 0,
+   "kept": 0,
+   "rejected_regression": 0,
+   "moves": {
+    "params": 0,
+    "swap": 0,
+    "idea": 0,
+    "tune": 0,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 0.0,
+  "llm": {
+   "calls": 0,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0
+  }
+ },
+ "final_body": "battery: nimh_pack (capacity=4.8); chassis: printed_tub (length=20, ride_height=2, width=18); drive: n20_gearmotor (gear_ratio=100); locomotion: wheels4 (wheel_radius=3); sensor: bump_switch",
+ "final_bom": [
+  {
+   "item": "print:PLA",
+   "qty": 140.8,
+   "slot": "chassis",
+   "note": ""
+  },
+  {
+   "item": "print:PLA",
+   "qty": 40.8,
+   "slot": "locomotion",
+   "note": "hubs, arms, mounts"
+  },
+  {
+   "item": "tire_oring",
+   "qty": 4.0,
+   "slot": "locomotion",
+   "note": ""
+  },
+  {
+   "item": "n20_gearmotor_100",
+   "qty": 4.0,
+   "slot": "drive",
+   "note": ""
+  },
+  {
+   "item": "driver_tb6612",
+   "qty": 2.0,
+   "slot": "drive",
+   "note": ""
+  },
+  {
+   "item": "nimh_aa",
+   "qty": 2.0,
+   "slot": "battery",
+   "note": ""
+  },
+  {
+   "item": "bump_switch",
+   "qty": 2.0,
+   "slot": "sensor",
+   "note": ""
+  }
+ ],
+ "stock_bom": [
+  {
+   "item": "print:PLA",
+   "qty": 140.8,
+   "slot": "chassis",
+   "note": ""
+  },
+  {
+   "item": "print:PLA",
+   "qty": 40.8,
+   "slot": "locomotion",
+   "note": "hubs, arms, mounts"
+  },
+  {
+   "item": "tire_oring",
+   "qty": 4.0,
+   "slot": "locomotion",
+   "note": ""
+  },
+  {
+   "item": "n20_gearmotor_100",
+   "qty": 4.0,
+   "slot": "drive",
+   "note": ""
+  },
+  {
+   "item": "driver_tb6612",
+   "qty": 2.0,
+   "slot": "drive",
+   "note": ""
+  },
+  {
+   "item": "nimh_aa",
+   "qty": 2.0,
+   "slot": "battery",
+   "note": ""
+  },
+  {
+   "item": "bump_switch",
+   "qty": 2.0,
+   "slot": "sensor",
+   "note": ""
+  }
+ ],
+ "judge_key": "7aeaf16dff38",
+ "iterations": [
+  {
+   "iteration": 0,
+   "body": "battery: nimh_pack (capacity=4.8); chassis: printed_tub (length=20, ride_height=2, width=18); drive: n20_gearmotor (gear_ratio=100); locomotion: wheels4 (wheel_radius=3); sensor: bump_switch",
+   "held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "failing_mechanisms": {
+    "chassis_wider_than_gap": 1,
+    "sensing_range_short": 1,
+    "step_higher_than_climbable": 1,
+    "gap_longer_than_support": 1,
+    "sinks_in_sand": 1,
+    "battery_exhausted": 1
+   },
+   "failing": {
+    "bedroom_train0": {
+     "mechanism": "chassis_wider_than_gap",
+     "detail": "stopped at feature 2/3, a 20.0 cm opening centred +2.0 cm off the robot's line: the robot is 23.0 cm wide overall; the opening is 20.0 cm"
+    },
+    "hallway_train0": {
+     "mechanism": "sensing_range_short",
+     "detail": "reached the end in 79 s (76 s at best); 45 s allowed; in the dark it sees 0.00 m ahead, less than its 0.20 m length, so it touches each of 10 obstacles at <= 0.25 m/s and backs off (40 s)"
+    },
+    "porch_train0": {
+     "mechanism": "step_higher_than_climbable",
+     "detail": "stopped at feature 2/3, a 5.5 cm step up (concrete, mu 0.75): the edge is 5.45 cm; its 3.0 cm wheels climb at most 2.27 cm at edge mu 0.78"
+    },
+    "garden_train0": {
+     "mechanism": "gap_longer_than_support",
+     "detail": "stopped at feature 3/4, a 9.0 cm wide, 5.0 cm deep trench (concrete edges, mu 0.75): each 3.0 cm wheel spans 6.0 cm, drops 4.96 cm into the 9.1 cm trench and climbs out of at most 2.10 cm"
+    },
+    "sandbox_train0": {
+     "mechanism": "sinks_in_sand",
+     "detail": "stopped at feature 3/4, 1.5 m of loose sand (it takes 0.75 kPa to sink 1 cm): ground pressure 2.49 kPa on 15 cm2 of contact sinks it 3.30 cm; it climbs out of 1.09 cm (belly clearance 2.0 cm)"
+    },
+    "lawn_train0": {
+     "mechanism": "battery_exhausted",
+     "detail": "stopped at feature 3/3, 5000 m of grass: the 4.8 Wh pack (4.08 Wh usable) ran out 77% of the way; at full speed it spends 5.28 Wh to here (3.80 J/m on grass at 0.38 kg)"
+    }
+   },
+   "proposals": [],
+   "accepted": null,
+   "notes": "",
+   "llm": {},
+   "seconds": null,
+   "stop": "no proposer"
+  }
+ ],
+ "llm_calls": []
+}

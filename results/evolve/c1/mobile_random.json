@@ -1,0 +1,6239 @@
+[
+ {
+  "run": "mobile_random_s0",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 0,
+  "final_body": {
+   "id": "b090",
+   "parent": "b012",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 18.0,
+      "length": 20.0,
+      "ride_height": 2.0
+     }
+    },
+    "locomotion": {
+     "type": "wheels4",
+     "params": {
+      "wheel_radius": 3.0
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 100.0
+     }
+    },
+    "battery": {
+     "type": "liion_pack",
+     "params": {
+      "capacity": 25.627763740177866
+     }
+    },
+    "sensor": {
+     "type": "ultrasonic",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "b012",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "b012",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "b012",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 5,
+    "body": "b012",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 6,
+    "body": "b012",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 7,
+    "body": "b012",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b012",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b012",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b090",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "hallway",
+   "kitchen",
+   "lawn",
+   "living_room",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "hallway",
+    "kitchen",
+    "lawn",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 12,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 17.5,
+   "fab_minutes": 0.0,
+   "lead_days": 3.0,
+   "owned": {
+    "bump_switch": 2.0,
+    "bms_board": 1.0,
+    "tire_oring": 4.0,
+    "nimh_aa": 2.0,
+    "driver_tb6612": 2.0,
+    "n20_gearmotor_100": 4.0,
+    "hc_sr04": 1.0,
+    "cell_18650": 3.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.0,
+  "attempts": 5809,
+  "proposals": {
+   "total": 34,
+   "tried": 28,
+   "refused": 6,
+   "ideas": 0,
+   "kept": 2,
+   "rejected_regression": 8,
+   "moves": {
+    "params": 12,
+    "swap": 18,
+    "idea": 0,
+    "tune": 4,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [
+   {
+    "id": "b092",
+    "body": "battery: liion_pack (capacity=25.6278); chassis: printed_tub (length=20, ride_height=2, width=18); drive: n20_gearmotor (gear_ratio=100); locomotion: rocker_bogie6 (bogie_length=9.14933, wheel_radius=5.79618); sensor: bump_switch",
+    "gained": [
+     "garden",
+     "sandbox"
+    ],
+    "lost": [
+     "under_sofa"
+    ],
+    "why_lost": "lost under_sofa (under_sofa: too_tall_for_clearance, stopped at feature 3/3, 0.8 m under a 9.0 cm high overhang: the robot is 13.6 cm tall; the overhang is 9.0 cm)",
+    "iteration": 9,
+    "edit": "locomotion -> rocker_bogie6 (bogie_length=9.14933, wheel_radius=5.79618)"
+   },
+   {
+    "id": "b09t0",
+    "body": "battery: liion_pack (capacity=25.6278); chassis: printed_tub (length=20, ride_height=2, width=18); drive: n20_gearmotor (gear_ratio=100); locomotion: rocker_bogie6 (bogie_length=8, wheel_radius=6); sensor: bump_switch",
+    "gained": [
+     "garden",
+     "sandbox"
+    ],
+    "lost": [
+     "under_sofa"
+    ],
+    "why_lost": "lost under_sofa (under_sofa: too_tall_for_clearance, stopped at feature 3/3, 0.8 m under a 9.0 cm high overhang: the robot is 14.0 cm tall; the overhang is 9.0 cm)",
+    "iteration": 9,
+    "edit": "locomotion (bogie_length=8, wheel_radius=6)"
+   },
+   {
+    "id": "b09t1",
+    "body": "battery: liion_pack (capacity=25.6278); chassis: printed_tub (length=20, ride_height=2, width=18); drive: n20_gearmotor (gear_ratio=100); locomotion: rocker_bogie6 (bogie_length=11.489, wheel_radius=6); sensor: bump_switch",
+    "gained": [
+     "garden",
+     "sandbox"
+    ],
+    "lost": [
+     "under_sofa"
+    ],
+    "why_lost": "lost under_sofa (under_sofa: too_tall_for_clearance, stopped at feature 3/3, 0.8 m under a 9.0 cm high overhang: the robot is 14.0 cm tall; the overhang is 9.0 cm)",
+    "iteration": 9,
+    "edit": "locomotion (bogie_length=11.489, wheel_radius=6)"
+   },
+   {
+    "id": "b09t2",
+    "body": "battery: liion_pack (capacity=25.6278); chassis: printed_tub (length=20, ride_height=2, width=18); drive: n20_gearmotor (gear_ratio=100); locomotion: rocker_bogie6 (bogie_length=8.758, wheel_radius=6); sensor: bump_switch",
+    "gained": [
+     "garden",
+     "sandbox"
+    ],
+    "lost": [
+     "under_sofa"
+    ],
+    "why_lost": "lost under_sofa (under_sofa: too_tall_for_clearance, stopped at feature 3/3, 0.8 m under a 9.0 cm high overhang: the robot is 14.0 cm tall; the overhang is 9.0 cm)",
+    "iteration": 9,
+    "edit": "locomotion (bogie_length=8.758, wheel_radius=6)"
+   },
+   {
+    "id": "b09t3",
+    "body": "battery: liion_pack (capacity=25.6278); chassis: printed_tub (length=20, ride_height=2, width=18); drive: n20_gearmotor (gear_ratio=100); locomotion: rocker_bogie6 (bogie_length=8.451, wheel_radius=6); sensor: bump_switch",
+    "gained": [
+     "garden",
+     "sandbox"
+    ],
+    "lost": [
+     "under_sofa"
+    ],
+    "why_lost": "lost under_sofa (under_sofa: too_tall_for_clearance, stopped at feature 3/3, 0.8 m under a 9.0 cm high overhang: the robot is 14.0 cm tall; the overhang is 9.0 cm)",
+    "iteration": 9,
+    "edit": "locomotion (bogie_length=8.451, wheel_radius=6)"
+   }
+  ],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s1",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 1,
+  "final_body": {
+   "id": "b041",
+   "parent": "b020",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 10.440945811889094,
+      "length": 29.070262173496133,
+      "ride_height": 3.598345228740247
+     }
+    },
+    "locomotion": {
+     "type": "tracks",
+     "params": {
+      "track_length": 29.117867378565357,
+      "idler_height": 5.056975289129056
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 100.0
+     }
+    },
+    "battery": {
+     "type": "nimh_pack",
+     "params": {
+      "capacity": 15.006126500184884
+     }
+    },
+    "sensor": {
+     "type": "ultrasonic",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "b002",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "b010",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "b020",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "b020",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 5,
+    "body": "b041",
+    "held_groups": 9,
+    "tasks_passed": 9,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 6,
+    "body": "b041",
+    "held_groups": 9,
+    "tasks_passed": 9,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 7,
+    "body": "b041",
+    "held_groups": 9,
+    "tasks_passed": 9,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b041",
+    "held_groups": 9,
+    "tasks_passed": 9,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b041",
+    "held_groups": 9,
+    "tasks_passed": 9,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b041",
+    "held_groups": 9,
+    "tasks_passed": 9,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "bedroom",
+   "garden",
+   "hallway",
+   "kitchen",
+   "lawn",
+   "living_room",
+   "sandbox",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "bedroom",
+    "garden",
+    "hallway",
+    "kitchen",
+    "lawn",
+    "living_room",
+    "sandbox",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 18,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 19.0,
+   "fab_minutes": 200.5,
+   "lead_days": 4.0,
+   "owned": {
+    "nimh_aa": 3.0,
+    "hc_sr04": 1.0,
+    "n20_gearmotor_100": 4.0,
+    "bump_switch": 2.0,
+    "driver_tb6612": 2.0,
+    "tire_oring": 4.0,
+    "rubber_track_kit": 1.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.0,
+  "attempts": 3068,
+  "proposals": {
+   "total": 30,
+   "tried": 20,
+   "refused": 10,
+   "ideas": 0,
+   "kept": 4,
+   "rejected_regression": 4,
+   "moves": {
+    "params": 18,
+    "swap": 12,
+    "idea": 0,
+    "tune": 0,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s2",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 2,
+  "final_body": {
+   "id": "b050",
+   "parent": "b011",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 12.400996212885378,
+      "length": 22.652615816095743,
+      "ride_height": 4.280345952587505
+     }
+    },
+    "locomotion": {
+     "type": "wheels4",
+     "params": {
+      "wheel_radius": 3.0
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 100.0
+     }
+    },
+    "battery": {
+     "type": "nimh_pack",
+     "params": {
+      "capacity": 11.183518865919234
+     }
+    },
+    "sensor": {
+     "type": "ultrasonic",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "b000",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "b011",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "b011",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "b011",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 5,
+    "body": "b011",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 6,
+    "body": "b050",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 7,
+    "body": "b050",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b050",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.1,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b050",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.1,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b050",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.1,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "bedroom",
+   "hallway",
+   "kitchen",
+   "lawn",
+   "living_room",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "bedroom",
+    "hallway",
+    "kitchen",
+    "lawn",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 14,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 2.5,
+   "fab_minutes": 120.7,
+   "lead_days": 2.0,
+   "owned": {
+    "bump_switch": 2.0,
+    "hc_sr04": 1.0,
+    "n20_gearmotor_100": 4.0,
+    "tire_oring": 4.0,
+    "nimh_aa": 2.0,
+    "driver_tb6612": 2.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.1,
+  "attempts": 5062,
+  "proposals": {
+   "total": 36,
+   "tried": 29,
+   "refused": 7,
+   "ideas": 0,
+   "kept": 3,
+   "rejected_regression": 12,
+   "moves": {
+    "params": 17,
+    "swap": 13,
+    "idea": 0,
+    "tune": 6,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [
+   {
+    "id": "b072",
+    "body": "battery: nimh_pack (capacity=11.1835); chassis: printed_tub (length=22.6526, ride_height=4.28035, width=12.401); drive: n20_gearmotor (gear_ratio=100); locomotion: tracks (idler_height=5.70363, track_length=24.3404); sensor: ultrasonic",
+    "gained": [
+     "garden",
+     "sandbox"
+    ],
+    "lost": [
+     "bedroom"
+    ],
+    "why_lost": "lost bedroom (bedroom: gap_margin_below_drift, stopped at feature 2/3, a 20.0 cm opening centred +2.0 cm off the robot's line: 0.67 cm to spare per side; it passed +1.34 cm off centre (st)",
+    "iteration": 7,
+    "edit": "locomotion -> tracks (idler_height=5.70363, track_length=24.3404)"
+   },
+   {
+    "id": "b07t0",
+    "body": "battery: nimh_pack (capacity=11.1835); chassis: printed_tub (length=22.6526, ride_height=4.28035, width=12.401); drive: n20_gearmotor (gear_ratio=100); locomotion: tracks (idler_height=8, track_length=24.849); sensor: ultrasonic",
+    "gained": [
+     "garden",
+     "porch",
+     "sandbox"
+    ],
+    "lost": [
+     "bedroom",
+     "under_sofa"
+    ],
+    "why_lost": "lost bedroom, under_sofa (under_sofa: too_tall_for_clearance, stopped at feature 3/3, 0.8 m under a 9.0 cm high overhang: the robot is 9.5 cm tall; the overhang is 8.9 cm; bedroom: gap_margin_below_drift, stopped at feature 2/3, a 20.0 cm opening centred +2.0 cm off the robot's line: 0.67 cm to spare per side; it passed +1.34 cm off centre (st)",
+    "iteration": 7,
+    "edit": "locomotion (idler_height=8, track_length=24.849)"
+   },
+   {
+    "id": "b07t3",
+    "body": "battery: nimh_pack (capacity=11.1835); chassis: printed_tub (length=22.6526, ride_height=4.28035, width=12.401); drive: n20_gearmotor (gear_ratio=100); locomotion: tracks (idler_height=8, track_length=24.651); sensor: ultrasonic",
+    "gained": [
+     "garden",
+     "porch",
+     "sandbox"
+    ],
+    "lost": [
+     "bedroom",
+     "under_sofa"
+    ],
+    "why_lost": "lost bedroom, under_sofa (under_sofa: too_tall_for_clearance, stopped at feature 3/3, 0.8 m under a 9.0 cm high overhang: the robot is 9.5 cm tall; the overhang is 8.9 cm; bedroom: gap_margin_below_drift, stopped at feature 2/3, a 20.0 cm opening centred +2.0 cm off the robot's line: 0.67 cm to spare per side; it passed +1.34 cm off centre (st)",
+    "iteration": 7,
+    "edit": "locomotion (idler_height=8, track_length=24.651)"
+   },
+   {
+    "id": "b07t4",
+    "body": "battery: nimh_pack (capacity=11.1835); chassis: printed_tub (length=22.6526, ride_height=4.28035, width=12.401); drive: n20_gearmotor (gear_ratio=100); locomotion: tracks (idler_height=7.986, track_length=24.791); sensor: ultrasonic",
+    "gained": [
+     "garden",
+     "porch",
+     "sandbox"
+    ],
+    "lost": [
+     "bedroom",
+     "under_sofa"
+    ],
+    "why_lost": "lost bedroom, under_sofa (under_sofa: too_tall_for_clearance, stopped at feature 3/3, 0.8 m under a 9.0 cm high overhang: the robot is 9.5 cm tall; the overhang is 8.9 cm; bedroom: gap_margin_below_drift, stopped at feature 2/3, a 20.0 cm opening centred +2.0 cm off the robot's line: 0.67 cm to spare per side; it passed +1.34 cm off centre (st)",
+    "iteration": 7,
+    "edit": "locomotion (idler_height=7.986, track_length=24.791)"
+   },
+   {
+    "id": "b07t5",
+    "body": "battery: nimh_pack (capacity=11.1835); chassis: printed_tub (length=22.6526, ride_height=4.28035, width=12.401); drive: n20_gearmotor (gear_ratio=100); locomotion: tracks (idler_height=7.79, track_length=26.275); sensor: ultrasonic",
+    "gained": [
+     "garden",
+     "porch",
+     "sandbox"
+    ],
+    "lost": [
+     "bedroom",
+     "under_sofa"
+    ],
+    "why_lost": "lost bedroom, under_sofa (under_sofa: too_tall_for_clearance, stopped at feature 3/3, 0.8 m under a 9.0 cm high overhang: the robot is 9.3 cm tall; the overhang is 8.9 cm; bedroom: gap_margin_below_drift, stopped at feature 2/3, a 20.0 cm opening centred +2.0 cm off the robot's line: 0.67 cm to spare per side; it passed +1.34 cm off centre (st)",
+    "iteration": 7,
+    "edit": "locomotion (idler_height=7.79, track_length=26.275)"
+   }
+  ],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s3",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 3,
+  "final_body": {
+   "id": "b071",
+   "parent": "b031",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 13.499446793100873,
+      "length": 30.597737485486245,
+      "ride_height": 4.219791496540865
+     }
+    },
+    "locomotion": {
+     "type": "wheels4",
+     "params": {
+      "wheel_radius": 3.0
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 100.0
+     }
+    },
+    "battery": {
+     "type": "liion_pack",
+     "params": {
+      "capacity": 11.169618474119504
+     }
+    },
+    "sensor": {
+     "type": "ultrasonic",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "b001",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "b001",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "b001",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "b031",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 5,
+    "body": "b031",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 6,
+    "body": "b031",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 7,
+    "body": "b031",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b071",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b071",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b071",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "bedroom",
+   "hallway",
+   "kitchen",
+   "lawn",
+   "living_room",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "bedroom",
+    "hallway",
+    "kitchen",
+    "lawn",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 14,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 13.0,
+   "fab_minutes": 162.5,
+   "lead_days": 3.0,
+   "owned": {
+    "n20_gearmotor_100": 4.0,
+    "nimh_aa": 2.0,
+    "driver_tb6612": 2.0,
+    "bump_switch": 2.0,
+    "cell_18650": 2.0,
+    "bms_board": 1.0,
+    "hc_sr04": 1.0,
+    "tire_oring": 4.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.0,
+  "attempts": 5486,
+  "proposals": {
+   "total": 34,
+   "tried": 30,
+   "refused": 4,
+   "ideas": 0,
+   "kept": 3,
+   "rejected_regression": 10,
+   "moves": {
+    "params": 22,
+    "swap": 8,
+    "idea": 0,
+    "tune": 4,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s4",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 4,
+  "final_body": {
+   "id": "b082",
+   "parent": "b021",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 11.410709968153265,
+      "length": 26.89630046602507,
+      "ride_height": 2.725746592352765
+     }
+    },
+    "locomotion": {
+     "type": "wheels4",
+     "params": {
+      "wheel_radius": 3.0
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 100.0
+     }
+    },
+    "battery": {
+     "type": "nimh_pack",
+     "params": {
+      "capacity": 10.80379998105893
+     }
+    },
+    "sensor": {
+     "type": "ultrasonic",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "b012",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "b021",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "b021",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 5,
+    "body": "b021",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 6,
+    "body": "b021",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 7,
+    "body": "b021",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b021",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b082",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b082",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "bedroom",
+   "hallway",
+   "kitchen",
+   "lawn",
+   "living_room",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "bedroom",
+    "hallway",
+    "kitchen",
+    "lawn",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 14,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 2.5,
+   "fab_minutes": 131.9,
+   "lead_days": 2.0,
+   "owned": {
+    "bump_switch": 2.0,
+    "hc_sr04": 1.0,
+    "nimh_aa": 2.0,
+    "driver_tb6612": 2.0,
+    "tire_oring": 4.0,
+    "n20_gearmotor_100": 4.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.0,
+  "attempts": 3507,
+  "proposals": {
+   "total": 30,
+   "tried": 20,
+   "refused": 10,
+   "ideas": 0,
+   "kept": 3,
+   "rejected_regression": 7,
+   "moves": {
+    "params": 15,
+    "swap": 15,
+    "idea": 0,
+    "tune": 0,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s5",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 5,
+  "final_body": {
+   "id": "b062",
+   "parent": "b010",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 18.0,
+      "length": 20.0,
+      "ride_height": 2.0
+     }
+    },
+    "locomotion": {
+     "type": "tracks",
+     "params": {
+      "track_length": 23.275860098758557,
+      "idler_height": 3.7148082805288496
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 100.0
+     }
+    },
+    "battery": {
+     "type": "liion_pack",
+     "params": {
+      "capacity": 13.80879179139269
+     }
+    },
+    "sensor": {
+     "type": "ultrasonic",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "b000",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "b010",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "b010",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "b010",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 5,
+    "body": "b010",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 6,
+    "body": "b010",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 7,
+    "body": "b062",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b062",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b062",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b062",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "garden",
+   "hallway",
+   "kitchen",
+   "lawn",
+   "living_room",
+   "sandbox",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "garden",
+    "hallway",
+    "kitchen",
+    "lawn",
+    "living_room",
+    "sandbox",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 16,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 27.0,
+   "fab_minutes": 52.1,
+   "lead_days": 4.0,
+   "owned": {
+    "cell_18650": 2.0,
+    "nimh_aa": 2.0,
+    "bump_switch": 2.0,
+    "hc_sr04": 1.0,
+    "n20_gearmotor_100": 4.0,
+    "rubber_track_kit": 1.0,
+    "bms_board": 1.0,
+    "tire_oring": 4.0,
+    "driver_tb6612": 2.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.0,
+  "attempts": 3283,
+  "proposals": {
+   "total": 31,
+   "tried": 19,
+   "refused": 12,
+   "ideas": 0,
+   "kept": 3,
+   "rejected_regression": 6,
+   "moves": {
+    "params": 22,
+    "swap": 8,
+    "idea": 0,
+    "tune": 0,
+    "merge": 1
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s6",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 6,
+  "final_body": {
+   "id": "b030",
+   "parent": "stock",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 18.0,
+      "length": 20.0,
+      "ride_height": 2.0
+     }
+    },
+    "locomotion": {
+     "type": "wheels4",
+     "params": {
+      "wheel_radius": 3.0
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 100.0
+     }
+    },
+    "battery": {
+     "type": "nimh_pack",
+     "params": {
+      "capacity": 9.423309986849354
+     }
+    },
+    "sensor": {
+     "type": "bump_switch",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "b030",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 5,
+    "body": "b030",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 6,
+    "body": "b030",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 7,
+    "body": "b030",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b030",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b030",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b030",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "kitchen",
+   "lawn",
+   "living_room",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "kitchen",
+    "lawn",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 10,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 0.0,
+   "fab_minutes": 0.0,
+   "lead_days": 0.0,
+   "owned": {
+    "driver_tb6612": 2.0,
+    "tire_oring": 4.0,
+    "nimh_aa": 2.0,
+    "bump_switch": 2.0,
+    "n20_gearmotor_100": 4.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.0,
+  "attempts": 4769,
+  "proposals": {
+   "total": 30,
+   "tried": 20,
+   "refused": 10,
+   "ideas": 0,
+   "kept": 1,
+   "rejected_regression": 4,
+   "moves": {
+    "params": 21,
+    "swap": 9,
+    "idea": 0,
+    "tune": 0,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s7",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 7,
+  "final_body": {
+   "id": "b041",
+   "parent": "stock",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 18.0,
+      "length": 20.0,
+      "ride_height": 2.0
+     }
+    },
+    "locomotion": {
+     "type": "wheels4",
+     "params": {
+      "wheel_radius": 4.200830384952072
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 100.0
+     }
+    },
+    "battery": {
+     "type": "nimh_pack",
+     "params": {
+      "capacity": 4.8
+     }
+    },
+    "sensor": {
+     "type": "bump_switch",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 5,
+    "body": "b041",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 6,
+    "body": "b041",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 7,
+    "body": "b041",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b041",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b041",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b041",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "kitchen",
+   "lawn",
+   "living_room",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 9,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 0.0,
+   "fab_minutes": 68.5,
+   "lead_days": 0.0,
+   "owned": {
+    "bump_switch": 2.0,
+    "n20_gearmotor_100": 4.0,
+    "tire_oring": 4.0,
+    "driver_tb6612": 2.0,
+    "nimh_aa": 2.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.0,
+  "attempts": 5044,
+  "proposals": {
+   "total": 31,
+   "tried": 23,
+   "refused": 8,
+   "ideas": 0,
+   "kept": 1,
+   "rejected_regression": 7,
+   "moves": {
+    "params": 19,
+    "swap": 11,
+    "idea": 0,
+    "tune": 0,
+    "merge": 1
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s8",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 8,
+  "final_body": {
+   "id": "b090",
+   "parent": "b011",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 18.0,
+      "length": 20.0,
+      "ride_height": 2.0
+     }
+    },
+    "locomotion": {
+     "type": "tracks",
+     "params": {
+      "track_length": 21.039526517705493,
+      "idler_height": 4.627291238736793
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 100.0
+     }
+    },
+    "battery": {
+     "type": "liion_pack",
+     "params": {
+      "capacity": 14.21130549697465
+     }
+    },
+    "sensor": {
+     "type": "ultrasonic",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "b001",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "b011",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "b011",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "b011",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 5,
+    "body": "b011",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 6,
+    "body": "b011",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 7,
+    "body": "b011",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b011",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b011",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b090",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "garden",
+   "hallway",
+   "kitchen",
+   "lawn",
+   "living_room",
+   "sandbox",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "hallway",
+    "kitchen",
+    "lawn",
+    "living_room",
+    "sandbox",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 15,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 27.0,
+   "fab_minutes": 52.2,
+   "lead_days": 4.0,
+   "owned": {
+    "driver_tb6612": 2.0,
+    "hc_sr04": 1.0,
+    "bump_switch": 2.0,
+    "nimh_aa": 2.0,
+    "bms_board": 1.0,
+    "cell_18650": 2.0,
+    "rubber_track_kit": 1.0,
+    "tire_oring": 4.0,
+    "n20_gearmotor_100": 4.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.0,
+  "attempts": 4726,
+  "proposals": {
+   "total": 30,
+   "tried": 26,
+   "refused": 4,
+   "ideas": 0,
+   "kept": 3,
+   "rejected_regression": 7,
+   "moves": {
+    "params": 19,
+    "swap": 11,
+    "idea": 0,
+    "tune": 0,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s9",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 9,
+  "final_body": {
+   "id": "b01m",
+   "parent": "stock",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 18.0,
+      "length": 20.0,
+      "ride_height": 2.0
+     }
+    },
+    "locomotion": {
+     "type": "wheels4",
+     "params": {
+      "wheel_radius": 3.0
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 100.0
+     }
+    },
+    "battery": {
+     "type": "liion_pack",
+     "params": {
+      "capacity": 24.150665230246375
+     }
+    },
+    "sensor": {
+     "type": "ultrasonic",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "b01m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "b01m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "b01m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 5,
+    "body": "b01m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 6,
+    "body": "b01m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 7,
+    "body": "b01m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b01m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b01m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b01m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "hallway",
+   "kitchen",
+   "lawn",
+   "living_room",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "hallway",
+    "kitchen",
+    "lawn",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 12,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 17.5,
+   "fab_minutes": 0.0,
+   "lead_days": 3.0,
+   "owned": {
+    "cell_18650": 3.0,
+    "n20_gearmotor_100": 4.0,
+    "driver_tb6612": 2.0,
+    "tire_oring": 4.0,
+    "bump_switch": 2.0,
+    "hc_sr04": 1.0,
+    "bms_board": 1.0,
+    "nimh_aa": 2.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.0,
+  "attempts": 4669,
+  "proposals": {
+   "total": 31,
+   "tried": 25,
+   "refused": 6,
+   "ideas": 0,
+   "kept": 1,
+   "rejected_regression": 6,
+   "moves": {
+    "params": 18,
+    "swap": 12,
+    "idea": 0,
+    "tune": 0,
+    "merge": 1
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s10",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 10,
+  "final_body": {
+   "id": "b02m",
+   "parent": "stock",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 13.617830938792439,
+      "length": 31.064794998112124,
+      "ride_height": 2.392852900767044
+     }
+    },
+    "locomotion": {
+     "type": "wheels4",
+     "params": {
+      "wheel_radius": 3.0
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 100.0
+     }
+    },
+    "battery": {
+     "type": "nimh_pack",
+     "params": {
+      "capacity": 7.817572587269831
+     }
+    },
+    "sensor": {
+     "type": "bump_switch",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "b02m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "b02m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 5,
+    "body": "b02m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 6,
+    "body": "b02m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 7,
+    "body": "b02m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b02m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b02m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b02m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "bedroom",
+   "kitchen",
+   "lawn",
+   "living_room",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "bedroom",
+    "kitchen",
+    "lawn",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 12,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 0.0,
+   "fab_minutes": 165.5,
+   "lead_days": 0.0,
+   "owned": {
+    "bump_switch": 2.0,
+    "tire_oring": 4.0,
+    "n20_gearmotor_100": 4.0,
+    "nimh_aa": 2.0,
+    "driver_tb6612": 2.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.1,
+  "attempts": 4973,
+  "proposals": {
+   "total": 31,
+   "tried": 22,
+   "refused": 9,
+   "ideas": 0,
+   "kept": 1,
+   "rejected_regression": 4,
+   "moves": {
+    "params": 22,
+    "swap": 8,
+    "idea": 0,
+    "tune": 0,
+    "merge": 1
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s11",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 11,
+  "final_body": {
+   "id": "b061",
+   "parent": "b032",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 12.363060799393505,
+      "length": 27.467247145518215,
+      "ride_height": 2.0
+     }
+    },
+    "locomotion": {
+     "type": "wheels4",
+     "params": {
+      "wheel_radius": 3.0
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 100.0
+     }
+    },
+    "battery": {
+     "type": "nimh_pack",
+     "params": {
+      "capacity": 12.505172408072406
+     }
+    },
+    "sensor": {
+     "type": "ultrasonic",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "b000",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "b000",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "b000",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "b032",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 5,
+    "body": "b032",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 6,
+    "body": "b032",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 7,
+    "body": "b061",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b061",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b061",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b061",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "bedroom",
+   "hallway",
+   "kitchen",
+   "lawn",
+   "living_room",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "bedroom",
+    "hallway",
+    "kitchen",
+    "lawn",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 14,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 2.5,
+   "fab_minutes": 140.8,
+   "lead_days": 2.0,
+   "owned": {
+    "bump_switch": 2.0,
+    "driver_tb6612": 2.0,
+    "n20_gearmotor_100": 4.0,
+    "hc_sr04": 1.0,
+    "nimh_aa": 2.0,
+    "tire_oring": 4.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.0,
+  "attempts": 4982,
+  "proposals": {
+   "total": 31,
+   "tried": 24,
+   "refused": 7,
+   "ideas": 0,
+   "kept": 3,
+   "rejected_regression": 5,
+   "moves": {
+    "params": 19,
+    "swap": 11,
+    "idea": 0,
+    "tune": 0,
+    "merge": 1
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s12",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 12,
+  "final_body": {
+   "id": "b001",
+   "parent": "stock",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 18.0,
+      "length": 20.0,
+      "ride_height": 2.0
+     }
+    },
+    "locomotion": {
+     "type": "wheels4",
+     "params": {
+      "wheel_radius": 3.0
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 100.0
+     }
+    },
+    "battery": {
+     "type": "nimh_pack",
+     "params": {
+      "capacity": 6.27309294271042
+     }
+    },
+    "sensor": {
+     "type": "bump_switch",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "b001",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "b001",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "b001",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "b001",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 5,
+    "body": "b001",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 6,
+    "body": "b001",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 7,
+    "body": "b001",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b001",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b001",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b001",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "kitchen",
+   "lawn",
+   "living_room",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "kitchen",
+    "lawn",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 10,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 0.0,
+   "fab_minutes": 0.0,
+   "lead_days": 0.0,
+   "owned": {
+    "driver_tb6612": 2.0,
+    "n20_gearmotor_100": 4.0,
+    "tire_oring": 4.0,
+    "nimh_aa": 2.0,
+    "bump_switch": 2.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.0,
+  "attempts": 3576,
+  "proposals": {
+   "total": 30,
+   "tried": 16,
+   "refused": 14,
+   "ideas": 0,
+   "kept": 1,
+   "rejected_regression": 7,
+   "moves": {
+    "params": 14,
+    "swap": 16,
+    "idea": 0,
+    "tune": 0,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s13",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 13,
+  "final_body": {
+   "id": "b070",
+   "parent": "b052",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 12.56949229282819,
+      "length": 25.189290712210983,
+      "ride_height": 3.0825309161312675
+     }
+    },
+    "locomotion": {
+     "type": "wheels4",
+     "params": {
+      "wheel_radius": 3.0
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 100.0
+     }
+    },
+    "battery": {
+     "type": "nimh_pack",
+     "params": {
+      "capacity": 16.069506867054855
+     }
+    },
+    "sensor": {
+     "type": "ultrasonic",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "b010",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "b010",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "b010",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 5,
+    "body": "b010",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 6,
+    "body": "b052",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 7,
+    "body": "b052",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b070",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b070",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b070",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "bedroom",
+   "hallway",
+   "kitchen",
+   "lawn",
+   "living_room",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "bedroom",
+    "hallway",
+    "kitchen",
+    "lawn",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 14,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 5.0,
+   "fab_minutes": 132.5,
+   "lead_days": 2.0,
+   "owned": {
+    "hc_sr04": 1.0,
+    "n20_gearmotor_100": 4.0,
+    "bump_switch": 2.0,
+    "tire_oring": 4.0,
+    "driver_tb6612": 2.0,
+    "nimh_aa": 3.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.0,
+  "attempts": 4202,
+  "proposals": {
+   "total": 30,
+   "tried": 23,
+   "refused": 7,
+   "ideas": 0,
+   "kept": 3,
+   "rejected_regression": 7,
+   "moves": {
+    "params": 21,
+    "swap": 9,
+    "idea": 0,
+    "tune": 0,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s14",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 14,
+  "final_body": {
+   "id": "b040",
+   "parent": "b031",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 18.0,
+      "length": 20.0,
+      "ride_height": 2.0
+     }
+    },
+    "locomotion": {
+     "type": "tracks",
+     "params": {
+      "track_length": 20.199442004448443,
+      "idler_height": 6.52779572727715
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 100.0
+     }
+    },
+    "battery": {
+     "type": "nimh_pack",
+     "params": {
+      "capacity": 14.206020333778522
+     }
+    },
+    "sensor": {
+     "type": "ultrasonic",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "b000",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "b000",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "b000",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "b031",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 5,
+    "body": "b040",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 6,
+    "body": "b040",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 7,
+    "body": "b040",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 8,
+    "body": "b040",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b040",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b040",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "hallway",
+   "kitchen",
+   "lawn",
+   "living_room",
+   "porch",
+   "sandbox",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "hallway",
+    "kitchen",
+    "lawn",
+    "living_room",
+    "porch",
+    "sandbox",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 17,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 16.5,
+   "fab_minutes": 58.4,
+   "lead_days": 4.0,
+   "owned": {
+    "tire_oring": 4.0,
+    "hc_sr04": 1.0,
+    "n20_gearmotor_100": 4.0,
+    "nimh_aa": 2.0,
+    "bump_switch": 2.0,
+    "rubber_track_kit": 1.0,
+    "driver_tb6612": 2.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.0,
+  "attempts": 3392,
+  "proposals": {
+   "total": 30,
+   "tried": 19,
+   "refused": 11,
+   "ideas": 0,
+   "kept": 3,
+   "rejected_regression": 4,
+   "moves": {
+    "params": 18,
+    "swap": 12,
+    "idea": 0,
+    "tune": 0,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s15",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 15,
+  "final_body": {
+   "id": "b032",
+   "parent": "b021",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 18.0,
+      "length": 20.0,
+      "ride_height": 2.0
+     }
+    },
+    "locomotion": {
+     "type": "wheels4",
+     "params": {
+      "wheel_radius": 3.0
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 100.0
+     }
+    },
+    "battery": {
+     "type": "nimh_pack",
+     "params": {
+      "capacity": 8.16019917201247
+     }
+    },
+    "sensor": {
+     "type": "ultrasonic",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "b021",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "b032",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 5,
+    "body": "b032",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 6,
+    "body": "b032",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 7,
+    "body": "b032",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b032",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b032",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b032",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "hallway",
+   "kitchen",
+   "lawn",
+   "living_room",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "hallway",
+    "kitchen",
+    "lawn",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 12,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 2.5,
+   "fab_minutes": 0.0,
+   "lead_days": 2.0,
+   "owned": {
+    "bump_switch": 2.0,
+    "n20_gearmotor_100": 4.0,
+    "hc_sr04": 1.0,
+    "tire_oring": 4.0,
+    "driver_tb6612": 2.0,
+    "nimh_aa": 2.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.0,
+  "attempts": 4875,
+  "proposals": {
+   "total": 30,
+   "tried": 24,
+   "refused": 6,
+   "ideas": 0,
+   "kept": 2,
+   "rejected_regression": 3,
+   "moves": {
+    "params": 18,
+    "swap": 12,
+    "idea": 0,
+    "tune": 0,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s16",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 16,
+  "final_body": {
+   "id": "b00m",
+   "parent": "stock",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 10.708867452612557,
+      "length": 30.048419257318084,
+      "ride_height": 1.760934839731613
+     }
+    },
+    "locomotion": {
+     "type": "wheels4",
+     "params": {
+      "wheel_radius": 3.0
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 73.33030871445808
+     }
+    },
+    "battery": {
+     "type": "nimh_pack",
+     "params": {
+      "capacity": 4.8
+     }
+    },
+    "sensor": {
+     "type": "bump_switch",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "b00m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "b00m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "b00m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "b00m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 5,
+    "body": "b00m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 6,
+    "body": "b00m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 7,
+    "body": "b00m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b00m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b00m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b00m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "bedroom",
+   "kitchen",
+   "lawn",
+   "living_room",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "bedroom",
+    "kitchen",
+    "lawn",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 12,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 14.0,
+   "fab_minutes": 139.4,
+   "lead_days": 3.0,
+   "owned": {
+    "n20_gearmotor_100": 4.0,
+    "n20_gearmotor_50": 4.0,
+    "tire_oring": 4.0,
+    "nimh_aa": 2.0,
+    "driver_tb6612": 2.0,
+    "bump_switch": 2.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.0,
+  "attempts": 3998,
+  "proposals": {
+   "total": 31,
+   "tried": 21,
+   "refused": 10,
+   "ideas": 0,
+   "kept": 1,
+   "rejected_regression": 11,
+   "moves": {
+    "params": 18,
+    "swap": 12,
+    "idea": 0,
+    "tune": 0,
+    "merge": 1
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s17",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 17,
+  "final_body": {
+   "id": "b010",
+   "parent": "b002",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 18.0,
+      "length": 20.0,
+      "ride_height": 2.0
+     }
+    },
+    "locomotion": {
+     "type": "wheels4",
+     "params": {
+      "wheel_radius": 3.0
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 100.0
+     }
+    },
+    "battery": {
+     "type": "nimh_pack",
+     "params": {
+      "capacity": 6.66788735171634
+     }
+    },
+    "sensor": {
+     "type": "ultrasonic",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "b002",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "b010",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "b010",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "b010",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 5,
+    "body": "b010",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 6,
+    "body": "b010",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 7,
+    "body": "b010",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b010",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b010",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b010",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "hallway",
+   "kitchen",
+   "lawn",
+   "living_room",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "hallway",
+    "kitchen",
+    "lawn",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 12,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 2.5,
+   "fab_minutes": 0.0,
+   "lead_days": 2.0,
+   "owned": {
+    "nimh_aa": 2.0,
+    "driver_tb6612": 2.0,
+    "bump_switch": 2.0,
+    "tire_oring": 4.0,
+    "n20_gearmotor_100": 4.0,
+    "hc_sr04": 1.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.0,
+  "attempts": 4284,
+  "proposals": {
+   "total": 30,
+   "tried": 25,
+   "refused": 5,
+   "ideas": 0,
+   "kept": 2,
+   "rejected_regression": 9,
+   "moves": {
+    "params": 23,
+    "swap": 7,
+    "idea": 0,
+    "tune": 0,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s18",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 18,
+  "final_body": {
+   "id": "b05m",
+   "parent": "b000",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 10.360036454629446,
+      "length": 20.0,
+      "ride_height": 2.0
+     }
+    },
+    "locomotion": {
+     "type": "wheels4",
+     "params": {
+      "wheel_radius": 3.0
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 100.0
+     }
+    },
+    "battery": {
+     "type": "nimh_pack",
+     "params": {
+      "capacity": 8.117254421719842
+     }
+    },
+    "sensor": {
+     "type": "ultrasonic",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "b000",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "b000",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "b000",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "b000",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 5,
+    "body": "b000",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 6,
+    "body": "b05m",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 7,
+    "body": "b05m",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b05m",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b05m",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b05m",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "bedroom",
+   "hallway",
+   "kitchen",
+   "lawn",
+   "living_room",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "bedroom",
+    "hallway",
+    "kitchen",
+    "lawn",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 14,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 2.5,
+   "fab_minutes": 98.0,
+   "lead_days": 2.0,
+   "owned": {
+    "n20_gearmotor_100": 4.0,
+    "driver_tb6612": 2.0,
+    "nimh_aa": 2.0,
+    "tire_oring": 4.0,
+    "hc_sr04": 1.0,
+    "bump_switch": 2.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.0,
+  "attempts": 3886,
+  "proposals": {
+   "total": 31,
+   "tried": 19,
+   "refused": 12,
+   "ideas": 0,
+   "kept": 2,
+   "rejected_regression": 4,
+   "moves": {
+    "params": 12,
+    "swap": 18,
+    "idea": 0,
+    "tune": 0,
+    "merge": 1
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s19",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 19,
+  "final_body": {
+   "id": "b090",
+   "parent": "b061",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 18.0,
+      "length": 20.0,
+      "ride_height": 2.0
+     }
+    },
+    "locomotion": {
+     "type": "tracks",
+     "params": {
+      "track_length": 23.311745788314298,
+      "idler_height": 4.987499915056085
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 100.0
+     }
+    },
+    "battery": {
+     "type": "liion_pack",
+     "params": {
+      "capacity": 19.527556918296344
+     }
+    },
+    "sensor": {
+     "type": "ultrasonic",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "b002",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "b010",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "b010",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "b010",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 5,
+    "body": "b010",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 6,
+    "body": "b010",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 7,
+    "body": "b061",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b061",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b061",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b090",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "garden",
+   "hallway",
+   "kitchen",
+   "lawn",
+   "living_room",
+   "sandbox",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "garden",
+    "hallway",
+    "kitchen",
+    "lawn",
+    "living_room",
+    "sandbox",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 16,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 31.5,
+   "fab_minutes": 93.9,
+   "lead_days": 4.0,
+   "owned": {
+    "tire_oring": 4.0,
+    "n20_gearmotor_100": 4.0,
+    "rubber_track_kit": 1.0,
+    "hc_sr04": 1.0,
+    "driver_tb6612": 2.0,
+    "nimh_aa": 2.0,
+    "bms_board": 1.0,
+    "cell_18650": 3.0,
+    "bump_switch": 2.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.0,
+  "attempts": 4336,
+  "proposals": {
+   "total": 30,
+   "tried": 23,
+   "refused": 7,
+   "ideas": 0,
+   "kept": 4,
+   "rejected_regression": 4,
+   "moves": {
+    "params": 17,
+    "swap": 13,
+    "idea": 0,
+    "tune": 0,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s20",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 20,
+  "final_body": {
+   "id": "b011",
+   "parent": "b000",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 18.0,
+      "length": 20.0,
+      "ride_height": 2.0
+     }
+    },
+    "locomotion": {
+     "type": "wheels4",
+     "params": {
+      "wheel_radius": 3.0
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 68.18883275280614
+     }
+    },
+    "battery": {
+     "type": "nimh_pack",
+     "params": {
+      "capacity": 4.8
+     }
+    },
+    "sensor": {
+     "type": "ultrasonic",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "b000",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "b011",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "b011",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "b011",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 5,
+    "body": "b011",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 6,
+    "body": "b011",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 7,
+    "body": "b011",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b011",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b011",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b011",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "hallway",
+   "kitchen",
+   "lawn",
+   "living_room",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "hallway",
+    "kitchen",
+    "lawn",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 12,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 16.5,
+   "fab_minutes": 0.0,
+   "lead_days": 3.0,
+   "owned": {
+    "n20_gearmotor_50": 4.0,
+    "n20_gearmotor_100": 4.0,
+    "driver_tb6612": 2.0,
+    "hc_sr04": 1.0,
+    "bump_switch": 2.0,
+    "tire_oring": 4.0,
+    "nimh_aa": 2.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.0,
+  "attempts": 4379,
+  "proposals": {
+   "total": 31,
+   "tried": 23,
+   "refused": 8,
+   "ideas": 0,
+   "kept": 2,
+   "rejected_regression": 6,
+   "moves": {
+    "params": 24,
+    "swap": 6,
+    "idea": 0,
+    "tune": 0,
+    "merge": 1
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s21",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 21,
+  "final_body": {
+   "id": "b031",
+   "parent": "b020",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 18.0,
+      "length": 20.0,
+      "ride_height": 2.0
+     }
+    },
+    "locomotion": {
+     "type": "wheels4",
+     "params": {
+      "wheel_radius": 3.0
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 100.0
+     }
+    },
+    "battery": {
+     "type": "nimh_pack",
+     "params": {
+      "capacity": 10.756457766062079
+     }
+    },
+    "sensor": {
+     "type": "ultrasonic",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "b020",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "b031",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 5,
+    "body": "b031",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 6,
+    "body": "b031",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 7,
+    "body": "b031",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b031",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b031",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b031",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "hallway",
+   "kitchen",
+   "lawn",
+   "living_room",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "hallway",
+    "kitchen",
+    "lawn",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 12,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 2.5,
+   "fab_minutes": 0.0,
+   "lead_days": 2.0,
+   "owned": {
+    "driver_tb6612": 2.0,
+    "nimh_aa": 2.0,
+    "n20_gearmotor_100": 4.0,
+    "tire_oring": 4.0,
+    "hc_sr04": 1.0,
+    "bump_switch": 2.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.0,
+  "attempts": 4807,
+  "proposals": {
+   "total": 30,
+   "tried": 23,
+   "refused": 7,
+   "ideas": 0,
+   "kept": 2,
+   "rejected_regression": 5,
+   "moves": {
+    "params": 17,
+    "swap": 13,
+    "idea": 0,
+    "tune": 0,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s22",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 22,
+  "final_body": {
+   "id": "b020",
+   "parent": "b012",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 11.06777848074944,
+      "length": 20.0,
+      "ride_height": 2.0
+     }
+    },
+    "locomotion": {
+     "type": "wheels4",
+     "params": {
+      "wheel_radius": 4.287111066743778
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 100.0
+     }
+    },
+    "battery": {
+     "type": "nimh_pack",
+     "params": {
+      "capacity": 4.8
+     }
+    },
+    "sensor": {
+     "type": "bump_switch",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "b012",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "b020",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "b020",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 5,
+    "body": "b020",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 6,
+    "body": "b020",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 7,
+    "body": "b020",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b020",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b020",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b020",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "bedroom",
+   "kitchen",
+   "lawn",
+   "living_room",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "bedroom",
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 11,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 0.0,
+   "fab_minutes": 172.8,
+   "lead_days": 0.0,
+   "owned": {
+    "nimh_aa": 2.0,
+    "bump_switch": 2.0,
+    "n20_gearmotor_100": 4.0,
+    "driver_tb6612": 2.0,
+    "tire_oring": 4.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.0,
+  "attempts": 4530,
+  "proposals": {
+   "total": 36,
+   "tried": 27,
+   "refused": 9,
+   "ideas": 0,
+   "kept": 2,
+   "rejected_regression": 14,
+   "moves": {
+    "params": 25,
+    "swap": 5,
+    "idea": 0,
+    "tune": 6,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [
+   {
+    "id": "b042",
+    "body": "battery: nimh_pack (capacity=4.8); chassis: printed_tub (length=20, ride_height=2, width=11.0678); drive: n20_gearmotor (gear_ratio=100); locomotion: tracks (idler_height=6.11146, track_length=18.0393); sensor: bump_switch",
+    "gained": [
+     "porch",
+     "sandbox"
+    ],
+    "lost": [
+     "lawn"
+    ],
+    "why_lost": "lost lawn (lawn: battery_exhausted, stopped at feature 3/3, 5000 m of grass: the 4.8 Wh pack (4.08 Wh usable) ran out 49% of the way; at full speed it spends 8.35 Wh to here (6)",
+    "iteration": 4,
+    "edit": "locomotion -> tracks (idler_height=6.11146, track_length=18.0393)"
+   },
+   {
+    "id": "b04t2",
+    "body": "battery: nimh_pack (capacity=4.8); chassis: printed_tub (length=20, ride_height=2, width=11.0678); drive: n20_gearmotor (gear_ratio=100); locomotion: tracks (idler_height=6.36, track_length=19.842); sensor: bump_switch",
+    "gained": [
+     "porch",
+     "sandbox"
+    ],
+    "lost": [
+     "lawn"
+    ],
+    "why_lost": "lost lawn (lawn: battery_exhausted, stopped at feature 3/3, 5000 m of grass: the 4.8 Wh pack (4.08 Wh usable) ran out 49% of the way; at full speed it spends 8.37 Wh to here (6)",
+    "iteration": 4,
+    "edit": "locomotion (idler_height=6.36, track_length=19.842)"
+   },
+   {
+    "id": "b04t5",
+    "body": "battery: nimh_pack (capacity=4.8); chassis: printed_tub (length=20, ride_height=2, width=11.0678); drive: n20_gearmotor (gear_ratio=100); locomotion: tracks (idler_height=5.447, track_length=20.78); sensor: bump_switch",
+    "gained": [
+     "garden",
+     "sandbox"
+    ],
+    "lost": [
+     "lawn"
+    ],
+    "why_lost": "lost lawn (lawn: battery_exhausted, stopped at feature 3/3, 5000 m of grass: the 4.8 Wh pack (4.08 Wh usable) ran out 49% of the way; at full speed it spends 8.36 Wh to here (6)",
+    "iteration": 4,
+    "edit": "locomotion (idler_height=5.447, track_length=20.78)"
+   }
+  ],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s23",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 23,
+  "final_body": {
+   "id": "b031",
+   "parent": "b000",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 18.0,
+      "length": 20.0,
+      "ride_height": 2.0
+     }
+    },
+    "locomotion": {
+     "type": "wheels4",
+     "params": {
+      "wheel_radius": 3.0
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 100.0
+     }
+    },
+    "battery": {
+     "type": "liion_pack",
+     "params": {
+      "capacity": 11.81851141717156
+     }
+    },
+    "sensor": {
+     "type": "ultrasonic",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "b000",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "b000",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "b000",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "b031",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 5,
+    "body": "b031",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 6,
+    "body": "b031",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 7,
+    "body": "b031",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b031",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b031",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b031",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "hallway",
+   "kitchen",
+   "lawn",
+   "living_room",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "hallway",
+    "kitchen",
+    "lawn",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 12,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 13.0,
+   "fab_minutes": 0.0,
+   "lead_days": 3.0,
+   "owned": {
+    "cell_18650": 2.0,
+    "bms_board": 1.0,
+    "hc_sr04": 1.0,
+    "nimh_aa": 2.0,
+    "driver_tb6612": 2.0,
+    "bump_switch": 2.0,
+    "tire_oring": 4.0,
+    "n20_gearmotor_100": 4.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.0,
+  "attempts": 4623,
+  "proposals": {
+   "total": 30,
+   "tried": 24,
+   "refused": 6,
+   "ideas": 0,
+   "kept": 2,
+   "rejected_regression": 8,
+   "moves": {
+    "params": 21,
+    "swap": 9,
+    "idea": 0,
+    "tune": 0,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s24",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 24,
+  "final_body": {
+   "id": "b062",
+   "parent": "b032",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 13.017997494741701,
+      "length": 18.302368099072392,
+      "ride_height": 1.5578171137274437
+     }
+    },
+    "locomotion": {
+     "type": "wheels4",
+     "params": {
+      "wheel_radius": 3.0
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 60.19930543603973
+     }
+    },
+    "battery": {
+     "type": "nimh_pack",
+     "params": {
+      "capacity": 4.8
+     }
+    },
+    "sensor": {
+     "type": "ultrasonic",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "b011",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "b011",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "b032",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 5,
+    "body": "b032",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 6,
+    "body": "b032",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 7,
+    "body": "b062",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b062",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b062",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b062",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "bedroom",
+   "hallway",
+   "kitchen",
+   "lawn",
+   "living_room",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "bedroom",
+    "hallway",
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 12,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 16.5,
+   "fab_minutes": 105.5,
+   "lead_days": 3.0,
+   "owned": {
+    "n20_gearmotor_100": 4.0,
+    "driver_tb6612": 2.0,
+    "hc_sr04": 1.0,
+    "nimh_aa": 2.0,
+    "tire_oring": 4.0,
+    "bump_switch": 2.0,
+    "n20_gearmotor_50": 4.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.0,
+  "attempts": 5573,
+  "proposals": {
+   "total": 42,
+   "tried": 29,
+   "refused": 13,
+   "ideas": 0,
+   "kept": 3,
+   "rejected_regression": 12,
+   "moves": {
+    "params": 20,
+    "swap": 10,
+    "idea": 0,
+    "tune": 12,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s25",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 25,
+  "final_body": {
+   "id": "b041",
+   "parent": "b01m",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 12.347508286777625,
+      "length": 24.834571140310242,
+      "ride_height": 3.9036780368439588
+     }
+    },
+    "locomotion": {
+     "type": "wheels4",
+     "params": {
+      "wheel_radius": 3.0
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 100.0
+     }
+    },
+    "battery": {
+     "type": "nimh_pack",
+     "params": {
+      "capacity": 16.8521970719567
+     }
+    },
+    "sensor": {
+     "type": "ultrasonic",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "b01m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "b01m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 4,
+    "body": "b01m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 5,
+    "body": "b041",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 6,
+    "body": "b041",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 7,
+    "body": "b041",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b041",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b041",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b041",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.1,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "bedroom",
+   "hallway",
+   "kitchen",
+   "lawn",
+   "living_room",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "bedroom",
+    "hallway",
+    "kitchen",
+    "lawn",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 14,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 7.5,
+   "fab_minutes": 129.6,
+   "lead_days": 2.0,
+   "owned": {
+    "n20_gearmotor_100": 4.0,
+    "nimh_aa": 4.0,
+    "bump_switch": 2.0,
+    "driver_tb6612": 2.0,
+    "hc_sr04": 1.0,
+    "tire_oring": 4.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.1,
+  "attempts": 4444,
+  "proposals": {
+   "total": 31,
+   "tried": 23,
+   "refused": 8,
+   "ideas": 0,
+   "kept": 2,
+   "rejected_regression": 8,
+   "moves": {
+    "params": 22,
+    "swap": 8,
+    "idea": 0,
+    "tune": 0,
+    "merge": 1
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s26",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 26,
+  "final_body": {
+   "id": "b011",
+   "parent": "b00m",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 13.23777886959752,
+      "length": 19.14608399808726,
+      "ride_height": 3.662050155128584
+     }
+    },
+    "locomotion": {
+     "type": "wheels4",
+     "params": {
+      "wheel_radius": 3.0
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 100.0
+     }
+    },
+    "battery": {
+     "type": "nimh_pack",
+     "params": {
+      "capacity": 5.353641043860202
+     }
+    },
+    "sensor": {
+     "type": "ultrasonic",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "b00m",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "b011",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "b011",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "b011",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 5,
+    "body": "b011",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 6,
+    "body": "b011",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 7,
+    "body": "b011",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b011",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b011",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b011",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "bedroom",
+   "hallway",
+   "kitchen",
+   "lawn",
+   "living_room",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "hallway",
+    "kitchen",
+    "lawn",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 13,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 2.5,
+   "fab_minutes": 110.4,
+   "lead_days": 2.0,
+   "owned": {
+    "tire_oring": 4.0,
+    "bump_switch": 2.0,
+    "driver_tb6612": 2.0,
+    "nimh_aa": 2.0,
+    "hc_sr04": 1.0,
+    "n20_gearmotor_100": 4.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.0,
+  "attempts": 4029,
+  "proposals": {
+   "total": 31,
+   "tried": 25,
+   "refused": 6,
+   "ideas": 0,
+   "kept": 2,
+   "rejected_regression": 8,
+   "moves": {
+    "params": 24,
+    "swap": 6,
+    "idea": 0,
+    "tune": 0,
+    "merge": 1
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s27",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 27,
+  "final_body": {
+   "id": "b012",
+   "parent": "stock",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 18.0,
+      "length": 20.0,
+      "ride_height": 2.0
+     }
+    },
+    "locomotion": {
+     "type": "wheels4",
+     "params": {
+      "wheel_radius": 3.0
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 100.0
+     }
+    },
+    "battery": {
+     "type": "nimh_pack",
+     "params": {
+      "capacity": 15.059679919586996
+     }
+    },
+    "sensor": {
+     "type": "bump_switch",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "b012",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "b012",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "b012",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 5,
+    "body": "b012",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 6,
+    "body": "b012",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 7,
+    "body": "b012",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b012",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b012",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b012",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "kitchen",
+   "lawn",
+   "living_room",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "kitchen",
+    "lawn",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 10,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 2.5,
+   "fab_minutes": 0.0,
+   "lead_days": 1.0,
+   "owned": {
+    "n20_gearmotor_100": 4.0,
+    "driver_tb6612": 2.0,
+    "tire_oring": 4.0,
+    "bump_switch": 2.0,
+    "nimh_aa": 3.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.0,
+  "attempts": 4913,
+  "proposals": {
+   "total": 30,
+   "tried": 22,
+   "refused": 8,
+   "ideas": 0,
+   "kept": 1,
+   "rejected_regression": 9,
+   "moves": {
+    "params": 15,
+    "swap": 15,
+    "idea": 0,
+    "tune": 0,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s28",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 28,
+  "final_body": {
+   "id": "b042",
+   "parent": "b001",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 18.0,
+      "length": 20.0,
+      "ride_height": 2.0
+     }
+    },
+    "locomotion": {
+     "type": "wheels4",
+     "params": {
+      "wheel_radius": 3.0
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 100.0
+     }
+    },
+    "battery": {
+     "type": "nimh_pack",
+     "params": {
+      "capacity": 17.116863461281397
+     }
+    },
+    "sensor": {
+     "type": "ultrasonic",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "b001",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "b001",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "b001",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "b001",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 5,
+    "body": "b042",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 6,
+    "body": "b042",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 7,
+    "body": "b042",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b042",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b042",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b042",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "hallway",
+   "kitchen",
+   "lawn",
+   "living_room",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "hallway",
+    "kitchen",
+    "lawn",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 12,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 7.5,
+   "fab_minutes": 0.0,
+   "lead_days": 2.0,
+   "owned": {
+    "bump_switch": 2.0,
+    "n20_gearmotor_100": 4.0,
+    "driver_tb6612": 2.0,
+    "tire_oring": 4.0,
+    "nimh_aa": 4.0,
+    "hc_sr04": 1.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.0,
+  "attempts": 4320,
+  "proposals": {
+   "total": 30,
+   "tried": 22,
+   "refused": 8,
+   "ideas": 0,
+   "kept": 2,
+   "rejected_regression": 4,
+   "moves": {
+    "params": 20,
+    "swap": 10,
+    "idea": 0,
+    "tune": 0,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "mobile_random_s29",
+  "world": "mobile",
+  "arm": "random",
+  "seed": 29,
+  "final_body": {
+   "id": "b002",
+   "parent": "stock",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 18.0,
+      "length": 20.0,
+      "ride_height": 2.0
+     }
+    },
+    "locomotion": {
+     "type": "wheels4",
+     "params": {
+      "wheel_radius": 3.0
+     }
+    },
+    "drive": {
+     "type": "n20_gearmotor",
+     "params": {
+      "gear_ratio": 100.0
+     }
+    },
+    "battery": {
+     "type": "nimh_pack",
+     "params": {
+      "capacity": 15.64018741581444
+     }
+    },
+    "sensor": {
+     "type": "bump_switch",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 4,
+    "tasks_passed": 4,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 1,
+    "body": "b002",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 2,
+    "body": "b002",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 3,
+    "body": "b002",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 4,
+    "body": "b002",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 5,
+    "body": "b002",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.0
+   },
+   {
+    "iteration": 6,
+    "body": "b002",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 7,
+    "body": "b002",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 8,
+    "body": "b002",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 9,
+    "body": "b002",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   },
+   {
+    "iteration": 10,
+    "body": "b002",
+    "held_groups": 5,
+    "tasks_passed": 5,
+    "sim_s": 0.0,
+    "wall_s": 0.1
+   }
+  ],
+  "train_groups": 10,
+  "final_held_train": [
+   "kitchen",
+   "lawn",
+   "living_room",
+   "shed",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "kitchen",
+    "lawn",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "living_room",
+    "shed",
+    "under_sofa"
+   ],
+   "final_tasks": 10,
+   "stock_tasks": 8,
+   "n": 20
+  },
+  "spent": {
+   "usd": 2.5,
+   "fab_minutes": 0.0,
+   "lead_days": 1.0,
+   "owned": {
+    "driver_tb6612": 2.0,
+    "bump_switch": 2.0,
+    "tire_oring": 4.0,
+    "n20_gearmotor_100": 4.0,
+    "nimh_aa": 3.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 0.0,
+  "attempts": 4655,
+  "proposals": {
+   "total": 30,
+   "tried": 21,
+   "refused": 9,
+   "ideas": 0,
+   "kept": 1,
+   "rejected_regression": 2,
+   "moves": {
+    "params": 21,
+    "swap": 9,
+    "idea": 0,
+    "tune": 0,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 0.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ }
+]

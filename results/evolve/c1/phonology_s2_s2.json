@@ -1,0 +1,592 @@
+{
+ "run": "phonology_s2_s2",
+ "summary": {
+  "world": "phonology",
+  "arm": "s2",
+  "seed": 2,
+  "final_body": {
+   "id": "b00m",
+   "parent": "stock",
+   "parts": {
+    "tract": {
+     "type": "short_cast",
+     "params": {
+      "length": 13.5
+     }
+    },
+    "tongue": {
+     "type": "tip_tongue",
+     "params": {
+      "rail_start": 3.25,
+      "stroke": 1.3
+     }
+    },
+    "lips": {
+     "type": "round_lips",
+     "params": {
+      "max_protrusion": 1.6
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.2,
+    "wall_s": 0.3
+   },
+   {
+    "iteration": 1,
+    "body": "b00m",
+    "held_groups": 13,
+    "tasks_passed": 13,
+    "sim_s": 0.6,
+    "wall_s": 48.5
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "ao",
+   "eh",
+   "er",
+   "ih",
+   "iy",
+   "k",
+   "p",
+   "t",
+   "uh",
+   "uw"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ae",
+    "ah",
+    "ao",
+    "eh",
+    "er",
+    "ih",
+    "iy",
+    "k",
+    "p",
+    "t",
+    "uh",
+    "uw"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 26,
+   "stock_tasks": 13,
+   "n": 26
+  },
+  "spent": {
+   "usd": 24.0,
+   "fab_minutes": 132.2,
+   "lead_days": 3.0,
+   "owned": {
+    "rail_100mm": 1.0,
+    "pushrod_kit": 2.0,
+    "servo_mg90s": 5.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 1.1,
+  "attempts": 3566,
+  "proposals": {
+   "total": 4,
+   "tried": 4,
+   "refused": 0,
+   "ideas": 0,
+   "kept": 1,
+   "rejected_regression": 0,
+   "moves": {
+    "params": 1,
+    "swap": 2,
+    "idea": 0,
+    "tune": 0,
+    "merge": 1
+   },
+   "mean_prediction_precision": 0.889
+  },
+  "frontier": [],
+  "wall_s": 49.0,
+  "llm": {
+   "calls": 1,
+   "tokens_in": 9256,
+   "tokens_out": 4868,
+   "usd_list_price": 0.154
+  }
+ },
+ "final_body": "lips: round_lips (max_protrusion=1.6); tongue: tip_tongue (rail_start=3.25, stroke=1.3); tract: short_cast (length=13.5)",
+ "final_bom": [
+  {
+   "item": "servo_mg90s",
+   "qty": 2.0,
+   "slot": "lips",
+   "note": ""
+  },
+  {
+   "item": "pushrod_kit",
+   "qty": 1.0,
+   "slot": "lips",
+   "note": ""
+  },
+  {
+   "item": "print:PLA",
+   "qty": 18.0,
+   "slot": "lips",
+   "note": ""
+  },
+  {
+   "item": "cast:silicone",
+   "qty": 14.0,
+   "slot": "lips",
+   "note": ""
+  },
+  {
+   "item": "servo_mg90s",
+   "qty": 4.0,
+   "slot": "tongue",
+   "note": ""
+  },
+  {
+   "item": "rail_100mm",
+   "qty": 1.0,
+   "slot": "tongue",
+   "note": ""
+  },
+  {
+   "item": "pushrod_kit",
+   "qty": 1.0,
+   "slot": "tongue",
+   "note": ""
+  },
+  {
+   "item": "print:PLA",
+   "qty": 38.0,
+   "slot": "tongue",
+   "note": ""
+  },
+  {
+   "item": "cast:silicone",
+   "qty": 12.0,
+   "slot": "tongue",
+   "note": ""
+  },
+  {
+   "item": "cast:silicone",
+   "qty": 40.5,
+   "slot": "tract",
+   "note": ""
+  },
+  {
+   "item": "print:PLA",
+   "qty": 54.0,
+   "slot": "tract",
+   "note": ""
+  }
+ ],
+ "stock_bom": [
+  {
+   "item": "servo_mg90s",
+   "qty": 1.0,
+   "slot": "lips",
+   "note": ""
+  },
+  {
+   "item": "print:PLA",
+   "qty": 15.0,
+   "slot": "lips",
+   "note": ""
+  },
+  {
+   "item": "cast:silicone",
+   "qty": 10.0,
+   "slot": "lips",
+   "note": ""
+  },
+  {
+   "item": "servo_mg90s",
+   "qty": 2.0,
+   "slot": "tongue",
+   "note": ""
+  },
+  {
+   "item": "rail_100mm",
+   "qty": 1.0,
+   "slot": "tongue",
+   "note": ""
+  },
+  {
+   "item": "print:PLA",
+   "qty": 25.0,
+   "slot": "tongue",
+   "note": ""
+  },
+  {
+   "item": "cast:silicone",
+   "qty": 8.0,
+   "slot": "tongue",
+   "note": ""
+  },
+  {
+   "item": "cast:silicone",
+   "qty": 40.5,
+   "slot": "tract",
+   "note": ""
+  },
+  {
+   "item": "print:PLA",
+   "qty": 54.0,
+   "slot": "tract",
+   "note": ""
+  }
+ ],
+ "judge_key": "7aeaf16dff38",
+ "iterations": [
+  {
+   "iteration": 0,
+   "body": "lips: jaw_lips (rest_area=3); tongue: cam_tongue (rail_start=3.25, stroke=0.95); tract: short_cast (length=13.5)",
+   "held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "failing_mechanisms": {
+    "f2_floor_too_high": 3,
+    "f3_floor_too_high": 1,
+    "no_closure_at_lips": 1,
+    "no_closure_at_alveolar": 1,
+    "no_closure_at_velar": 1
+   },
+   "failing": {
+    "ao_train0": {
+     "mechanism": "f2_floor_too_high",
+     "detail": "F 697/1071 Hz vs target 570/840 (F1 +22%, F2 +27%); over 601 open postures (System 1's map and its best) this body's F2 spans 1067-3086 Hz; with F1 within 10% of 570 Hz it spans 1126-1925 Hz; target F2 840 Hz"
+    },
+    "uh_train0": {
+     "mechanism": "f2_floor_too_high",
+     "detail": "F 482/1144 Hz vs target 440/1020 (F2 +12%); over 601 open postures (System 1's map and its best) this body's F2 spans 1074-3086 Hz; with F1 within 10% of 440 Hz it spans 1147-2225 Hz; target F2 1020 Hz"
+    },
+    "uw_train0": {
+     "mechanism": "f2_floor_too_high",
+     "detail": "F 417/1220 Hz vs target 300/870 (F1 +39%, F2 +40%); over 601 open postures (System 1's map and its best) this body's F2 spans 1074-3086 Hz; with F1 within 10% of 300 Hz it spans 1747-3086 Hz; target F2 870 Hz"
+    },
+    "er_train0": {
+     "mechanism": "f3_floor_too_high",
+     "detail": "F 677/1496/2769 Hz vs target 490/1350/1690 (F1 +38%, F2 +11%, F3 +64%); over 601 open postures (System 1's map and its best) this body's F3 spans 2769-4296 Hz; with F1 within 10% of 490 and F2 within 10% of 1350 Hz it spans 2984-3419 Hz; target F3 1690 Hz"
+    },
+    "p_train0": {
+     "mechanism": "no_closure_at_lips",
+     "detail": "narrowest 0.20 cm2 at 3.1 cm behind the teeth, airway elsewhere 1.08 cm2; the lips close to 3.00 cm2 at the least (a seal is < 0.05 cm2); tongue body: 3.25-10.2 cm behind the teeth, smallest area 0.20 cm2; lips: smallest opening 3.00 cm2"
+    },
+    "t_train0": {
+     "mechanism": "no_closure_at_alveolar",
+     "detail": "narrowest 0.20 cm2 at 4.2 cm behind the teeth, airway elsewhere 1.21 cm2; no articulator reaches the alveolar place (0-1.5 cm behind the teeth); tongue body: 3.25-10.2 cm behind the teeth, smallest area 0.20 cm2; lips: smallest opening 3.00 cm2"
+    },
+    "k_train0": {
+     "mechanism": "no_closure_at_velar",
+     "detail": "narrowest 0.20 cm2 at 3.7 cm behind the teeth, airway elsewhere 1.23 cm2; tongue body reaches the velar place (5.5-8.5 cm behind the teeth) but narrows it to 0.20 cm2 at the least (a seal is < 0.05 cm2); tongue body: 3.25-10.2 cm behind the teeth, smallest area 0.20 cm2; lips: smallest opening 3.00 cm2"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "tongue (stroke=1.3)",
+     "base": null,
+     "mechanism": "no_closure_at_velar: tongue body reaches 5.5-8.5 cm but narrows only to 0.20 cm2 (stroke 0.95 of the 1.2 cm bore radius leaves ~0.25 cm radius = 0.196 cm2).",
+     "principle": "A stop needs an articulator that reaches its place and seals the bore; cam lift past the 1.2 cm bore radius squeezes the tube shut.",
+     "hypothesis": "Raising stroke from 0.95 to 1.3 (> 1.2 bore radius) lets the pad seal (<0.05 cm2) at the velar place with the lips and pharynx open (>1 cm2). No place change can fix it since sealing depends only on stroke; this is the cheapest rung.",
+     "predicted_gains": [
+      "k"
+     ],
+     "risks": [
+      "iy",
+      "ih: tighter maximum lift means the same control travel spans more depth, raising noise sensitivity of high-front vowels; System 1 re-searches tongue_height and the 0.20 cm2 postures stay reachable at partial lift."
+     ],
+     "idea": null,
+     "result": "not kept (another proposal gained more): gained k, lost none; costs $0.00, 50 machine min",
+     "gained": [
+      "k"
+     ],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "k"
+      ],
+      "hit": [
+       "k"
+      ],
+      "missed": [],
+      "unpredicted": [],
+      "precision": 1.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 50.0,
+      "lines": [
+       "rail_100mm x1: provided (reused)",
+       "servo_mg90s x3: provided (reused)",
+       "print:PLA 25.0 g for tongue: 30 machine minutes",
+       "cast:silicone 8.0 g for tongue: 20 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "f2_floor_too_high",
+      "f3_floor_too_high",
+      "no_closure_at_alveolar",
+      "no_closure_at_lips"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "lips -> round_lips (max_protrusion=1.6)",
+     "base": null,
+     "mechanism": "no_closure_at_lips (lips stop at 3.00 cm2) and f2_floor_too_high for uw/uh/ao (with F1 near target, F2 floors 1747/1147/1126 Hz vs targets 870/1020/840).",
+     "principle": "Lip opening is a velocity maximum of every formant: closing and protruding the lips lowers F1, F2, F3; a longer lip tube lowers all formants together. A stop at the lips needs a lip seal.",
+     "hypothesis": "jaw_lips has no value that closes below 2.5 cm2 or protrudes, so a params move cannot help. round_lips gives 0-6.6 cm2 (seal for /p/) and up to 1.6 cm protrusion (lip tube 2.6 cm, tract to 16.1 cm) plus small rounded opening, dropping F2 toward 870-1020 Hz for back rounded vowels. Retractable protrusion avoids the long_cast penalty on aa F1 (ceiling 854 would fall ~708 < 730 target) and iy F2.",
+     "predicted_gains": [
+      "p",
+      "uw",
+      "uh",
+      "ao"
+     ],
+     "risks": [
+      "aa",
+      "ae: max opening 6.6 vs 6.9 cm2 now; slight F1 ceiling drop, but at zero protrusion the tract length is unchanged (14.5 cm) and current aa/ae solutions are within range.",
+      "iy: lip tube unchanged at zero protrusion, so F2 2290 remains reachable."
+     ],
+     "idea": null,
+     "result": "not kept (another proposal gained more): gained ao, p, uh, uw, lost none; costs $4.00, 57 machine min",
+     "gained": [
+      "ao",
+      "p",
+      "uh",
+      "uw"
+     ],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "ao",
+       "p",
+       "uh",
+       "uw"
+      ],
+      "hit": [
+       "ao",
+       "p",
+       "uh",
+       "uw"
+      ],
+      "missed": [],
+      "unpredicted": [],
+      "precision": 1.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 4.0,
+      "lead_days": 2.0,
+      "fab_minutes": 56.6,
+      "lines": [
+       "pushrod_kit x1: 0 provided, buy 1 at $4 ($4.00, 2 days)",
+       "rail_100mm x1: provided (reused)",
+       "servo_mg90s x4: provided (reused)",
+       "print:PLA 18.0 g for lips: 22 machine minutes",
+       "cast:silicone 14.0 g for lips: 35 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "f3_floor_too_high",
+      "no_closure_at_alveolar",
+      "no_closure_at_velar"
+     ]
+    },
+    {
+     "k": 2,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "tongue -> tip_tongue (rail_start=3.25, stroke=1.3)",
+     "base": null,
+     "mechanism": "no_closure_at_alveolar: no articulator reaches 0-1.5 cm behind the teeth (tongue pad starts at 3.25, rail_start min 2.5); also no_closure_at_velar (stroke 0.95 < 1.2); f3_floor_too_high for er (lowest F3 2769 vs 1690) needs simultaneous constrictions.",
+     "principle": "A stop needs an articulator that reaches its place and seals; a very low F3 needs constrictions near several F3 velocity maxima at once.",
+     "hypothesis": "cam_tongue's rail_start range [2.5,4] can never reach the alveolar place, so a swap is required. tip_tongue adds a tip blade sliding 0.3-5 cm behind the teeth that seals the full bore (/t/), while its body pad at stroke 1.3 seals the velar place (/k/). Two independent constrictions (tip under the palate + body pad toward the pharynx) give /er/ a chance to pull F3 down, especially together with round_lips.",
+     "predicted_gains": [
+      "t",
+      "k",
+      "er"
+     ],
+     "risks": [
+      "iy",
+      "ih",
+      "eh: body pad keeps same rail (3.25-10.25) so vowel postures remain; tip can be parked retracted. Higher stroke raises noise sensitivity but System 1 refits height."
+     ],
+     "idea": null,
+     "result": "not kept (another proposal gained more): gained k, t, uh, uw, lost none; costs $12.00, 76 machine min",
+     "gained": [
+      "k",
+      "t",
+      "uh",
+      "uw"
+     ],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "er",
+       "k",
+       "t"
+      ],
+      "hit": [
+       "k",
+       "t"
+      ],
+      "missed": [
+       "er"
+      ],
+      "unpredicted": [
+       "uh",
+       "uw"
+      ],
+      "precision": 0.667,
+      "lost": []
+     },
+     "resources": {
+      "usd": 12.0,
+      "lead_days": 3.0,
+      "fab_minutes": 75.6,
+      "lines": [
+       "pushrod_kit x1: 0 provided, buy 1 at $4 ($4.00, 2 days)",
+       "rail_100mm x1: provided (reused)",
+       "servo_mg90s x5: 4 provided, buy 1 at $8 ($8.00, 3 days)",
+       "print:PLA 38.0 g for tongue: 46 machine minutes",
+       "cast:silicone 12.0 g for tongue: 30 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "f2_floor_too_high",
+      "no_closure_at_lips"
+     ]
+    },
+    {
+     "k": "m",
+     "move": "merge",
+     "declared_move": "merge",
+     "edit": "tongue -> tip_tongue (rail_start=3.25, stroke=1.3); lips -> round_lips (max_protrusion=1.6)",
+     "base": null,
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the union of kept-eligible proposals b001, b002, which change disjoint slots",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "KEPT: gained ao, er, k, p, t, uh, uw, lost none; costs $24.00, 132 machine min",
+     "gained": [
+      "ao",
+      "er",
+      "k",
+      "p",
+      "t",
+      "uh",
+      "uw"
+     ],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 24.0,
+      "lead_days": 3.0,
+      "fab_minutes": 132.2,
+      "lines": [
+       "pushrod_kit x2: 0 provided, buy 2 at $4 ($8.00, 2 days)",
+       "rail_100mm x1: provided (reused)",
+       "servo_mg90s x6: 4 provided, buy 2 at $8 ($16.00, 3 days)",
+       "print:PLA 18.0 g for lips: 22 machine minutes",
+       "cast:silicone 14.0 g for lips: 35 machine minutes",
+       "print:PLA 38.0 g for tongue: 46 machine minutes",
+       "cast:silicone 12.0 g for tongue: 30 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    }
+   ],
+   "accepted": "b00m",
+   "notes": "If proposals 2 and 3 are combined, they need 6 servos (all 6 controller channels). My estimated shopping list is 2 pushrod kits ($8) and 2 extra servos ($16), about $24 in total, with 3 days of lead time and 133 machine minutes, all within the limits. I rejected long_cast because a longer tract would lower the F1 ceiling below the /\u0251/ target (730 Hz) and also lower F2 for /i/. I avoided pneumatic_tongue because its valve manifold cannot be bought.",
+   "llm": {
+    "tag": "iter00",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 47.3,
+    "tokens_in": 9256,
+    "tokens_out": 4868,
+    "usd_list_price": 0.1536,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 48.5,
+   "stop": null
+  },
+  {
+   "iteration": 1,
+   "body": "lips: round_lips (max_protrusion=1.6); tongue: tip_tongue (rail_start=3.25, stroke=1.3); tract: short_cast (length=13.5)",
+   "held": [
+    "aa",
+    "ae",
+    "ah",
+    "ao",
+    "eh",
+    "er",
+    "ih",
+    "iy",
+    "k",
+    "p",
+    "t",
+    "uh",
+    "uw"
+   ],
+   "failing_mechanisms": {},
+   "failing": {},
+   "proposals": [],
+   "accepted": null,
+   "notes": "",
+   "llm": {},
+   "seconds": null,
+   "stop": "all groups held"
+  }
+ ],
+ "llm_calls": [
+  {
+   "tag": "iter00",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 47.3,
+   "tokens_in": 9256,
+   "tokens_out": 4868,
+   "usd_list_price": 0.1536,
+   "billing": "plan",
+   "error": ""
+  }
+ ]
+}

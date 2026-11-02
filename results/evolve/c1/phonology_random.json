@@ -1,0 +1,6463 @@
+[
+ {
+  "run": "phonology_random_s0",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 0,
+  "final_body": {
+   "id": "b051",
+   "parent": "b010",
+   "parts": {
+    "tract": {
+     "type": "short_cast",
+     "params": {
+      "length": 13.5
+     }
+    },
+    "tongue": {
+     "type": "tip_tongue",
+     "params": {
+      "rail_start": 3.3154374871981345,
+      "stroke": 1.2545506966514377
+     }
+    },
+    "lips": {
+     "type": "round_lips",
+     "params": {
+      "max_protrusion": 0.6520213010644096
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.2,
+    "wall_s": 0.3
+   },
+   {
+    "iteration": 1,
+    "body": "b002",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 0.6,
+    "wall_s": 0.9
+   },
+   {
+    "iteration": 2,
+    "body": "b010",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 0.9,
+    "wall_s": 1.4
+   },
+   {
+    "iteration": 3,
+    "body": "b010",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 1.1,
+    "wall_s": 1.8
+   },
+   {
+    "iteration": 4,
+    "body": "b010",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 1.5,
+    "wall_s": 2.4
+   },
+   {
+    "iteration": 5,
+    "body": "b010",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 1.7,
+    "wall_s": 2.9
+   },
+   {
+    "iteration": 6,
+    "body": "b051",
+    "held_groups": 13,
+    "tasks_passed": 13,
+    "sim_s": 1.9,
+    "wall_s": 3.2
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "ao",
+   "eh",
+   "er",
+   "ih",
+   "iy",
+   "k",
+   "p",
+   "t",
+   "uh",
+   "uw"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ae",
+    "ah",
+    "ao",
+    "eh",
+    "er",
+    "ih",
+    "iy",
+    "k",
+    "p",
+    "t",
+    "uh",
+    "uw"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 26,
+   "stock_tasks": 12,
+   "n": 26
+  },
+  "spent": {
+   "usd": 24.0,
+   "fab_minutes": 175.2,
+   "lead_days": 3.0,
+   "owned": {
+    "rail_100mm": 1.0,
+    "servo_mg90s": 5.0,
+    "pushrod_kit": 2.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 2.4,
+  "attempts": 7553,
+  "proposals": {
+   "total": 18,
+   "tried": 17,
+   "refused": 1,
+   "ideas": 0,
+   "kept": 3,
+   "rejected_regression": 12,
+   "moves": {
+    "params": 11,
+    "swap": 7,
+    "idea": 0,
+    "tune": 0,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 3.7,
+  "llm": {
+   "calls": 6,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s1",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 1,
+  "final_body": {
+   "id": "b022",
+   "parent": "b010",
+   "parts": {
+    "tract": {
+     "type": "larynx_tube",
+     "params": {
+      "length": 13.159463432998184,
+      "travel": 2.0321371710957576
+     }
+    },
+    "tongue": {
+     "type": "tip_tongue",
+     "params": {
+      "rail_start": 2.7162394190794505,
+      "stroke": 1.2640546129960708
+     }
+    },
+    "lips": {
+     "type": "jaw_lips",
+     "params": {
+      "rest_area": 3.0
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.2,
+    "wall_s": 0.3
+   },
+   {
+    "iteration": 1,
+    "body": "b000",
+    "held_groups": 9,
+    "tasks_passed": 9,
+    "sim_s": 0.8,
+    "wall_s": 1.1
+   },
+   {
+    "iteration": 2,
+    "body": "b010",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 1.2,
+    "wall_s": 1.8
+   },
+   {
+    "iteration": 3,
+    "body": "b022",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 1.6,
+    "wall_s": 2.4
+   },
+   {
+    "iteration": 4,
+    "body": "b022",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 1.7,
+    "wall_s": 2.6
+   },
+   {
+    "iteration": 5,
+    "body": "b022",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 1.8,
+    "wall_s": 2.9
+   },
+   {
+    "iteration": 6,
+    "body": "b022",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 1.9,
+    "wall_s": 3.0
+   },
+   {
+    "iteration": 7,
+    "body": "b022",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 2.0,
+    "wall_s": 3.2
+   },
+   {
+    "iteration": 8,
+    "body": "b022",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 2.0,
+    "wall_s": 3.3
+   },
+   {
+    "iteration": 9,
+    "body": "b022",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 2.1,
+    "wall_s": 3.5
+   },
+   {
+    "iteration": 10,
+    "body": "b022",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 2.3,
+    "wall_s": 3.9
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "ao",
+   "eh",
+   "er",
+   "ih",
+   "iy",
+   "k",
+   "t",
+   "uh",
+   "uw"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy",
+    "k",
+    "t",
+    "uh",
+    "uw"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 21,
+   "stock_tasks": 13,
+   "n": 26
+  },
+  "spent": {
+   "usd": 35.0,
+   "fab_minutes": 507.4,
+   "lead_days": 5.0,
+   "owned": {
+    "servo_mg90s": 5.0,
+    "pushrod_kit": 1.0,
+    "slide_40mm": 1.0,
+    "rail_100mm": 1.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 2.9,
+  "attempts": 9349,
+  "proposals": {
+   "total": 31,
+   "tried": 20,
+   "refused": 11,
+   "ideas": 0,
+   "kept": 3,
+   "rejected_regression": 11,
+   "moves": {
+    "params": 18,
+    "swap": 12,
+    "idea": 0,
+    "tune": 0,
+    "merge": 1
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 4.5,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s2",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 2,
+  "final_body": {
+   "id": "b002",
+   "parent": "stock",
+   "parts": {
+    "tract": {
+     "type": "short_cast",
+     "params": {
+      "length": 13.814866029751185
+     }
+    },
+    "tongue": {
+     "type": "cam_tongue",
+     "params": {
+      "rail_start": 3.25,
+      "stroke": 0.95
+     }
+    },
+    "lips": {
+     "type": "jaw_lips",
+     "params": {
+      "rest_area": 3.0
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.2,
+    "wall_s": 0.3
+   },
+   {
+    "iteration": 1,
+    "body": "b002",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.7,
+    "wall_s": 1.0
+   },
+   {
+    "iteration": 2,
+    "body": "b002",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 1.1,
+    "wall_s": 1.6
+   },
+   {
+    "iteration": 3,
+    "body": "b002",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 1.7,
+    "wall_s": 2.4
+   },
+   {
+    "iteration": 4,
+    "body": "b002",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 2.2,
+    "wall_s": 3.1
+   },
+   {
+    "iteration": 5,
+    "body": "b002",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 2.5,
+    "wall_s": 3.6
+   },
+   {
+    "iteration": 6,
+    "body": "b002",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 2.9,
+    "wall_s": 4.2
+   },
+   {
+    "iteration": 7,
+    "body": "b002",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 3.2,
+    "wall_s": 4.7
+   },
+   {
+    "iteration": 8,
+    "body": "b002",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 3.6,
+    "wall_s": 5.4
+   },
+   {
+    "iteration": 9,
+    "body": "b002",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 4.0,
+    "wall_s": 5.9
+   },
+   {
+    "iteration": 10,
+    "body": "b002",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 4.4,
+    "wall_s": 6.5
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "eh",
+   "ih",
+   "iy",
+   "uh"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 13,
+   "stock_tasks": 13,
+   "n": 26
+  },
+  "spent": {
+   "usd": 0.0,
+   "fab_minutes": 169.9,
+   "lead_days": 0.0,
+   "owned": {
+    "rail_100mm": 1.0,
+    "servo_mg90s": 3.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 5.1,
+  "attempts": 16763,
+  "proposals": {
+   "total": 30,
+   "tried": 28,
+   "refused": 2,
+   "ideas": 0,
+   "kept": 1,
+   "rejected_regression": 19,
+   "moves": {
+    "params": 19,
+    "swap": 11,
+    "idea": 0,
+    "tune": 0,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 7.3,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s3",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 3,
+  "final_body": {
+   "id": "b061",
+   "parent": "b000",
+   "parts": {
+    "tract": {
+     "type": "short_cast",
+     "params": {
+      "length": 14.102548930412794
+     }
+    },
+    "tongue": {
+     "type": "cam_tongue",
+     "params": {
+      "rail_start": 3.25,
+      "stroke": 0.95
+     }
+    },
+    "lips": {
+     "type": "round_lips",
+     "params": {
+      "max_protrusion": 1.52107967728293
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.2,
+    "wall_s": 0.3
+   },
+   {
+    "iteration": 1,
+    "body": "b000",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.7,
+    "wall_s": 1.0
+   },
+   {
+    "iteration": 2,
+    "body": "b000",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 1.1,
+    "wall_s": 1.6
+   },
+   {
+    "iteration": 3,
+    "body": "b000",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 1.2,
+    "wall_s": 1.9
+   },
+   {
+    "iteration": 4,
+    "body": "b000",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 2.4,
+    "wall_s": 3.7
+   },
+   {
+    "iteration": 5,
+    "body": "b000",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 2.5,
+    "wall_s": 4.0
+   },
+   {
+    "iteration": 6,
+    "body": "b000",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 3.1,
+    "wall_s": 4.8
+   },
+   {
+    "iteration": 7,
+    "body": "b061",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 3.4,
+    "wall_s": 5.3
+   },
+   {
+    "iteration": 8,
+    "body": "b061",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 3.8,
+    "wall_s": 5.9
+   },
+   {
+    "iteration": 9,
+    "body": "b061",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 4.0,
+    "wall_s": 6.2
+   },
+   {
+    "iteration": 10,
+    "body": "b061",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 4.4,
+    "wall_s": 6.9
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "ao",
+   "eh",
+   "ih",
+   "iy",
+   "p",
+   "uh",
+   "uw"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ah",
+    "ao",
+    "eh",
+    "ih",
+    "iy",
+    "p",
+    "uh",
+    "uw"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 19,
+   "stock_tasks": 13,
+   "n": 26
+  },
+  "spent": {
+   "usd": 4.0,
+   "fab_minutes": 230.0,
+   "lead_days": 2.0,
+   "owned": {
+    "servo_mg90s": 3.0,
+    "pushrod_kit": 1.0,
+    "rail_100mm": 1.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 5.1,
+  "attempts": 16281,
+  "proposals": {
+   "total": 34,
+   "tried": 32,
+   "refused": 2,
+   "ideas": 0,
+   "kept": 2,
+   "rejected_regression": 21,
+   "moves": {
+    "params": 21,
+    "swap": 9,
+    "idea": 0,
+    "tune": 4,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [
+   {
+    "id": "b031",
+    "body": "lips: jaw_lips (rest_area=3); tongue: tip_tongue (rail_start=2.81079, stroke=1.04106); tract: short_cast (length=14.1025)",
+    "gained": [
+     "er",
+     "t",
+     "uw"
+    ],
+    "lost": [
+     "aa"
+    ],
+    "why_lost": "lost aa (aa: f1_ceiling_too_low, F 651/1193 Hz vs target 730/1090 (F1 -11%); over 340 open postures (System 1's map and its best) this body's F1 spans 202-687 Hz; with F2 wi)",
+    "iteration": 3,
+    "edit": "tongue -> tip_tongue (rail_start=2.81079, stroke=1.04106)"
+   },
+   {
+    "id": "b03t0",
+    "body": "lips: jaw_lips (rest_area=3); tongue: tip_tongue (rail_start=2.5, stroke=1.134); tract: short_cast (length=14.1025)",
+    "gained": [
+     "k",
+     "t",
+     "uw"
+    ],
+    "lost": [
+     "aa"
+    ],
+    "why_lost": "lost aa (aa: f1_ceiling_too_low, F 628/1239 Hz vs target 730/1090 (F1 -14%, F2 +14%); over 326 open postures (System 1's map and its best) this body's F1 spans 201-649 Hz; w)",
+    "iteration": 3,
+    "edit": "tongue (rail_start=2.5, stroke=1.134)"
+   },
+   {
+    "id": "b03t1",
+    "body": "lips: jaw_lips (rest_area=3); tongue: tip_tongue (rail_start=2.5, stroke=0.913); tract: short_cast (length=14.1025)",
+    "gained": [
+     "er",
+     "t"
+    ],
+    "lost": [
+     "aa"
+    ],
+    "why_lost": "lost aa (aa: f1_ceiling_too_low, F 624/1252 Hz vs target 730/1090 (F1 -15%, F2 +15%); over 427 open postures (System 1's map and its best) this body's F1 spans 236-650 Hz; w)",
+    "iteration": 3,
+    "edit": "tongue (rail_start=2.5, stroke=0.913)"
+   },
+   {
+    "id": "b03t2",
+    "body": "lips: jaw_lips (rest_area=3); tongue: tip_tongue (rail_start=2.65, stroke=1.239); tract: short_cast (length=14.1025)",
+    "gained": [
+     "k",
+     "t",
+     "uw"
+    ],
+    "lost": [
+     "aa"
+    ],
+    "why_lost": "lost aa (aa: f1_ceiling_too_low, F 643/1209 Hz vs target 730/1090 (F1 -12%, F2 +11%); over 293 open postures (System 1's map and its best) this body's F1 spans 218-667 Hz; w)",
+    "iteration": 3,
+    "edit": "tongue (rail_start=2.65, stroke=1.239)"
+   },
+   {
+    "id": "b03t3",
+    "body": "lips: jaw_lips (rest_area=3); tongue: tip_tongue (rail_start=2.522, stroke=1.298); tract: short_cast (length=14.1025)",
+    "gained": [
+     "k",
+     "t",
+     "uw"
+    ],
+    "lost": [
+     "aa"
+    ],
+    "why_lost": "lost aa (aa: f1_ceiling_too_low, F 633/1227 Hz vs target 730/1090 (F1 -13%, F2 +13%); over 289 open postures (System 1's map and its best) this body's F1 spans 217-632 Hz; w)",
+    "iteration": 3,
+    "edit": "tongue (rail_start=2.522, stroke=1.298)"
+   }
+  ],
+  "wall_s": 7.5,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s4",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 4,
+  "final_body": {
+   "id": "b030",
+   "parent": "b001",
+   "parts": {
+    "tract": {
+     "type": "larynx_tube",
+     "params": {
+      "length": 13.035666780583178,
+      "travel": 2.8595493906161336
+     }
+    },
+    "tongue": {
+     "type": "cam_tongue",
+     "params": {
+      "rail_start": 2.761791724216043,
+      "stroke": 1.2101446919313594
+     }
+    },
+    "lips": {
+     "type": "jaw_lips",
+     "params": {
+      "rest_area": 3.0
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.2,
+    "wall_s": 0.3
+   },
+   {
+    "iteration": 1,
+    "body": "b001",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.8,
+    "wall_s": 1.1
+   },
+   {
+    "iteration": 2,
+    "body": "b001",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 2.8,
+    "wall_s": 3.7
+   },
+   {
+    "iteration": 3,
+    "body": "b001",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 3.5,
+    "wall_s": 4.6
+   },
+   {
+    "iteration": 4,
+    "body": "b030",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 3.9,
+    "wall_s": 5.3
+   },
+   {
+    "iteration": 5,
+    "body": "b030",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 4.4,
+    "wall_s": 6.0
+   },
+   {
+    "iteration": 6,
+    "body": "b030",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 4.8,
+    "wall_s": 6.6
+   },
+   {
+    "iteration": 7,
+    "body": "b030",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 5.3,
+    "wall_s": 7.3
+   },
+   {
+    "iteration": 8,
+    "body": "b030",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 5.8,
+    "wall_s": 8.0
+   },
+   {
+    "iteration": 9,
+    "body": "b030",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 6.3,
+    "wall_s": 8.8
+   },
+   {
+    "iteration": 10,
+    "body": "b030",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 6.8,
+    "wall_s": 9.4
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "eh",
+   "ih",
+   "iy",
+   "k",
+   "uh"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy",
+    "k",
+    "uh"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 16,
+   "stock_tasks": 12,
+   "n": 26
+  },
+  "spent": {
+   "usd": 15.0,
+   "fab_minutes": 264.3,
+   "lead_days": 5.0,
+   "owned": {
+    "slide_40mm": 1.0,
+    "servo_mg90s": 3.0,
+    "rail_100mm": 1.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 7.5,
+  "attempts": 24142,
+  "proposals": {
+   "total": 34,
+   "tried": 33,
+   "refused": 1,
+   "ideas": 0,
+   "kept": 2,
+   "rejected_regression": 16,
+   "moves": {
+    "params": 18,
+    "swap": 12,
+    "idea": 0,
+    "tune": 4,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 10.2,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s5",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 5,
+  "final_body": {
+   "id": "b020",
+   "parent": "b011",
+   "parts": {
+    "tract": {
+     "type": "larynx_tube",
+     "params": {
+      "length": 13.530651122084285,
+      "travel": 1.5716027601762832
+     }
+    },
+    "tongue": {
+     "type": "cam_tongue",
+     "params": {
+      "rail_start": 2.907177406795152,
+      "stroke": 1.2157558213344455
+     }
+    },
+    "lips": {
+     "type": "round_lips",
+     "params": {
+      "max_protrusion": 1.4442310376087408
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.2,
+    "wall_s": 0.3
+   },
+   {
+    "iteration": 1,
+    "body": "b000",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.8,
+    "wall_s": 1.1
+   },
+   {
+    "iteration": 2,
+    "body": "b011",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 1.3,
+    "wall_s": 1.8
+   },
+   {
+    "iteration": 3,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 1.7,
+    "wall_s": 2.4
+   },
+   {
+    "iteration": 4,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 2.0,
+    "wall_s": 3.0
+   },
+   {
+    "iteration": 5,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 2.2,
+    "wall_s": 3.4
+   },
+   {
+    "iteration": 6,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 2.4,
+    "wall_s": 3.8
+   },
+   {
+    "iteration": 7,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 2.6,
+    "wall_s": 4.3
+   },
+   {
+    "iteration": 8,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 2.9,
+    "wall_s": 4.7
+   },
+   {
+    "iteration": 9,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 3.2,
+    "wall_s": 5.2
+   },
+   {
+    "iteration": 10,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 3.4,
+    "wall_s": 5.7
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "ao",
+   "eh",
+   "ih",
+   "iy",
+   "k",
+   "p",
+   "uh",
+   "uw"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy",
+    "k",
+    "p",
+    "uh",
+    "uw"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 21,
+   "stock_tasks": 13,
+   "n": 26
+  },
+  "spent": {
+   "usd": 27.0,
+   "fab_minutes": 327.0,
+   "lead_days": 5.0,
+   "owned": {
+    "slide_40mm": 1.0,
+    "servo_mg90s": 4.0,
+    "pushrod_kit": 1.0,
+    "rail_100mm": 1.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 4.0,
+  "attempts": 13014,
+  "proposals": {
+   "total": 30,
+   "tried": 29,
+   "refused": 1,
+   "ideas": 0,
+   "kept": 3,
+   "rejected_regression": 10,
+   "moves": {
+    "params": 23,
+    "swap": 7,
+    "idea": 0,
+    "tune": 0,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 6.3,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s6",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 6,
+  "final_body": {
+   "id": "b090",
+   "parent": "b062",
+   "parts": {
+    "tract": {
+     "type": "short_cast",
+     "params": {
+      "length": 14.01893315364467
+     }
+    },
+    "tongue": {
+     "type": "cam_tongue",
+     "params": {
+      "rail_start": 3.7122692543952738,
+      "stroke": 1.2105695546876463
+     }
+    },
+    "lips": {
+     "type": "round_lips",
+     "params": {
+      "max_protrusion": 1.2540000792558181
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.2,
+    "wall_s": 0.3
+   },
+   {
+    "iteration": 1,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.7,
+    "wall_s": 1.0
+   },
+   {
+    "iteration": 2,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.9,
+    "wall_s": 1.4
+   },
+   {
+    "iteration": 3,
+    "body": "b021",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 1.6,
+    "wall_s": 2.3
+   },
+   {
+    "iteration": 4,
+    "body": "b021",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 2.1,
+    "wall_s": 3.0
+   },
+   {
+    "iteration": 5,
+    "body": "b021",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 2.3,
+    "wall_s": 3.4
+   },
+   {
+    "iteration": 6,
+    "body": "b021",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 2.6,
+    "wall_s": 3.9
+   },
+   {
+    "iteration": 7,
+    "body": "b062",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 2.9,
+    "wall_s": 4.5
+   },
+   {
+    "iteration": 8,
+    "body": "b062",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 3.1,
+    "wall_s": 4.8
+   },
+   {
+    "iteration": 9,
+    "body": "b062",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 3.5,
+    "wall_s": 5.4
+   },
+   {
+    "iteration": 10,
+    "body": "b090",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 3.8,
+    "wall_s": 5.9
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "ao",
+   "eh",
+   "ih",
+   "iy",
+   "k",
+   "p",
+   "uh",
+   "uw"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ah",
+    "ao",
+    "eh",
+    "ih",
+    "iy",
+    "k",
+    "p",
+    "uh",
+    "uw"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 21,
+   "stock_tasks": 12,
+   "n": 26
+  },
+  "spent": {
+   "usd": 4.0,
+   "fab_minutes": 279.2,
+   "lead_days": 2.0,
+   "owned": {
+    "rail_100mm": 1.0,
+    "pushrod_kit": 1.0,
+    "servo_mg90s": 3.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 4.4,
+  "attempts": 14556,
+  "proposals": {
+   "total": 30,
+   "tried": 27,
+   "refused": 3,
+   "ideas": 0,
+   "kept": 3,
+   "rejected_regression": 13,
+   "moves": {
+    "params": 20,
+    "swap": 10,
+    "idea": 0,
+    "tune": 0,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 6.5,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s7",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 7,
+  "final_body": {
+   "id": "b040",
+   "parent": "b012",
+   "parts": {
+    "tract": {
+     "type": "short_cast",
+     "params": {
+      "length": 14.094138857504092
+     }
+    },
+    "tongue": {
+     "type": "tip_tongue",
+     "params": {
+      "rail_start": 3.6889928788206294,
+      "stroke": 1.0355254606088138
+     }
+    },
+    "lips": {
+     "type": "round_lips",
+     "params": {
+      "max_protrusion": 1.2397171669425262
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.2,
+    "wall_s": 0.3
+   },
+   {
+    "iteration": 1,
+    "body": "b002",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.9,
+    "wall_s": 1.2
+   },
+   {
+    "iteration": 2,
+    "body": "b012",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 1.2,
+    "wall_s": 1.8
+   },
+   {
+    "iteration": 3,
+    "body": "b012",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 2.5,
+    "wall_s": 3.6
+   },
+   {
+    "iteration": 4,
+    "body": "b012",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 2.7,
+    "wall_s": 4.0
+   },
+   {
+    "iteration": 5,
+    "body": "b040",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 3.2,
+    "wall_s": 4.7
+   },
+   {
+    "iteration": 6,
+    "body": "b040",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 3.3,
+    "wall_s": 5.0
+   },
+   {
+    "iteration": 7,
+    "body": "b040",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 3.7,
+    "wall_s": 5.7
+   },
+   {
+    "iteration": 8,
+    "body": "b040",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 3.8,
+    "wall_s": 5.9
+   },
+   {
+    "iteration": 9,
+    "body": "b040",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 4.5,
+    "wall_s": 7.1
+   },
+   {
+    "iteration": 10,
+    "body": "b040",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 4.8,
+    "wall_s": 7.5
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "ao",
+   "eh",
+   "er",
+   "ih",
+   "iy",
+   "p",
+   "t",
+   "uh",
+   "uw"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ah",
+    "ao",
+    "eh",
+    "er",
+    "ih",
+    "iy",
+    "p",
+    "t",
+    "uh",
+    "uw"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 23,
+   "stock_tasks": 12,
+   "n": 26
+  },
+  "spent": {
+   "usd": 24.0,
+   "fab_minutes": 305.6,
+   "lead_days": 3.0,
+   "owned": {
+    "rail_100mm": 1.0,
+    "servo_mg90s": 5.0,
+    "pushrod_kit": 2.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 5.3,
+  "attempts": 17133,
+  "proposals": {
+   "total": 38,
+   "tried": 37,
+   "refused": 1,
+   "ideas": 0,
+   "kept": 3,
+   "rejected_regression": 21,
+   "moves": {
+    "params": 19,
+    "swap": 11,
+    "idea": 0,
+    "tune": 8,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 8.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s8",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 8,
+  "final_body": {
+   "id": "b080",
+   "parent": "b020",
+   "parts": {
+    "tract": {
+     "type": "short_cast",
+     "params": {
+      "length": 13.5
+     }
+    },
+    "tongue": {
+     "type": "tip_tongue",
+     "params": {
+      "rail_start": 3.4702870405902817,
+      "stroke": 1.237949466313967
+     }
+    },
+    "lips": {
+     "type": "round_lips",
+     "params": {
+      "max_protrusion": 0.9109425906840991
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.2,
+    "wall_s": 0.3
+   },
+   {
+    "iteration": 1,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.6,
+    "wall_s": 0.9
+   },
+   {
+    "iteration": 2,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 1.3,
+    "wall_s": 1.7
+   },
+   {
+    "iteration": 3,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 1.7,
+    "wall_s": 2.3
+   },
+   {
+    "iteration": 4,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 2.1,
+    "wall_s": 3.0
+   },
+   {
+    "iteration": 5,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 2.4,
+    "wall_s": 3.5
+   },
+   {
+    "iteration": 6,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 2.5,
+    "wall_s": 3.7
+   },
+   {
+    "iteration": 7,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 2.7,
+    "wall_s": 4.2
+   },
+   {
+    "iteration": 8,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 3.1,
+    "wall_s": 4.8
+   },
+   {
+    "iteration": 9,
+    "body": "b080",
+    "held_groups": 13,
+    "tasks_passed": 13,
+    "sim_s": 3.5,
+    "wall_s": 5.5
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "ao",
+   "eh",
+   "er",
+   "ih",
+   "iy",
+   "k",
+   "p",
+   "t",
+   "uh",
+   "uw"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ae",
+    "ah",
+    "ao",
+    "eh",
+    "ih",
+    "iy",
+    "k",
+    "p",
+    "t",
+    "uh",
+    "uw"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 25,
+   "stock_tasks": 12,
+   "n": 26
+  },
+  "spent": {
+   "usd": 24.0,
+   "fab_minutes": 132.2,
+   "lead_days": 3.0,
+   "owned": {
+    "pushrod_kit": 2.0,
+    "servo_mg90s": 5.0,
+    "rail_100mm": 1.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 4.1,
+  "attempts": 13191,
+  "proposals": {
+   "total": 28,
+   "tried": 26,
+   "refused": 2,
+   "ideas": 0,
+   "kept": 2,
+   "rejected_regression": 16,
+   "moves": {
+    "params": 19,
+    "swap": 8,
+    "idea": 0,
+    "tune": 0,
+    "merge": 1
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 6.1,
+  "llm": {
+   "calls": 9,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s9",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 9,
+  "final_body": {
+   "id": "b020",
+   "parent": "b00m",
+   "parts": {
+    "tract": {
+     "type": "larynx_tube",
+     "params": {
+      "length": 14.336475258097526,
+      "travel": 1.0531754689351944
+     }
+    },
+    "tongue": {
+     "type": "cam_tongue",
+     "params": {
+      "rail_start": 3.666301124380268,
+      "stroke": 1.1012522407224956
+     }
+    },
+    "lips": {
+     "type": "round_lips",
+     "params": {
+      "max_protrusion": 1.512810051783918
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.2,
+    "wall_s": 0.3
+   },
+   {
+    "iteration": 1,
+    "body": "b00m",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 1.0,
+    "wall_s": 1.3
+   },
+   {
+    "iteration": 2,
+    "body": "b00m",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 1.3,
+    "wall_s": 1.9
+   },
+   {
+    "iteration": 3,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 1.8,
+    "wall_s": 2.6
+   },
+   {
+    "iteration": 4,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 2.1,
+    "wall_s": 3.1
+   },
+   {
+    "iteration": 5,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 2.3,
+    "wall_s": 3.5
+   },
+   {
+    "iteration": 6,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 2.5,
+    "wall_s": 3.8
+   },
+   {
+    "iteration": 7,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 2.6,
+    "wall_s": 4.1
+   },
+   {
+    "iteration": 8,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 2.9,
+    "wall_s": 4.6
+   },
+   {
+    "iteration": 9,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 3.2,
+    "wall_s": 5.1
+   },
+   {
+    "iteration": 10,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 3.3,
+    "wall_s": 5.2
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "ao",
+   "eh",
+   "ih",
+   "iy",
+   "k",
+   "p",
+   "uh",
+   "uw"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ah",
+    "ao",
+    "eh",
+    "ih",
+    "iy",
+    "k",
+    "p",
+    "uh",
+    "uw"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 21,
+   "stock_tasks": 13,
+   "n": 26
+  },
+  "spent": {
+   "usd": 27.0,
+   "fab_minutes": 336.90000000000003,
+   "lead_days": 5.0,
+   "owned": {
+    "slide_40mm": 1.0,
+    "rail_100mm": 1.0,
+    "servo_mg90s": 4.0,
+    "pushrod_kit": 1.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 3.9,
+  "attempts": 12506,
+  "proposals": {
+   "total": 31,
+   "tried": 26,
+   "refused": 5,
+   "ideas": 0,
+   "kept": 2,
+   "rejected_regression": 5,
+   "moves": {
+    "params": 16,
+    "swap": 14,
+    "idea": 0,
+    "tune": 0,
+    "merge": 1
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 5.8,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s10",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 10,
+  "final_body": {
+   "id": "b042",
+   "parent": "b001",
+   "parts": {
+    "tract": {
+     "type": "short_cast",
+     "params": {
+      "length": 13.5
+     }
+    },
+    "tongue": {
+     "type": "cam_tongue",
+     "params": {
+      "rail_start": 2.70387940603076,
+      "stroke": 1.0823255358467918
+     }
+    },
+    "lips": {
+     "type": "round_lips",
+     "params": {
+      "max_protrusion": 1.442965644024924
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.2,
+    "wall_s": 0.3
+   },
+   {
+    "iteration": 1,
+    "body": "b001",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.6,
+    "wall_s": 0.9
+   },
+   {
+    "iteration": 2,
+    "body": "b001",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 2.6,
+    "wall_s": 3.4
+   },
+   {
+    "iteration": 3,
+    "body": "b001",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 3.0,
+    "wall_s": 4.1
+   },
+   {
+    "iteration": 4,
+    "body": "b001",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 3.5,
+    "wall_s": 4.8
+   },
+   {
+    "iteration": 5,
+    "body": "b042",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 3.9,
+    "wall_s": 5.5
+   },
+   {
+    "iteration": 6,
+    "body": "b042",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 4.2,
+    "wall_s": 5.9
+   },
+   {
+    "iteration": 7,
+    "body": "b042",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 4.5,
+    "wall_s": 6.4
+   },
+   {
+    "iteration": 8,
+    "body": "b042",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 4.8,
+    "wall_s": 6.9
+   },
+   {
+    "iteration": 9,
+    "body": "b042",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 5.0,
+    "wall_s": 7.3
+   },
+   {
+    "iteration": 10,
+    "body": "b042",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 5.2,
+    "wall_s": 7.8
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "ao",
+   "eh",
+   "ih",
+   "iy",
+   "k",
+   "p",
+   "uh",
+   "uw"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ae",
+    "ah",
+    "ao",
+    "eh",
+    "ih",
+    "iy",
+    "k",
+    "p",
+    "uh",
+    "uw"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 22,
+   "stock_tasks": 12,
+   "n": 26
+  },
+  "spent": {
+   "usd": 4.0,
+   "fab_minutes": 106.6,
+   "lead_days": 2.0,
+   "owned": {
+    "pushrod_kit": 1.0,
+    "servo_mg90s": 3.0,
+    "rail_100mm": 1.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 5.8,
+  "attempts": 19175,
+  "proposals": {
+   "total": 34,
+   "tried": 34,
+   "refused": 0,
+   "ideas": 0,
+   "kept": 2,
+   "rejected_regression": 12,
+   "moves": {
+    "params": 21,
+    "swap": 9,
+    "idea": 0,
+    "tune": 4,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 8.4,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s11",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 11,
+  "final_body": {
+   "id": "b021",
+   "parent": "b001",
+   "parts": {
+    "tract": {
+     "type": "short_cast",
+     "params": {
+      "length": 14.35642204592074
+     }
+    },
+    "tongue": {
+     "type": "cam_tongue",
+     "params": {
+      "rail_start": 3.703304025667725,
+      "stroke": 1.2071334862896903
+     }
+    },
+    "lips": {
+     "type": "jaw_lips",
+     "params": {
+      "rest_area": 3.0
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.2,
+    "wall_s": 0.3
+   },
+   {
+    "iteration": 1,
+    "body": "b001",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.8,
+    "wall_s": 1.1
+   },
+   {
+    "iteration": 2,
+    "body": "b001",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 1.2,
+    "wall_s": 1.8
+   },
+   {
+    "iteration": 3,
+    "body": "b021",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 1.6,
+    "wall_s": 2.3
+   },
+   {
+    "iteration": 4,
+    "body": "b021",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 2.0,
+    "wall_s": 2.9
+   },
+   {
+    "iteration": 5,
+    "body": "b021",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 3.2,
+    "wall_s": 4.6
+   },
+   {
+    "iteration": 6,
+    "body": "b021",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 3.7,
+    "wall_s": 5.3
+   },
+   {
+    "iteration": 7,
+    "body": "b021",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 3.9,
+    "wall_s": 5.8
+   },
+   {
+    "iteration": 8,
+    "body": "b021",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 4.2,
+    "wall_s": 6.2
+   },
+   {
+    "iteration": 9,
+    "body": "b021",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 4.6,
+    "wall_s": 6.7
+   },
+   {
+    "iteration": 10,
+    "body": "b021",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 5.7,
+    "wall_s": 8.4
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "eh",
+   "ih",
+   "iy",
+   "k",
+   "uh"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ah",
+    "eh",
+    "ih",
+    "iy",
+    "k",
+    "uh"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 15,
+   "stock_tasks": 13,
+   "n": 26
+  },
+  "spent": {
+   "usd": 0.0,
+   "fab_minutes": 226.6,
+   "lead_days": 0.0,
+   "owned": {
+    "servo_mg90s": 3.0,
+    "rail_100mm": 1.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 6.5,
+  "attempts": 20785,
+  "proposals": {
+   "total": 38,
+   "tried": 36,
+   "refused": 2,
+   "ideas": 0,
+   "kept": 2,
+   "rejected_regression": 22,
+   "moves": {
+    "params": 24,
+    "swap": 6,
+    "idea": 0,
+    "tune": 8,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [
+   {
+    "id": "b04t3",
+    "body": "lips: jaw_lips (rest_area=3); tongue: tip_tongue (rail_start=2.922, stroke=0.721); tract: short_cast (length=14.3564)",
+    "gained": [
+     "er",
+     "t",
+     "uw"
+    ],
+    "lost": [
+     "aa",
+     "k"
+    ],
+    "why_lost": "lost aa, k (aa: f2_floor_too_high, F 652/1212 Hz vs target 730/1090 (F1 -11%, F2 +11%); over 398 open postures (System 1's map and its best) this body's F2 spans 1033-2178 Hz;; k: no_closure_at_velar, narrowest 0.00 cm2 at 5.1 cm behind the teeth, airway elsewhere 2.72 cm2; tongue body reaches the velar place (5.5-8.5 cm behind the teeth) )",
+    "iteration": 4,
+    "edit": "tongue (rail_start=2.922, stroke=0.721)"
+   },
+   {
+    "id": "b091",
+    "body": "lips: jaw_lips (rest_area=3); tongue: tip_tongue (rail_start=2.7246, stroke=1.03829); tract: short_cast (length=14.3564)",
+    "gained": [
+     "er",
+     "t",
+     "uw"
+    ],
+    "lost": [
+     "aa",
+     "k"
+    ],
+    "why_lost": "lost aa, k (aa: f2_floor_too_high, F 624/1240 Hz vs target 730/1090 (F1 -15%, F2 +14%); over 331 open postures (System 1's map and its best) this body's F2 spans 754-2817 Hz; ; k: no_closure_at_velar, narrowest 0.00 cm2 at 5.1 cm behind the teeth, airway elsewhere 3.03 cm2; tongue body reaches the velar place (5.5-8.5 cm behind the teeth) )",
+    "iteration": 9,
+    "edit": "tongue -> tip_tongue (rail_start=2.7246, stroke=1.03829)"
+   },
+   {
+    "id": "b09t2",
+    "body": "lips: jaw_lips (rest_area=3); tongue: tip_tongue (rail_start=3.038, stroke=1.08); tract: short_cast (length=14.3564)",
+    "gained": [
+     "ao",
+     "er",
+     "t",
+     "uw"
+    ],
+    "lost": [
+     "aa"
+    ],
+    "why_lost": "lost aa (aa: not_robust_to_motor_noise, F 655/1202 Hz vs target 730/1090 (F1 -10%, F2 +10%); the closest open posture gives F 667/1195 Hz noise-free (97% of the 10% window used); S)",
+    "iteration": 9,
+    "edit": "tongue (rail_start=3.038, stroke=1.08)"
+   }
+  ],
+  "wall_s": 9.2,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s12",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 12,
+  "final_body": {
+   "id": "b060",
+   "parent": "b052",
+   "parts": {
+    "tract": {
+     "type": "larynx_tube",
+     "params": {
+      "length": 12.938779869016676,
+      "travel": 2.5859401537893865
+     }
+    },
+    "tongue": {
+     "type": "long_rail_tongue",
+     "params": {
+      "rail_start": 3.106709255805945,
+      "stroke": 1.1343815146461544
+     }
+    },
+    "lips": {
+     "type": "jaw_lips",
+     "params": {
+      "rest_area": 3.0
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.2,
+    "wall_s": 0.3
+   },
+   {
+    "iteration": 1,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.9,
+    "wall_s": 1.2
+   },
+   {
+    "iteration": 2,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 3.5,
+    "wall_s": 4.6
+   },
+   {
+    "iteration": 3,
+    "body": "b022",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 4.4,
+    "wall_s": 5.8
+   },
+   {
+    "iteration": 4,
+    "body": "b022",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 5.1,
+    "wall_s": 6.8
+   },
+   {
+    "iteration": 5,
+    "body": "b022",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 5.9,
+    "wall_s": 7.9
+   },
+   {
+    "iteration": 6,
+    "body": "b052",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 6.4,
+    "wall_s": 8.7
+   },
+   {
+    "iteration": 7,
+    "body": "b060",
+    "held_groups": 9,
+    "tasks_passed": 9,
+    "sim_s": 6.9,
+    "wall_s": 9.6
+   },
+   {
+    "iteration": 8,
+    "body": "b060",
+    "held_groups": 9,
+    "tasks_passed": 9,
+    "sim_s": 7.5,
+    "wall_s": 10.6
+   },
+   {
+    "iteration": 9,
+    "body": "b060",
+    "held_groups": 9,
+    "tasks_passed": 9,
+    "sim_s": 8.3,
+    "wall_s": 11.6
+   },
+   {
+    "iteration": 10,
+    "body": "b060",
+    "held_groups": 9,
+    "tasks_passed": 9,
+    "sim_s": 8.6,
+    "wall_s": 12.2
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "ao",
+   "eh",
+   "ih",
+   "iy",
+   "k",
+   "uh"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy",
+    "k",
+    "uh"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 17,
+   "stock_tasks": 12,
+   "n": 26
+  },
+  "spent": {
+   "usd": 27.0,
+   "fab_minutes": 329.99999999999994,
+   "lead_days": 5.0,
+   "owned": {
+    "rail_100mm": 1.0,
+    "servo_mg90s": 3.0,
+    "slide_40mm": 1.0,
+    "rail_150mm": 1.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 9.5,
+  "attempts": 23029,
+  "proposals": {
+   "total": 34,
+   "tried": 34,
+   "refused": 0,
+   "ideas": 0,
+   "kept": 3,
+   "rejected_regression": 16,
+   "moves": {
+    "params": 21,
+    "swap": 9,
+    "idea": 0,
+    "tune": 4,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 13.2,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s13",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 13,
+  "final_body": {
+   "id": "b040",
+   "parent": "b011",
+   "parts": {
+    "tract": {
+     "type": "larynx_tube",
+     "params": {
+      "length": 14.122046797568684,
+      "travel": 1.5228927228329532
+     }
+    },
+    "tongue": {
+     "type": "long_rail_tongue",
+     "params": {
+      "rail_start": 3.1130999990346604,
+      "stroke": 0.962424795030884
+     }
+    },
+    "lips": {
+     "type": "round_lips",
+     "params": {
+      "max_protrusion": 1.0557829600792652
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.3,
+    "wall_s": 0.4
+   },
+   {
+    "iteration": 1,
+    "body": "b000",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.8,
+    "wall_s": 1.2
+   },
+   {
+    "iteration": 2,
+    "body": "b011",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 1.5,
+    "wall_s": 2.2
+   },
+   {
+    "iteration": 3,
+    "body": "b011",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 2.0,
+    "wall_s": 2.9
+   },
+   {
+    "iteration": 4,
+    "body": "b011",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 3.3,
+    "wall_s": 4.6
+   },
+   {
+    "iteration": 5,
+    "body": "b040",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 4.3,
+    "wall_s": 6.2
+   },
+   {
+    "iteration": 6,
+    "body": "b040",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 5.3,
+    "wall_s": 7.9
+   },
+   {
+    "iteration": 7,
+    "body": "b040",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 6.1,
+    "wall_s": 9.2
+   },
+   {
+    "iteration": 8,
+    "body": "b040",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 6.5,
+    "wall_s": 9.9
+   },
+   {
+    "iteration": 9,
+    "body": "b040",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 7.0,
+    "wall_s": 10.8
+   },
+   {
+    "iteration": 10,
+    "body": "b040",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 7.6,
+    "wall_s": 11.7
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "ao",
+   "eh",
+   "ih",
+   "iy",
+   "p",
+   "uh",
+   "uw"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ae",
+    "ah",
+    "ao",
+    "eh",
+    "ih",
+    "iy",
+    "p",
+    "uh",
+    "uw"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 20,
+   "stock_tasks": 13,
+   "n": 26
+  },
+  "spent": {
+   "usd": 39.0,
+   "fab_minutes": 342.8,
+   "lead_days": 5.0,
+   "owned": {
+    "rail_100mm": 1.0,
+    "rail_150mm": 1.0,
+    "servo_mg90s": 4.0,
+    "pushrod_kit": 1.0,
+    "slide_40mm": 1.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 8.5,
+  "attempts": 15656,
+  "proposals": {
+   "total": 30,
+   "tried": 28,
+   "refused": 2,
+   "ideas": 0,
+   "kept": 3,
+   "rejected_regression": 8,
+   "moves": {
+    "params": 16,
+    "swap": 14,
+    "idea": 0,
+    "tune": 0,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 12.7,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s14",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 14,
+  "final_body": {
+   "id": "b080",
+   "parent": "b022",
+   "parts": {
+    "tract": {
+     "type": "short_cast",
+     "params": {
+      "length": 13.972114285791488
+     }
+    },
+    "tongue": {
+     "type": "cam_tongue",
+     "params": {
+      "rail_start": 2.7373597661476294,
+      "stroke": 1.2099263690455246
+     }
+    },
+    "lips": {
+     "type": "round_lips",
+     "params": {
+      "max_protrusion": 1.3684827016122365
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.2,
+    "wall_s": 0.3
+   },
+   {
+    "iteration": 1,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.7,
+    "wall_s": 1.0
+   },
+   {
+    "iteration": 2,
+    "body": "b011",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 1.6,
+    "wall_s": 2.1
+   },
+   {
+    "iteration": 3,
+    "body": "b022",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 2.3,
+    "wall_s": 3.1
+   },
+   {
+    "iteration": 4,
+    "body": "b022",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 2.9,
+    "wall_s": 3.9
+   },
+   {
+    "iteration": 5,
+    "body": "b022",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 3.3,
+    "wall_s": 4.6
+   },
+   {
+    "iteration": 6,
+    "body": "b022",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 3.7,
+    "wall_s": 5.1
+   },
+   {
+    "iteration": 7,
+    "body": "b022",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 4.0,
+    "wall_s": 5.7
+   },
+   {
+    "iteration": 8,
+    "body": "b022",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 4.2,
+    "wall_s": 6.2
+   },
+   {
+    "iteration": 9,
+    "body": "b080",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 4.6,
+    "wall_s": 6.8
+   },
+   {
+    "iteration": 10,
+    "body": "b080",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 4.9,
+    "wall_s": 7.4
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "ao",
+   "eh",
+   "ih",
+   "iy",
+   "k",
+   "p",
+   "uh",
+   "uw"
+  ],
+  "test": {
+   "final_held": [
+    "ah",
+    "ao",
+    "eh",
+    "ih",
+    "iy",
+    "k",
+    "p",
+    "uh",
+    "uw"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 20,
+   "stock_tasks": 12,
+   "n": 26
+  },
+  "spent": {
+   "usd": 4.0,
+   "fab_minutes": 278.40000000000003,
+   "lead_days": 2.0,
+   "owned": {
+    "rail_100mm": 1.0,
+    "pushrod_kit": 1.0,
+    "servo_mg90s": 3.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 5.6,
+  "attempts": 16642,
+  "proposals": {
+   "total": 30,
+   "tried": 29,
+   "refused": 1,
+   "ideas": 0,
+   "kept": 3,
+   "rejected_regression": 17,
+   "moves": {
+    "params": 20,
+    "swap": 10,
+    "idea": 0,
+    "tune": 0,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 8.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s15",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 15,
+  "final_body": {
+   "id": "b090",
+   "parent": "b082",
+   "parts": {
+    "tract": {
+     "type": "short_cast",
+     "params": {
+      "length": 13.5
+     }
+    },
+    "tongue": {
+     "type": "tip_tongue",
+     "params": {
+      "rail_start": 3.5093557182505455,
+      "stroke": 1.205929544964631
+     }
+    },
+    "lips": {
+     "type": "round_lips",
+     "params": {
+      "max_protrusion": 1.443790045263976
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.2,
+    "wall_s": 0.3
+   },
+   {
+    "iteration": 1,
+    "body": "b002",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 0.9,
+    "wall_s": 1.3
+   },
+   {
+    "iteration": 2,
+    "body": "b002",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 1.5,
+    "wall_s": 2.2
+   },
+   {
+    "iteration": 3,
+    "body": "b002",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 1.9,
+    "wall_s": 2.7
+   },
+   {
+    "iteration": 4,
+    "body": "b002",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 2.2,
+    "wall_s": 3.3
+   },
+   {
+    "iteration": 5,
+    "body": "b002",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 2.6,
+    "wall_s": 3.9
+   },
+   {
+    "iteration": 6,
+    "body": "b002",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 3.1,
+    "wall_s": 4.7
+   },
+   {
+    "iteration": 7,
+    "body": "b002",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 3.5,
+    "wall_s": 5.3
+   },
+   {
+    "iteration": 8,
+    "body": "b002",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 3.8,
+    "wall_s": 5.9
+   },
+   {
+    "iteration": 9,
+    "body": "b082",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 4.1,
+    "wall_s": 6.4
+   },
+   {
+    "iteration": 10,
+    "body": "b090",
+    "held_groups": 13,
+    "tasks_passed": 13,
+    "sim_s": 4.4,
+    "wall_s": 6.9
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "ao",
+   "eh",
+   "er",
+   "ih",
+   "iy",
+   "k",
+   "p",
+   "t",
+   "uh",
+   "uw"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "er",
+    "ih",
+    "iy",
+    "k",
+    "p",
+    "t",
+    "uh",
+    "uw"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 25,
+   "stock_tasks": 13,
+   "n": 26
+  },
+  "spent": {
+   "usd": 24.0,
+   "fab_minutes": 182.2,
+   "lead_days": 3.0,
+   "owned": {
+    "pushrod_kit": 2.0,
+    "rail_100mm": 1.0,
+    "servo_mg90s": 5.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 4.9,
+  "attempts": 14616,
+  "proposals": {
+   "total": 31,
+   "tried": 30,
+   "refused": 1,
+   "ideas": 0,
+   "kept": 3,
+   "rejected_regression": 8,
+   "moves": {
+    "params": 19,
+    "swap": 11,
+    "idea": 0,
+    "tune": 0,
+    "merge": 1
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 7.5,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s16",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 16,
+  "final_body": {
+   "id": "b031",
+   "parent": "b022",
+   "parts": {
+    "tract": {
+     "type": "larynx_tube",
+     "params": {
+      "length": 12.653044358233046,
+      "travel": 2.4597697160933443
+     }
+    },
+    "tongue": {
+     "type": "cam_tongue",
+     "params": {
+      "rail_start": 3.9379507465966306,
+      "stroke": 1.2894894914249635
+     }
+    },
+    "lips": {
+     "type": "round_lips",
+     "params": {
+      "max_protrusion": 1.5619450802438108
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.2,
+    "wall_s": 0.3
+   },
+   {
+    "iteration": 1,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.6,
+    "wall_s": 0.9
+   },
+   {
+    "iteration": 2,
+    "body": "b010",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 1.3,
+    "wall_s": 1.8
+   },
+   {
+    "iteration": 3,
+    "body": "b022",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 1.9,
+    "wall_s": 2.8
+   },
+   {
+    "iteration": 4,
+    "body": "b031",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 2.3,
+    "wall_s": 3.4
+   },
+   {
+    "iteration": 5,
+    "body": "b031",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 2.6,
+    "wall_s": 3.9
+   },
+   {
+    "iteration": 6,
+    "body": "b031",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 3.0,
+    "wall_s": 4.6
+   },
+   {
+    "iteration": 7,
+    "body": "b031",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 3.2,
+    "wall_s": 5.0
+   },
+   {
+    "iteration": 8,
+    "body": "b031",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 3.6,
+    "wall_s": 5.6
+   },
+   {
+    "iteration": 9,
+    "body": "b031",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 3.9,
+    "wall_s": 6.0
+   },
+   {
+    "iteration": 10,
+    "body": "b031",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 4.2,
+    "wall_s": 6.6
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "ao",
+   "eh",
+   "ih",
+   "iy",
+   "k",
+   "p",
+   "uh",
+   "uw"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ae",
+    "ah",
+    "ao",
+    "eh",
+    "ih",
+    "iy",
+    "k",
+    "p",
+    "uh",
+    "uw"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 22,
+   "stock_tasks": 13,
+   "n": 26
+  },
+  "spent": {
+   "usd": 27.0,
+   "fab_minutes": 316.3,
+   "lead_days": 5.0,
+   "owned": {
+    "slide_40mm": 1.0,
+    "pushrod_kit": 1.0,
+    "servo_mg90s": 4.0,
+    "rail_100mm": 1.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 4.8,
+  "attempts": 14233,
+  "proposals": {
+   "total": 31,
+   "tried": 29,
+   "refused": 2,
+   "ideas": 0,
+   "kept": 3,
+   "rejected_regression": 9,
+   "moves": {
+    "params": 19,
+    "swap": 11,
+    "idea": 0,
+    "tune": 0,
+    "merge": 1
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 7.3,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s17",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 17,
+  "final_body": {
+   "id": "b09t3",
+   "parent": "b091",
+   "parts": {
+    "tract": {
+     "type": "short_cast",
+     "params": {
+      "length": 14.224070072474735
+     }
+    },
+    "tongue": {
+     "type": "tip_tongue",
+     "params": {
+      "rail_start": 2.91,
+      "stroke": 1.164
+     }
+    },
+    "lips": {
+     "type": "jaw_lips",
+     "params": {
+      "rest_area": 3.0
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.2,
+    "wall_s": 0.3
+   },
+   {
+    "iteration": 1,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 2.6,
+    "wall_s": 3.3
+   },
+   {
+    "iteration": 2,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 3.2,
+    "wall_s": 4.3
+   },
+   {
+    "iteration": 3,
+    "body": "b022",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 3.9,
+    "wall_s": 5.3
+   },
+   {
+    "iteration": 4,
+    "body": "b022",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 4.4,
+    "wall_s": 6.1
+   },
+   {
+    "iteration": 5,
+    "body": "b022",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 4.8,
+    "wall_s": 6.7
+   },
+   {
+    "iteration": 6,
+    "body": "b022",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 6.3,
+    "wall_s": 8.8
+   },
+   {
+    "iteration": 7,
+    "body": "b022",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 6.8,
+    "wall_s": 9.5
+   },
+   {
+    "iteration": 8,
+    "body": "b022",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 7.2,
+    "wall_s": 10.2
+   },
+   {
+    "iteration": 9,
+    "body": "b022",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 7.8,
+    "wall_s": 11.0
+   },
+   {
+    "iteration": 10,
+    "body": "b09t3",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 8.4,
+    "wall_s": 12.1
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "eh",
+   "er",
+   "ih",
+   "iy",
+   "k",
+   "t",
+   "uh",
+   "uw"
+  ],
+  "test": {
+   "final_held": [
+    "ah",
+    "eh",
+    "er",
+    "ih",
+    "iy",
+    "k",
+    "t",
+    "uh"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 20,
+   "stock_tasks": 13,
+   "n": 26
+  },
+  "spent": {
+   "usd": 12.0,
+   "fab_minutes": 250.6,
+   "lead_days": 3.0,
+   "owned": {
+    "pushrod_kit": 1.0,
+    "servo_mg90s": 4.0,
+    "rail_100mm": 1.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 9.1,
+  "attempts": 26225,
+  "proposals": {
+   "total": 42,
+   "tried": 41,
+   "refused": 1,
+   "ideas": 0,
+   "kept": 2,
+   "rejected_regression": 25,
+   "moves": {
+    "params": 21,
+    "swap": 9,
+    "idea": 0,
+    "tune": 12,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [
+   {
+    "id": "b052",
+    "body": "lips: jaw_lips (rest_area=3); tongue: tip_tongue (rail_start=2.53308, stroke=0.759585); tract: short_cast (length=14.2241)",
+    "gained": [
+     "t",
+     "uw"
+    ],
+    "lost": [
+     "aa"
+    ],
+    "why_lost": "lost aa (aa: f1_ceiling_too_low, F 627/1243 Hz vs target 730/1090 (F1 -14%, F2 +14%); over 398 open postures (System 1's map and its best) this body's F1 spans 270-627 Hz; w)",
+    "iteration": 5,
+    "edit": "tongue -> tip_tongue (rail_start=2.53308, stroke=0.759585)"
+   },
+   {
+    "id": "b05t0",
+    "body": "lips: jaw_lips (rest_area=3); tongue: tip_tongue (rail_start=2.5, stroke=0.877); tract: short_cast (length=14.2241)",
+    "gained": [
+     "er",
+     "t",
+     "uw"
+    ],
+    "lost": [
+     "aa"
+    ],
+    "why_lost": "lost aa (aa: f1_ceiling_too_low, F 621/1254 Hz vs target 730/1090 (F1 -15%, F2 +15%); over 404 open postures (System 1's map and its best) this body's F1 spans 236-634 Hz; w)",
+    "iteration": 5,
+    "edit": "tongue (rail_start=2.5, stroke=0.877)"
+   },
+   {
+    "id": "b05t1",
+    "body": "lips: jaw_lips (rest_area=3); tongue: tip_tongue (rail_start=2.5, stroke=0.863); tract: short_cast (length=14.2241)",
+    "gained": [
+     "t",
+     "uw"
+    ],
+    "lost": [
+     "aa"
+    ],
+    "why_lost": "lost aa (aa: f2_floor_too_high, F 622/1242 Hz vs target 730/1090 (F1 -15%, F2 +14%); over 390 open postures (System 1's map and its best) this body's F2 spans 877-2751 Hz; )",
+    "iteration": 5,
+    "edit": "tongue (rail_start=2.5, stroke=0.863)"
+   },
+   {
+    "id": "b05t3",
+    "body": "lips: jaw_lips (rest_area=3); tongue: tip_tongue (rail_start=2.5, stroke=1.05); tract: short_cast (length=14.2241)",
+    "gained": [
+     "er",
+     "t",
+     "uw"
+    ],
+    "lost": [
+     "aa"
+    ],
+    "why_lost": "lost aa (aa: f1_ceiling_too_low, F 623/1249 Hz vs target 730/1090 (F1 -15%, F2 +15%); over 340 open postures (System 1's map and its best) this body's F1 spans 205-627 Hz; w)",
+    "iteration": 5,
+    "edit": "tongue (rail_start=2.5, stroke=1.05)"
+   },
+   {
+    "id": "b091",
+    "body": "lips: jaw_lips (rest_area=3); tongue: tip_tongue (rail_start=2.73627, stroke=1.09975); tract: short_cast (length=14.2241)",
+    "gained": [
+     "ao",
+     "er",
+     "k",
+     "t",
+     "uw"
+    ],
+    "lost": [
+     "aa"
+    ],
+    "why_lost": "lost aa (aa: f1_ceiling_too_low, F 646/1215 Hz vs target 730/1090 (F1 -12%, F2 +11%); over 334 open postures (System 1's map and its best) this body's F1 spans 208-644 Hz; w)",
+    "iteration": 9,
+    "edit": "tongue -> tip_tongue (rail_start=2.73627, stroke=1.09975)"
+   },
+   {
+    "id": "b09t0",
+    "body": "lips: jaw_lips (rest_area=3); tongue: tip_tongue (rail_start=2.645, stroke=1.028); tract: short_cast (length=14.2241)",
+    "gained": [
+     "ao",
+     "er",
+     "t",
+     "uw"
+    ],
+    "lost": [
+     "aa"
+    ],
+    "why_lost": "lost aa (aa: f1_ceiling_too_low, F 636/1226 Hz vs target 730/1090 (F1 -13%, F2 +12%); over 358 open postures (System 1's map and its best) this body's F1 spans 206-640 Hz; w)",
+    "iteration": 9,
+    "edit": "tongue (rail_start=2.645, stroke=1.028)"
+   },
+   {
+    "id": "b09t1",
+    "body": "lips: jaw_lips (rest_area=3); tongue: tip_tongue (rail_start=2.5, stroke=1.09); tract: short_cast (length=14.2241)",
+    "gained": [
+     "k",
+     "t",
+     "uw"
+    ],
+    "lost": [
+     "aa"
+    ],
+    "why_lost": "lost aa (aa: f1_ceiling_too_low, F 625/1249 Hz vs target 730/1090 (F1 -14%, F2 +15%); over 324 open postures (System 1's map and its best) this body's F1 spans 207-632 Hz; w)",
+    "iteration": 9,
+    "edit": "tongue (rail_start=2.5, stroke=1.09)"
+   },
+   {
+    "id": "b09t2",
+    "body": "lips: jaw_lips (rest_area=3); tongue: tip_tongue (rail_start=2.502, stroke=1.216); tract: short_cast (length=14.2241)",
+    "gained": [
+     "er",
+     "k",
+     "t",
+     "uw"
+    ],
+    "lost": [
+     "aa",
+     "ae"
+    ],
+    "why_lost": "lost aa, ae (ae: f2_ceiling_too_low, F 595/1547 Hz vs target 660/1720 (F2 -10%); over 292 open postures (System 1's map and its best) this body's F2 spans 891-2735 Hz; with F1 w; aa: f1_ceiling_too_low, F 621/1238 Hz vs target 730/1090 (F1 -15%, F2 +14%); over 292 open postures (System 1's map and its best) this body's F1 spans 183-622 Hz; w)",
+    "iteration": 9,
+    "edit": "tongue (rail_start=2.502, stroke=1.216)"
+   }
+  ],
+  "wall_s": 12.8,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s18",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 18,
+  "final_body": {
+   "id": "b06t0",
+   "parent": "b061",
+   "parts": {
+    "tract": {
+     "type": "short_cast",
+     "params": {
+      "length": 13.5
+     }
+    },
+    "tongue": {
+     "type": "tip_tongue",
+     "params": {
+      "rail_start": 3.575,
+      "stroke": 1.105
+     }
+    },
+    "lips": {
+     "type": "round_lips",
+     "params": {
+      "max_protrusion": 1.2376241879130656
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.2,
+    "wall_s": 0.3
+   },
+   {
+    "iteration": 1,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 2.1,
+    "wall_s": 2.7
+   },
+   {
+    "iteration": 2,
+    "body": "b012",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 2.7,
+    "wall_s": 3.6
+   },
+   {
+    "iteration": 3,
+    "body": "b012",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 3.1,
+    "wall_s": 4.2
+   },
+   {
+    "iteration": 4,
+    "body": "b012",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 3.5,
+    "wall_s": 4.8
+   },
+   {
+    "iteration": 5,
+    "body": "b012",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 3.8,
+    "wall_s": 5.3
+   },
+   {
+    "iteration": 6,
+    "body": "b012",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 4.0,
+    "wall_s": 5.8
+   },
+   {
+    "iteration": 7,
+    "body": "b06t0",
+    "held_groups": 13,
+    "tasks_passed": 13,
+    "sim_s": 4.5,
+    "wall_s": 6.6
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "ao",
+   "eh",
+   "er",
+   "ih",
+   "iy",
+   "k",
+   "p",
+   "t",
+   "uh",
+   "uw"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ae",
+    "ah",
+    "ao",
+    "eh",
+    "er",
+    "ih",
+    "iy",
+    "k",
+    "p",
+    "t",
+    "uh",
+    "uw"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 26,
+   "stock_tasks": 13,
+   "n": 26
+  },
+  "spent": {
+   "usd": 24.0,
+   "fab_minutes": 132.2,
+   "lead_days": 3.0,
+   "owned": {
+    "pushrod_kit": 2.0,
+    "servo_mg90s": 5.0,
+    "rail_100mm": 1.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 5.0,
+  "attempts": 16306,
+  "proposals": {
+   "total": 28,
+   "tried": 27,
+   "refused": 1,
+   "ideas": 0,
+   "kept": 2,
+   "rejected_regression": 11,
+   "moves": {
+    "params": 14,
+    "swap": 7,
+    "idea": 0,
+    "tune": 6,
+    "merge": 1
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [
+   {
+    "id": "b061",
+    "body": "lips: round_lips (max_protrusion=1.23762); tongue: tip_tongue (rail_start=3.11407, stroke=1.0879); tract: short_cast (length=13.5)",
+    "gained": [
+     "er",
+     "k",
+     "t"
+    ],
+    "lost": [
+     "ao"
+    ],
+    "why_lost": "lost ao (ao: f1_ceiling_too_low, F 532/932 Hz vs target 570/840 (F2 +11%); narrowest 0.14 cm2, a vowel needs 0.15; over 211 open postures (System 1's map and its best) this )",
+    "iteration": 6,
+    "edit": "tongue -> tip_tongue (rail_start=3.11407, stroke=1.0879)"
+   }
+  ],
+  "wall_s": 7.0,
+  "llm": {
+   "calls": 7,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s19",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 19,
+  "final_body": {
+   "id": "b020",
+   "parent": "b01t0",
+   "parts": {
+    "tract": {
+     "type": "short_cast",
+     "params": {
+      "length": 14.356151023039315
+     }
+    },
+    "tongue": {
+     "type": "tip_tongue",
+     "params": {
+      "rail_start": 3.3090895484786094,
+      "stroke": 0.9233034103149026
+     }
+    },
+    "lips": {
+     "type": "jaw_lips",
+     "params": {
+      "rest_area": 3.0
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.2,
+    "wall_s": 0.3
+   },
+   {
+    "iteration": 1,
+    "body": "b002",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.9,
+    "wall_s": 1.2
+   },
+   {
+    "iteration": 2,
+    "body": "b01t0",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 1.5,
+    "wall_s": 2.1
+   },
+   {
+    "iteration": 3,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 2.0,
+    "wall_s": 2.9
+   },
+   {
+    "iteration": 4,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 2.2,
+    "wall_s": 3.2
+   },
+   {
+    "iteration": 5,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 2.5,
+    "wall_s": 3.7
+   },
+   {
+    "iteration": 6,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 2.8,
+    "wall_s": 4.2
+   },
+   {
+    "iteration": 7,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 3.9,
+    "wall_s": 5.9
+   },
+   {
+    "iteration": 8,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 4.2,
+    "wall_s": 6.4
+   },
+   {
+    "iteration": 9,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 4.5,
+    "wall_s": 6.9
+   },
+   {
+    "iteration": 10,
+    "body": "b020",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 5.0,
+    "wall_s": 7.6
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "ao",
+   "eh",
+   "er",
+   "ih",
+   "iy",
+   "t",
+   "uh",
+   "uw"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ah",
+    "ao",
+    "eh",
+    "er",
+    "ih",
+    "iy",
+    "t",
+    "uh",
+    "uw"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 21,
+   "stock_tasks": 13,
+   "n": 26
+  },
+  "spent": {
+   "usd": 12.0,
+   "fab_minutes": 327.79999999999995,
+   "lead_days": 3.0,
+   "owned": {
+    "pushrod_kit": 1.0,
+    "servo_mg90s": 4.0,
+    "rail_100mm": 1.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 5.5,
+  "attempts": 18201,
+  "proposals": {
+   "total": 36,
+   "tried": 35,
+   "refused": 1,
+   "ideas": 0,
+   "kept": 3,
+   "rejected_regression": 18,
+   "moves": {
+    "params": 18,
+    "swap": 12,
+    "idea": 0,
+    "tune": 5,
+    "merge": 1
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 8.2,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s20",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 20,
+  "final_body": {
+   "id": "b080",
+   "parent": "b001",
+   "parts": {
+    "tract": {
+     "type": "short_cast",
+     "params": {
+      "length": 13.5
+     }
+    },
+    "tongue": {
+     "type": "cam_tongue",
+     "params": {
+      "rail_start": 3.0844897064245806,
+      "stroke": 1.141573270905527
+     }
+    },
+    "lips": {
+     "type": "jaw_lips",
+     "params": {
+      "rest_area": 2.571639547204665
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.2,
+    "wall_s": 0.3
+   },
+   {
+    "iteration": 1,
+    "body": "b001",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.8,
+    "wall_s": 1.1
+   },
+   {
+    "iteration": 2,
+    "body": "b001",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 1.1,
+    "wall_s": 1.6
+   },
+   {
+    "iteration": 3,
+    "body": "b001",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 1.6,
+    "wall_s": 2.2
+   },
+   {
+    "iteration": 4,
+    "body": "b001",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 1.7,
+    "wall_s": 2.5
+   },
+   {
+    "iteration": 5,
+    "body": "b001",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 2.3,
+    "wall_s": 3.4
+   },
+   {
+    "iteration": 6,
+    "body": "b001",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 2.6,
+    "wall_s": 3.8
+   },
+   {
+    "iteration": 7,
+    "body": "b001",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 2.7,
+    "wall_s": 4.2
+   },
+   {
+    "iteration": 8,
+    "body": "b001",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 2.9,
+    "wall_s": 4.5
+   },
+   {
+    "iteration": 9,
+    "body": "b080",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 3.3,
+    "wall_s": 5.2
+   },
+   {
+    "iteration": 10,
+    "body": "b080",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 3.7,
+    "wall_s": 5.8
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "eh",
+   "ih",
+   "iy",
+   "k",
+   "uh"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy",
+    "k"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 15,
+   "stock_tasks": 13,
+   "n": 26
+  },
+  "spent": {
+   "usd": 0.0,
+   "fab_minutes": 93.0,
+   "lead_days": 0.0,
+   "owned": {
+    "servo_mg90s": 3.0,
+    "rail_100mm": 1.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 4.5,
+  "attempts": 14791,
+  "proposals": {
+   "total": 30,
+   "tried": 28,
+   "refused": 2,
+   "ideas": 0,
+   "kept": 2,
+   "rejected_regression": 21,
+   "moves": {
+    "params": 22,
+    "swap": 8,
+    "idea": 0,
+    "tune": 0,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 6.6,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s21",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 21,
+  "final_body": {
+   "id": "b082",
+   "parent": "b051",
+   "parts": {
+    "tract": {
+     "type": "short_cast",
+     "params": {
+      "length": 13.5
+     }
+    },
+    "tongue": {
+     "type": "tip_tongue",
+     "params": {
+      "rail_start": 3.86958828552682,
+      "stroke": 1.1825191381851359
+     }
+    },
+    "lips": {
+     "type": "round_lips",
+     "params": {
+      "max_protrusion": 1.3098011904084252
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.2,
+    "wall_s": 0.3
+   },
+   {
+    "iteration": 1,
+    "body": "b000",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 0.8,
+    "wall_s": 1.2
+   },
+   {
+    "iteration": 2,
+    "body": "b000",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 1.0,
+    "wall_s": 1.6
+   },
+   {
+    "iteration": 3,
+    "body": "b000",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 1.3,
+    "wall_s": 2.1
+   },
+   {
+    "iteration": 4,
+    "body": "b000",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 1.7,
+    "wall_s": 2.7
+   },
+   {
+    "iteration": 5,
+    "body": "b000",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 2.0,
+    "wall_s": 3.2
+   },
+   {
+    "iteration": 6,
+    "body": "b051",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 2.4,
+    "wall_s": 3.8
+   },
+   {
+    "iteration": 7,
+    "body": "b051",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 2.8,
+    "wall_s": 4.5
+   },
+   {
+    "iteration": 8,
+    "body": "b051",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 3.0,
+    "wall_s": 4.9
+   },
+   {
+    "iteration": 9,
+    "body": "b082",
+    "held_groups": 13,
+    "tasks_passed": 13,
+    "sim_s": 3.1,
+    "wall_s": 5.1
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "ao",
+   "eh",
+   "er",
+   "ih",
+   "iy",
+   "k",
+   "p",
+   "t",
+   "uh",
+   "uw"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ae",
+    "ah",
+    "ao",
+    "eh",
+    "er",
+    "ih",
+    "iy",
+    "k",
+    "p",
+    "t",
+    "uh",
+    "uw"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 26,
+   "stock_tasks": 13,
+   "n": 26
+  },
+  "spent": {
+   "usd": 24.0,
+   "fab_minutes": 182.2,
+   "lead_days": 3.0,
+   "owned": {
+    "pushrod_kit": 2.0,
+    "rail_100mm": 1.0,
+    "servo_mg90s": 5.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 3.6,
+  "attempts": 11702,
+  "proposals": {
+   "total": 28,
+   "tried": 27,
+   "refused": 1,
+   "ideas": 0,
+   "kept": 3,
+   "rejected_regression": 7,
+   "moves": {
+    "params": 20,
+    "swap": 7,
+    "idea": 0,
+    "tune": 0,
+    "merge": 1
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 5.6,
+  "llm": {
+   "calls": 9,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s22",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 22,
+  "final_body": {
+   "id": "b072",
+   "parent": "b031",
+   "parts": {
+    "tract": {
+     "type": "short_cast",
+     "params": {
+      "length": 13.5
+     }
+    },
+    "tongue": {
+     "type": "tip_tongue",
+     "params": {
+      "rail_start": 3.750076698129615,
+      "stroke": 1.2625205943022153
+     }
+    },
+    "lips": {
+     "type": "round_lips",
+     "params": {
+      "max_protrusion": 0.6514387674752593
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.2,
+    "wall_s": 0.3
+   },
+   {
+    "iteration": 1,
+    "body": "b002",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 0.7,
+    "wall_s": 1.0
+   },
+   {
+    "iteration": 2,
+    "body": "b002",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 1.2,
+    "wall_s": 1.7
+   },
+   {
+    "iteration": 3,
+    "body": "b002",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 1.7,
+    "wall_s": 2.5
+   },
+   {
+    "iteration": 4,
+    "body": "b031",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 2.0,
+    "wall_s": 3.0
+   },
+   {
+    "iteration": 5,
+    "body": "b031",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 2.3,
+    "wall_s": 3.4
+   },
+   {
+    "iteration": 6,
+    "body": "b031",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 2.5,
+    "wall_s": 3.8
+   },
+   {
+    "iteration": 7,
+    "body": "b031",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 2.9,
+    "wall_s": 4.4
+   },
+   {
+    "iteration": 8,
+    "body": "b072",
+    "held_groups": 13,
+    "tasks_passed": 13,
+    "sim_s": 3.2,
+    "wall_s": 4.9
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "ao",
+   "eh",
+   "er",
+   "ih",
+   "iy",
+   "k",
+   "p",
+   "t",
+   "uh",
+   "uw"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "er",
+    "ih",
+    "iy",
+    "k",
+    "p",
+    "t",
+    "uh",
+    "uw"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 25,
+   "stock_tasks": 13,
+   "n": 26
+  },
+  "spent": {
+   "usd": 24.0,
+   "fab_minutes": 182.2,
+   "lead_days": 3.0,
+   "owned": {
+    "rail_100mm": 1.0,
+    "servo_mg90s": 5.0,
+    "pushrod_kit": 2.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 3.6,
+  "attempts": 11907,
+  "proposals": {
+   "total": 24,
+   "tried": 23,
+   "refused": 1,
+   "ideas": 0,
+   "kept": 3,
+   "rejected_regression": 7,
+   "moves": {
+    "params": 12,
+    "swap": 12,
+    "idea": 0,
+    "tune": 0,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 5.4,
+  "llm": {
+   "calls": 8,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s23",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 23,
+  "final_body": {
+   "id": "b05t0",
+   "parent": "b052",
+   "parts": {
+    "tract": {
+     "type": "short_cast",
+     "params": {
+      "length": 13.5
+     }
+    },
+    "tongue": {
+     "type": "tip_tongue",
+     "params": {
+      "rail_start": 3.506,
+      "stroke": 0.91
+     }
+    },
+    "lips": {
+     "type": "round_lips",
+     "params": {
+      "max_protrusion": 0.7286442243176362
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.2,
+    "wall_s": 0.3
+   },
+   {
+    "iteration": 1,
+    "body": "b000",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 0.6,
+    "wall_s": 0.9
+   },
+   {
+    "iteration": 2,
+    "body": "b000",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 1.0,
+    "wall_s": 1.5
+   },
+   {
+    "iteration": 3,
+    "body": "b000",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 1.4,
+    "wall_s": 2.1
+   },
+   {
+    "iteration": 4,
+    "body": "b000",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 1.5,
+    "wall_s": 2.3
+   },
+   {
+    "iteration": 5,
+    "body": "b000",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 1.7,
+    "wall_s": 2.8
+   },
+   {
+    "iteration": 6,
+    "body": "b05t0",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 2.0,
+    "wall_s": 3.3
+   },
+   {
+    "iteration": 7,
+    "body": "b05t0",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 2.2,
+    "wall_s": 3.7
+   },
+   {
+    "iteration": 8,
+    "body": "b05t0",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 2.7,
+    "wall_s": 4.8
+   },
+   {
+    "iteration": 9,
+    "body": "b05t0",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 3.0,
+    "wall_s": 5.2
+   },
+   {
+    "iteration": 10,
+    "body": "b05t0",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 3.3,
+    "wall_s": 5.7
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "ao",
+   "eh",
+   "er",
+   "ih",
+   "iy",
+   "p",
+   "t",
+   "uh",
+   "uw"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ae",
+    "ah",
+    "ao",
+    "eh",
+    "er",
+    "ih",
+    "iy",
+    "p",
+    "t",
+    "uh",
+    "uw"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 24,
+   "stock_tasks": 13,
+   "n": 26
+  },
+  "spent": {
+   "usd": 24.0,
+   "fab_minutes": 132.2,
+   "lead_days": 3.0,
+   "owned": {
+    "pushrod_kit": 2.0,
+    "servo_mg90s": 5.0,
+    "rail_100mm": 1.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 3.9,
+  "attempts": 12060,
+  "proposals": {
+   "total": 35,
+   "tried": 32,
+   "refused": 3,
+   "ideas": 0,
+   "kept": 2,
+   "rejected_regression": 12,
+   "moves": {
+    "params": 20,
+    "swap": 10,
+    "idea": 0,
+    "tune": 5,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [
+   {
+    "id": "b052",
+    "body": "lips: round_lips (max_protrusion=0.728644); tongue: tip_tongue (rail_start=3.39053, stroke=0.842696); tract: short_cast (length=13.5)",
+    "gained": [
+     "er",
+     "t"
+    ],
+    "lost": [
+     "ao"
+    ],
+    "why_lost": "lost ao (ao: f1_ceiling_too_low, F 509/925 Hz vs target 570/840 (F1 -11%, F2 +10%); over 268 open postures (System 1's map and its best) this body's F1 spans 219-824 Hz; wit)",
+    "iteration": 5,
+    "edit": "tongue -> tip_tongue (rail_start=3.39053, stroke=0.842696)"
+   }
+  ],
+  "wall_s": 6.3,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s24",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 24,
+  "final_body": {
+   "id": "b030",
+   "parent": "b011",
+   "parts": {
+    "tract": {
+     "type": "short_cast",
+     "params": {
+      "length": 13.5
+     }
+    },
+    "tongue": {
+     "type": "tip_tongue",
+     "params": {
+      "rail_start": 2.9611634687190618,
+      "stroke": 1.2164429041780356
+     }
+    },
+    "lips": {
+     "type": "round_lips",
+     "params": {
+      "max_protrusion": 0.9323994119712985
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.3,
+    "wall_s": 0.4
+   },
+   {
+    "iteration": 1,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 2.7,
+    "wall_s": 3.6
+   },
+   {
+    "iteration": 2,
+    "body": "b011",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 3.4,
+    "wall_s": 4.8
+   },
+   {
+    "iteration": 3,
+    "body": "b011",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 3.8,
+    "wall_s": 5.4
+   },
+   {
+    "iteration": 4,
+    "body": "b030",
+    "held_groups": 13,
+    "tasks_passed": 13,
+    "sim_s": 4.1,
+    "wall_s": 5.9
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "ao",
+   "eh",
+   "er",
+   "ih",
+   "iy",
+   "k",
+   "p",
+   "t",
+   "uh",
+   "uw"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ae",
+    "ah",
+    "ao",
+    "eh",
+    "er",
+    "ih",
+    "iy",
+    "k",
+    "p",
+    "t",
+    "uh",
+    "uw"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 26,
+   "stock_tasks": 12,
+   "n": 26
+  },
+  "spent": {
+   "usd": 24.0,
+   "fab_minutes": 132.2,
+   "lead_days": 3.0,
+   "owned": {
+    "pushrod_kit": 2.0,
+    "rail_100mm": 1.0,
+    "servo_mg90s": 5.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 4.7,
+  "attempts": 11071,
+  "proposals": {
+   "total": 17,
+   "tried": 17,
+   "refused": 0,
+   "ideas": 0,
+   "kept": 2,
+   "rejected_regression": 6,
+   "moves": {
+    "params": 8,
+    "swap": 4,
+    "idea": 0,
+    "tune": 4,
+    "merge": 1
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 6.6,
+  "llm": {
+   "calls": 4,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s25",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 25,
+  "final_body": {
+   "id": "b062",
+   "parent": "b002",
+   "parts": {
+    "tract": {
+     "type": "short_cast",
+     "params": {
+      "length": 13.5
+     }
+    },
+    "tongue": {
+     "type": "cam_tongue",
+     "params": {
+      "rail_start": 2.8674876194019046,
+      "stroke": 1.1855769396479154
+     }
+    },
+    "lips": {
+     "type": "round_lips",
+     "params": {
+      "max_protrusion": 0.8257713152101344
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.3,
+    "wall_s": 0.4
+   },
+   {
+    "iteration": 1,
+    "body": "b002",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 0.9,
+    "wall_s": 1.3
+   },
+   {
+    "iteration": 2,
+    "body": "b002",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 1.6,
+    "wall_s": 2.3
+   },
+   {
+    "iteration": 3,
+    "body": "b002",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 2.0,
+    "wall_s": 2.9
+   },
+   {
+    "iteration": 4,
+    "body": "b002",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 2.4,
+    "wall_s": 3.5
+   },
+   {
+    "iteration": 5,
+    "body": "b002",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 2.8,
+    "wall_s": 4.1
+   },
+   {
+    "iteration": 6,
+    "body": "b002",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 3.2,
+    "wall_s": 4.8
+   },
+   {
+    "iteration": 7,
+    "body": "b062",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 3.6,
+    "wall_s": 5.3
+   },
+   {
+    "iteration": 8,
+    "body": "b062",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 4.4,
+    "wall_s": 6.7
+   },
+   {
+    "iteration": 9,
+    "body": "b062",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 4.6,
+    "wall_s": 7.2
+   },
+   {
+    "iteration": 10,
+    "body": "b062",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 5.1,
+    "wall_s": 7.9
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "ao",
+   "eh",
+   "ih",
+   "iy",
+   "k",
+   "p",
+   "uh",
+   "uw"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ae",
+    "ah",
+    "ao",
+    "eh",
+    "ih",
+    "iy",
+    "k",
+    "p",
+    "uh",
+    "uw"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 22,
+   "stock_tasks": 13,
+   "n": 26
+  },
+  "spent": {
+   "usd": 4.0,
+   "fab_minutes": 106.6,
+   "lead_days": 2.0,
+   "owned": {
+    "servo_mg90s": 3.0,
+    "rail_100mm": 1.0,
+    "pushrod_kit": 1.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 5.8,
+  "attempts": 15987,
+  "proposals": {
+   "total": 34,
+   "tried": 32,
+   "refused": 2,
+   "ideas": 0,
+   "kept": 2,
+   "rejected_regression": 17,
+   "moves": {
+    "params": 18,
+    "swap": 12,
+    "idea": 0,
+    "tune": 4,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [
+   {
+    "id": "b07t1",
+    "body": "lips: round_lips (max_protrusion=0.825771); tongue: tip_tongue (rail_start=3.269, stroke=1.063); tract: short_cast (length=13.5)",
+    "gained": [
+     "er",
+     "t"
+    ],
+    "lost": [
+     "k"
+    ],
+    "why_lost": "lost k (k: no_closure_at_velar, narrowest 0.06 cm2 at 5.9 cm behind the teeth, airway elsewhere 0.72 cm2; tongue body reaches the velar place (5.5-8.5 cm behind the teeth) )",
+    "iteration": 7,
+    "edit": "tongue (rail_start=3.269, stroke=1.063)"
+   },
+   {
+    "id": "b07t2",
+    "body": "lips: round_lips (max_protrusion=0.825771); tongue: tip_tongue (rail_start=3.442, stroke=0.972); tract: short_cast (length=13.5)",
+    "gained": [
+     "er",
+     "t"
+    ],
+    "lost": [
+     "k"
+    ],
+    "why_lost": "lost k (k: no_closure_at_velar, narrowest 0.00 cm2 at 4.8 cm behind the teeth, airway elsewhere 0.30 cm2; tongue body reaches the velar place (5.5-8.5 cm behind the teeth) )",
+    "iteration": 7,
+    "edit": "tongue (rail_start=3.442, stroke=0.972)"
+   }
+  ],
+  "wall_s": 8.6,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s26",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 26,
+  "final_body": {
+   "id": "b020",
+   "parent": "b010",
+   "parts": {
+    "tract": {
+     "type": "short_cast",
+     "params": {
+      "length": 14.424836056350712
+     }
+    },
+    "tongue": {
+     "type": "tip_tongue",
+     "params": {
+      "rail_start": 3.5934566289668717,
+      "stroke": 1.25239070484889
+     }
+    },
+    "lips": {
+     "type": "jaw_lips",
+     "params": {
+      "rest_area": 3.0
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.2,
+    "wall_s": 0.3
+   },
+   {
+    "iteration": 1,
+    "body": "b001",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 0.8,
+    "wall_s": 1.1
+   },
+   {
+    "iteration": 2,
+    "body": "b010",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 1.1,
+    "wall_s": 1.6
+   },
+   {
+    "iteration": 3,
+    "body": "b020",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 1.4,
+    "wall_s": 2.2
+   },
+   {
+    "iteration": 4,
+    "body": "b020",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 1.7,
+    "wall_s": 2.8
+   },
+   {
+    "iteration": 5,
+    "body": "b020",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 2.0,
+    "wall_s": 3.3
+   },
+   {
+    "iteration": 6,
+    "body": "b020",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 2.2,
+    "wall_s": 3.6
+   },
+   {
+    "iteration": 7,
+    "body": "b020",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 2.5,
+    "wall_s": 4.1
+   },
+   {
+    "iteration": 8,
+    "body": "b020",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 2.7,
+    "wall_s": 4.6
+   },
+   {
+    "iteration": 9,
+    "body": "b020",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 3.0,
+    "wall_s": 5.0
+   },
+   {
+    "iteration": 10,
+    "body": "b020",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 3.4,
+    "wall_s": 5.6
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "ao",
+   "eh",
+   "er",
+   "ih",
+   "iy",
+   "k",
+   "t",
+   "uh",
+   "uw"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ah",
+    "ao",
+    "eh",
+    "er",
+    "ih",
+    "iy",
+    "k",
+    "t",
+    "uh",
+    "uw"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 23,
+   "stock_tasks": 13,
+   "n": 26
+  },
+  "spent": {
+   "usd": 12.0,
+   "fab_minutes": 328.7,
+   "lead_days": 3.0,
+   "owned": {
+    "rail_100mm": 1.0,
+    "pushrod_kit": 1.0,
+    "servo_mg90s": 4.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 3.9,
+  "attempts": 12202,
+  "proposals": {
+   "total": 30,
+   "tried": 28,
+   "refused": 2,
+   "ideas": 0,
+   "kept": 3,
+   "rejected_regression": 15,
+   "moves": {
+    "params": 21,
+    "swap": 9,
+    "idea": 0,
+    "tune": 0,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 6.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s27",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 27,
+  "final_body": {
+   "id": "b04t1",
+   "parent": "b042",
+   "parts": {
+    "tract": {
+     "type": "short_cast",
+     "params": {
+      "length": 14.386831423260103
+     }
+    },
+    "tongue": {
+     "type": "cam_tongue",
+     "params": {
+      "rail_start": 3.25,
+      "stroke": 0.95
+     }
+    },
+    "lips": {
+     "type": "round_lips",
+     "params": {
+      "max_protrusion": 1.088
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.2,
+    "wall_s": 0.3
+   },
+   {
+    "iteration": 1,
+    "body": "b002",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.9,
+    "wall_s": 1.2
+   },
+   {
+    "iteration": 2,
+    "body": "b002",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 1.4,
+    "wall_s": 1.9
+   },
+   {
+    "iteration": 3,
+    "body": "b002",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 2.3,
+    "wall_s": 3.3
+   },
+   {
+    "iteration": 4,
+    "body": "b002",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 2.7,
+    "wall_s": 3.9
+   },
+   {
+    "iteration": 5,
+    "body": "b04t1",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 3.3,
+    "wall_s": 4.9
+   },
+   {
+    "iteration": 6,
+    "body": "b04t1",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 3.7,
+    "wall_s": 5.6
+   },
+   {
+    "iteration": 7,
+    "body": "b04t1",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 4.6,
+    "wall_s": 6.9
+   },
+   {
+    "iteration": 8,
+    "body": "b04t1",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 5.4,
+    "wall_s": 8.2
+   },
+   {
+    "iteration": 9,
+    "body": "b04t1",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 5.9,
+    "wall_s": 8.9
+   },
+   {
+    "iteration": 10,
+    "body": "b04t1",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 6.1,
+    "wall_s": 9.4
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "ao",
+   "eh",
+   "ih",
+   "iy",
+   "p",
+   "uh",
+   "uw"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ah",
+    "ao",
+    "eh",
+    "ih",
+    "iy",
+    "p",
+    "uh",
+    "uw"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 19,
+   "stock_tasks": 12,
+   "n": 26
+  },
+  "spent": {
+   "usd": 4.0,
+   "fab_minutes": 233.6,
+   "lead_days": 2.0,
+   "owned": {
+    "servo_mg90s": 3.0,
+    "rail_100mm": 1.0,
+    "pushrod_kit": 1.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 6.8,
+  "attempts": 21982,
+  "proposals": {
+   "total": 44,
+   "tried": 44,
+   "refused": 0,
+   "ideas": 0,
+   "kept": 2,
+   "rejected_regression": 29,
+   "moves": {
+    "params": 16,
+    "swap": 14,
+    "idea": 0,
+    "tune": 14,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [
+   {
+    "id": "b021",
+    "body": "lips: round_lips (max_protrusion=0.711309); tongue: cam_tongue (rail_start=3.25, stroke=0.95); tract: short_cast (length=14.3868)",
+    "gained": [
+     "ao",
+     "p",
+     "uw"
+    ],
+    "lost": [
+     "ae"
+    ],
+    "why_lost": "lost ae (ae: f2_ceiling_too_low, F 599/1544 Hz vs target 660/1720 (F2 -10%); over 390 open postures (System 1's map and its best) this body's F2 spans 654-2839 Hz; with F1 w)",
+    "iteration": 2,
+    "edit": "lips -> round_lips (max_protrusion=0.711309)"
+   },
+   {
+    "id": "b02t0",
+    "body": "lips: round_lips (max_protrusion=0.768); tongue: cam_tongue (rail_start=3.25, stroke=0.95); tract: short_cast (length=14.3868)",
+    "gained": [
+     "ao",
+     "p",
+     "uw"
+    ],
+    "lost": [
+     "ae"
+    ],
+    "why_lost": "lost ae (ae: f2_ceiling_too_low, F 598/1543 Hz vs target 660/1720 (F2 -10%); over 390 open postures (System 1's map and its best) this body's F2 spans 667-2345 Hz; with F1 w)",
+    "iteration": 2,
+    "edit": "lips (max_protrusion=0.768)"
+   },
+   {
+    "id": "b02t1",
+    "body": "lips: round_lips (max_protrusion=0.604); tongue: cam_tongue (rail_start=3.25, stroke=0.95); tract: short_cast (length=14.3868)",
+    "gained": [
+     "ao",
+     "p",
+     "uw"
+    ],
+    "lost": [
+     "ae"
+    ],
+    "why_lost": "lost ae (ae: f2_ceiling_too_low, F 598/1546 Hz vs target 660/1720 (F2 -10%); over 401 open postures (System 1's map and its best) this body's F2 spans 565-2765 Hz; with F1 w)",
+    "iteration": 2,
+    "edit": "lips (max_protrusion=0.604)"
+   },
+   {
+    "id": "b02t2",
+    "body": "lips: round_lips (max_protrusion=0.872); tongue: cam_tongue (rail_start=3.25, stroke=0.95); tract: short_cast (length=14.3868)",
+    "gained": [
+     "ao",
+     "p",
+     "uw"
+    ],
+    "lost": [
+     "ae"
+    ],
+    "why_lost": "lost ae (ae: not_robust_to_motor_noise, passed once, failed a confirmation: F 598/1548 Hz vs target 660/1720 (F2 -10%); the closest open posture gives F 599/1552 Hz noise-free (98%)",
+    "iteration": 2,
+    "edit": "lips (max_protrusion=0.872)"
+   },
+   {
+    "id": "b02t3",
+    "body": "lips: round_lips (max_protrusion=1.107); tongue: cam_tongue (rail_start=3.25, stroke=0.95); tract: short_cast (length=14.3868)",
+    "gained": [
+     "ao",
+     "p",
+     "uw"
+    ],
+    "lost": [
+     "ae"
+    ],
+    "why_lost": "lost ae (ae: f1_ceiling_too_low, F 593/1546 Hz vs target 660/1720 (F1 -10%, F2 -10%); over 400 open postures (System 1's map and its best) this body's F1 spans 194-671 Hz; w)",
+    "iteration": 2,
+    "edit": "lips (max_protrusion=1.107)"
+   },
+   {
+    "id": "b042",
+    "body": "lips: round_lips (max_protrusion=1.22251); tongue: cam_tongue (rail_start=3.25, stroke=0.95); tract: short_cast (length=14.3868)",
+    "gained": [
+     "ao",
+     "p",
+     "uw"
+    ],
+    "lost": [
+     "ae"
+    ],
+    "why_lost": "lost ae (ae: f2_ceiling_too_low, F 599/1546 Hz vs target 660/1720 (F2 -10%); over 396 open postures (System 1's map and its best) this body's F2 spans 609-2479 Hz; with F1 w)",
+    "iteration": 4,
+    "edit": "lips -> round_lips (max_protrusion=1.22251)"
+   },
+   {
+    "id": "b04t0",
+    "body": "lips: round_lips (max_protrusion=1.051); tongue: cam_tongue (rail_start=3.25, stroke=0.95); tract: short_cast (length=14.3868)",
+    "gained": [
+     "ao",
+     "p",
+     "uw"
+    ],
+    "lost": [
+     "ae"
+    ],
+    "why_lost": "lost ae (ae: f2_ceiling_too_low, F 596/1545 Hz vs target 660/1720 (F2 -10%); over 404 open postures (System 1's map and its best) this body's F2 spans 697-2824 Hz; with F1 w)",
+    "iteration": 4,
+    "edit": "lips (max_protrusion=1.051)"
+   },
+   {
+    "id": "b060",
+    "body": "lips: round_lips (max_protrusion=1.088); tongue: tip_tongue (rail_start=3.08824, stroke=1.0787); tract: short_cast (length=14.3868)",
+    "gained": [
+     "er",
+     "k",
+     "t"
+    ],
+    "lost": [
+     "aa",
+     "ae"
+    ],
+    "why_lost": "lost aa, ae (ae: f2_ceiling_too_low, F 591/1528 Hz vs target 660/1720 (F1 -10%, F2 -11%); over 205 open postures (System 1's map and its best) this body's F2 spans 755-2637 Hz; ; aa: f1_ceiling_too_low, F 656/1159 Hz vs target 730/1090 (F1 -10%); over 205 open postures (System 1's map and its best) this body's F1 spans 171-656 Hz; with F2 wi)",
+    "iteration": 6,
+    "edit": "tongue -> tip_tongue (rail_start=3.08824, stroke=1.0787)"
+   },
+   {
+    "id": "b06t0",
+    "body": "lips: round_lips (max_protrusion=1.088); tongue: tip_tongue (rail_start=2.879, stroke=1.191); tract: short_cast (length=14.3868)",
+    "gained": [
+     "er",
+     "k",
+     "t"
+    ],
+    "lost": [
+     "aa",
+     "ae"
+    ],
+    "why_lost": "lost aa, ae (ae: f2_ceiling_too_low, F 585/1530 Hz vs target 660/1720 (F1 -11%, F2 -11%); over 216 open postures (System 1's map and its best) this body's F2 spans 695-2338 Hz; ; aa: f1_ceiling_too_low, F 636/1199 Hz vs target 730/1090 (F1 -13%); over 216 open postures (System 1's map and its best) this body's F1 spans 193-640 Hz; with F2 wi)",
+    "iteration": 6,
+    "edit": "tongue (rail_start=2.879, stroke=1.191)"
+   },
+   {
+    "id": "b06t2",
+    "body": "lips: round_lips (max_protrusion=1.088); tongue: tip_tongue (rail_start=3.142, stroke=1.127); tract: short_cast (length=14.3868)",
+    "gained": [
+     "er",
+     "k",
+     "t"
+    ],
+    "lost": [
+     "ae"
+    ],
+    "why_lost": "lost ae (ae: not_robust_to_motor_noise, F 593/1557 Hz vs target 660/1720 (F1 -10%); the closest open posture gives F 595/1554 Hz noise-free (98% of the 10% window used); System 1 f)",
+    "iteration": 6,
+    "edit": "tongue (rail_start=3.142, stroke=1.127)"
+   },
+   {
+    "id": "b071",
+    "body": "lips: round_lips (max_protrusion=1.088); tongue: tip_tongue (rail_start=3.5854, stroke=0.759241); tract: short_cast (length=14.3868)",
+    "gained": [
+     "er",
+     "t"
+    ],
+    "lost": [
+     "ao"
+    ],
+    "why_lost": "lost ao (ao: f1_ceiling_too_low, F 499/940 Hz vs target 570/840 (F1 -12%, F2 +12%); over 279 open postures (System 1's map and its best) this body's F1 spans 212-684 Hz; wit)",
+    "iteration": 7,
+    "edit": "tongue -> tip_tongue (rail_start=3.5854, stroke=0.759241)"
+   },
+   {
+    "id": "b07t0",
+    "body": "lips: round_lips (max_protrusion=1.088); tongue: tip_tongue (rail_start=4, stroke=0.734); tract: short_cast (length=14.3868)",
+    "gained": [
+     "er",
+     "t"
+    ],
+    "lost": [
+     "ao"
+    ],
+    "why_lost": "lost ao (ao: f1_ceiling_too_low, F 490/951 Hz vs target 570/840 (F1 -14%, F2 +13%); over 275 open postures (System 1's map and its best) this body's F1 spans 189-671 Hz; wit)",
+    "iteration": 7,
+    "edit": "tongue (rail_start=4, stroke=0.734)"
+   },
+   {
+    "id": "b07t3",
+    "body": "lips: round_lips (max_protrusion=1.088); tongue: tip_tongue (rail_start=3.842, stroke=0.793); tract: short_cast (length=14.3868)",
+    "gained": [
+     "er",
+     "t"
+    ],
+    "lost": [
+     "ao"
+    ],
+    "why_lost": "lost ao (ao: f2_floor_too_high, F 514/931 Hz vs target 570/840 (F2 +11%); over 292 open postures (System 1's map and its best) this body's F2 spans 819-2223 Hz; with F1 wit)",
+    "iteration": 7,
+    "edit": "tongue (rail_start=3.842, stroke=0.793)"
+   }
+  ],
+  "wall_s": 10.1,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s28",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 28,
+  "final_body": {
+   "id": "b061",
+   "parent": "b042",
+   "parts": {
+    "tract": {
+     "type": "short_cast",
+     "params": {
+      "length": 14.401759020647438
+     }
+    },
+    "tongue": {
+     "type": "tip_tongue",
+     "params": {
+      "rail_start": 3.5063960443188513,
+      "stroke": 1.174499748861198
+     }
+    },
+    "lips": {
+     "type": "jaw_lips",
+     "params": {
+      "rest_area": 3.0
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.2,
+    "wall_s": 0.3
+   },
+   {
+    "iteration": 1,
+    "body": "b002",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 0.7,
+    "wall_s": 0.9
+   },
+   {
+    "iteration": 2,
+    "body": "b002",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 1.1,
+    "wall_s": 1.6
+   },
+   {
+    "iteration": 3,
+    "body": "b002",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 1.3,
+    "wall_s": 2.0
+   },
+   {
+    "iteration": 4,
+    "body": "b002",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 2.2,
+    "wall_s": 3.5
+   },
+   {
+    "iteration": 5,
+    "body": "b042",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 3.0,
+    "wall_s": 4.6
+   },
+   {
+    "iteration": 6,
+    "body": "b042",
+    "held_groups": 8,
+    "tasks_passed": 8,
+    "sim_s": 3.9,
+    "wall_s": 6.1
+   },
+   {
+    "iteration": 7,
+    "body": "b061",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 4.1,
+    "wall_s": 6.5
+   },
+   {
+    "iteration": 8,
+    "body": "b061",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 4.2,
+    "wall_s": 6.8
+   },
+   {
+    "iteration": 9,
+    "body": "b061",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 4.6,
+    "wall_s": 7.4
+   },
+   {
+    "iteration": 10,
+    "body": "b061",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 5.0,
+    "wall_s": 8.1
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "ao",
+   "eh",
+   "er",
+   "ih",
+   "iy",
+   "k",
+   "t",
+   "uh",
+   "uw"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ah",
+    "ao",
+    "eh",
+    "er",
+    "ih",
+    "iy",
+    "k",
+    "t",
+    "uh",
+    "uw"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 23,
+   "stock_tasks": 13,
+   "n": 26
+  },
+  "spent": {
+   "usd": 12.0,
+   "fab_minutes": 302.7,
+   "lead_days": 3.0,
+   "owned": {
+    "rail_100mm": 1.0,
+    "servo_mg90s": 4.0,
+    "pushrod_kit": 1.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 5.6,
+  "attempts": 16339,
+  "proposals": {
+   "total": 41,
+   "tried": 36,
+   "refused": 5,
+   "ideas": 0,
+   "kept": 3,
+   "rejected_regression": 27,
+   "moves": {
+    "params": 15,
+    "swap": 15,
+    "idea": 0,
+    "tune": 11,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [
+   {
+    "id": "b030",
+    "body": "lips: round_lips (max_protrusion=1.50039); tongue: cam_tongue (rail_start=3.25, stroke=0.95); tract: short_cast (length=14.4018)",
+    "gained": [
+     "ao",
+     "p",
+     "uw"
+    ],
+    "lost": [
+     "ae"
+    ],
+    "why_lost": "lost ae (ae: f1_ceiling_too_low, F 591/1562 Hz vs target 660/1720 (F1 -10%); over 392 open postures (System 1's map and its best) this body's F1 spans 178-681 Hz; with F2 wi)",
+    "iteration": 3,
+    "edit": "lips -> round_lips (max_protrusion=1.50039)"
+   },
+   {
+    "id": "b03t0",
+    "body": "lips: round_lips (max_protrusion=1.6); tongue: cam_tongue (rail_start=3.25, stroke=0.95); tract: short_cast (length=14.4018)",
+    "gained": [
+     "ao",
+     "p",
+     "uw"
+    ],
+    "lost": [
+     "ae"
+    ],
+    "why_lost": "lost ae (ae: f1_ceiling_too_low, F 588/1543 Hz vs target 660/1720 (F1 -11%, F2 -10%); over 411 open postures (System 1's map and its best) this body's F1 spans 171-681 Hz; w)",
+    "iteration": 3,
+    "edit": "lips (max_protrusion=1.6)"
+   },
+   {
+    "id": "b03t1",
+    "body": "lips: round_lips (max_protrusion=1.329); tongue: cam_tongue (rail_start=3.25, stroke=0.95); tract: short_cast (length=14.4018)",
+    "gained": [
+     "ao",
+     "p",
+     "uw"
+    ],
+    "lost": [
+     "ae"
+    ],
+    "why_lost": "lost ae (ae: f1_ceiling_too_low, F 593/1548 Hz vs target 660/1720 (F1 -10%); over 422 open postures (System 1's map and its best) this body's F1 spans 200-664 Hz; with F2 wi)",
+    "iteration": 3,
+    "edit": "lips (max_protrusion=1.329)"
+   },
+   {
+    "id": "b03t2",
+    "body": "lips: round_lips (max_protrusion=1.284); tongue: cam_tongue (rail_start=3.25, stroke=0.95); tract: short_cast (length=14.4018)",
+    "gained": [
+     "ao",
+     "p",
+     "uw"
+    ],
+    "lost": [
+     "ae"
+    ],
+    "why_lost": "lost ae (ae: f1_ceiling_too_low, F 594/1546 Hz vs target 660/1720 (F2 -10%); over 430 open postures (System 1's map and its best) this body's F1 spans 165-651 Hz; with F2 wi)",
+    "iteration": 3,
+    "edit": "lips (max_protrusion=1.284)"
+   },
+   {
+    "id": "b03t6",
+    "body": "lips: round_lips (max_protrusion=1.572); tongue: cam_tongue (rail_start=3.25, stroke=0.95); tract: short_cast (length=14.4018)",
+    "gained": [
+     "ao",
+     "p",
+     "uw"
+    ],
+    "lost": [
+     "ae"
+    ],
+    "why_lost": "lost ae (ae: not_robust_to_motor_noise, F 600/1546 Hz vs target 660/1720 (F2 -10%); the closest open posture gives F 595/1557 Hz noise-free (98% of the 10% window used); System 1 f)",
+    "iteration": 3,
+    "edit": "lips (max_protrusion=1.572)"
+   },
+   {
+    "id": "b051",
+    "body": "lips: round_lips (max_protrusion=1.13193); tongue: cam_tongue (rail_start=3.25, stroke=1.20175); tract: short_cast (length=14.4018)",
+    "gained": [
+     "ao",
+     "p",
+     "uw"
+    ],
+    "lost": [
+     "ae"
+    ],
+    "why_lost": "lost ae (ae: f1_ceiling_too_low, F 592/1537 Hz vs target 660/1720 (F1 -10%, F2 -11%); over 294 open postures (System 1's map and its best) this body's F1 spans 182-685 Hz; w)",
+    "iteration": 5,
+    "edit": "lips -> round_lips (max_protrusion=1.13193)"
+   },
+   {
+    "id": "b05t0",
+    "body": "lips: round_lips (max_protrusion=1.472); tongue: cam_tongue (rail_start=3.25, stroke=1.20175); tract: short_cast (length=14.4018)",
+    "gained": [
+     "ao",
+     "p",
+     "uw"
+    ],
+    "lost": [
+     "ae"
+    ],
+    "why_lost": "lost ae (ae: f1_ceiling_too_low, F 593/1548 Hz vs target 660/1720 (F1 -10%, F2 -10%); over 302 open postures (System 1's map and its best) this body's F1 spans 179-665 Hz; w)",
+    "iteration": 5,
+    "edit": "lips (max_protrusion=1.472)"
+   },
+   {
+    "id": "b05t1",
+    "body": "lips: round_lips (max_protrusion=0.797); tongue: cam_tongue (rail_start=3.25, stroke=1.20175); tract: short_cast (length=14.4018)",
+    "gained": [
+     "ao",
+     "p",
+     "uw"
+    ],
+    "lost": [
+     "ae"
+    ],
+    "why_lost": "lost ae (ae: f1_ceiling_too_low, F 590/1540 Hz vs target 660/1720 (F1 -11%, F2 -10%); over 273 open postures (System 1's map and its best) this body's F1 spans 194-684 Hz; w)",
+    "iteration": 5,
+    "edit": "lips (max_protrusion=0.797)"
+   },
+   {
+    "id": "b05t2",
+    "body": "lips: round_lips (max_protrusion=1.073); tongue: cam_tongue (rail_start=3.25, stroke=1.20175); tract: short_cast (length=14.4018)",
+    "gained": [
+     "ao",
+     "p",
+     "uw"
+    ],
+    "lost": [
+     "ae"
+    ],
+    "why_lost": "lost ae (ae: f2_ceiling_too_low, F 596/1544 Hz vs target 660/1720 (F2 -10%); over 280 open postures (System 1's map and its best) this body's F2 spans 719-2631 Hz; with F1 w)",
+    "iteration": 5,
+    "edit": "lips (max_protrusion=1.073)"
+   },
+   {
+    "id": "b05t3",
+    "body": "lips: round_lips (max_protrusion=1.131); tongue: cam_tongue (rail_start=3.25, stroke=1.20175); tract: short_cast (length=14.4018)",
+    "gained": [
+     "ao",
+     "p",
+     "uw"
+    ],
+    "lost": [
+     "ae"
+    ],
+    "why_lost": "lost ae (ae: f1_ceiling_too_low, F 599/1547 Hz vs target 660/1720 (F2 -10%); over 285 open postures (System 1's map and its best) this body's F1 spans 199-672 Hz; with F2 wi)",
+    "iteration": 5,
+    "edit": "lips (max_protrusion=1.131)"
+   },
+   {
+    "id": "b062",
+    "body": "lips: round_lips (max_protrusion=0.80048); tongue: cam_tongue (rail_start=3.25, stroke=1.20175); tract: short_cast (length=14.4018)",
+    "gained": [
+     "ao",
+     "p",
+     "uw"
+    ],
+    "lost": [
+     "ae"
+    ],
+    "why_lost": "lost ae (ae: not_robust_to_motor_noise, passed once, failed a confirmation: F 594/1557 Hz vs target 660/1720 (F1 -10%); the closest open posture gives F 596/1550 Hz noise-free (99%)",
+    "iteration": 6,
+    "edit": "lips -> round_lips (max_protrusion=0.80048)"
+   }
+  ],
+  "wall_s": 8.7,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ },
+ {
+  "run": "phonology_random_s29",
+  "world": "phonology",
+  "arm": "random",
+  "seed": 29,
+  "final_body": {
+   "id": "b062",
+   "parent": "b021",
+   "parts": {
+    "tract": {
+     "type": "short_cast",
+     "params": {
+      "length": 14.021539916581538
+     }
+    },
+    "tongue": {
+     "type": "cam_tongue",
+     "params": {
+      "rail_start": 3.25,
+      "stroke": 0.95
+     }
+    },
+    "lips": {
+     "type": "round_lips",
+     "params": {
+      "max_protrusion": 1.5765025512054542
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.2,
+    "wall_s": 0.3
+   },
+   {
+    "iteration": 1,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.9,
+    "wall_s": 1.3
+   },
+   {
+    "iteration": 2,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 1.4,
+    "wall_s": 1.9
+   },
+   {
+    "iteration": 3,
+    "body": "b021",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 1.9,
+    "wall_s": 2.6
+   },
+   {
+    "iteration": 4,
+    "body": "b021",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 2.3,
+    "wall_s": 3.3
+   },
+   {
+    "iteration": 5,
+    "body": "b021",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 2.8,
+    "wall_s": 4.0
+   },
+   {
+    "iteration": 6,
+    "body": "b021",
+    "held_groups": 7,
+    "tasks_passed": 7,
+    "sim_s": 3.0,
+    "wall_s": 4.6
+   },
+   {
+    "iteration": 7,
+    "body": "b062",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 3.4,
+    "wall_s": 5.2
+   },
+   {
+    "iteration": 8,
+    "body": "b062",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 3.7,
+    "wall_s": 5.8
+   },
+   {
+    "iteration": 9,
+    "body": "b062",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 4.1,
+    "wall_s": 6.4
+   },
+   {
+    "iteration": 10,
+    "body": "b062",
+    "held_groups": 10,
+    "tasks_passed": 10,
+    "sim_s": 4.4,
+    "wall_s": 7.0
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "ao",
+   "eh",
+   "ih",
+   "iy",
+   "p",
+   "uh",
+   "uw"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ae",
+    "ah",
+    "ao",
+    "eh",
+    "ih",
+    "iy",
+    "p",
+    "uh",
+    "uw"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 20,
+   "stock_tasks": 12,
+   "n": 26
+  },
+  "spent": {
+   "usd": 4.0,
+   "fab_minutes": 229.2,
+   "lead_days": 2.0,
+   "owned": {
+    "pushrod_kit": 1.0,
+    "servo_mg90s": 3.0,
+    "rail_100mm": 1.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 5.1,
+  "attempts": 15022,
+  "proposals": {
+   "total": 30,
+   "tried": 29,
+   "refused": 1,
+   "ideas": 0,
+   "kept": 2,
+   "rejected_regression": 6,
+   "moves": {
+    "params": 24,
+    "swap": 6,
+    "idea": 0,
+    "tune": 0,
+    "merge": 0
+   },
+   "mean_prediction_precision": null
+  },
+  "frontier": [],
+  "wall_s": 7.7,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "usd_list_price": 0.0
+  }
+ }
+]
