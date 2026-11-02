@@ -1,0 +1,1224 @@
+{
+ "pads": {
+  "flat": {
+   "wrist_roll_follower_so101_v1": {
+    "members": 4,
+    "joints": 4,
+    "floating": [],
+    "undeclared": [],
+    "loose": [],
+    "form": {
+     "fixed pad shoe": {
+      "material": "printed",
+      "sharp_mm": 189.8,
+      "overhang": null,
+      "wall_p01_mm": 1.63
+     },
+     "fixed pad skin": {
+      "material": "tpu",
+      "sharp_mm": 106.6,
+      "overhang": null,
+      "wall_p01_mm": 1.73
+     },
+     "fixed pad screws": {
+      "material": "metal",
+      "sharp_mm": 70.5,
+      "overhang": null,
+      "wall_p01_mm": null
+     }
+    }
+   },
+   "moving_jaw_so101_v1": {
+    "members": 4,
+    "joints": 4,
+    "floating": [],
+    "undeclared": [],
+    "loose": [],
+    "form": {
+     "moving pad shoe": {
+      "material": "printed",
+      "sharp_mm": 196.2,
+      "overhang": null,
+      "wall_p01_mm": 1.21
+     },
+     "moving pad skin": {
+      "material": "tpu",
+      "sharp_mm": 106.5,
+      "overhang": null,
+      "wall_p01_mm": 1.57
+     },
+     "moving pad screws": {
+      "material": "metal",
+      "sharp_mm": 70.5,
+      "overhang": null,
+      "wall_p01_mm": null
+     }
+    }
+   }
+  },
+  "grooved40": {
+   "wrist_roll_follower_so101_v1": {
+    "members": 4,
+    "joints": 4,
+    "floating": [],
+    "undeclared": [],
+    "loose": [],
+    "form": {
+     "fixed pad shoe": {
+      "material": "printed",
+      "sharp_mm": 253.4,
+      "overhang": null,
+      "wall_p01_mm": 0.16
+     },
+     "fixed pad skin": {
+      "material": "tpu",
+      "sharp_mm": 143.5,
+      "overhang": null,
+      "wall_p01_mm": 2.7
+     },
+     "fixed pad screws": {
+      "material": "metal",
+      "sharp_mm": 70.5,
+      "overhang": null,
+      "wall_p01_mm": null
+     }
+    }
+   },
+   "moving_jaw_so101_v1": {
+    "members": 4,
+    "joints": 4,
+    "floating": [],
+    "undeclared": [],
+    "loose": [],
+    "form": {
+     "moving pad shoe": {
+      "material": "printed",
+      "sharp_mm": 242.7,
+      "overhang": null,
+      "wall_p01_mm": 0.39
+     },
+     "moving pad skin": {
+      "material": "tpu",
+      "sharp_mm": 191.2,
+      "overhang": null,
+      "wall_p01_mm": 0.47
+     },
+     "moving pad screws": {
+      "material": "metal",
+      "sharp_mm": 70.5,
+      "overhang": null,
+      "wall_p01_mm": null
+     }
+    }
+   }
+  },
+  "hooked": {
+   "wrist_roll_follower_so101_v1": {
+    "members": 4,
+    "joints": 4,
+    "floating": [],
+    "undeclared": [],
+    "loose": [],
+    "form": {
+     "fixed pad shoe": {
+      "material": "printed",
+      "sharp_mm": 244.3,
+      "overhang": null,
+      "wall_p01_mm": 1.11
+     },
+     "fixed pad skin": {
+      "material": "tpu",
+      "sharp_mm": 185.3,
+      "overhang": null,
+      "wall_p01_mm": 1.04
+     },
+     "fixed pad screws": {
+      "material": "metal",
+      "sharp_mm": 70.5,
+      "overhang": null,
+      "wall_p01_mm": null
+     }
+    }
+   },
+   "moving_jaw_so101_v1": {
+    "members": 4,
+    "joints": 4,
+    "floating": [],
+    "undeclared": [],
+    "loose": [],
+    "form": {
+     "moving pad shoe": {
+      "material": "printed",
+      "sharp_mm": 237.2,
+      "overhang": null,
+      "wall_p01_mm": 0.52
+     },
+     "moving pad skin": {
+      "material": "tpu",
+      "sharp_mm": 193.9,
+      "overhang": null,
+      "wall_p01_mm": 0.27
+     },
+     "moving pad screws": {
+      "material": "metal",
+      "sharp_mm": 70.5,
+      "overhang": null,
+      "wall_p01_mm": null
+     }
+    }
+   }
+  }
+ },
+ "rig": {
+  "stock": {
+   "members": 33,
+   "joints": 43,
+   "floating": [],
+   "undeclared": [],
+   "loose": [],
+   "form": {
+    "base plate": {
+     "material": "printed",
+     "sharp_mm": 0.0,
+     "overhang": 0.0,
+     "wall_p01_mm": 5.97
+    },
+    "cast tract": {
+     "material": "silicone",
+     "sharp_mm": 1168.8,
+     "overhang": null,
+     "wall_p01_mm": 2.75
+    },
+    "face plate": {
+     "material": "printed",
+     "sharp_mm": 444.0,
+     "overhang": 0.007,
+     "wall_p01_mm": 4.0
+    },
+    "reed housing": {
+     "material": "printed",
+     "sharp_mm": 201.9,
+     "overhang": 0.159,
+     "wall_p01_mm": 3.0
+    },
+    "reed": {
+     "material": "metal",
+     "sharp_mm": 114.0,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "air fitting": {
+     "material": "metal",
+     "sharp_mm": 50.2,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "air hose": {
+     "material": "rubber",
+     "sharp_mm": 80.3,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "rail": {
+     "material": "metal",
+     "sharp_mm": 0.0,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "carriage": {
+     "material": "metal",
+     "sharp_mm": 71.4,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "sled": {
+     "material": "printed",
+     "sharp_mm": 69.2,
+     "overhang": 0.031,
+     "wall_p01_mm": 3.0
+    },
+    "cam servo": {
+     "material": "servo",
+     "sharp_mm": 82.7,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "servo mount": {
+     "material": "printed",
+     "sharp_mm": 254.8,
+     "overhang": 0.268,
+     "wall_p01_mm": 2.5
+    },
+    "screws": {
+     "material": "metal",
+     "sharp_mm": 59.0,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "horn": {
+     "material": "printed",
+     "sharp_mm": 61.2,
+     "overhang": 0.102,
+     "wall_p01_mm": 1.6
+    },
+    "cam": {
+     "material": "printed",
+     "sharp_mm": 56.5,
+     "overhang": 0.0,
+     "wall_p01_mm": 4.0
+    },
+    "follower rod": {
+     "material": "metal",
+     "sharp_mm": 47.1,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "follower guide": {
+     "material": "printed",
+     "sharp_mm": 23.2,
+     "overhang": 0.09,
+     "wall_p01_mm": 2.21
+    },
+    "tongue pad": {
+     "material": "tpu",
+     "sharp_mm": 644.3,
+     "overhang": 0.27,
+     "wall_p01_mm": 1.17
+    },
+    "rail servo": {
+     "material": "servo",
+     "sharp_mm": 82.7,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "servo mount 2": {
+     "material": "printed",
+     "sharp_mm": 0.0,
+     "overhang": 0.03,
+     "wall_p01_mm": 3.0
+    },
+    "screws 2": {
+     "material": "metal",
+     "sharp_mm": 129.3,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "horn 2": {
+     "material": "printed",
+     "sharp_mm": 71.0,
+     "overhang": 0.177,
+     "wall_p01_mm": 1.6
+    },
+    "crank": {
+     "material": "printed",
+     "sharp_mm": 94.2,
+     "overhang": 0.0,
+     "wall_p01_mm": 3.0
+    },
+    "connecting rod": {
+     "material": "printed",
+     "sharp_mm": 79.1,
+     "overhang": 0.237,
+     "wall_p01_mm": 3.0
+    },
+    "upper lip": {
+     "material": "silicone",
+     "sharp_mm": 129.1,
+     "overhang": null,
+     "wall_p01_mm": 0.29
+    },
+    "lower lip": {
+     "material": "silicone",
+     "sharp_mm": 129.1,
+     "overhang": null,
+     "wall_p01_mm": 0.25
+    },
+    "jaw": {
+     "material": "printed",
+     "sharp_mm": 0.0,
+     "overhang": 0.088,
+     "wall_p01_mm": 4.0
+    },
+    "jaw guide": {
+     "material": "printed",
+     "sharp_mm": 36.7,
+     "overhang": 0.158,
+     "wall_p01_mm": 3.9
+    },
+    "jaw servo": {
+     "material": "servo",
+     "sharp_mm": 82.7,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "servo mount 3": {
+     "material": "printed",
+     "sharp_mm": 254.8,
+     "overhang": 0.27,
+     "wall_p01_mm": 2.5
+    },
+    "screws 3": {
+     "material": "metal",
+     "sharp_mm": 59.0,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "horn 3": {
+     "material": "printed",
+     "sharp_mm": 91.4,
+     "overhang": 0.135,
+     "wall_p01_mm": 1.6
+    },
+    "jaw link": {
+     "material": "metal",
+     "sharp_mm": 65.3,
+     "overhang": null,
+     "wall_p01_mm": null
+    }
+   }
+  },
+  "rich": {
+   "members": 59,
+   "joints": 80,
+   "floating": [],
+   "undeclared": [],
+   "loose": [],
+   "form": {
+    "base plate": {
+     "material": "printed",
+     "sharp_mm": 0.0,
+     "overhang": 0.0,
+     "wall_p01_mm": 5.96
+    },
+    "cast tract": {
+     "material": "silicone",
+     "sharp_mm": 1309.1,
+     "overhang": null,
+     "wall_p01_mm": 0.83
+    },
+    "face plate": {
+     "material": "printed",
+     "sharp_mm": 488.0,
+     "overhang": 0.006,
+     "wall_p01_mm": 4.0
+    },
+    "pharynx clamp": {
+     "material": "printed",
+     "sharp_mm": 428.1,
+     "overhang": 0.213,
+     "wall_p01_mm": 2.29
+    },
+    "larynx bellows": {
+     "material": "silicone",
+     "sharp_mm": 1038.9,
+     "overhang": null,
+     "wall_p01_mm": 1.5
+    },
+    "larynx slide": {
+     "material": "metal",
+     "sharp_mm": 0.0,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "slide carriage": {
+     "material": "metal",
+     "sharp_mm": 0.0,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "lead screw": {
+     "material": "metal",
+     "sharp_mm": 25.1,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "larynx servo": {
+     "material": "servo",
+     "sharp_mm": 82.7,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "servo mount": {
+     "material": "printed",
+     "sharp_mm": 254.8,
+     "overhang": 0.271,
+     "wall_p01_mm": 2.5
+    },
+    "screws": {
+     "material": "metal",
+     "sharp_mm": 59.0,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "shaft coupler": {
+     "material": "metal",
+     "sharp_mm": 50.2,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "reed housing": {
+     "material": "printed",
+     "sharp_mm": 201.9,
+     "overhang": 0.136,
+     "wall_p01_mm": 3.0
+    },
+    "reed": {
+     "material": "metal",
+     "sharp_mm": 114.0,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "air fitting": {
+     "material": "metal",
+     "sharp_mm": 50.2,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "air hose": {
+     "material": "rubber",
+     "sharp_mm": 80.3,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "rail": {
+     "material": "metal",
+     "sharp_mm": 0.0,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "carriage": {
+     "material": "metal",
+     "sharp_mm": 71.4,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "sled": {
+     "material": "printed",
+     "sharp_mm": 69.2,
+     "overhang": 0.031,
+     "wall_p01_mm": 3.0
+    },
+    "cam servo": {
+     "material": "servo",
+     "sharp_mm": 82.7,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "servo mount 2": {
+     "material": "printed",
+     "sharp_mm": 254.8,
+     "overhang": 0.268,
+     "wall_p01_mm": 2.5
+    },
+    "screws 2": {
+     "material": "metal",
+     "sharp_mm": 59.0,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "horn": {
+     "material": "printed",
+     "sharp_mm": 61.2,
+     "overhang": 0.102,
+     "wall_p01_mm": 1.6
+    },
+    "cam": {
+     "material": "printed",
+     "sharp_mm": 56.5,
+     "overhang": 0.0,
+     "wall_p01_mm": 4.0
+    },
+    "follower rod": {
+     "material": "metal",
+     "sharp_mm": 47.1,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "follower guide": {
+     "material": "printed",
+     "sharp_mm": 23.2,
+     "overhang": 0.09,
+     "wall_p01_mm": 2.21
+    },
+    "tongue pad": {
+     "material": "tpu",
+     "sharp_mm": 620.3,
+     "overhang": 0.27,
+     "wall_p01_mm": 1.17
+    },
+    "rail servo": {
+     "material": "servo",
+     "sharp_mm": 82.7,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "servo mount 3": {
+     "material": "printed",
+     "sharp_mm": 0.0,
+     "overhang": 0.03,
+     "wall_p01_mm": 3.0
+    },
+    "screws 3": {
+     "material": "metal",
+     "sharp_mm": 129.3,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "horn 2": {
+     "material": "printed",
+     "sharp_mm": 71.0,
+     "overhang": 0.177,
+     "wall_p01_mm": 1.6
+    },
+    "crank": {
+     "material": "printed",
+     "sharp_mm": 94.2,
+     "overhang": 0.0,
+     "wall_p01_mm": 3.0
+    },
+    "connecting rod": {
+     "material": "printed",
+     "sharp_mm": 79.1,
+     "overhang": 0.237,
+     "wall_p01_mm": 3.0
+    },
+    "palate bridge": {
+     "material": "printed",
+     "sharp_mm": 0.0,
+     "overhang": 0.148,
+     "wall_p01_mm": 4.0
+    },
+    "tip servo": {
+     "material": "servo",
+     "sharp_mm": 82.7,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "servo mount 4": {
+     "material": "printed",
+     "sharp_mm": 254.8,
+     "overhang": 0.27,
+     "wall_p01_mm": 2.5
+    },
+    "screws 4": {
+     "material": "metal",
+     "sharp_mm": 59.0,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "horn 3": {
+     "material": "printed",
+     "sharp_mm": 91.9,
+     "overhang": 0.129,
+     "wall_p01_mm": 1.6
+    },
+    "tip servo 2": {
+     "material": "servo",
+     "sharp_mm": 82.7,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "servo mount 5": {
+     "material": "printed",
+     "sharp_mm": 254.8,
+     "overhang": 0.27,
+     "wall_p01_mm": 2.5
+    },
+    "screws 5": {
+     "material": "metal",
+     "sharp_mm": 59.0,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "horn 4": {
+     "material": "printed",
+     "sharp_mm": 140.1,
+     "overhang": 0.039,
+     "wall_p01_mm": 1.6
+    },
+    "tip stem": {
+     "material": "metal",
+     "sharp_mm": 27.0,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "pushrod": {
+     "material": "metal",
+     "sharp_mm": 55.2,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "pushrod 2": {
+     "material": "metal",
+     "sharp_mm": 55.2,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "tip blade": {
+     "material": "tpu",
+     "sharp_mm": 530.3,
+     "overhang": 0.19,
+     "wall_p01_mm": 1.17
+    },
+    "lip sleeve": {
+     "material": "silicone",
+     "sharp_mm": 408.0,
+     "overhang": null,
+     "wall_p01_mm": 0.67
+    },
+    "lip ring": {
+     "material": "silicone",
+     "sharp_mm": 0.0,
+     "overhang": null,
+     "wall_p01_mm": 4.97
+    },
+    "ring clip": {
+     "material": "printed",
+     "sharp_mm": 0.0,
+     "overhang": 0.034,
+     "wall_p01_mm": 6.0
+    },
+    "protrusion servo": {
+     "material": "servo",
+     "sharp_mm": 82.7,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "servo mount 6": {
+     "material": "printed",
+     "sharp_mm": 254.8,
+     "overhang": 0.27,
+     "wall_p01_mm": 2.5
+    },
+    "screws 6": {
+     "material": "metal",
+     "sharp_mm": 59.0,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "horn 5": {
+     "material": "printed",
+     "sharp_mm": 100.0,
+     "overhang": 0.13,
+     "wall_p01_mm": 1.6
+    },
+    "pushrod 3": {
+     "material": "metal",
+     "sharp_mm": 55.2,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "drawstring servo": {
+     "material": "servo",
+     "sharp_mm": 82.7,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "servo mount 7": {
+     "material": "printed",
+     "sharp_mm": 254.8,
+     "overhang": 0.268,
+     "wall_p01_mm": 2.5
+    },
+    "screws 7": {
+     "material": "metal",
+     "sharp_mm": 59.0,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "horn 6": {
+     "material": "printed",
+     "sharp_mm": 92.0,
+     "overhang": 0.075,
+     "wall_p01_mm": 1.6
+    },
+    "drawstring": {
+     "material": "rubber",
+     "sharp_mm": 6.3,
+     "overhang": null,
+     "wall_p01_mm": null
+    }
+   }
+  },
+  "pneumatic_spread": {
+   "members": 33,
+   "joints": 47,
+   "floating": [],
+   "undeclared": [],
+   "loose": [],
+   "form": {
+    "base plate": {
+     "material": "printed",
+     "sharp_mm": 0.0,
+     "overhang": 0.0,
+     "wall_p01_mm": 5.76
+    },
+    "cast tract": {
+     "material": "silicone",
+     "sharp_mm": 847.1,
+     "overhang": null,
+     "wall_p01_mm": 1.96
+    },
+    "face plate": {
+     "material": "printed",
+     "sharp_mm": 444.0,
+     "overhang": 0.007,
+     "wall_p01_mm": 4.0
+    },
+    "reed housing": {
+     "material": "printed",
+     "sharp_mm": 201.9,
+     "overhang": 0.159,
+     "wall_p01_mm": 3.0
+    },
+    "reed": {
+     "material": "metal",
+     "sharp_mm": 114.0,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "air fitting": {
+     "material": "metal",
+     "sharp_mm": 50.2,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "air hose": {
+     "material": "rubber",
+     "sharp_mm": 80.3,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "valve manifold": {
+     "material": "board",
+     "sharp_mm": 0.0,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "hydrostat tongue": {
+     "material": "silicone",
+     "sharp_mm": 701.7,
+     "overhang": null,
+     "wall_p01_mm": 1.97
+    },
+    "air port": {
+     "material": "metal",
+     "sharp_mm": 25.1,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "air line": {
+     "material": "rubber",
+     "sharp_mm": 27.6,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "air port 2": {
+     "material": "metal",
+     "sharp_mm": 25.1,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "air line 2": {
+     "material": "rubber",
+     "sharp_mm": 27.6,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "air port 3": {
+     "material": "metal",
+     "sharp_mm": 25.1,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "air line 3": {
+     "material": "rubber",
+     "sharp_mm": 27.6,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "upper lip": {
+     "material": "silicone",
+     "sharp_mm": 121.1,
+     "overhang": null,
+     "wall_p01_mm": 0.38
+    },
+    "lower lip": {
+     "material": "silicone",
+     "sharp_mm": 121.1,
+     "overhang": null,
+     "wall_p01_mm": 0.29
+    },
+    "jaw": {
+     "material": "printed",
+     "sharp_mm": 0.0,
+     "overhang": 0.095,
+     "wall_p01_mm": 4.0
+    },
+    "jaw guide": {
+     "material": "printed",
+     "sharp_mm": 36.7,
+     "overhang": 0.158,
+     "wall_p01_mm": 3.9
+    },
+    "jaw servo": {
+     "material": "servo",
+     "sharp_mm": 82.7,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "servo mount": {
+     "material": "printed",
+     "sharp_mm": 254.8,
+     "overhang": 0.27,
+     "wall_p01_mm": 2.5
+    },
+    "screws": {
+     "material": "metal",
+     "sharp_mm": 59.0,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "horn": {
+     "material": "printed",
+     "sharp_mm": 91.4,
+     "overhang": 0.134,
+     "wall_p01_mm": 1.6
+    },
+    "jaw link": {
+     "material": "metal",
+     "sharp_mm": 65.3,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "corner servo": {
+     "material": "servo",
+     "sharp_mm": 82.7,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "servo mount 2": {
+     "material": "printed",
+     "sharp_mm": 0.0,
+     "overhang": 0.032,
+     "wall_p01_mm": 3.0
+    },
+    "screws 2": {
+     "material": "metal",
+     "sharp_mm": 129.3,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "horn 2": {
+     "material": "printed",
+     "sharp_mm": 62.9,
+     "overhang": 0.155,
+     "wall_p01_mm": 1.6
+    },
+    "horn 3": {
+     "material": "printed",
+     "sharp_mm": 37.5,
+     "overhang": 0.0,
+     "wall_p01_mm": 1.6
+    },
+    "corner clip": {
+     "material": "printed",
+     "sharp_mm": 0.0,
+     "overhang": 0.063,
+     "wall_p01_mm": 4.0
+    },
+    "corner cord": {
+     "material": "rubber",
+     "sharp_mm": 6.3,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "corner clip 2": {
+     "material": "printed",
+     "sharp_mm": 0.0,
+     "overhang": 0.063,
+     "wall_p01_mm": 4.0
+    },
+    "corner cord 2": {
+     "material": "rubber",
+     "sharp_mm": 6.3,
+     "overhang": null,
+     "wall_p01_mm": null
+    }
+   }
+  },
+  "long_rail_long_cast": {
+   "members": 33,
+   "joints": 43,
+   "floating": [],
+   "undeclared": [],
+   "loose": [],
+   "form": {
+    "base plate": {
+     "material": "printed",
+     "sharp_mm": 0.0,
+     "overhang": 0.0,
+     "wall_p01_mm": 5.99
+    },
+    "cast tract": {
+     "material": "silicone",
+     "sharp_mm": 1348.8,
+     "overhang": null,
+     "wall_p01_mm": 1.41
+    },
+    "face plate": {
+     "material": "printed",
+     "sharp_mm": 444.0,
+     "overhang": 0.007,
+     "wall_p01_mm": 4.0
+    },
+    "reed housing": {
+     "material": "printed",
+     "sharp_mm": 201.9,
+     "overhang": 0.159,
+     "wall_p01_mm": 3.0
+    },
+    "reed": {
+     "material": "metal",
+     "sharp_mm": 114.0,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "air fitting": {
+     "material": "metal",
+     "sharp_mm": 50.2,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "air hose": {
+     "material": "rubber",
+     "sharp_mm": 80.3,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "rail": {
+     "material": "metal",
+     "sharp_mm": 0.0,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "carriage": {
+     "material": "metal",
+     "sharp_mm": 71.4,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "sled": {
+     "material": "printed",
+     "sharp_mm": 69.2,
+     "overhang": 0.03,
+     "wall_p01_mm": 3.0
+    },
+    "cam servo": {
+     "material": "servo",
+     "sharp_mm": 82.7,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "servo mount": {
+     "material": "printed",
+     "sharp_mm": 254.8,
+     "overhang": 0.268,
+     "wall_p01_mm": 2.5
+    },
+    "screws": {
+     "material": "metal",
+     "sharp_mm": 59.0,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "horn": {
+     "material": "printed",
+     "sharp_mm": 61.2,
+     "overhang": 0.102,
+     "wall_p01_mm": 1.6
+    },
+    "cam": {
+     "material": "printed",
+     "sharp_mm": 56.5,
+     "overhang": 0.0,
+     "wall_p01_mm": 4.0
+    },
+    "follower rod": {
+     "material": "metal",
+     "sharp_mm": 47.1,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "follower guide": {
+     "material": "printed",
+     "sharp_mm": 23.2,
+     "overhang": 0.09,
+     "wall_p01_mm": 2.21
+    },
+    "tongue pad": {
+     "material": "tpu",
+     "sharp_mm": 764.3,
+     "overhang": 0.27,
+     "wall_p01_mm": 1.17
+    },
+    "rail servo": {
+     "material": "servo",
+     "sharp_mm": 82.7,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "servo mount 2": {
+     "material": "printed",
+     "sharp_mm": 0.0,
+     "overhang": 0.03,
+     "wall_p01_mm": 3.0
+    },
+    "screws 2": {
+     "material": "metal",
+     "sharp_mm": 129.3,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "horn 2": {
+     "material": "printed",
+     "sharp_mm": 71.0,
+     "overhang": 0.177,
+     "wall_p01_mm": 1.6
+    },
+    "crank": {
+     "material": "printed",
+     "sharp_mm": 124.2,
+     "overhang": 0.0,
+     "wall_p01_mm": 3.0
+    },
+    "connecting rod": {
+     "material": "printed",
+     "sharp_mm": 79.1,
+     "overhang": 0.236,
+     "wall_p01_mm": 3.0
+    },
+    "upper lip": {
+     "material": "silicone",
+     "sharp_mm": 129.1,
+     "overhang": null,
+     "wall_p01_mm": 0.29
+    },
+    "lower lip": {
+     "material": "silicone",
+     "sharp_mm": 129.1,
+     "overhang": null,
+     "wall_p01_mm": 0.25
+    },
+    "jaw": {
+     "material": "printed",
+     "sharp_mm": 0.0,
+     "overhang": 0.088,
+     "wall_p01_mm": 4.0
+    },
+    "jaw guide": {
+     "material": "printed",
+     "sharp_mm": 36.7,
+     "overhang": 0.158,
+     "wall_p01_mm": 3.9
+    },
+    "jaw servo": {
+     "material": "servo",
+     "sharp_mm": 82.7,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "servo mount 3": {
+     "material": "printed",
+     "sharp_mm": 254.8,
+     "overhang": 0.27,
+     "wall_p01_mm": 2.5
+    },
+    "screws 3": {
+     "material": "metal",
+     "sharp_mm": 59.0,
+     "overhang": null,
+     "wall_p01_mm": null
+    },
+    "horn 3": {
+     "material": "printed",
+     "sharp_mm": 91.4,
+     "overhang": 0.135,
+     "wall_p01_mm": 1.6
+    },
+    "jaw link": {
+     "material": "metal",
+     "sharp_mm": 65.3,
+     "overhang": null,
+     "wall_p01_mm": null
+    }
+   }
+  }
+ },
+ "refused": {
+  "flat": [],
+  "grooved40": [
+   "a 3 mm groove leaves 0.0 mm of PLA between its floor and the jaw's socket (at least 1.2)"
+  ],
+  "hooked": []
+ },
+ "sweep": {
+  "stock": [],
+  "rich": [
+   {
+    "control": "tongue_place",
+    "value": 3.25,
+    "floating": [],
+    "undeclared": [
+     [
+      "tongue pad",
+      "tip stem",
+      [
+       3.0,
+       3.0,
+       1.0
+      ]
+     ],
+     [
+      "tongue pad",
+      "tip blade",
+      [
+       61.3,
+       26.4,
+       8.9
+      ]
+     ]
+    ],
+    "loose": []
+   },
+   {
+    "control": "tip_place",
+    "value": 5.0,
+    "floating": [],
+    "undeclared": [
+     [
+      "tongue pad",
+      "tip stem",
+      [
+       3.0,
+       3.0,
+       1.0
+      ]
+     ],
+     [
+      "tongue pad",
+      "tip blade",
+      [
+       61.3,
+       26.4,
+       7.6
+      ]
+     ]
+    ],
+    "loose": []
+   }
+  ],
+  "pneumatic_spread": [],
+  "long_rail_long_cast": []
+ }
+}

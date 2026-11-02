@@ -7,6 +7,10 @@ Small, tracked outputs that decisions cite. Run directories (`runs/`) stay untra
 - `gold/<design>.json`: the same measurement on finger designs (the V2 gold check). The file
   name encodes the design: `r` reach in mm, `a` pad angle in degrees, `g` groove in mm, `t` TPU
   skin in mm, `w` pad width in mm. For example, `r10a20t2` is reach 10, angle 20, TPU 2.
+- `design_language/`: the design language (docs/design-language.md) before and after, written by
+  `scripts/design_language.py`. It holds the pads and the talking-robot rig as drawn before (`before_*`; the rig's
+  before pictures are from commit cbfb3a2) and after (`after_*`, `tips_*`). It also holds labelled rigs with a
+  legend of what each part does (`labelled_rig_*`) and the audit of every drawn assembly (`audit.md`, `audit.json`).
 - `superseded/`: the gold sweeps run before two faults were fixed (D-038), kept so the
   before-and-after numbers in the decision log can be checked:
   - `opening_bug`: `fingers.opening_for` fell back to fixed jaw angles;

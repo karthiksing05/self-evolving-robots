@@ -67,7 +67,10 @@ COMPONENTS: dict[str, tuple[str, tuple[str, ...]]] = {
 TOOLING = ("src/sea/cli.py", "src/sea/harness.py", "src/sea/report.py", "src/sea/design/cad.py",
            "src/sea/worlds/cad.py", "src/sea/worlds/film.py",
            # contact penetration over a replay: measured for the audit (D-051), it decides nothing yet
-           "src/sea/mechanism/audit.py")
+           "src/sea/mechanism/audit.py",
+           # the design language shapes how parts are drawn; its laws are tooling until they join the judge
+           "src/sea/design/language.py", "src/sea/design/pad_cad.py", "src/sea/design/callouts.py",
+           "src/sea/worlds/rig_cad.py")
 
 
 def _hash_files(paths: tuple[str, ...]) -> str:
