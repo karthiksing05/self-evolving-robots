@@ -92,9 +92,11 @@ def test_capability_is_one_instrument_for_stock_and_pads():
     assert {s: widest_mm(stock, s) for s in STOCK_WIDEST_MM} == STOCK_WIDEST_MM and "table" in basis(stock)
     pads = Design(id="p", fingers=FingerSpec(pad_angle_deg=40, groove_mm=3, pad_tpu_mm=3, width_mm=20))
     assert "measured on these fingers" in basis(pads)
-    assert all(widest_mm(pads, s) >= STOCK_WIDEST_MM[s] + 15 for s in STOCK_WIDEST_MM)  # tilted pads hold wider
+    # tilted pads hold wider cans and boxes, and spheres 5 mm narrower than the stock (D-054)
+    assert all(widest_mm(pads, s) > STOCK_WIDEST_MM[s] for s in ("cylinder", "box"))
+    assert widest_mm(pads, "sphere") < STOCK_WIDEST_MM["sphere"]
     lib = Library.seed()
-    wide = object_spec("sphere", 60, 60, 58, 0.7)
+    wide = object_spec("cylinder", 75, 80, 58, 0.7)
     assert any(e.code == "aperture" for e in typecheck(lib.prims["pick_up"].body, stock, lib.prims, LIMITS, control=wide))
     assert typecheck(lib.prims["pick_up"].body, pads, lib.prims, LIMITS, control=wide) == []
     scan = real_object("tennis_ball")  # its bounding width is not a grip width: the trial decides

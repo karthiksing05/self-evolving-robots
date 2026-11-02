@@ -1375,3 +1375,66 @@ One verdict did move, against the prediction. The validation slider `val_p011 c1
 - the force it held for a tick was 9.0 N.
 
 A soft contact's overshoot had decided that verdict, and an overshoot is not a push the robot commanded. The audit's impact law (P2) is where such a pulse will be judged, against the energy it carries rather than an unmeasured stiffness.
+
+## D-054 Grasp contacts are rigid, and the finger bends on its own joint (world: physics)
+**Observed.** The mechanism audit (D-051) found held objects sunk into the jaws: in 16 of 18 held grasps the 95th percentile of penetration was above 1 mm, with peaks of 7.7–10.2 mm. MuJoCo's contact is a spring per unit of effective mass that relaxes over the time constant `solref[0]` (20 ms by default). So how deep an object sinks depends on its mass, not its material. On the 21 stock picks at the default:
+
+| Object | Mass | Sinks into the jaws (p95) |
+|---|---|---|
+| Die | 5 g | 8.5 mm |
+| Cup | 13 g | 2.9 mm |
+| Sugar box | 514 g | 0.3 mm |
+
+Objects set down on the table sank 5–10 mm before the contact caught them.
+
+Three fixes failed on the way, each for a reason:
+- **One calibrated compliance** (impedance 0.97 to 0.99 at 20 ms, about 3e4 N/m on the 50 g probe): light objects still sank 2–8 mm.
+- **A time constant scaled by the square root of the object's mass:**
+  - Light objects sank 1.3 mm or less, but heavy ones sank 3 mm, because the arm adds about 1.9 kg⁻¹ to the effective inverse mass at a jaw (read from `efc_diagA`).
+  - A slow contact also let a 370 g can sink 13 mm into the table on landing.
+- **Rigid contacts alone** (time constant two timesteps): every object stayed under 0.8 mm. But the closing jaw now stopped dead within 2 ms, and a stock pick read 211–277 N on its target. The compliance the old contact had lent the jaw has to live somewhere physical.
+
+**Change.**
+- **Contacts.** In grasp scenes every contact has a time constant of two timesteps (4 ms), the stiffest MuJoCo integrates stably, with impedance 0.97 to 0.99 over 1 mm (`GRASP_SOLREF`, `GRASP_SOLIMP` in `sim/build_model.py`).
+- **The finger bends on its own joint.** `jaw_flex` sits on the gripper joint's axis, in the same body, so the rotor drives `gripper` and the finger deflects on `jaw_flex`. The servo's encoder still reads `gripper`.
+  - Its stiffness is the stock jaw's bending stiffness in the closing direction: 1.1e3 N·m/rad about the hinge, or 2.2e5 N/m at a load 70 mm out. It is integrated over the jaw mesh's sections with solid PLA (E 3.5 GPa). The section's second moment runs from 2e4 mm⁴ at the root to 90 mm⁴ at the tip.
+  - The gear train, which has no published stiffness, is rigid, so this is the stiff bound on an impact.
+  - The rebound is taken as lost in the gear train's tooth friction and backlash (damping ratio 1). The servo's damping was identified in free motion and does not include that loss.
+  - The joint's inertia, k·dt², keeps its mode at one radian per timestep.
+- **The gold.** It is re-recorded with `scripts/measure_grasp.py --write`, with cases now past the envelope: cans to 90 mm, boxes to 80 mm, spheres to 90 mm. `STOCK_WIDEST_MM` (`design/grip.py`) follows it.
+
+**Prediction** (from the rigid-contact measurements, before the flex joint):
+- Every object's p95 penetration stays under 1 mm.
+- The closing impact reaches the stiff bound, ω·√(kJ) = 1.8 rad/s × √(1100 × 0.028) ≈ 10 N·m, or about 140 N at 70 mm. It lasts less than a tick, so D-053's measure reads the squeeze.
+- The stock envelope does not shrink.
+
+**Measured.**
+- **Penetration, on the 21 stock picks** (one replay each, with System 1's fixed retry). Under the default, p95 into the jaws exceeded 1 mm on 12 of 21 picks, worst 8.5 mm, and objects sank up to 9.9 mm into the table. Now:
+  - into the jaws: p95 at most 0.77 mm (the die), median 0.16 mm;
+  - into the table: at most 0.48 mm.
+  - 14 of the 21 replays pass, against 13 before.
+- **The closing impact** on a phase A can is 129 N for about 10 ms, then a sustained squeeze of 25–33 N. No bad-state warnings appear.
+- **The stock envelope widens:**
+
+  | | Before | Now |
+  |---|---|---|
+  | Widest can | 55 mm | 70 mm |
+  | Widest box | 60 mm | 70 mm |
+  | Spheres, tips 12 mm past the equator | to 50 mm | to 80 mm |
+  | Spheres, tips 5 mm past the equator | none | to 80 mm |
+
+  The 80 and 90 mm cans, the 80 mm box and the 90 mm sphere lift 0 mm. Unchanged: the heaviest 30 mm can held (800 g; 1200 g lifts 2.7 mm), the grip current (2.691 A), and the median squeeze (43.3 → 43.4 N).
+- **Tilted pads** (40°, 3 mm groove) hold cans and boxes to 85 mm and spheres to 75 mm. That is 15 mm wider than the stock on cans and boxes, and 5 mm narrower on spheres; why is not yet explained.
+
+**Reading.**
+- **Old failures were artifacts.** The old stock failures (cans past 55 mm, balls near the equator) came from the simulator. A soft contact let them sink and turn out of the jaws.
+- **Phase B no longer escalates.** Phase B's objects (D-048: cans of 60 and 65 mm, a 70 mm box, balls of 30 and 40 mm) are now inside the envelope, and `tests/test_grasp_world.py` records that the stock picks the 60 mm can and the 40 mm ball. Re-deriving phase B is a change to the judge and gets its own entry (D-055).
+- **Test cases re-pinned.** Cases near the old threshold were draw-dependent and are now pinned:
+  - the lost-grip reflex: a 50 mm, 800 g can at friction 0.2 lifts 10 mm and slips;
+  - the lift that falls back: a 60 mm, 800 g can at friction 0.25;
+  - the seed replay compares tick 30, because the perception draw moves the approach from about tick 15.
+  - The recorded tuna-can failure now replays as `no_actuation`, because the jaw only grazes the 85 mm can.
+- **Open items.**
+  - A load–deflection test on a real STS3215 horn would replace the rigid gear train.
+  - The gold's payload cases (a 30 mm can at 800–1200 g) are denser than lead, which the density law in P2 will refuse.
+  - Films and campaign results were judged under the old physics. `film.READS` marks the films stale, and P6 re-runs the campaigns.

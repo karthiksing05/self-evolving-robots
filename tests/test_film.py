@@ -81,26 +81,43 @@ def test_silent_films_play_together_and_sounding_ones_in_turn():
 
 
 def test_gripper_film_replays_the_recorded_failure():
-    """gripper_s2v3_s0, iteration 3: the stock hinge on the tuna can with System 1's best controls stalls."""
+    """gripper_s2v3_s0, iteration 3: the stock hinge on the tuna can with System 1's best controls.  It stalled
+    on soft contacts; on rigid ones (D-054) the jaw only grazes the 85 mm can, too briefly to count (D-053)."""
     world = GripperWorld()
     tuna = _task(world, "reg_tuna_fish_can")
     ctl = {"grasp.side": 0.004802, "grasp.close": -0.167291, "grasp.close_s": 0.832028, "grasp.lift": 0.059022,
            "grasp.hold_s": 1.429247, "grasp.speed": 0.025509}
     clip = F.gripper(world.stock(), tuna, ctl, size=(160, 120))
-    assert not clip.ok and clip.verdict.startswith("stuck") and len(clip.frames) > 50
+    assert not clip.ok and clip.verdict.startswith("no actuation") and len(clip.frames) > 50
+
+
+class _Stop(Exception):
+    pass
+
+
+def _tick(world, task, seed: int, n: int = 30) -> np.ndarray:
+    """The state ``n`` ticks into a replay; the perception draw moves the approach from about tick 15."""
+    seen: list[np.ndarray] = []
+
+    def probe(model):
+        def hook(data):
+            seen.append(data.qpos.copy())
+            if len(seen) == n:
+                raise _Stop
+        return hook
+
+    with pytest.raises(_Stop):
+        F.gripper(world.stock(), task, {}, seed, probe=probe, render=False)
+    return seen[-1]
 
 
 def test_gripper_film_replays_under_the_runs_seed():
-    """gripper_s2v3_s2 (seed 2), iteration 0: the grooved slide held the screwdriver on its seed's draw."""
+    """The replay draws its randomization from the run's seed, as System 1's attempt did: the same seed starts
+    the same way, another seed does not."""
     world = GripperWorld()
-    slide = _body(world, Edit(slot="jaw", type="prismatic", params={"drive_mm_per_rad": 60.0}),
-                  Edit(slot="pads", type="pads", params={"reach_mm": 0.0, "pad_angle_deg": 8.798, "groove_mm": 3.337,
-                                                         "lip_mm": 0.0, "pad_tpu_mm": 1.314, "width_mm": 9.465}))
-    ctl = {"grasp.side": 0.001862, "grasp.close": -0.045743, "grasp.close_s": 0.462136, "grasp.lift": 0.060612,
-           "grasp.hold_s": 1.137773, "grasp.speed": 0.037254}
     task = _task(world, "reg_flat_screwdriver")
-    assert F.gripper(slide, task, ctl, 2, size=(160, 120)).ok
-    assert not F.gripper(slide, task, ctl, 0, size=(160, 120)).ok  # another draw, another verdict
+    a, b, c = (_tick(world, task, s) for s in (0, 2, 2))
+    assert np.allclose(b, c) and not np.allclose(a, b)
 
 
 def test_gripper_film_replays_system1s_fixed_retry_when_the_record_says_defaults():

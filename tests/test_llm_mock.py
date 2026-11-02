@@ -327,7 +327,7 @@ def test_prompt_has_ten_sections_and_stable_hash():
     assert "push [motor] Guarded push." in text and "depth=[0.0005, 0.08]" in text
     assert "p003:c2 cls=door handle=push_latch" in text and "surprise_z=peak_force=0.4" in text
     assert "(no similar past fixes yet)" in text and "rack: empty" in text
-    assert "widest grip by shape: box=60, cylinder=55, sphere=50 mm (V1 capability table)" in text
+    assert "widest grip by shape: box=70, cylinder=70, sphere=80 mm (V1 capability table)" in text
     assert "pad_angle_deg [0, 45]" in text and "## 9. Rejected before trial\n(none yet)" in text
 
 

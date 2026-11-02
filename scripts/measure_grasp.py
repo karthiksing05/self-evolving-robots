@@ -21,13 +21,13 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 GOLDEN = ROOT / "tests" / "golden" / "stock_grasp.json"
 CASES: list[tuple[str, float, float, float, float]] = [  # shape, width mm, mass g, friction, sphere_past_mm
-    *[("cylinder", w, 50.0, 0.8, 0.0) for w in (20, 25, 30, 35, 40, 45, 50, 55, 60, 70)],
+    *[("cylinder", w, 50.0, 0.8, 0.0) for w in (20, 25, 30, 35, 40, 45, 50, 55, 60, 70, 80, 90)],
     *[("cylinder", 30, m, 0.8, 0.0) for m in (100, 200, 400, 800, 1200)],
     # friction: if a failure does not move with friction, it is geometry, not slip
     *[("cylinder", 30, m, 0.3, 0.0) for m in (200, 800)],
     *[("cylinder", 50, 50.0, mu, 0.0) for mu in (0.3, 1.5)],
-    *[("box", w, 50.0, 0.8, 0.0) for w in (20, 30, 40, 50, 60)],
-    *[("sphere", w, 50.0, 0.8, past) for w in (20, 30, 40, 50) for past in (5.0, 12.0)],
+    *[("box", w, 50.0, 0.8, 0.0) for w in (20, 30, 40, 50, 60, 70, 80)],
+    *[("sphere", w, 50.0, 0.8, past) for w in (20, 30, 40, 50, 60, 70, 80, 90) for past in (5.0, 12.0)],
     *[("sphere", 40, 50.0, mu, 12.0) for mu in (0.3, 1.5)],
 ]
 

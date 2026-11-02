@@ -55,7 +55,7 @@ def test_an_object_is_a_free_body_whose_coordinate_is_its_height():
 
 def test_the_aperture_rule_makes_wide_objects_structural():
     lib = Library.seed()
-    for width, ok in ((45, True), (55, True), (60, False)):  # the stock envelope: cans to 55 mm (D-048)
+    for width, ok in ((45, True), (70, True), (75, False)):  # the stock envelope: cans to 70 mm (D-054)
         c = object_spec("cylinder", width, 70, 100, 0.8)
         errs = typecheck(lib.prims["pick_up"].body, Design(id="stock"), lib.prims, LIMITS, control=c)
         assert (not errs) == ok and {e.code for e in errs} <= {"aperture"}
@@ -83,20 +83,21 @@ def suite():
 
 def test_the_stock_gripper_picks_phase_a_and_escalates_phase_b(suite):
     assert suite["gtr000"].result.verdict == "pass" and suite["gtr001"].result.verdict == "pass"
-    assert suite["gb_wide_can_60"].result.verdict == "no_applicable_primitive"  # aperture: before simulation
-    assert suite["gb_ball_40"].result.verdict in ("stuck", "wrong_behavior")  # an equator grip loses the ball
+    # Phase B's objects were chosen on soft contacts, which lost cans past 55 mm and balls near the equator
+    # (D-054): on rigid contacts, the stock jaws hold both.
+    assert suite["gb_wide_can_60"].result.verdict == "pass" and suite["gb_ball_40"].result.verdict == "pass"
 
 
 def test_the_squeeze_is_the_task_not_a_force_violation(suite):
     tr = suite["gtr000"].trace
-    assert "pinch" in tr.contact_types and tr.peak_control_force > 30
+    assert "pinch" in tr.contact_types and tr.peak_control_force > 20  # the squeeze held a whole tick (D-053)
     assert max(tr.tip_force) < LIMITS.max_force_n  # every contact but the squeeze stays under the hard limit
 
 
 def test_a_lift_that_falls_back_is_not_a_pass():
-    # A 60 mm can lifts about 20 mm and then slides out (V1, D-048).  Skip the aperture rule and run the
-    # pick: the object passed its travel for a moment, but held_for needs the full hold.
-    panel = table_panel("t60", "train", 0, object_spec("cylinder", 60, 60, 50, 0.8))
+    # A 60 mm, 800 g can at friction 0.25 lifts through its travel and then slides out (D-054).  Run the pick:
+    # the object passed its travel for a moment, but held_for needs the full hold.
+    panel = table_panel("a1", "train", 0, object_spec("cylinder", 60, 80, 800, 0.25))
     (can,) = panel.controls
     runner = PanelRunner(panel, _cfg(), 0)
     trace = runner.attempt(can, Library.seed().prims["pick_up"].body, {})

@@ -55,6 +55,14 @@ JAW_FRICTION = 0.45  # bare printed PLA jaw face (D-032)
 # squeezed at 30 N slid out.  Values above 1 stiffen friction without raising mu ("preventing slip", MuJoCo
 # XML reference, option/impratio); MuJoCo Menagerie's gripper scenes use 10.
 GRASP_IMPRATIO = 10.0
+# Contact stiffness in the same scenes (D-054).  MuJoCo's contact is a spring per unit of effective mass that
+# relaxes over the time constant ``solref[0]``.  At the default 20 ms a held object sank into the jaws by an
+# amount set by its mass, not its material (a 5 g die 8 mm, a 500 g box 0.3 mm), and an object set down on the
+# table sank 5 to 10 mm before the contact caught it; part of every grip was held by overlap (D-051).  Two
+# timesteps is the stiffest time constant MuJoCo integrates stably: every object then sinks under 1 mm, light or
+# heavy, held or set down.  The compliance a grip does have is the finger's, on its own joint (``_finger_flex``).
+GRASP_SOLREF = (2 * TIMESTEP, 1.0)
+GRASP_SOLIMP = (0.97, 0.99, 0.001, 0.5, 2.0)
 
 
 def pair_friction(a: float, b: float) -> float:
@@ -363,6 +371,25 @@ def _tool_body(gripper, site_pos, site_quat, slot: int, tool, gidx: list[int], s
 
 MM = 1e-3
 COUPLER_MASS = 0.004  # kg: the parallelogram's finger carrier; the jaw's own mass stays on the driven link
+# The moving finger bends (D-054).  Its bending stiffness about the hinge, integrated over the stock jaw mesh's
+# sections in the closing direction with solid PLA (E 3.5 GPa), loaded 70 mm out: 1.1e3 N m/rad (2.2e5 N/m at the
+# load).  The servo's gear train has no published stiffness and is rigid here, so the finger is the only spring
+# between the rotor and the object: the stiff bound on an impact.  The rebound is taken as lost (damping ratio 1)
+# in the gear train's tooth friction and backlash, which the servo's damping, identified in free motion, leaves out.
+FINGER_STIFFNESS_NM_PER_RAD = 1100.0
+FINGER_LEVER_M = 0.07
+FINGER_DAMPING_RATIO = 1.0
+
+
+def _finger_flex(spec: mujoco.MjSpec) -> None:
+    """A spring joint in series with the gripper joint, on the same axis: the rotor drives the gripper joint
+    and the finger deflects on this one.  Its inertia keeps the flex mode at one radian per timestep, the
+    fastest the integrator follows."""
+    j = spec.joint("gripper")
+    k = FINGER_STIFFNESS_NM_PER_RAD if j.type == mujoco.mjtJoint.mjJNT_HINGE else FINGER_STIFFNESS_NM_PER_RAD / FINGER_LEVER_M**2
+    inertia = k * TIMESTEP**2
+    j.parent.add_joint(name="jaw_flex", type=j.type, axis=list(j.axis), pos=list(j.pos), stiffness=[k, 0.0, 0.0],
+                       damping=[2 * FINGER_DAMPING_RATIO * float(np.sqrt(k * inertia)), 0.0, 0.0], armature=inertia)
 
 
 def _jaw_joint(spec: mujoco.MjSpec, f) -> float:
@@ -526,6 +553,9 @@ def build_model(design: Design, panel: PanelSpec | None = None, tools: list | No
                        contype=OBJECT_BITS[0], conaffinity=OBJECT_BITS[1], condim=4)
     if surfaces:
         spec.option.impratio = GRASP_IMPRATIO
+        _finger_flex(spec)
+        for g in spec.geoms:
+            g.solref, g.solimp = list(GRASP_SOLREF), list(GRASP_SOLIMP)
         jaws = [g.name for g in spec.geoms if g.name.startswith(("jaw_fixed", "jaw_moving"))]
         for g in spec.geoms:
             if g.contype == ROBOT_BITS[0] and not g.name.startswith(("jaw_fixed", "jaw_moving")):
@@ -533,7 +563,8 @@ def build_model(design: Design, panel: PanelSpec | None = None, tools: list | No
         for name, friction in surfaces:
             for j in jaws:
                 mu = pair_friction(jaw_mu.get(j, JAW_FRICTION), friction)
-                spec.add_pair(geomname1=j, geomname2=name, condim=4, friction=[mu, mu, 0.005, 0.0001, 0.0001])
+                spec.add_pair(geomname1=j, geomname2=name, condim=4, friction=[mu, mu, 0.005, 0.0001, 0.0001],
+                              solref=list(GRASP_SOLREF), solimp=list(GRASP_SOLIMP))
 
     model = spec.compile()
     data = mujoco.MjData(model)

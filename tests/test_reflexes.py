@@ -15,7 +15,7 @@ from sea.design.build import build
 from sea.loop import trace_summary
 from sea.propose.prompt import _failing_section
 from sea.sim.env import ControlRun, PanelRunner, SuiteConfig, _judge
-from sea.sim.grasp_world import grasp_panels, object_spec, phase_b_panels, table_panel
+from sea.sim.grasp_world import grasp_panels, object_spec, table_panel
 from sea.sim.sensors import IMPACT_ACC
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -32,8 +32,9 @@ def _cfg(pads: bool = True) -> SuiteConfig:
 CASES = {
     "can": (grasp_panels("train", 1)[0], True),
     "heavy": (table_panel("heavy", "train", 0, object_spec("cylinder", 30, 60, 1200, 0.8)), True),
-    "ball": (next(p for p in phase_b_panels() if p.id == "gb_ball_40"), True),
-    "ball_no_pads": (next(p for p in phase_b_panels() if p.id == "gb_ball_40"), False),
+    # a 50 mm, 800 g can at friction 0.2 lifts about 10 mm and slips out of the stock jaws (D-054)
+    "slips": (table_panel("slips", "train", 0, object_spec("cylinder", 50, 80, 800, 0.2)), True),
+    "slips_no_pads": (table_panel("slips", "train", 0, object_spec("cylinder", 50, 80, 800, 0.2)), False),
 }
 
 
@@ -73,8 +74,8 @@ def test_too_heavy_stops_on_load_limit(picks):
 
 
 def test_a_lost_grip_is_felt_only_with_pads(picks):
-    _, _, felt, r_felt = picks["ball"]
-    _, _, blind, r_blind = picks["ball_no_pads"]
+    _, _, felt, r_felt = picks["slips"]
+    _, _, blind, r_blind = picks["slips_no_pads"]
     assert felt.note == "slip" and felt.sensors.pad_drop_t is not None
     assert blind.note == "" and "jaw_pads" not in blind.sensors.parts and blind.sensors.pad_drop_t is None
     assert r_felt.verdict == r_blind.verdict == "wrong_behavior"  # the reflex changes the diagnosis, not the verdict
