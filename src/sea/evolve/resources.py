@@ -126,3 +126,57 @@ def check(new: Body, new_bom: Sequence[BomLine], cur: Body, cur_bom: Sequence[Bo
                       f"{float(budget.get('fab_minutes', 0.0)) - spent.fab_minutes:.0f} left")
     return ResourceReport(ok=not errors, lines=lines, errors=errors, usd=round(usd, 2), lead_days=lead,
                           fab_minutes=round(minutes, 1), buy=buy)
+
+
+def cost_idea(needs: Sequence[Any], manifest: dict[str, Any], spent: Spent) -> dict[str, Any]:
+    """What an idea's bill of materials would take from this bench: provided, bought at the manifest's price, not
+    provided, or a new item at System 2's own estimate.  An idea is never built, so nothing is charged."""
+    items: dict[str, dict[str, Any]] = manifest.get("items", {})
+    fab: dict[str, dict[str, Any]] = manifest.get("fabrication", {})
+    owned = spent.owned or {}
+    lines, missing, new = [], [], []
+    usd = est = lead = minutes = 0.0
+    for n in needs:
+        if is_fab(n.item):
+            spec = fab.get(n.item)
+            if spec is None:
+                missing.append(f"{n.item}: no machine for it on this bench")
+                continue
+            m = n.qty * float(spec.get("minutes_per_unit", 0.0))
+            minutes += m
+            lines.append(f"{n.item} {n.qty:g} {spec.get('unit', '')}: {m:.0f} machine min")
+            continue
+        spec = items.get(n.item)
+        if spec is None:
+            if n.usd_each is None:
+                missing.append(f"{n.item} x{n.qty:g}: not on the manifest and unpriced")
+            else:
+                est += n.qty * n.usd_each
+                lead = max(lead, float(n.lead_days or 0.0))
+                new.append(f"{n.item} x{n.qty:g}: not on the manifest; estimated ${n.qty * n.usd_each:.2f}")
+            continue
+        short = max(0.0, n.qty - float(spec.get("on_hand", 0)) - owned.get(n.item, 0.0))
+        if short <= 1e-9:
+            lines.append(f"{n.item} x{n.qty:g}: provided")
+        elif spec.get("usd") is None:
+            missing.append(f"{n.item} x{n.qty:g}: cannot be bought")
+        else:
+            usd += short * float(spec["usd"])
+            lead = max(lead, float(spec.get("lead_days", 0)))
+            lines.append(f"{n.item} x{n.qty:g}: buy {short:g} at ${float(spec['usd']):g}")
+    budget = manifest.get("budget", {})
+    left = float(budget.get("usd", 0.0)) - spent.usd
+    fits = not missing and usd + est <= left + 1e-9 and lead <= float(budget.get("lead_days", float("inf"))) + 1e-9 \
+        and spent.fab_minutes + minutes <= float(budget.get("fab_minutes", float("inf"))) + 1e-9
+    return {"usd": round(usd, 2), "usd_estimated": round(est, 2), "lead_days": lead, "fab_minutes": round(minutes, 1),
+            "lines": lines, "new_items": new, "missing": missing, "fits_budget": fits}
+
+
+def idea_text(c: dict[str, Any]) -> str:
+    """One line for the prompt and the record."""
+    head = (f"${c['usd']:.2f} from the manifest" + (f" + ${c['usd_estimated']:.2f} estimated for new items"
+                                                     if c["usd_estimated"] else "") +
+            f", {c['lead_days']:g} days, {c['fab_minutes']:.0f} machine min")
+    tail = "; ".join(c["missing"] + c["new_items"])
+    return head + ("; within the budget left" if c["fits_budget"] else "; NOT within what is left or provided") + \
+        (f" ({tail})" if tail else "")

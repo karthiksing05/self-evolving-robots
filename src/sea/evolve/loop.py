@@ -38,7 +38,7 @@ from pydantic import BaseModel, ConfigDict
 from sea.evolve.core import Body, Edit, Outcome, Proposal, ProposalBatch, Task, World, apply, edit_rung
 from sea.evolve.llm import Proposer
 from sea.evolve.prompt import SYSTEM, build
-from sea.evolve.resources import ResourceReport, charge, check, start
+from sea.evolve.resources import ResourceReport, charge, check, cost_idea, idea_text, start
 
 Arm = Literal["s2", "random", "s1"]
 
@@ -362,10 +362,10 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                                          "hypothesis": prop.hypothesis, "edit": _edit_text(prop.edits)}
                 if prop.move == "idea" or prop.idea is not None and not prop.edits:
                     idea = prop.idea.model_dump() if prop.idea else {"name": "?", "needs": []}
-                    known = set(manifest.get("items", {}))
-                    idea["provided"] = [n for n in idea.get("needs", []) if n.split(" ")[0] in known]
-                    ideas.append({**idea, "iteration": it})
-                    entry.update(result=f"idea recorded, not tested: {idea['name']}", tried=False)
+                    cost = cost_idea(prop.idea.needs if prop.idea else [], manifest, spent)
+                    ideas.append({**idea, "iteration": it, "cost": cost})
+                    entry.update(result=f"idea recorded, not tested: {idea['name']}; it would need {idea_text(cost)}",
+                                 tried=False)
                     trials.append(entry)
                     history.append(entry)
                     continue

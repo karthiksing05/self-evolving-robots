@@ -113,11 +113,19 @@ class Edit(_Model):
                                      "takes the type's midpoint for any parameter left out")
 
 
+class Need(_Model):
+    item: str = Field(description="a manifest item's exact name, print:<material> (qty in grams), or a new item")
+    qty: float = 1.0
+    usd_each: float | None = Field(default=None, description="for an item the manifest does not list: your estimated "
+                                   "price; leave empty for a manifest item")
+    lead_days: float | None = Field(default=None, description="for an item the manifest does not list: your estimate")
+
+
 class Idea(_Model):
     name: str
     description: str = Field(description="the part and how it works physically")
-    needs: list[str] = Field(default_factory=list, description="items it needs: manifest item names, or new items "
-                             "with an estimated price")
+    slot: str = Field(default="", description="the slot it would fill, or a new slot")
+    needs: list[Need] = Field(default_factory=list, description="its bill of materials, item by item")
     test: str = Field(default="", description="what would have to be built in the simulator to try it")
 
 

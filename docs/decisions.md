@@ -1127,3 +1127,28 @@ the best kept-eligible candidate that iteration. In that run, a merge already ga
 while the loop spent four tuning trials on a 15.5 cm cast that gained one and broke four. A tuned
 body can be kept only if it outscores the best candidate. A swap that already gains fewer groups is
 unlikely to, so the allowance goes where it can change the decision.
+
+## D-047 An idea is a costed bill of materials (policy + judge)
+An `idea` used to carry its needs as free text, matched loosely against the manifest's item names.
+That fell short of the rule that every new part must acknowledge whether the bench provides it. An
+idea now names a slot and a bill of materials (`Need`: item, quantity, and for an item the manifest
+lacks, System 2's estimated price and lead time).
+
+`resources.cost_idea` costs it the same way `check` costs a part, against the same ledger:
+- provided;
+- bought at the manifest's price;
+- cannot be bought;
+- not on the manifest, at System 2's own estimate;
+- machine minutes for printed grams.
+
+It also says whether the whole idea fits what the run has left. The record, the prompt's idea list
+and `summary.json` carry that costing. Nothing is charged, because an idea is never built.
+
+So an idea is a proposal for the outer loop with a price on it. For example, a shoulder spring that
+needs a $3 spring and 20 g of PLA is a cheap catalogue addition. A 12 V arm is a budget decision.
+
+Also noted: the phonology world's gold path costs $24, not $16, once the spare servo is counted once
+(D-046).
+
+Tests: `tests/test_evolve.py` (the jet-pack idea: a $4 rail from the manifest, a $50 jet at System 2's
+estimate, 30 machine minutes, over budget).

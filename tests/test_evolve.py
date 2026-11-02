@@ -12,6 +12,7 @@ from sea.evolve.core import (
     BomLine,
     Edit,
     Idea,
+    Need,
     Outcome,
     Param,
     Part,
@@ -167,7 +168,9 @@ def test_loop_ratchet_swap_and_ideas(tmp_path):
             _p("swap", [Edit(slot="sensor", type="lidar")]),  # not provided: refused
         ]),
         ProposalBatch(proposals=[
-            _p("idea", idea=Idea(name="jet pack", description="fly to it", needs=["rail", "jet"])),
+            _p("idea", idea=Idea(name="jet pack", description="fly to it",
+                                 needs=[Need(item="rail"), Need(item="jet", usd_each=50.0, lead_days=9),
+                                        Need(item="print:PLA", qty=30)])),
             _p("swap", [Edit(slot="stick", type="telescopic", params={"length": 0.5})], gains=["d0.45", "d0.15"]),
             _p("params", [Edit(slot="stick", params={"length": 0.1})]),  # the body rejected in iteration 1
         ]),
@@ -178,7 +181,9 @@ def test_loop_ratchet_swap_and_ideas(tmp_path):
     assert s["final_held_train"] == ["d0.15", "d0.25", "d0.45"]
     assert s["test"]["final_held"] == ["d0.15", "d0.25", "d0.45"] and s["test"]["stock_held"] == ["d0.15"]
     assert s["spent"]["usd"] == 4 and [i["name"] for i in s["ideas"]] == ["jet pack"]
-    assert s["ideas"][0]["provided"] == ["rail"]
+    cost = s["ideas"][0]["cost"]
+    assert cost["usd"] == 4 and cost["usd_estimated"] == 50 and cost["fab_minutes"] == 30 and not cost["fits_budget"]
+    assert "jet x1: not on the manifest; estimated $50.00" in cost["new_items"]
     recs = [json.loads(x) for x in (tmp_path / "iterations.jsonl").read_text().splitlines()]
     results = [t["result"] for t in recs[0]["trials"]]
     assert results[0].startswith("rejected: lost d0.15") and results[1].startswith("KEPT")

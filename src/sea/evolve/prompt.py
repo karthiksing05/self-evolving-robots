@@ -12,7 +12,7 @@ from collections.abc import Sequence
 from typing import Any
 
 from sea.evolve.core import Body, BomLine, Outcome, PartType, Task, World
-from sea.evolve.resources import Spent, check, is_fab, totals
+from sea.evolve.resources import Spent, check, idea_text, is_fab, totals
 
 SYSTEM = """You are System 2 of a self-evolving robot.  System 1 has already searched the control \
 parameters of every task; what still fails is yours.  You change the robot's body, and only the body.  \
@@ -25,8 +25,8 @@ their kinematic limits, what they can and cannot reach.  Reason from those numbe
 3. Climb the ladder only as far as you must.  A `params` move (new values for the current parts) is \
 cheapest.  A `swap` replaces a part with another type from the catalogue: a redesign of that part, worth \
 its cost when the brief or the history shows that no value in the current part's range fixes the \
-mechanism.  An `idea` is a part the catalogue lacks; it is recorded with what it needs and is not \
-tested, so propose one only when no catalogue part can address the mechanism.
+mechanism.  An `idea` is a part the catalogue lacks; it is recorded with its bill of materials, costed \
+against the bench, and not tested, so propose one only when no catalogue part can address the mechanism.
 4. The robot's history comes first.  A change is kept only if every task group already held still \
 passes.  Say which held groups your change puts at risk and why they will survive.
 5. Resources are real.  Every part has a bill of materials.  Items on hand are free, items with a price \
@@ -125,7 +125,7 @@ def build(world: World, body: Body, tasks: Sequence[Task], outcomes: dict[str, O
             "every held group.")
     if ideas:
         sec.append("# Ideas recorded so far (untested: no builder in the simulator)\n" +
-                   "\n".join(f"- {i['name']}: needs {', '.join(i['needs']) or 'nothing listed'}" for i in ideas[-6:]))
+                   "\n".join(f"- {i['name']} (iteration {i['iteration'] + 1}): {idea_text(i['cost'])}" for i in ideas[-6:]))
     close = (f"Propose 1 to {max_proposals} body changes for the failing groups.  Each proposal is tried on "
              "its own and kept only if it gains a group and loses none; proposals that are each kept-eligible and "
              "change different slots are also tried together.")
