@@ -1,0 +1,132 @@
+{
+ "run": "gripper_s2mech_s1",
+ "world": "gripper",
+ "frames": [
+  {
+   "iteration": 0,
+   "id": "stock",
+   "held": 15,
+   "groups": 21,
+   "changes": [],
+   "body": {
+    "id": "stock",
+    "parent": null,
+    "parts": {
+     "jaw": {
+      "type": "revolute",
+      "params": {}
+     },
+     "pads": {
+      "type": "none",
+      "params": {}
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "file": "00_stock.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 2,
+   "id": "b011",
+   "held": 16,
+   "groups": 21,
+   "changes": [
+    "pads: none \u2192 pads (groove_mm 0, lip_mm 0, pad_angle_deg 7, pad_tpu_mm 2, reach_mm 0, width_mm 12)"
+   ],
+   "body": {
+    "id": "b011",
+    "parent": "stock",
+    "parts": {
+     "jaw": {
+      "type": "revolute",
+      "params": {}
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 0.0,
+       "pad_angle_deg": 7.0,
+       "groove_mm": 0.0,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 2.0,
+       "width_mm": 12.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "swap",
+   "gained": [
+    "potted_meat_can"
+   ],
+   "lost": [],
+   "cost": "$0.00, 4 machine min",
+   "why": [
+    "This is a friction-only pad with no geometry change: reach 0, groove 0, lip 0, width 12, 2 mm TPU, pad_angle 7. Interpolating the brief between pad_angle 0 and 45 gives faces about +14, +28 and +53 deg at 35, 55 and 85 mm with tips about -1, +3 and +25 mm, essentially the stock geometry that holds all 15 groups. The changes I suspect broke 8 groups in iteration 1 are left out: reach 15, angle 20, width 20, lip and groove. With mu doubled, the short top-edge grip on the potted meat can should stop sliding. The part costs $0, 0 days and about 16 machine minutes."
+   ],
+   "file": "01_b011.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 4,
+   "id": "b030",
+   "held": 17,
+   "groups": 21,
+   "changes": [
+    "pads: pad_angle_deg 7 \u2192 17"
+   ],
+   "body": {
+    "id": "b030",
+    "parent": "b011",
+    "parts": {
+     "jaw": {
+      "type": "revolute",
+      "params": {}
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 0.0,
+       "pad_angle_deg": 17.0,
+       "groove_mm": 0.0,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 2.0,
+       "width_mm": 12.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "params",
+   "gained": [
+    "gelatin_box"
+   ],
+   "lost": [],
+   "cost": "$0.00, 4 machine min",
+   "why": [
+    "Change only pad_angle, from 7 to 17 deg. Reach, lip and groove stay 0, so I avoid the reach-15 changes that broke 8 to 10 groups in iteration 1, and the pad-on-pad interference that got iteration 1's pad_angle 32 + reach 15 refused. Interpolating the brief: gelatin at 73 mm goes from +44 to about +34 deg, with the tip about +15 mm against a 30 mm top. That is still below the top and cuts the downward push from N sin44 = 0.69 N to 0.56 N. Gelatin was already marginal (it rose 29 mm), so this should hold it. This sits between two bodies already tried. pad_angle 7 held all 16 groups. pad_angle 30 held every group except potted_meat_can, including dice at about -21 deg against atan 0.4 = 22 deg. So at 17 deg the small objects stay well inside their margins (dice about -9 deg). Cheaper moves are used up: System 1 already tuned close, speed and side for gelatin at the current geometry. A swap is not justified: the parallelogram tip rises +48 mm at 85 mm, and the prismatic opens only 58 mm."
+   ],
+   "file": "02_b030.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  }
+ ]
+}

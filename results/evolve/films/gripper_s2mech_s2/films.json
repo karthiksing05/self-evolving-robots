@@ -1,0 +1,27 @@
+{
+ "run": "gripper_s2mech_s2",
+ "world": "gripper",
+ "films": [
+  {
+   "frame": 1,
+   "id": "b05t3",
+   "group": "gelatin_box",
+   "task": "reg_gelatin_box",
+   "file": "01_b05t3_gelatin_box.mp4",
+   "poster": "01_b05t3_gelatin_box.jpg",
+   "seconds": 15.2,
+   "sound": false,
+   "clipping_mm": 0.12,
+   "before": {
+    "ok": false,
+    "verdict": "squeezed down out (stuck (slip))",
+    "recorded": "squeezed_down_out"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "recorded": true
+   }
+  }
+ ]
+}
