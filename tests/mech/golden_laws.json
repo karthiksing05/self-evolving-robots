@@ -1,0 +1,254 @@
+{
+ "revolute {}": {
+  "laws": [],
+  "fastened": [],
+  "loose": [],
+  "clashes": [
+   "sts3215_03a_no_horn_v1 / moving_jaw_so101_v1",
+   "sts3215_03a_no_horn_v1 / sts3215_horn"
+  ],
+  "carried": {
+   "moving_jaw_so101_v1": 0.0
+  }
+ },
+ "parallelogram {\"link_mm\": 50.0}": {
+  "laws": [],
+  "fastened": [
+   "sts3215_03a_no_horn_v1 / jaw_bracket"
+  ],
+  "loose": [],
+  "clashes": [
+   "sts3215_03a_no_horn_v1 / jaw_driver_horn_boss0",
+   "sts3215_03a_no_horn_v1 / jaw_driver_horn_web",
+   "sts3215_03a_no_horn_v1 / jaw_driver_rear_boss0",
+   "sts3215_03a_no_horn_v1 / jaw_driver_rear_web",
+   "sts3215_03a_no_horn_v1 / sts3215_horn"
+  ],
+  "carried": {
+   "moving_jaw_so101_v1": 0.0,
+   "jaw_coupler": 0.3,
+   "jaw_follower": 0.3
+  }
+ },
+ "parallelogram {\"link_mm\": 70.0}": {
+  "laws": [],
+  "fastened": [
+   "sts3215_03a_no_horn_v1 / jaw_bracket"
+  ],
+  "loose": [],
+  "clashes": [
+   "sts3215_03a_no_horn_v1 / jaw_driver_horn_boss0",
+   "sts3215_03a_no_horn_v1 / jaw_driver_horn_web",
+   "sts3215_03a_no_horn_v1 / jaw_driver_rear_boss0",
+   "sts3215_03a_no_horn_v1 / jaw_driver_rear_web",
+   "sts3215_03a_no_horn_v1 / sts3215_horn"
+  ],
+  "carried": {
+   "moving_jaw_so101_v1": 0.0,
+   "jaw_coupler": 0.3,
+   "jaw_follower": 0.3
+  }
+ },
+ "parallelogram {\"link_mm\": 89.0}": {
+  "laws": [],
+  "fastened": [
+   "sts3215_03a_no_horn_v1 / jaw_bracket"
+  ],
+  "loose": [],
+  "clashes": [
+   "sts3215_03a_no_horn_v1 / jaw_driver_horn_boss0",
+   "sts3215_03a_no_horn_v1 / jaw_driver_horn_web",
+   "sts3215_03a_no_horn_v1 / jaw_driver_rear_boss0",
+   "sts3215_03a_no_horn_v1 / jaw_driver_rear_web",
+   "sts3215_03a_no_horn_v1 / sts3215_horn"
+  ],
+  "carried": {
+   "moving_jaw_so101_v1": 0.0,
+   "jaw_coupler": 0.3,
+   "jaw_follower": 0.3
+  }
+ },
+ "parallelogram {\"link_mm\": 90.0}": {
+  "laws": [],
+  "fastened": [
+   "sts3215_03a_no_horn_v1 / jaw_bracket"
+  ],
+  "loose": [],
+  "clashes": [
+   "sts3215_03a_no_horn_v1 / jaw_driver_horn_boss0",
+   "sts3215_03a_no_horn_v1 / jaw_driver_horn_web",
+   "sts3215_03a_no_horn_v1 / jaw_driver_rear_boss0",
+   "sts3215_03a_no_horn_v1 / jaw_driver_rear_web",
+   "sts3215_03a_no_horn_v1 / sts3215_horn"
+  ],
+  "carried": {
+   "moving_jaw_so101_v1": 0.0,
+   "jaw_coupler": 0.3,
+   "jaw_follower": 0.3
+  }
+ },
+ "prismatic {\"pinion_teeth\": 17.0}": {
+  "laws": [],
+  "fastened": [
+   "jaw_rod0 / jaw_clamp",
+   "jaw_rod1 / jaw_clamp",
+   "wrist_roll_follower_so101_v1 / jaw_clamp_bracket"
+  ],
+  "loose": [],
+  "clashes": [
+   "sts3215_03a_no_horn_v1 / jaw_pinion_hub",
+   "sts3215_03a_no_horn_v1 / sts3215_horn"
+  ],
+  "carried": {
+   "moving_jaw_so101_v1": 0.0,
+   "jaw_carriage": 0.1
+  }
+ },
+ "prismatic {\"pinion_teeth\": 30.0}": {
+  "laws": [],
+  "fastened": [
+   "jaw_rod0 / jaw_clamp",
+   "jaw_rod1 / jaw_clamp",
+   "wrist_roll_follower_so101_v1 / jaw_clamp_bracket"
+  ],
+  "loose": [],
+  "clashes": [
+   "sts3215_03a_no_horn_v1 / jaw_pinion_hub",
+   "sts3215_03a_no_horn_v1 / sts3215_horn"
+  ],
+  "carried": {
+   "moving_jaw_so101_v1": 0.0,
+   "jaw_carriage": 0.1
+  }
+ },
+ "prismatic {\"pinion_teeth\": 40.0}": {
+  "laws": [],
+  "fastened": [
+   "jaw_rod0 / jaw_clamp",
+   "jaw_rod1 / jaw_clamp",
+   "wrist_roll_follower_so101_v1 / jaw_clamp_bracket"
+  ],
+  "loose": [],
+  "clashes": [
+   "sts3215_03a_no_horn_v1 / jaw_pinion_hub",
+   "sts3215_03a_no_horn_v1 / sts3215_horn"
+  ],
+  "carried": {
+   "moving_jaw_so101_v1": 0.0,
+   "jaw_carriage": 0.1
+  }
+ },
+ "prismatic {\"pinion_teeth\": 60.0}": {
+  "laws": [
+   "mechanism law (no interference): the wrist servo and the pinion share material, a region up to 20.0 x 6.0 x 5.7 mm (jaw at -0.17..1.75 rad, wrist rolled +2.38 rad and 1 other arm poses); parts may share material only at a bearing seat, within 10 mm of the hinge axis",
+   "mechanism law (no interference): the wrist and the pinion share material, a region up to 25.9 x 6.0 x 8.5 mm (jaw at -0.17..1.75 rad, wrist rolled -2.74 rad and 2 other arm poses); parts may share material only at a bearing seat, within 10 mm of the hinge axis"
+  ],
+  "fastened": [
+   "jaw_rod0 / jaw_clamp",
+   "jaw_rod1 / jaw_clamp",
+   "wrist_roll_follower_so101_v1 / jaw_clamp_bracket"
+  ],
+  "loose": [],
+  "clashes": [
+   "sts3215_03a_no_horn_v1 / jaw_pinion_hub",
+   "sts3215_03a_no_horn_v1 / sts3215_horn",
+   "wrist:sts3215_03a_no_horn_v1 / jaw_pinion",
+   "wrist:wrist_roll_pitch_so101_v2 / jaw_pinion"
+  ],
+  "carried": {
+   "moving_jaw_so101_v1": 0.0,
+   "jaw_carriage": 0.1
+  }
+ },
+ "long_slide {\"sector_radius_mm\": 30.0}": {
+  "laws": [],
+  "fastened": [
+   "jaw_rod0 / jaw_clamp",
+   "jaw_rod1 / jaw_clamp",
+   "wrist_roll_follower_so101_v1 / jaw_clamp_bracket"
+  ],
+  "loose": [],
+  "clashes": [
+   "jaw_pinion / jaw_carriage0",
+   "jaw_pinion / jaw_carriage1",
+   "jaw_pinion / jaw_carriage2",
+   "jaw_pinion / jaw_carriage_bore0_in",
+   "jaw_pinion / jaw_carriage_bore1_in",
+   "sts3215_03a_no_horn_v1 / jaw_pinion_hub",
+   "sts3215_03a_no_horn_v1 / sts3215_horn"
+  ],
+  "carried": {
+   "moving_jaw_so101_v1": 0.0,
+   "jaw_carriage": 0.1
+  }
+ },
+ "long_slide {\"sector_radius_mm\": 40.0}": {
+  "laws": [],
+  "fastened": [
+   "jaw_rod0 / jaw_clamp",
+   "jaw_rod1 / jaw_clamp",
+   "wrist_roll_follower_so101_v1 / jaw_clamp_bracket"
+  ],
+  "loose": [],
+  "clashes": [
+   "jaw_pinion / jaw_carriage0",
+   "jaw_pinion / jaw_carriage1",
+   "jaw_pinion / jaw_carriage2",
+   "jaw_pinion / jaw_carriage_bore0_in",
+   "jaw_pinion / jaw_carriage_bore1_in",
+   "sts3215_03a_no_horn_v1 / jaw_pinion_hub",
+   "sts3215_03a_no_horn_v1 / sts3215_horn"
+  ],
+  "carried": {
+   "moving_jaw_so101_v1": 0.0,
+   "jaw_carriage": 0.1
+  }
+ },
+ "long_slide {\"sector_radius_mm\": 46.0}": {
+  "laws": [],
+  "fastened": [
+   "jaw_rod0 / jaw_clamp",
+   "jaw_rod1 / jaw_clamp",
+   "wrist_roll_follower_so101_v1 / jaw_clamp_bracket"
+  ],
+  "loose": [],
+  "clashes": [
+   "jaw_pinion / jaw_carriage0",
+   "jaw_pinion / jaw_carriage1",
+   "jaw_pinion / jaw_carriage2",
+   "jaw_pinion / jaw_carriage_bore0_in",
+   "jaw_pinion / jaw_carriage_bore1_in",
+   "sts3215_03a_no_horn_v1 / jaw_pinion_hub",
+   "sts3215_03a_no_horn_v1 / sts3215_horn"
+  ],
+  "carried": {
+   "moving_jaw_so101_v1": 0.0,
+   "jaw_carriage": 0.1
+  }
+ },
+ "long_slide {\"sector_radius_mm\": 50.0}": {
+  "laws": [
+   "mechanism law (no interference): the wrist and the pinion share material, a region up to 1.6 x 0.2 x 0.5 mm (jaw at -0.17 rad, wrist rolled -2.74 rad); parts may share material only at a bearing seat, within 10 mm of the hinge axis"
+  ],
+  "fastened": [
+   "jaw_rod0 / jaw_clamp",
+   "jaw_rod1 / jaw_clamp",
+   "wrist_roll_follower_so101_v1 / jaw_clamp_bracket"
+  ],
+  "loose": [],
+  "clashes": [
+   "jaw_pinion / jaw_carriage0",
+   "jaw_pinion / jaw_carriage1",
+   "jaw_pinion / jaw_carriage2",
+   "jaw_pinion / jaw_carriage_bore0_in",
+   "jaw_pinion / jaw_carriage_bore1_in",
+   "sts3215_03a_no_horn_v1 / jaw_pinion_hub",
+   "sts3215_03a_no_horn_v1 / sts3215_horn",
+   "wrist:wrist_roll_pitch_so101_v2 / jaw_pinion"
+  ],
+  "carried": {
+   "moving_jaw_so101_v1": 0.0,
+   "jaw_carriage": 0.1
+  }
+ }
+}

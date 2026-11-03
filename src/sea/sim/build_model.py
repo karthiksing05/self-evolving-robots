@@ -41,7 +41,7 @@ from sea.sim.controls import (
     MovingPart,
     build_geometry,
 )
-from sea.sim.jaws import BODIES, RodSprings, four_bar, slide
+from sea.sim.jaws import RodSprings
 
 TIMESTEP = 0.002
 STALL_TORQUE = {7.4: 1.62, 12.0: 2.94}
@@ -532,15 +532,16 @@ def _stops(model: mujoco.MjModel, linked: list[tuple[str, float]]) -> list[tuple
     return [(model.geom(a).name, model.geom(b).name) for a, b in sorted(near)]
 
 
-def _jaw_joint(spec: mujoco.MjSpec, f) -> list[tuple[str, float]]:
+def _jaw_joint(spec: mujoco.MjSpec, f):
     """Rebuild the moving jaw as its part's mechanism (D-042, ``sim/jaws.py``); returns the mechanism's other
     joints with their units per servo radian.  The gripper joint stays the servo's output, a hinge in
     radians: the slide's pinion turns on it (D-058), and the parallelogram's driving links (D-057)."""
-    if f.jaw == "prismatic":
-        return slide(spec, f.drive_mm_per_rad * MM, f.sector)
-    if f.jaw == "parallelogram":
-        return four_bar(spec, f.link_mm)
-    return []
+    from sea.mech import build
+    from sea.mech.seed.gripper import Site, jaw_graph
+
+    g = jaw_graph(f, Site.of(spec))
+    build.compile(spec, g)
+    return g
 
 
 def build_model(design: Design, panel: PanelSpec | None = None, tools: list | None = None,
@@ -561,7 +562,8 @@ def build_model(design: Design, panel: PanelSpec | None = None, tools: list | No
         volts = design.arm.servo_voltage.get(act.name, 7.4)
         tau = STALL_TORQUE[float(volts)]
         act.forcerange = [-tau, tau]
-    linked = _jaw_joint(spec, design.fingers)
+    jaw_mech = _jaw_joint(spec, design.fingers)
+    linked = list(jaw_mech.linked)
     _horn(spec, design.fingers)
     # Stock jaw geoms get the names the verifier maps (Appendix B).  The jaw meshes collide through
     # their CoACD parts instead of one convex hull (D-013); other arm meshes keep their hulls.
@@ -606,7 +608,7 @@ def build_model(design: Design, panel: PanelSpec | None = None, tools: list | No
         _, names = _tool_body(gripper, np.asarray(site.pos), np.asarray(site.quat), slot, tool, gidx, spec)
         tool_names[slot] = names
         spec.add_exclude(bodyname1="moving_jaw_so101_v1", bodyname2=f"tool_slot{slot}")
-        for b in BODIES[design.fingers.jaw]:
+        for b in jaw_mech.new_bodies():
             spec.add_exclude(bodyname1=b, bodyname2=f"tool_slot{slot}")
 
     faults = faults or {}
@@ -697,7 +699,7 @@ def build_model(design: Design, panel: PanelSpec | None = None, tools: list | No
     geom_kind: dict[int, str] = {}
     geom_contact: dict[int, ContactType] = {}
     robot_bodies = {model.body(n).id for n in ("base", "shoulder", "upper_arm", "lower_arm", "wrist", "gripper",
-                                                "moving_jaw_so101_v1", *BODIES[design.fingers.jaw])}
+                                                "moving_jaw_so101_v1", *jaw_mech.new_bodies())}
     for g in range(model.ngeom):
         name = model.geom(g).name
         if name.startswith("jaw_fixed"):

@@ -2404,3 +2404,32 @@ The long slide reached 20 of 21 groups (D-066) on exactly this idealisation.
   - rocker-bogie with wheels 6/14, 6/18, 5/10, 4/12 and 3/8 (wheel cm / bogie cm): passes.
   - Before the links moved outboard, wheel 6 / bogie 14 (the tests' distractor), 6/18 and 5/10 were refused for a link inside a wheel, 7.8–15.3 mm. That refusal was the model's fault, not the body's.
 - No kept result is judged differently, so no campaign is re-run.
+
+## D-078 A mechanism is a graph of parts; the gripper's jaws are its seed modules (world: physics; judge: mechanism)
+
+**Why.** On every seed of the D-076 campaign, System 2 asked for mechanisms that nothing could build. It proposed a braced or bridged slide three times, and a moving pad that stays parallel to the fixed one ten times. Both were recorded as ideas and never tried.
+
+The theory says competence grows by composing typed primitives and promoting recurring compositions into a library (theory.md §3.1–3.5). That holds today for control programs (`compose/`) but not for bodies. Each gripper jaw was described four times over, by hand:
+- its MJCF builder (`jaws.four_bar`, `jaws.slide`);
+- its kinematics (`design/fingers.py`'s branches per jaw type);
+- the name tables the laws and the CAD read (`HAND`, `BODIES`, `_assembly`, `_allowed_mm`);
+- its bill of materials (`worlds/gripper.py`).
+
+Nothing System 2 wrote could enter any of these.
+
+**Change.** This is the first step (C0) of the plan for compositional mechanisms. It changes no behaviour.
+- **`sea/mech/graph.py`: a mechanism is plain data.**
+  - **Bodies** carry parts and joints. A body's inertia follows a declared rule (`Inertial`: slender, disc or lumped). The hand builders' approximations are now visible data on the seeds, not constants inside code.
+  - **Parts** are things with a function: a link plate, a hub, a web, a gear, the rack's teeth, a rod, a clamp, a bracket that seats on the frame, the finger's blade, and bought parts. Each part declares its material, its role to the laws (structure, pin, rod, clamp, bracket, finger) and the printed piece it belongs to.
+  - **Constraints:** a loop (a closing pin), a mesh (teeth as a joint equality), and a guide (a carriage on two clamped rods that bend, D-076).
+- **`sea/mech/build.py`: one builder compiles any graph.** It takes mass from volume and density (bought parts from their datasheets), seats brackets on the frame mesh, compiles loops as pins and meshes as equalities, and gives a guide its four bending joints.
+- **`sea/mech/seed/gripper.py`: the catalogue's four jaws are now graphs.** The four jaws are revolute, parallelogram, prismatic and long slide. The robot's model supplies the gripper's site data: the servo's range and the jaw's orientation. `jaws.four_bar` and `jaws.slide` are deleted, and `jaws.py` keeps only the SO-101's measurements and the rods' physics.
+- **The laws read the graph (C0b).**
+  - The bodies to sweep, which fixed parts may share material (a rod in a clamp's piece; a bracket or clamp on the stock frame) and the transmission angle all come from the graph.
+  - The transmission angle is measured at every loop's pin in the simulator, not computed from the parallelogram's hard-coded follower direction. A loop System 2 builds is then judged by the same law.
+
+**Prediction** (written before C0b and C0c were measured):
+- the graph compiles the same model as the deleted builders, at the ends and middle of every parameter range: every body, joint, solid, constraint and mass within 1e-6 (relative and absolute);
+- every law gives the same output on those 13 bodies;
+- the full suite stays green with the same verdicts;
+- no result moves, and no campaign is re-run.
