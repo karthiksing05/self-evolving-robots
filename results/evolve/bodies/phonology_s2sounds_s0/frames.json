@@ -1,0 +1,150 @@
+{
+ "run": "phonology_s2sounds_s0",
+ "world": "phonology",
+ "frames": [
+  {
+   "iteration": 0,
+   "id": "stock",
+   "held": 6,
+   "groups": 17,
+   "changes": [],
+   "body": {
+    "id": "stock",
+    "parent": null,
+    "parts": {
+     "tract": {
+      "type": "short_cast",
+      "params": {
+       "length": 13.5
+      }
+     },
+     "tongue": {
+      "type": "cam_tongue",
+      "params": {
+       "rail_start": 3.25,
+       "stroke": 0.95
+      }
+     },
+     "lips": {
+      "type": "jaw_lips",
+      "params": {
+       "rest_area": 3.0
+      }
+     }
+    }
+   },
+   "file": "00_stock.png",
+   "views": [
+    "section",
+    "side"
+   ]
+  },
+  {
+   "iteration": 1,
+   "id": "b00m",
+   "held": 16,
+   "groups": 17,
+   "changes": [
+    "lips: jaw_lips \u2192 round_lips (max_protrusion 1.6)",
+    "tongue: cam_tongue \u2192 tip_tongue (rail_start 3.25, stroke 1.3)"
+   ],
+   "body": {
+    "id": "b00m",
+    "parent": "stock",
+    "parts": {
+     "tract": {
+      "type": "short_cast",
+      "params": {
+       "length": 13.5
+      }
+     },
+     "tongue": {
+      "type": "tip_tongue",
+      "params": {
+       "rail_start": 3.25,
+       "stroke": 1.3
+      }
+     },
+     "lips": {
+      "type": "round_lips",
+      "params": {
+       "max_protrusion": 1.6
+      }
+     }
+    }
+   },
+   "move": "merge",
+   "gained": [
+    "ao",
+    "er",
+    "k",
+    "ka",
+    "p",
+    "s",
+    "sh",
+    "t",
+    "uh",
+    "uw"
+   ],
+   "lost": [],
+   "cost": "$24.00, 132 machine min",
+   "why": [
+    "The tip blade seals at 0.3-1.5 cm for /t/, and partly closed it gives a 0.05-0.15 cm2 channel at the ridge for /s/. The front cavity there is short, so the hiss should land in 4000-8000 Hz. For /t\u0251/, the body pad holds the pharyngeal /\u0251/ constriction during the closure, so the rail servo no longer has to make the 79-degree trip it needs now. I also set the body stroke to 1.3 cm, which gives the velar seal for /k/ and the /\u0283/ channel. For /k\u0251/, the move from a velar seal near 8.5 cm to the pharyngeal /\u0251/ near 9.5 cm is about 15 degrees on the rail servo (106 degrees over 7 cm). Whether the cam's height change also stays under 30 degrees, the trial will decide. Bill: pushrod_kit $4 (2 days), servo_mg90s x4 on hand, rail_100mm reused. The brief prices the swap at $12, 3 days and 76 machine minutes, all within budget.",
+    "The drawstring takes the lip opening to 0 cm2, which seals for /p/ while the tongue is lowered to keep the airway open. Narrowing the lips to a small opening, with the ring pushed out 1.6 cm (the tube goes from 14.5 to 16.1 cm, about 10% lower overall), and a back tongue constriction should pull F2 down toward 840-1020 Hz and F1 down toward 300-570 Hz. That covers /\u0254/, /\u028a/ and /u/. Bill: pushrod_kit $4 (2 days), 2 servos reused, 57 machine minutes."
+   ],
+   "file": "01_b00m.png",
+   "views": [
+    "section",
+    "side"
+   ]
+  },
+  {
+   "iteration": 9,
+   "id": "b082",
+   "held": 17,
+   "groups": 17,
+   "changes": [
+    "tract: length 13.5 \u2192 13.2"
+   ],
+   "body": {
+    "id": "b082",
+    "parent": "b00m",
+    "parts": {
+     "tract": {
+      "type": "short_cast",
+      "params": {
+       "length": 13.2
+      }
+     },
+     "tongue": {
+      "type": "tip_tongue",
+      "params": {
+       "rail_start": 3.25,
+       "stroke": 1.3
+      }
+     },
+     "lips": {
+      "type": "round_lips",
+      "params": {
+       "max_protrusion": 1.6
+      }
+     }
+    }
+   },
+   "move": "params",
+   "gained": [
+    "ta"
+   ],
+   "lost": [],
+   "cost": "$0.00, 162 machine min",
+   "why": [
+    "At 13.2 formants rise about 2.2%: F1 is about 661 at the current posture and F2 about 1173. This is a hedge on proposal 1 that trades a little F1 margin for more F2 margin, in case the 13.0 failure was F2 noise with more spread than I estimate. Even 2 to 4 Hz of extra F1 headroom lets System 1 lift the vowel tip a few hundredths, and that is all a 2\u00b0 cut needs."
+   ],
+   "file": "02_b082.png",
+   "views": [
+    "section",
+    "side"
+   ]
+  }
+ ]
+}

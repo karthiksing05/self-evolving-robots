@@ -1,0 +1,614 @@
+{
+ "run": "gripper_s2depth_s0",
+ "world": "gripper",
+ "frames": [
+  {
+   "iteration": 0,
+   "id": "stock",
+   "held": 16,
+   "groups": 21,
+   "changes": [],
+   "body": {
+    "id": "stock",
+    "parent": null,
+    "parts": {
+     "jaw": {
+      "type": "revolute",
+      "params": {}
+     },
+     "pads": {
+      "type": "none",
+      "params": {}
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "file": "00_stock.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 1,
+   "id": "b001",
+   "held": 16,
+   "groups": 21,
+   "changes": [
+    "pads: none \u2192 pads (groove_mm 2, lip_mm 0, pad_angle_deg 20, pad_tpu_mm 2, reach_mm 0, width_mm 12)"
+   ],
+   "body": {
+    "id": "b001",
+    "parent": "stock",
+    "parts": {
+     "jaw": {
+      "type": "revolute",
+      "params": {}
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 0.0,
+       "pad_angle_deg": 20.0,
+       "groove_mm": 2.0,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 2.0,
+       "width_mm": 12.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "swap",
+   "gained": [],
+   "lost": [],
+   "cost": "$0.00, 5 machine min",
+   "why": [
+    "This is the cheapest fallback: $0, 0 days, 16 machine minutes, using on-hand M2 screws and about 3 g of print. With pad_angle 20, the moving face at about 57 mm should drop from about +33 deg to roughly +15 deg (tan 15\u00b0 \u2248 0.27), well within TPU's 0.9, so the can should stay held through the lift. It does not fix the wide low objects, because the tip still rises on the hinge. It changes a different slot from proposal 1, so if both are kept-eligible they can be combined: on the slide, the TPU and groove add friction and centre the rolling objects."
+   ],
+   "file": "01_b001.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 3,
+   "id": "b020",
+   "held": 16,
+   "groups": 21,
+   "changes": [
+    "jaw: revolute \u2192 long_slide (sector_radius_mm 43)",
+    "pads: pad_angle_deg 20 \u2192 0, reach_mm 0 \u2192 11"
+   ],
+   "body": {
+    "id": "b020",
+    "parent": "b001",
+    "parts": {
+     "jaw": {
+      "type": "long_slide",
+      "params": {
+       "sector_radius_mm": 43.0
+      }
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 11.0,
+       "pad_angle_deg": 0.0,
+       "groove_mm": 2.0,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 2.0,
+       "width_mm": 12.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "swap",
+   "gained": [],
+   "lost": [],
+   "cost": "$6.40, 241 machine min",
+   "why": [
+    "The record already tested each half of this change on its own. Sector 48.5 with reach 9.3 kept banana and lost only tomato_soup_can. Sector 42.7 with reach 0 kept tomato_soup_can, apple (75 mm), gelatin_box (73 mm) and every other group, lost only banana, and gained potted_meat_can. This proposal combines the two fixes: sector 43 keeps the short rack that held the tomato can, and reach 11 (just above the 9.3 that cured banana) lifts the rack clear of the banana's 38 mm top. Pad angle goes to 0 because the slide keeps the face's orientation; at 20 deg the face would sit -20 deg off parallel at every opening. Sector 43 also pulls the sector rim about 7 mm inside the radius-50 part that touched the wrist by 0.2 mm, so it should pass the interference check. Cheaper moves won't work: revolute pad parameters have already failed (pad_angle 45 lost banana and large_marker), and no pad value removes the hinge's +24 mm tip rise at the can's opening. servos_12v is refused at $68. Purchases: lm3uu_bearing x2 ($2.40) and steel_rod_3x150 x2 ($4.00), $6.40 in total with 3 days lead. M3 and M2 screws are on hand. Machine time is about 216 min for the slide plus about 16 min for the pads, inside the 595 min available."
+   ],
+   "file": "02_b020.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 4,
+   "id": "b032",
+   "held": 17,
+   "groups": 21,
+   "changes": [
+    "jaw: sector_radius_mm 43 \u2192 46",
+    "pads: pad_tpu_mm 2 \u2192 1, reach_mm 11 \u2192 15"
+   ],
+   "body": {
+    "id": "b032",
+    "parent": "b020",
+    "parts": {
+     "jaw": {
+      "type": "long_slide",
+      "params": {
+       "sector_radius_mm": 46.0
+      }
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 15.0,
+       "pad_angle_deg": 0.0,
+       "groove_mm": 2.0,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 1.0,
+       "width_mm": 12.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "params",
+   "gained": [
+    "tuna_fish_can"
+   ],
+   "lost": [],
+   "cost": "$0.00, 256 machine min",
+   "why": [
+    "46 \u00d7 1.92 \u2248 88 mm of travel, and with 1 mm TPU about 88\u201389 mm between pads. That clears tuna (85) with clearance, and squeeze rises to 35 N. It moves held geometry less than the other two proposals, so it is the most likely to be kept if they lose tomato_soup_can or banana. It also costs only machine time (sector reprint ~215 min)."
+   ],
+   "file": "03_b032.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 5,
+   "id": "b040",
+   "held": 17,
+   "groups": 21,
+   "changes": [
+    "pads: reach_mm 15 \u2192 7"
+   ],
+   "body": {
+    "id": "b040",
+    "parent": "b032",
+    "parts": {
+     "jaw": {
+      "type": "long_slide",
+      "params": {
+       "sector_radius_mm": 46.0
+      }
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 7.0,
+       "pad_angle_deg": 0.0,
+       "groove_mm": 2.0,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 1.0,
+       "width_mm": 12.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "params",
+   "gained": [],
+   "lost": [],
+   "cost": "$0.00, 6 machine min",
+   "why": [
+    "The record isolates reach as the variable. With reach 0, potted_meat_can was gained at both sector 42.7 and sector 48.5 (iteration 2). With reach 11 (sector 43) and reach 15 (sector 46, now) it fails, both times with the pad on the top. Reach exists only to lift the rack clear of short objects. At sector 42.7 with reach 0, banana failed by just 1 mm (rack at +20, top at +19). The rack hangs about 3.3 mm lower at sector 46, so banana needs reach of about 4.5 mm or more. Reach 7 leaves about 2.5 mm of margin on banana and pulls the pad tip 8 mm back from the can's top. Cheaper moves are exhausted: this is the cheapest move, a pads reprint (about 3 g, roughly 18 machine minutes, $0). A jaw parameter change would reprint 43 g of PLA (about 215 min against 98 left), and the 12 V servos are refused on budget. Neither addresses this mechanism anyway, since squeeze (2*0.35*35 = 24.5 N against 3.6 N of weight) and shoulder torque (0.41 + 0.55 = 0.96 against 1.62 N*m) both have margin."
+   ],
+   "file": "04_b040.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 6,
+   "id": "b050",
+   "held": 17,
+   "groups": 21,
+   "changes": [
+    "pads: width_mm 12 \u2192 18"
+   ],
+   "body": {
+    "id": "b050",
+    "parent": "b040",
+    "parts": {
+     "jaw": {
+      "type": "long_slide",
+      "params": {
+       "sector_radius_mm": 46.0
+      }
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 7.0,
+       "pad_angle_deg": 0.0,
+       "groove_mm": 2.0,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 1.0,
+       "width_mm": 18.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "params",
+   "gained": [],
+   "lost": [],
+   "cost": "$0.00, 9 machine min",
+   "why": [
+    "Pad width is the only pads parameter not yet varied. Reach has been tried at 0, 5, 7, 9, 11 and 15, and it is pinned between the banana (needs more than 5) and the can's grasp depth. Thickening the TPU skin would close the opening below the 85 mm tuna can. A groove of 0 would endanger the eight round objects. Going from 12 to 18 mm gives 1.5 times the contact length on the can's 102 mm depth, so about 1.5 times the resistance to turning, enough to hold it through the 30 mm lift. It costs $0 and about 25 machine minutes, within the 92 left. The slide is untouched: reprinting it would take about 215 minutes, which rules out any change to the jaw this round."
+   ],
+   "file": "05_b050.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 7,
+   "id": "b061",
+   "held": 17,
+   "groups": 21,
+   "changes": [
+    "pads: width_mm 18 \u2192 20"
+   ],
+   "body": {
+    "id": "b061",
+    "parent": "b050",
+    "parts": {
+     "jaw": {
+      "type": "long_slide",
+      "params": {
+       "sector_radius_mm": 46.0
+      }
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 7.0,
+       "pad_angle_deg": 0.0,
+       "groove_mm": 2.0,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 1.0,
+       "width_mm": 20.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "params",
+   "gained": [],
+   "lost": [],
+   "cost": "$0.00, 10 machine min",
+   "why": [
+    "This is the conservative bracket for the first proposal. Width 20 adds 2 mm, a third of the step that lost banana, so banana is the most likely to survive. It may still be enough to stop the rim pivot on the off-centre placement. If 21 loses banana and 20 keeps it, the record pins the threshold. Cost: $0, about 10 machine minutes."
+   ],
+   "file": "06_b061.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 8,
+   "id": "b071",
+   "held": 17,
+   "groups": 21,
+   "changes": [
+    "pads: reach_mm 7 \u2192 8"
+   ],
+   "body": {
+    "id": "b071",
+    "parent": "b061",
+    "parts": {
+     "jaw": {
+      "type": "long_slide",
+      "params": {
+       "sector_radius_mm": 46.0
+      }
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 8.0,
+       "pad_angle_deg": 0.0,
+       "groove_mm": 2.0,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 1.0,
+       "width_mm": 20.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "params",
+   "gained": [],
+   "lost": [],
+   "cost": "$0.00, 10 machine min",
+   "why": [
+    "Reach 7 and 9 both held everything at width 12. Reach 11 and 15 put the pad on the can's top, and 5 lost the banana. Reach 8 on the current 20 mm pads makes the contact strip taller without changing its width. This runs alongside proposal 1 so the trial can tell height and width apart. About 10 machine minutes, $0."
+   ],
+   "file": "07_b071.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 9,
+   "id": "b080",
+   "held": 17,
+   "groups": 21,
+   "changes": [
+    "pads: reach_mm 8 \u2192 9"
+   ],
+   "body": {
+    "id": "b080",
+    "parent": "b071",
+    "parts": {
+     "jaw": {
+      "type": "long_slide",
+      "params": {
+       "sector_radius_mm": 46.0
+      }
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 9.0,
+       "pad_angle_deg": 0.0,
+       "groove_mm": 2.0,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 1.0,
+       "width_mm": 20.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "params",
+   "gained": [],
+   "lost": [],
+   "cost": "$0.00, 11 machine min",
+   "why": [
+    "Reach went 7 to 8 at width 20 and gained a task, so contact height is the lever that works. Reach 9 held every group at width 12 (iteration 5, gained 1, lost none). Reach 11 and 15 put the pad on the can's top, and reach 5 lost the banana. 9 is the next 1 mm step and stays inside the known-safe band. Width stays at 20 because 22 and 24 lost the banana. Cost: pads reprint, about 10 machine min, $0. The wide-box failures (pudding 90, sugar 92, mustard 96 mm against an 88 mm opening) cannot be fixed with what is left: a sector reprint is about 215 min against 63 left, and the other jaws and the 12 V servos are refused."
+   ],
+   "file": "08_b080.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 10,
+   "id": "b091",
+   "held": 17,
+   "groups": 21,
+   "changes": [
+    "pads: reach_mm 9 \u2192 10"
+   ],
+   "body": {
+    "id": "b091",
+    "parent": "b080",
+    "parts": {
+     "jaw": {
+      "type": "long_slide",
+      "params": {
+       "sector_radius_mm": 46.0
+      }
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 10.0,
+       "pad_angle_deg": 0.0,
+       "groove_mm": 2.0,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 1.0,
+       "width_mm": 20.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "params",
+   "gained": [],
+   "lost": [],
+   "cost": "$0.00, 12 machine min",
+   "why": [
+    "This takes the next 1 mm step, reach 10, which brackets below the reach 11 that put the pad on the can's top at width 12 and sector 43. If the twist lever is the limit, 10 adds contact. If the pad-on-top threshold lies between 9 and 11, this trial pins it. Its only purpose is to tell reach apart from groove alongside proposal 1. It costs $0 and about 11 machine min."
+   ],
+   "file": "09_b091.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 11,
+   "id": "b101",
+   "held": 17,
+   "groups": 21,
+   "changes": [
+    "pads: reach_mm 10 \u2192 11"
+   ],
+   "body": {
+    "id": "b101",
+    "parent": "b091",
+    "parts": {
+     "jaw": {
+      "type": "long_slide",
+      "params": {
+       "sector_radius_mm": 46.0
+      }
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 11.0,
+       "pad_angle_deg": 0.0,
+       "groove_mm": 2.0,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 1.0,
+       "width_mm": 20.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "params",
+   "gained": [],
+   "lost": [],
+   "cost": "$0.00, 12 machine min",
+   "why": [
+    "Each 1 mm step of reach at width 20 has gained a task with no losses: 7 to 8 (iteration 8), 8 to 9 (iteration 9) and 9 to 10 (iteration 10). Reach 11 and 15 failed only on an older body (width 12, sector 43). Reach 11 is the next step on the trend, and this trial tests whether the old pad-on-top threshold still applies at width 20 and sector 46. Its only purpose is to separate height from groove against proposal 1. It costs $0 and about 12 machine minutes."
+   ],
+   "file": "10_b101.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 12,
+   "id": "b110",
+   "held": 17,
+   "groups": 21,
+   "changes": [
+    "pads: reach_mm 11 \u2192 12"
+   ],
+   "body": {
+    "id": "b110",
+    "parent": "b101",
+    "parts": {
+     "jaw": {
+      "type": "long_slide",
+      "params": {
+       "sector_radius_mm": 46.0
+      }
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 12.0,
+       "pad_angle_deg": 0.0,
+       "groove_mm": 2.0,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 1.0,
+       "width_mm": 20.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "params",
+   "gained": [],
+   "lost": [],
+   "cost": "$0.00, 13 machine min",
+   "why": [
+    "At width 20, every 1 mm step of reach has gained a task with no losses: 7\u21928, 8\u21929, 9\u219210 and 10\u219211 (iterations 8\u201311). The remaining failure is the same kind of contact-height failure. Reach 12 is the next step. It reuses the pads part: $0, about 12\u201313 machine min of the 28 left. Cheaper moves are used up. Width above 20 loses the banana (iterations 6 and 8). Groove 4 changes round contacts, not the flat side of the can. TPU thickness does not raise friction above 0.9."
+   ],
+   "file": "11_b110.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 14,
+   "id": "b130",
+   "held": 17,
+   "groups": 21,
+   "changes": [
+    "pads: pad_tpu_mm 1 \u2192 0"
+   ],
+   "body": {
+    "id": "b130",
+    "parent": "b110",
+    "parts": {
+     "jaw": {
+      "type": "long_slide",
+      "params": {
+       "sector_radius_mm": 46.0
+      }
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 12.0,
+       "pad_angle_deg": 0.0,
+       "groove_mm": 2.0,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 0.0,
+       "width_mm": 20.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "params",
+   "gained": [],
+   "lost": [],
+   "cost": "$0.00, 8 machine min",
+   "why": [
+    "Every other way to widen the jaw is refused. A sector of 50 mm needs a long_slide reprint of about 215 min, against the 16 left. The parallelogram needs 82 min and the prismatic 123 min. The 12 V servos cost $68 against $33.60 and would not widen the jaw anyway. pads=none opens to 96 mm, but reach 0 has already put the carriage on 38 mm-tall objects and lost the banana, and the pudding box is also 38 mm tall. The TPU skin is the only part of the face thickness that a pads reprint can change. A reprint with pad_tpu_mm=0 is PLA only: about 10 min, $0, no TPU print time. This keeps reach 12, width 20 and groove 2, which won every held group. It should open the jaw to about 90\u201391 mm, enough for the 90 mm pudding box with System 1's side clearance near zero (best rva000 run: side=2.8e-05). It will not reach the sugar box (92 mm) or the mustard bottle (96 mm). The cost is friction: 0.45 (bare PLA) instead of 0.9. Even for the 349 g soup can on metal, 2*0.45*35 N = 31.5 N against 3.4 N of weight, so friction still holds about 9x the weight."
+   ],
+   "file": "12_b130.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  }
+ ]
+}

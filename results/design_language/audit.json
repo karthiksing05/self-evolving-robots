@@ -181,7 +181,7 @@
      "material": "printed",
      "sharp_mm": 0.0,
      "overhang": 0.0,
-     "wall_p01_mm": 5.97
+     "wall_p01_mm": 5.87
     },
     "cast tract": {
      "material": "silicone",
@@ -198,7 +198,7 @@
     "reed housing": {
      "material": "printed",
      "sharp_mm": 201.9,
-     "overhang": 0.159,
+     "overhang": 0.093,
      "wall_p01_mm": 3.0
     },
     "reed": {
@@ -311,14 +311,14 @@
     },
     "crank": {
      "material": "printed",
-     "sharp_mm": 94.2,
+     "sharp_mm": 98.2,
      "overhang": 0.0,
      "wall_p01_mm": 3.0
     },
     "connecting rod": {
      "material": "printed",
      "sharp_mm": 79.1,
-     "overhang": 0.237,
+     "overhang": 0.231,
      "wall_p01_mm": 3.0
     },
     "upper lip": {
@@ -378,8 +378,8 @@
    }
   },
   "rich": {
-   "members": 59,
-   "joints": 80,
+   "members": 61,
+   "joints": 82,
    "floating": [],
    "undeclared": [],
    "loose": [],
@@ -388,7 +388,7 @@
      "material": "printed",
      "sharp_mm": 0.0,
      "overhang": 0.0,
-     "wall_p01_mm": 5.96
+     "wall_p01_mm": 5.99
     },
     "cast tract": {
      "material": "silicone",
@@ -404,9 +404,9 @@
     },
     "pharynx clamp": {
      "material": "printed",
-     "sharp_mm": 428.1,
+     "sharp_mm": 372.1,
      "overhang": 0.213,
-     "wall_p01_mm": 2.29
+     "wall_p01_mm": 2.55
     },
     "larynx bellows": {
      "material": "silicone",
@@ -426,11 +426,17 @@
      "overhang": null,
      "wall_p01_mm": null
     },
-    "lead screw": {
-     "material": "metal",
-     "sharp_mm": 25.1,
-     "overhang": null,
-     "wall_p01_mm": null
+    "rack": {
+     "material": "printed",
+     "sharp_mm": 0.0,
+     "overhang": 0.026,
+     "wall_p01_mm": 5.0
+    },
+    "servo riser": {
+     "material": "printed",
+     "sharp_mm": 0.0,
+     "overhang": 0.031,
+     "wall_p01_mm": 12.4
     },
     "larynx servo": {
      "material": "servo",
@@ -441,7 +447,7 @@
     "servo mount": {
      "material": "printed",
      "sharp_mm": 254.8,
-     "overhang": 0.271,
+     "overhang": 0.268,
      "wall_p01_mm": 2.5
     },
     "screws": {
@@ -450,16 +456,16 @@
      "overhang": null,
      "wall_p01_mm": null
     },
-    "shaft coupler": {
-     "material": "metal",
-     "sharp_mm": 50.2,
-     "overhang": null,
-     "wall_p01_mm": null
+    "pinion": {
+     "material": "printed",
+     "sharp_mm": 71.1,
+     "overhang": 0.0,
+     "wall_p01_mm": 3.0
     },
     "reed housing": {
      "material": "printed",
      "sharp_mm": 201.9,
-     "overhang": 0.136,
+     "overhang": 0.083,
      "wall_p01_mm": 3.0
     },
     "reed": {
@@ -572,14 +578,14 @@
     },
     "crank": {
      "material": "printed",
-     "sharp_mm": 94.2,
+     "sharp_mm": 98.2,
      "overhang": 0.0,
      "wall_p01_mm": 3.0
     },
     "connecting rod": {
      "material": "printed",
      "sharp_mm": 79.1,
-     "overhang": 0.237,
+     "overhang": 0.231,
      "wall_p01_mm": 3.0
     },
     "palate bridge": {
@@ -699,7 +705,7 @@
     "horn 5": {
      "material": "printed",
      "sharp_mm": 100.0,
-     "overhang": 0.13,
+     "overhang": 0.131,
      "wall_p01_mm": 1.6
     },
     "pushrod 3": {
@@ -707,6 +713,12 @@
      "sharp_mm": 55.2,
      "overhang": null,
      "wall_p01_mm": null
+    },
+    "servo riser 2": {
+     "material": "printed",
+     "sharp_mm": 0.0,
+     "overhang": 0.031,
+     "wall_p01_mm": 10.4
     },
     "drawstring servo": {
      "material": "servo",
@@ -717,7 +729,7 @@
     "servo mount 7": {
      "material": "printed",
      "sharp_mm": 254.8,
-     "overhang": 0.268,
+     "overhang": 0.266,
      "wall_p01_mm": 2.5
     },
     "screws 7": {
@@ -726,15 +738,15 @@
      "overhang": null,
      "wall_p01_mm": null
     },
-    "horn 6": {
+    "spool": {
      "material": "printed",
-     "sharp_mm": 92.0,
-     "overhang": 0.075,
-     "wall_p01_mm": 1.6
+     "sharp_mm": 104.8,
+     "overhang": 0.002,
+     "wall_p01_mm": 3.0
     },
-    "drawstring": {
+    "drawstring sheath": {
      "material": "rubber",
-     "sharp_mm": 6.3,
+     "sharp_mm": 15.1,
      "overhang": null,
      "wall_p01_mm": null
     }
@@ -768,7 +780,7 @@
     "reed housing": {
      "material": "printed",
      "sharp_mm": 201.9,
-     "overhang": 0.159,
+     "overhang": 0.093,
      "wall_p01_mm": 3.0
     },
     "reed": {
@@ -975,7 +987,7 @@
     "reed housing": {
      "material": "printed",
      "sharp_mm": 201.9,
-     "overhang": 0.159,
+     "overhang": 0.093,
      "wall_p01_mm": 3.0
     },
     "reed": {
@@ -1088,14 +1100,14 @@
     },
     "crank": {
      "material": "printed",
-     "sharp_mm": 124.2,
+     "sharp_mm": 128.2,
      "overhang": 0.0,
      "wall_p01_mm": 3.0
     },
     "connecting rod": {
      "material": "printed",
      "sharp_mm": 79.1,
-     "overhang": 0.236,
+     "overhang": 0.23,
      "wall_p01_mm": 3.0
     },
     "upper lip": {

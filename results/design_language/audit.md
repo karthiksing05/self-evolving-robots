@@ -11,7 +11,7 @@ Each assembly is checked by `sea.design.language.audit` (docs/design-language.md
 | pad hooked, on wrist_roll_follower_so101_v1 | 4 | 4 | 0 | 0 | 0 | 244.3 (fixed pad shoe) | - | 1.04 (fixed pad skin) |
 | pad hooked, on moving_jaw_so101_v1 | 4 | 4 | 0 | 0 | 0 | 237.2 (moving pad shoe) | - | 0.27 (moving pad skin) |
 | rig stock | 33 | 43 | 0 | 0 | 0 | 644.3 (tongue pad) | 0.27 (tongue pad) | 1.17 (tongue pad) |
-| rig rich | 59 | 80 | 0 | 0 | 0 | 620.3 (tongue pad) | 0.271 (servo mount) | 1.17 (tip blade) |
+| rig rich | 61 | 82 | 0 | 0 | 0 | 620.3 (tongue pad) | 0.27 (tongue pad) | 1.17 (tip blade) |
 | rig pneumatic_spread | 33 | 47 | 0 | 0 | 0 | 444 (face plate) | 0.27 (servo mount) | 1.6 (horn) |
 | rig long_rail_long_cast | 33 | 43 | 0 | 0 | 0 | 764.3 (tongue pad) | 0.27 (tongue pad) | 1.17 (tongue pad) |
 

@@ -1,0 +1,150 @@
+{
+ "run": "phonology_s2sounds_s2",
+ "world": "phonology",
+ "frames": [
+  {
+   "iteration": 0,
+   "id": "stock",
+   "held": 6,
+   "groups": 17,
+   "changes": [],
+   "body": {
+    "id": "stock",
+    "parent": null,
+    "parts": {
+     "tract": {
+      "type": "short_cast",
+      "params": {
+       "length": 13.5
+      }
+     },
+     "tongue": {
+      "type": "cam_tongue",
+      "params": {
+       "rail_start": 3.25,
+       "stroke": 0.95
+      }
+     },
+     "lips": {
+      "type": "jaw_lips",
+      "params": {
+       "rest_area": 3.0
+      }
+     }
+    }
+   },
+   "file": "00_stock.png",
+   "views": [
+    "section",
+    "side"
+   ]
+  },
+  {
+   "iteration": 1,
+   "id": "b00m",
+   "held": 15,
+   "groups": 17,
+   "changes": [
+    "lips: jaw_lips \u2192 round_lips (max_protrusion 1.6)",
+    "tongue: cam_tongue \u2192 tip_tongue (rail_start 3, stroke 1.3)"
+   ],
+   "body": {
+    "id": "b00m",
+    "parent": "stock",
+    "parts": {
+     "tract": {
+      "type": "short_cast",
+      "params": {
+       "length": 13.5
+      }
+     },
+     "tongue": {
+      "type": "tip_tongue",
+      "params": {
+       "rail_start": 3.0,
+       "stroke": 1.3
+      }
+     },
+     "lips": {
+      "type": "round_lips",
+      "params": {
+       "max_protrusion": 1.6
+      }
+     }
+    }
+   },
+   "move": "merge",
+   "gained": [
+    "ao",
+    "er",
+    "k",
+    "p",
+    "s",
+    "sh",
+    "t",
+    "uh",
+    "uw"
+   ],
+   "lost": [],
+   "cost": "$24.00, 132 machine min",
+   "why": [
+    "No cam_tongue setting gets closer than 2.5 cm to the teeth, so the tip blade (0.3-5 cm, able to seal) is the only part in the catalogue that reaches the alveolar place. The tip can seal for /t/, or open to 0.05-0.15 cm2 at about 0.5-1 cm for /s/; the front cavity of about 1.5-2 cm gives a hiss near 4400-5800 Hz. For /t\u0251/ the body pad can sit at its /\u0251/ posture while only the tip linkage releases, so the rail and cam servos do not turn. The body pad with stroke 1.3 also seals for /k/ and makes the /\u0283/ channel, as in proposal 1. It costs $12 (pushrod kit plus one servo), 3 days and 76 machine minutes.",
+    "No rest_area setting gets the jaw lips below 2.5 cm2 or adds any protrusion, so a different part is needed. The round lips close to 0 cm2, giving /p/ a seal with the airway open behind it. Narrowing to about 0.5-1 cm2 and protruding up to 1.6 cm lengthens the tract from 14.5 to about 16 cm and adds a constriction at the lip velocity maximum. Combined with the back tongue (F2 about 1070-1150 Hz now), that should bring F2 down to about 850-1000 Hz for /u/, /\u028a/ and /\u0254/, with F1 falling for /u/ as well. The rounding plus a tongue constriction near 3/5 of the tract also lowers F3 toward /\u025d/, which may also need the tip tongue from proposal 2. It costs $4 for the pushrod kit plus a servo ($8) if it is combined with the tip tongue, 2 days and 57 machine minutes, and it uses 6 of the 6 controller channels when combined."
+   ],
+   "file": "01_b00m.png",
+   "views": [
+    "section",
+    "side"
+   ]
+  },
+  {
+   "iteration": 2,
+   "id": "b011",
+   "held": 17,
+   "groups": 17,
+   "changes": [
+    "tract: length 13.5 \u2192 13"
+   ],
+   "body": {
+    "id": "b011",
+    "parent": "b00m",
+    "parts": {
+     "tract": {
+      "type": "short_cast",
+      "params": {
+       "length": 13.0
+      }
+     },
+     "tongue": {
+      "type": "tip_tongue",
+      "params": {
+       "rail_start": 3.0,
+       "stroke": 1.3
+      }
+     },
+     "lips": {
+      "type": "round_lips",
+      "params": {
+       "max_protrusion": 1.6
+      }
+     }
+    }
+   },
+   "move": "params",
+   "gained": [
+    "ka",
+    "ta"
+   ],
+   "lost": [],
+   "cost": "$0.00, 160 machine min",
+   "why": [
+    "Shortening the cast from 13.5 to 13.0 cm raises all formants by about 4%. The F1 ceiling goes to about 770 Hz, giving margin around 730 Hz, and the F2 reached in the high-F1 band goes to about 1020-1100 Hz, which brackets 1090 Hz. The vowel then holds under noise in a posture closer to the closure, which should help ta and possibly ka. It is a recast within the stock part's range: 40 g of silicone and 54 g of PLA, about 165 machine minutes and $0."
+   ],
+   "file": "02_b011.png",
+   "views": [
+    "section",
+    "side"
+   ]
+  }
+ ]
+}
