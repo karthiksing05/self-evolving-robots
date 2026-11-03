@@ -2028,3 +2028,31 @@ The sled and crank law and the clash law above were added, the stand and clamp r
 - **Stock on the test split:** 12 or 13 of 26 tasks, as before.
 
 As predicted. Under real linkages, a sled clear of the glottis, and a blade that cannot press through the pad, the c1 talker still says every sound. The 21 % of its sampled postures that clash were never the ones it needed.
+
+## D-072 Harder sounds: the fricatives /s/ and /ʃ/, and the syllables /ta/ and /ka/ (judge: world_phonology)
+
+**Why.** The talking robot's thirteen sounds are steady postures: ten vowels and three closures. System 2 solves them in one call on every seed (D-071). Speech has two things they leave out:
+- **Turbulence:** a fricative is a narrow channel whose noise the cavity in front of it filters. The world already names the channel: narrower than a vowel (0.15 cm²), wider than a closure (0.05 cm²).
+- **Time:** a stop is heard as a stop only when the release reaches the vowel fast. The servos and linkages now bound how fast that can be (D-071).
+
+**Change.**
+- **Fricatives.** /s/ (as in *see*) and /ʃ/ (as in *she*): the narrowest point lies in its place, and its area is at least 0.05 and below 0.15 cm². The airway elsewhere is open (above 0.2 cm²). The front cavity's first resonance, the peak of the frication noise, lies in its band:
+  - /s/: the alveolar ridge, 0–1.5 cm behind the teeth; a peak of 4–8 kHz;
+  - /ʃ/: behind it, 1.5–3.5 cm; a peak of 2–4 kHz.
+
+  The front cavity runs from the constriction to the lips. Its peak comes from the same lossy chain model as the vowels, with the constriction as its closed end, on a grid reaching 10 kHz.
+
+  The bands are the published ranges. For /s/, energy above 4 kHz, with a major peak reported at 3.5–5 kHz (Behrens & Blumstein 1988) and at 6–8 kHz (Jongman, Wayland & Wong 2000). For /ʃ/, 2–4 kHz (Hughes & Halle 1956; Behrens & Blumstein 1988). All as summarized by Maniwa, Jongman & Wade (2009); the original tables were not reachable.
+- **Syllables.** /ta/ and /ka/: a closure posture that passes the stop, a posture that passes /ɑ/, and between them no servo turns more than 30°. An MG90S turns 60° in 0.1 s at 4.8 V, so the release reaches the vowel in 50 ms. Formant transitions shorter than about 50 ms are heard as stops, and longer ones as glides (Liberman, Delattre, Gerstman & Cooper 1956).
+  - The servo angles come from each drive in `linkages`: crank, cam, five-bar, jaw link, pushrod, spool, pinion.
+  - System 1 searches both postures together, starting from pairs in its map, with servo noise on both.
+  - The tip blade's clash with the pad (D-071) applies to each posture.
+- **/pa/ is left out.** No lip part in the catalogue can release a bilabial closure that fast. On the best sampled pair, the round lips' spool turns 77° (129 ms) from the seal to /ɑ/, and the jaw lips never seal. A task no catalogued part can reach gives System 2 nothing to climb.
+- **Test splits:** the task groups go from 13 to 17. Each new group has a train task and two test tasks, under other noise, with the fricative bands and the /ɑ/ targets moved 3 %, as for the other sounds.
+- **The film and diagnosis read the new kinds.** A fricative's film plays the front cavity's filtered noise. A syllable's film glides from the closure through the burst to the vowel over the time its servos take.
+
+**Prediction** (from a sampled-posture probe, before the change):
+- **The stock holds none of the four new groups.** Its single cam pad reaches neither the ridge nor a narrow channel behind it. It holds no /k/, so it holds no /ka/.
+- **The c1 final** (`tip_tongue` + `round_lips`, 13.5 cm) holds /ʃ/, /ta/ and /ka/. /s/ is uncertain: the rounded lips' 1 cm tube puts most of its alveolar channels' peaks below 4 kHz, and 9 of 21 sampled channels lie in the band.
+- **Bodies with spread or jaw lips** hold /s/ easily (44–48 of 47–48 sampled channels in the band) but lose /uw/, /uh/, /ao/ and /p/, which need rounding.
+- **Three-seed campaign:** 16 or 17 of 17 train groups on each seed, from more than one System 2 call. /s/ against the rounded vowels is the conflict the catalogue may not resolve.

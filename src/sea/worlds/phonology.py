@@ -56,19 +56,23 @@ from sea.worlds import linkages
 C = 35000.0  # speed of sound, cm/s
 RHO = 1.14e-3  # air density, g/cm3
 FREQ = np.arange(40.0, 5000.0, 10.0)
-_W = 2 * np.pi * FREQ
-_GAMMA = 0.0055 * np.sqrt(FREQ / 500.0) + 1j * _W / C  # propagation constant per cm, lightly lossy
 
 
-def transfer_db(areas: np.ndarray, lengths: np.ndarray) -> np.ndarray:
-    """``20 log10 |U_lips / U_glottis|`` for a batch of area functions, glottis first: (B, N) -> (B, F)."""
+FREQ_HI = np.arange(500.0, 10000.0, 25.0)  # a fricative's noise reaches past 5 kHz
+
+
+def transfer_db(areas: np.ndarray, lengths: np.ndarray, freq: np.ndarray = FREQ) -> np.ndarray:
+    """``20 log10 |U_lips / U_glottis|`` for a batch of area functions, glottis first: (B, N) -> (B, F).  A section of
+    zero length passes through unchanged."""
     areas, lengths = np.atleast_2d(areas), np.atleast_2d(lengths)
-    a = np.ones((areas.shape[0], FREQ.size), complex)
+    w = 2 * np.pi * freq
+    gamma = 0.0055 * np.sqrt(freq / 500.0) + 1j * w / C
+    a = np.ones((areas.shape[0], freq.size), complex)
     b, c, d = np.zeros_like(a), np.zeros_like(a), np.ones_like(a)
     ch = sh = a
     for i in range(areas.shape[1]):
         if i == 0 or not np.array_equal(lengths[:, i], lengths[:, i - 1]):
-            gl = _GAMMA[None, :] * lengths[:, i:i + 1]
+            gl = gamma[None, :] * lengths[:, i:i + 1]
             ch, sh = np.cosh(gl), np.sinh(gl)
         z0 = (RHO * C / areas[:, i])[:, None]
         shz, szz = sh / z0, sh * z0
@@ -76,13 +80,13 @@ def transfer_db(areas: np.ndarray, lengths: np.ndarray) -> np.ndarray:
     al = areas[:, -1:]
     rr = 128 * RHO * C / (9 * np.pi ** 2 * al)  # radiation resistance
     lr = 8 * RHO * np.sqrt(al / np.pi) / (3 * np.pi * al)  # radiation inertance
-    zr = 1j * _W * lr * rr / (rr + 1j * _W * lr)
+    zr = 1j * w * lr * rr / (rr + 1j * w * lr)
     return -20 * np.log10(np.abs(c * zr + d))  # P_lips = Zr U_lips, U_glottis = (C Zr + D) U_lips
 
 
-def formants(areas: np.ndarray, lengths: np.ndarray, n: int = 3) -> np.ndarray:
+def formants(areas: np.ndarray, lengths: np.ndarray, n: int = 3, freq: np.ndarray = FREQ) -> np.ndarray:
     """The first ``n`` peaks of the transfer function, Hz, (B, n); nan where fewer peaks exist."""
-    mag = transfer_db(areas, lengths)
+    mag = transfer_db(areas, lengths, freq)
     peak = (mag[:, 1:-1] > mag[:, :-2]) & (mag[:, 1:-1] >= mag[:, 2:])
     out = np.full((mag.shape[0], n), np.nan)
     rows, cols = np.nonzero(peak)
@@ -93,7 +97,7 @@ def formants(areas: np.ndarray, lengths: np.ndarray, n: int = 3) -> np.ndarray:
     y0, y1, y2 = mag[rows, cols - 1], mag[rows, cols], mag[rows, cols + 1]
     den = y0 - 2 * y1 + y2
     off = np.where(np.abs(den) > 1e-12, 0.5 * (y0 - y2) / np.where(den == 0, 1, den), 0.0)
-    out[rows, rank] = FREQ[cols] + off * (FREQ[1] - FREQ[0])
+    out[rows, rank] = freq[cols] + off * (freq[1] - freq[0])
     return out
 
 
@@ -203,6 +207,16 @@ def clash(r: Rig, ctl: dict[str, np.ndarray]) -> tuple[np.ndarray, np.ndarray]:
     return np.maximum(over[rows, i], 0.0), d[rows, i]
 
 
+def noise_peak(r: Rig, ctl: dict[str, np.ndarray]) -> np.ndarray:
+    """Where frication noise peaks (Hz, B): the first resonance of the cavity in front of the narrowest point, closed
+    at that point and radiating at the lips (Stevens 1998: the noise source sits at the constriction's exit).  The
+    sections behind the constriction take no part.  nan where nothing lies in front of it."""
+    areas, lens, _ = tract(r, ctl)
+    i = np.argmin(areas, 1)
+    front = np.where(np.arange(areas.shape[1])[None, :] > i[:, None], lens, 0.0)
+    return formants(np.maximum(areas, 0.08), front, 1, FREQ_HI)[:, 0]
+
+
 def acoustics(r: Rig, ctl: dict[str, np.ndarray]) -> tuple[np.ndarray, np.ndarray]:
     """Formants (B, 3), and the narrowest point (B, 3): its area, where it is, and the airway beyond it."""
     areas, lens, dist = tract(r, ctl)
@@ -225,6 +239,15 @@ VOWELS = {
     "ah": ("ʌ", "hud", 640, 1190, 2390), "er": ("ɝ", "heard", 490, 1350, 1690),
 }
 STOPS = {"p": ("lips", "bilabial"), "t": ("alveolar", "alveolar"), "k": ("velar", "velar")}
+# Fricatives (D-072): a channel narrower than a vowel and wider than a closure, in its place, whose front cavity puts
+# the noise's peak in its band: /s/ above 4 kHz (major peaks reported at 3.5-5 and 6-8 kHz), /ʃ/ at 2-4 kHz, as
+# summarized by Maniwa, Jongman & Wade (2009).
+FRICATIVES = {"s": ("s", "see", (0.0, 1.5), (4000.0, 8000.0)), "sh": ("ʃ", "she", (1.5, 3.5), (2000.0, 4000.0))}
+# Syllables (D-072): the stop, then /ɑ/, with no servo turning more than TURN between them: 50 ms at an MG90S's
+# 60 degrees per 0.1 s.  Transitions shorter than about 50 ms are heard as stops, longer as glides (Liberman,
+# Delattre, Gerstman & Cooper 1956).  /pa/ is not set: no lip part releases a seal that fast (D-072).
+SYLLABLES = {"ta": ("t", "aa"), "ka": ("k", "aa")}
+TURN = np.radians(30.0)
 TOL = 0.10
 
 
@@ -233,6 +256,17 @@ def _vowel_error(f: np.ndarray, target: Sequence[float]) -> np.ndarray:
     t = np.asarray(target, float)
     e = (f[:, :t.size] / t - 1.0) / TOL
     return np.where(np.isnan(e), 10.0, e)
+
+
+def _fricative_error(clo: np.ndarray, peak: np.ndarray, spec: dict) -> np.ndarray:
+    """How far each posture is from the fricative ``spec`` (place, band), in units where <= 1 passes: the channel's
+    area between a closure and a vowel, in its place, the airway elsewhere open, and the noise's peak in its band."""
+    (lo, hi), (f_lo, f_hi) = spec["place"], spec["band"]
+    a_min, where, open_else = clo[:, 0], clo[:, 1], clo[:, 2]
+    miss = np.maximum(0.0, np.maximum(lo - where, where - hi))
+    pk = np.where(np.isnan(peak), 1.0, peak)
+    return np.maximum.reduce([A_CLOSE / np.maximum(a_min, 1e-6), a_min / A_VOWEL, np.where(miss > 0, 1.0 + miss, 0.0),
+                              A_OPEN / np.maximum(open_else, 1e-6), f_lo / pk, pk / f_hi])
 
 
 def _stop_error(clo: np.ndarray, place: str) -> np.ndarray:
@@ -344,6 +378,8 @@ class Babble:
     f: np.ndarray  # (n, 3) formants
     clo: np.ndarray  # (n, 3) closure: smallest area, its place, the airway elsewhere
     clash: np.ndarray  # (n,) how far the tip blade and the body pad press past each other, cm
+    peak: np.ndarray  # (n,) where frication noise would peak, Hz
+    angles: np.ndarray  # (n, servos) each servo's angle, rad (``linkages.servo_angles``)
 
 
 def _fmt(f: Sequence[float] | np.ndarray) -> str:
@@ -385,6 +421,26 @@ class PhonologyWorld:
                                 facts=f"{name} stop /{g}/: seal the tube {where} (area < {A_CLOSE:g} cm2) with the "
                                       f"airway open elsewhere (> {A_OPEN:g} cm2)",
                                 data={"kind": "stop", "place": place, "noise": 7 + 101 * i}))
+        for g, (ipa, word, (lo, hi), (f_lo, f_hi)) in FRICATIVES.items():
+            for split, i, scale in (("train", 0, 1.0), ("test", 1, 1.03), ("test", 2, 0.97)):
+                band = [round(f_lo * scale), round(f_hi * scale)]
+                out.append(Task(id=f"{g}_{split}{i}", split=split, group=g,  # type: ignore[arg-type]
+                                facts=f"fricative /{ipa}/ as in '{word}': a channel {lo:g}-{hi:g} cm behind the teeth "
+                                      f"narrower than a vowel and wider than a seal ({A_CLOSE:g}-{A_VOWEL:g} cm2), the "
+                                      f"airway open elsewhere (> {A_OPEN:g} cm2), and the cavity in front of it "
+                                      f"resonating at {band[0]}-{band[1]} Hz, where the hiss peaks",
+                                data={"kind": "fricative", "place": [lo, hi], "band": band, "noise": 7 + 101 * i}))
+        for g, (stop, vowel) in SYLLABLES.items():
+            ipa, word, *fs = VOWELS[vowel]
+            for split, i, scale in (("train", 0, 1.0), ("test", 1, 1.03), ("test", 2, 0.97)):
+                tgt = [round(v * scale) for v in fs[:2]]
+                out.append(Task(id=f"{g}_{split}{i}", split=split, group=g,  # type: ignore[arg-type]
+                                facts=f"syllable /{g[0]}{ipa}/: the /{stop}/ closure, then /{ipa}/ (F1/F2 {_fmt(tgt)} "
+                                      f"Hz, each within 10%), with no servo turning more than "
+                                      f"{np.degrees(TURN):.0f} degrees between them (50 ms: slower, it is heard as a "
+                                      "glide, not a stop)",
+                                data={"kind": "syllable", "stop": {"kind": "stop", "place": STOPS[stop][0]},
+                                      "vowel": {"kind": "vowel", "target": tgt}, "noise": 7 + 101 * i}))
         return out
 
     def catalogue(self) -> list[PartType]:
@@ -426,49 +482,90 @@ class PhonologyWorld:
             x = lo + u * (hi - lo)
             ctl = {k: x[:, j] for j, k in enumerate(keys)}
             f, clo = acoustics(r, ctl)
-            self._babble[key] = Babble(keys, x, f, clo, clash(r, ctl)[0])
+            self._babble[key] = Babble(keys, x, f, clo, clash(r, ctl)[0], noise_peak(r, ctl),
+                                       linkages.servo_angles(r, body.parts, ctl)[1])
         return self._babble[key]
 
     @staticmethod
-    def _errors(task: Task, f: np.ndarray, clo: np.ndarray, over: np.ndarray) -> np.ndarray:
-        if task.data["kind"] == "vowel":
-            formant = np.abs(_vowel_error(f, task.data["target"])).max(1)
+    def _errors(task: Task | dict, f: np.ndarray, clo: np.ndarray, over: np.ndarray, peak: np.ndarray | None = None
+                ) -> np.ndarray:
+        """Per posture, how far it is from the sound (``task``, or a task's data), <= 1 passing."""
+        data = task if isinstance(task, dict) else task.data
+        if data["kind"] == "vowel":
+            formant = np.abs(_vowel_error(f, data["target"])).max(1)
             e = np.maximum(formant, A_VOWEL / np.maximum(clo[:, 0], 1e-6))  # a vowel keeps its airway open
+        elif data["kind"] == "fricative":
+            e = _fricative_error(clo, np.full(len(clo), np.nan) if peak is None else peak, data)
         else:
-            e = _stop_error(clo, task.data["place"])
+            e = _stop_error(clo, data["place"])
         return np.where(over > CLASH, np.maximum(e, 1.0 + over / CLASH), e)  # a posture the parts cannot take
 
-    def solve(self, body: Body, task: Task, seed: int = 0) -> Outcome:
-        """System 1: ``local_search`` from the nearest postures in the body's map, up to ``starts`` of them."""
-        r, bab = rig(body), self.babble(body)
+    @staticmethod
+    def _sides(task: Task) -> list[tuple[str, dict]]:
+        """The postures a task needs, each with its control prefix: one for a sound, two for a syllable."""
+        d = task.data
+        return [("c.", d["stop"]), ("v.", d["vowel"])] if d["kind"] == "syllable" else [("", d)]
+
+    def _starts(self, r: Rig, bab: Babble, sides: list[tuple[str, dict]]) -> list[dict[str, float]]:
+        """The nearest postures (for a syllable, pairs) in the body's map, each start 15% of the range apart."""
         span = np.array([hi - lo for lo, hi in (r.controls[k] for k in bab.keys)])
-        picks: list[int] = []
-        # nearest first, each start 15% of the range apart
-        for i in np.argsort(self._errors(task, bab.f, bab.clo, bab.clash)):
-            if all(np.abs((bab.x[i] - bab.x[j]) / span).max() > 0.15 for j in picks):
-                picks.append(int(i))
+        errs = [self._errors(d, bab.f, bab.clo, bab.clash, bab.peak) for _, d in sides]
+        if len(sides) == 1:
+            cands, order = [bab.x[i][None] for i in range(len(bab.x))], np.argsort(errs[0])
+        else:  # pair the 40 nearest closures with the 40 nearest vowels, timed by the servos between them
+            ci, vi = np.argsort(errs[0])[:40], np.argsort(errs[1])[:40]
+            turn = np.abs(bab.angles[ci][:, None, :] - bab.angles[vi][None, :, :]).max(2, initial=0.0)
+            e = np.maximum(np.maximum(errs[0][ci][:, None], errs[1][vi][None, :]), turn / TURN).ravel()
+            pairs = [(a, b) for a in ci for b in vi]
+            cands, order = [np.stack([bab.x[a], bab.x[b]]) for a, b in pairs], np.argsort(e)
+        picks: list[np.ndarray] = []
+        for i in order:
+            if all(np.abs((cands[i] - q) / span).max() > 0.15 for q in picks):
+                picks.append(cands[i])
             if len(picks) == self.starts:
                 break
+        return [{p + k: float(v) for (p, _), row in zip(sides, x, strict=True) for k, v in zip(bab.keys, row,
+                                                                                                strict=True)}
+                for x in picks]
+
+    def solve(self, body: Body, task: Task, seed: int = 0) -> Outcome:
+        """System 1: ``local_search`` from the nearest postures in the body's map, up to ``starts`` of them.  A syllable
+        searches its closure and its vowel together."""
+        r, bab, sides = rig(body), self.babble(body), self._sides(task)
+        space = {p + k: rng for p, _ in sides for k, rng in r.controls.items()}
 
         def attempt(ctl: dict[str, float], s: int) -> Outcome:
             t0 = time.perf_counter()
             rng = np.random.default_rng([task.data["noise"], s])
-            x = {k: np.array([np.clip(ctl[k] + rng.normal(0.0, NOISE * (hi - lo)), lo, hi)])
-                 for k, (lo, hi) in r.controls.items()}
-            f, clo = acoustics(r, x)
-            over, at = clash(r, x)
-            e = float(self._errors(task, f, clo, over)[0])
-            said = self._said(task, f[0], clo[0])
-            if over[0] > CLASH:
-                said += (f"; the tip blade presses {20 * over[0]:.1f} mm into the tongue pad {at[0]:.1f} cm behind the "
-                         "teeth: no posture the parts can take")
-            return Outcome(task=task.id, success=e <= 1.0, score=1.0 / (1.0 + e), detail=said,
+            es, said, angles = [], [], []
+            for p, d in sides:
+                x = {k: np.array([np.clip(ctl[p + k] + rng.normal(0.0, NOISE * (hi - lo)), lo, hi)])
+                     for k, (lo, hi) in r.controls.items()}
+                f, clo = acoustics(r, x)
+                over, at = clash(r, x)
+                peak = noise_peak(r, x) if d["kind"] == "fricative" else None
+                es.append(float(self._errors(d, f, clo, over, peak)[0]))
+                said.append(self._said(d, f[0], clo[0], None if peak is None else float(peak[0])))
+                if over[0] > CLASH:
+                    said[-1] += (f"; the tip blade presses {20 * over[0]:.1f} mm into the tongue pad {at[0]:.1f} cm "
+                                 "behind the teeth: no posture the parts can take")
+                if len(sides) > 1:
+                    angles.append(linkages.servo_angles(r, body.parts, x))
+            detail = said[0]
+            if angles:
+                names, (a0, a1) = angles[0][0], (angles[0][1][0], angles[1][1][0])
+                k = int(np.argmax(np.abs(a1 - a0))) if names else 0
+                turn = float(np.abs(a1 - a0)[k]) if names else 0.0
+                es.append(turn / TURN)
+                detail = (f"closure: {said[0]}; vowel: {said[1]}; the {names[k] if names else 'valves'} turns "
+                          f"{np.degrees(turn):.0f} degrees between them (at most {np.degrees(TURN):.0f})")
+            e = max(es)
+            return Outcome(task=task.id, success=e <= 1.0, score=1.0 / (1.0 + e), detail=detail,
                            sim_s=time.perf_counter() - t0)
 
         out, attempts, sim_s = None, 0, 0.0
-        for j, i in enumerate(picks):
-            start = dict(zip(bab.keys, bab.x[i].tolist(), strict=True))
-            o = local_search(attempt, r.controls, start, m=32, confirm=2, seed=seed + 7919 * j, step=0.1, shrink=0.9)
+        for j, start in enumerate(self._starts(r, bab, sides)):
+            o = local_search(attempt, space, start, m=32, confirm=2, seed=seed + 7919 * j, step=0.1, shrink=0.9)
             attempts, sim_s = attempts + o.attempts, sim_s + o.sim_s
             if out is None or o.success or o.score > out.score:
                 out = o
@@ -482,9 +579,15 @@ class PhonologyWorld:
         return out.model_copy(update={"mechanism": mech, "detail": f"{out.detail}; {why}"})
 
     @staticmethod
-    def _said(task: Task, f: np.ndarray, clo: np.ndarray) -> str:
-        if task.data["kind"] == "vowel":
-            tgt = task.data["target"]
+    def _said(task: Task | dict, f: np.ndarray, clo: np.ndarray, peak: float | None = None) -> str:
+        data = task if isinstance(task, dict) else task.data
+        if data["kind"] == "fricative":
+            where = "the lips" if clo[1] < 0 else f"{clo[1]:.1f} cm behind the teeth"
+            hiss = "nothing in front of it to resonate" if peak is None or np.isnan(peak) else \
+                f"the hiss peaks at {peak:.0f} Hz vs {data['band'][0]}-{data['band'][1]}"
+            return f"narrowest {clo[0]:.2f} cm2 at {where}, airway elsewhere {min(clo[2], 99):.2f} cm2; {hiss}"
+        if data["kind"] == "vowel":
+            tgt = data["target"]
             got = f[:len(tgt)]
             off = ", ".join(f"F{j + 1} {100 * (g / t - 1):+.0f}%" for j, (g, t) in enumerate(zip(got, tgt, strict=True))
                             if not np.isnan(g) and abs(g / t - 1) > TOL)
@@ -495,6 +598,10 @@ class PhonologyWorld:
 
     # -------------------------------------------------- diagnosis
     def _diagnose(self, body: Body, task: Task, out: Outcome) -> tuple[str, str]:
+        if task.data["kind"] == "syllable":
+            return self._diagnose_syllable(body, task, out)
+        if task.data["kind"] == "fricative":
+            return self._diagnose_fricative(body, task, out)
         r, bab = rig(body), self.babble(body)
         best = {k: np.array([out.controls[k]]) for k in r.controls}
         fb, cb = acoustics(r, best)
@@ -528,6 +635,69 @@ class PhonologyWorld:
             span = f"no sampled posture has {cond} Hz"
         return mech, (f"over {len(f)} open postures (System 1's map and its best) this body's {name} spans "
                       f"{fk.min():.0f}-{fk.max():.0f} Hz; {span}; target {name} {tgt[k]} Hz")
+
+    def _diagnose_fricative(self, body: Body, task: Task, out: Outcome) -> tuple[str, str]:
+        r, bab, d = rig(body), self.babble(body), task.data
+        best = {k: np.array([out.controls[k]]) for k in r.controls}
+        _, cb = acoustics(r, best)
+        keep = np.concatenate([bab.clash, clash(r, best)[0]]) <= CLASH
+        clo = np.vstack([bab.clo, cb])[keep]
+        peak = np.concatenate([bab.peak, noise_peak(r, best)])[keep]
+        (lo, hi), (f_lo, f_hi) = d["place"], d["band"]
+        at = (clo[:, 1] >= lo) & (clo[:, 1] <= hi)
+        chan = at & (clo[:, 0] >= A_CLOSE) & (clo[:, 0] < A_VOWEL) & (clo[:, 2] > A_OPEN)
+        g = task.group
+        if not chan.any():
+            least = f"{clo[at, 0].min():.2f} cm2" if at.any() else "none (no sampled posture is narrowest there)"
+            there = [c[0] for c in self._closers(r) if c[1] <= hi and c[2] >= lo] or ["no articulator"]
+            return f"no_channel_at_{g}", (f"no posture makes a {A_CLOSE:g}-{A_VOWEL:g} cm2 channel {lo:g}-{hi:g} cm "
+                                          f"behind the teeth with the airway open elsewhere; reached by "
+                                          f"{', '.join(there)}; narrowest sampled there {least}")
+        pk = peak[chan]
+        inside = (pk >= f_lo) & (pk <= f_hi)
+        if inside.any():
+            e = _fricative_error(clo[chan], pk, d)
+            return ("not_robust_to_motor_noise" if "passed once" in out.detail or e.min() > 0.6 else
+                    "not_found_by_search", f"a channel whose hiss peaks in {f_lo}-{f_hi} Hz exists noise-free; "
+                                           f"System 1 found none that holds under {NOISE:.0%} servo noise")
+        low = np.nanmax(pk) < f_lo
+        return ("noise_peak_too_low" if low else "noise_peak_too_high",
+                f"over {int(chan.sum())} channels in place the cavity in front puts the hiss at "
+                f"{np.nanmin(pk):.0f}-{np.nanmax(pk):.0f} Hz, target {f_lo}-{f_hi} Hz; the front cavity resonates near "
+                f"c/4L: a longer one (rounded, protruded lips, a channel further back) lowers it")
+
+    def _diagnose_syllable(self, body: Body, task: Task, out: Outcome) -> tuple[str, str]:
+        """Each half alone first (System 1 on the closure, then on the vowel); if both hold, the move between them."""
+        r, bab, d = rig(body), self.babble(body), task.data
+        found = []
+        for p, part in (("c.", d["stop"]), ("v.", d["vowel"])):
+            sub = task.model_copy(update={"data": part | {"noise": d["noise"]}})
+            o = self.solve(body, sub)
+            if not o.success:
+                return o.mechanism or "not_found_by_search", f"its {'closure' if p == 'c.' else 'vowel'} alone: " + \
+                    o.detail.split("; ", 1)[-1]
+            found.append({k: np.array([v]) for k, v in o.controls.items()})
+        names = linkages.servo_angles(r, body.parts, found[0])[0]
+        if not names:
+            return "not_found_by_search", "both postures hold alone and nothing times the move between them"
+        sets = []
+        for part, x in zip((d["stop"], d["vowel"]), found, strict=True):
+            clean = self._errors(part, bab.f, bab.clo, bab.clash) <= 1.0
+            sets.append(np.vstack([bab.angles[clean], linkages.servo_angles(r, body.parts, x)[1]]))
+        diff = np.abs(sets[0][:, None, :] - sets[1][None, :, :])
+        worst = diff.max(2)
+        a, b = np.unravel_index(int(np.argmin(worst)), worst.shape)
+        k = int(np.argmax(diff[a, b]))
+        if worst[a, b] > TURN:
+            ms = 1000 * worst[a, b] / linkages.SERVO_SPEED
+            return "transition_too_slow", (f"each half holds alone, but of {len(sets[0])} clean closures and "
+                                           f"{len(sets[1])} clean vowels found, the nearest pair is "
+                                           f"{np.degrees(worst[a, b]):.0f} degrees apart on the {names[k]} ({ms:.0f} "
+                                           f"ms); a stop's release must reach the vowel within "
+                                           f"{np.degrees(TURN):.0f} degrees (50 ms)")
+        return ("not_robust_to_motor_noise" if "passed once" in out.detail else "not_found_by_search",
+                f"a closure and a vowel {np.degrees(worst[a, b]):.0f} degrees apart exist; System 1 found no pair that "
+                f"holds under {NOISE:.0%} servo noise")
 
     def _closers(self, r: Rig) -> list[tuple[str, float, float, float]]:
         """Each articulator that can narrow the tube: name, place range (cm behind the teeth), smallest area."""
@@ -585,6 +755,20 @@ class PhonologyWorld:
         lines.append(f"- lips: {lips}")
         lines.append(f"- servos: {r.servos} of {CHANNELS} controller channels; controls: "
                      + ", ".join(f"{k} {lo:.2f}-{hi:.2f}" for k, (lo, hi) in sorted(r.controls.items())))
+        names = linkages.servo_angles(r, body.parts, {k: bab.x[:1, j] for j, k in enumerate(bab.keys)})[0]
+        if names:
+            turns = np.degrees(np.ptp(bab.angles, 0))
+            lines.append("- drives, degrees each servo turns over its controls' whole ranges (an MG90S turns 60 in "
+                         "0.1 s): " + ", ".join(f"{n} {t:.0f}" for n, t in zip(names, turns, strict=True)))
+        ch = (bab.clo[:, 0] >= A_CLOSE) & (bab.clo[:, 0] < A_VOWEL) & (bab.clo[:, 2] > A_OPEN) & (bab.clash <= CLASH)
+        if ch.any():
+            pk = bab.peak[ch]
+            lines.append(f"- fricative channels ({A_CLOSE:g}-{A_VOWEL:g} cm2, airway open elsewhere) in {int(ch.sum())} "
+                         f"sampled postures, at {bab.clo[ch, 1].min():.1f}-{bab.clo[ch, 1].max():.1f} cm behind the "
+                         f"teeth; their hiss peaks at {np.nanmin(pk):.0f}-{np.nanmax(pk):.0f} Hz")
+        else:
+            lines.append(f"- fricative channels: no sampled posture makes a {A_CLOSE:g}-{A_VOWEL:g} cm2 channel with the "
+                         "airway open elsewhere")
         f = bab.f[~np.isnan(bab.f).any(1) & (bab.clo[:, 0] >= A_VOWEL)]
         lines.append(f"- sampled vowel space ({len(f)} of {len(bab.f)} sampled postures keep the narrowest point at "
                      f"or above {A_VOWEL:g} cm2): F1 {f[:, 0].min():.0f}-"
@@ -626,6 +810,13 @@ class PhonologyWorld:
             "A stop needs an articulator that reaches its place and seals the bore there, with the rest of the airway "
             "open so pressure builds behind the closure and the release radiates; an articulator acts only within its "
             "mechanism's travel and stroke.",
+            "A fricative is turbulent air through a channel narrower than a vowel's and wider than a seal; its hiss "
+            "is shaped by the cavity in front of the channel, which resonates near c/4L: a short front cavity "
+            "(a channel at the ridge, short lips) gives the high hiss of /s/, a longer one (further back, rounded or "
+            "protruded lips) the lower hiss of /ʃ/.",
+            "A syllable is a closure released into a vowel; listeners hear a stop only if the release reaches the vowel "
+            "within about 50 ms, so every servo between the two postures must turn little: a mechanism whose "
+            "articulator needs a large turn to open or close cannot make it, however well it makes each posture.",
             "Servo noise moves every posture; a tight constriction makes the formants, F1 above all, sensitive to it, "
             "so a sound counts only when it repeats on fresh noise.",
         ]

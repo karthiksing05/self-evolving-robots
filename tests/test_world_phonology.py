@@ -11,10 +11,20 @@ import pytest
 from sea.evolve.core import Body, Edit, Part, World, apply
 from sea.evolve.loop import RunConfig, held_groups, run
 from sea.evolve.resources import check
-from sea.worlds.phonology import STOPS, VOWELS, PhonologyWorld, acoustics, formants, rig
+from sea.worlds.phonology import (
+    FRICATIVES,
+    STOPS,
+    SYLLABLES,
+    VOWELS,
+    PhonologyWorld,
+    acoustics,
+    formants,
+    rig,
+)
 
 PHYSICAL = {"f1_floor_too_high", "f1_ceiling_too_low", "f2_floor_too_high", "f2_ceiling_too_low", "f3_floor_too_high",
-            "no_closure_at_lips", "no_closure_at_alveolar", "no_closure_at_velar"}
+            "no_closure_at_lips", "no_closure_at_alveolar", "no_closure_at_velar", "no_channel_at_s", "no_channel_at_sh",
+            "noise_peak_too_low", "noise_peak_too_high", "transition_too_slow"}
 
 
 @pytest.fixture(scope="module")
@@ -33,7 +43,7 @@ def _held(w: PhonologyWorld, body: Body, split: str = "train") -> set[str]:
 
 def _gold(w: PhonologyWorld) -> Body:
     cat = {p.name: p for p in w.catalogue()}
-    return apply(w.stock(), [Edit(slot="tongue", type="tip_tongue", params={"stroke": 1.3}),
+    return apply(w.stock(), [Edit(slot="tongue", type="tip_tongue", params={"rail_start": 3.5, "stroke": 1.3}),
                              Edit(slot="lips", type="round_lips", params={"max_protrusion": 1.6})], cat, "gold")
 
 
@@ -63,12 +73,13 @@ def test_world_contract(world):
         types = [p for p in cat if p.slot == s]
         assert len(types) >= 3 and sum(p.stock for p in types) == 1
         assert world.stock().parts[s].type == next(p.name for p in types if p.stock)
-    words = {w for _, w, *_ in VOWELS.values()} | {f"/{g}/" for g in [*VOWELS, *STOPS]}
+    words = {w for _, w, *_ in [*VOWELS.values(), *FRICATIVES.values()]} | {
+        f"/{g}/" for g in [*VOWELS, *STOPS, *FRICATIVES, *SYLLABLES]}
     for p in cat:  # a part says what it does, never which sound it is for
         assert p.provides and not any(w in p.provides for w in words)
         assert all(prm.doc for prm in p.params.values())
     tasks = world.tasks()
-    assert len({t.group for t in tasks}) == 13 and {t.split for t in tasks} == {"train", "test"}
+    assert len({t.group for t in tasks}) == 17 and {t.split for t in tasks} == {"train", "test"}
     assert all(sum(t.split == "train" for t in tasks if t.group == g) == 1 for g in {t.group for t in tasks})
 
 
@@ -103,7 +114,9 @@ def test_a_gold_body_holds_every_group_within_budget(world):
     assert res.ok and 0 < res.usd <= world.manifest()["budget"]["usd"]
     groups = {t.group for t in world.tasks()}
     assert _held(world, gold) == groups
-    assert _held(world, gold, "test") == groups  # other noise, targets moved 3%
+    # other noise, targets moved 3%; the syllables sit at the servos' 30 degree edge, and the /ɑ/ moved up 3% takes
+    # more than that from either closure (D-072)
+    assert _held(world, gold, "test") == groups - set(SYLLABLES)
 
 
 def test_no_params_only_body_holds_everything(world):
@@ -120,7 +133,7 @@ def test_no_params_only_body_holds_everything(world):
         assert outs["er"].mechanism == "f3_floor_too_high"
     # ... but parameters are the cheaper rung where they suffice: a full cam stroke seals the velum
     stroke = apply(stock, [Edit(slot="tongue", params={"stroke": 1.3})], cat, "stroke")
-    assert _held(world, stroke) - _held(world, stock) == {"k"}
+    assert _held(world, stroke) - _held(world, stock) == {"k", "ka", "sh"}  # a deeper cam seals the velum
 
 
 def test_the_longer_cast_is_a_trap(world):
@@ -151,5 +164,5 @@ def test_loop_runs_on_the_phonology_world(tmp_path):
     for arm in ("random", "s1"):
         s = run(RunConfig(world="phonology", arm=arm, iterations=2), tmp_path / arm, world=PhonologyWorld(),
                 log=lambda m: None)
-        assert s["arm"] == arm and s["train_groups"] == 13 and len(s["final_held_train"]) >= 6
-        assert s["test"]["n"] == 26 and (tmp_path / arm / "summary.json").exists()
+        assert s["arm"] == arm and s["train_groups"] == 17 and len(s["final_held_train"]) >= 6
+        assert s["test"]["n"] == 34 and (tmp_path / arm / "summary.json").exists()

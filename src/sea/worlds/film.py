@@ -43,6 +43,7 @@ import numpy as np
 from sea.evolve.core import Body, Task
 from sea.worlds import cad as C
 from sea.worlds import gripper as G
+from sea.worlds import linkages
 from sea.worlds import mobile as M
 from sea.worlds import phonology as P
 
@@ -693,14 +694,16 @@ def _utter(r: P.Rig, ctl: dict[str, float], seed: int = 0, f0: float = 120.0) ->
     return _course(r, ctl, seed, f0)["audio"]
 
 
-def _course(r: P.Rig, ctl: dict[str, float], seed: int = 0, f0: float = 120.0) -> dict[str, Any]:
+def _course(r: P.Rig, ctl: dict[str, float], seed: int = 0, f0: float = 120.0, vowel: dict[str, float] | None = None,
+            release: float | None = None) -> dict[str, Any]:
     """``_utter``'s sound with what made it: the area function every 5 ms (``ts``, ``areas``, ``dist``), whether
-    the posture seals, and when the closure forms (``t_hold``) and releases (``t_rel``)."""
+    the posture seals, and when the closure forms (``t_hold``) and releases (``t_rel``).  A syllable gives its
+    ``vowel`` posture to open into, and the ``release`` time its servos take to get there."""
     rng = np.random.default_rng(seed)
     lo = {k: v[0] for k, v in r.controls.items()}
     hi = {k: v[1] for k, v in r.controls.items()}
-    open_ = {k: (hi[k] if k in ("jaw", "lip_radius") else lo[k] if k.endswith("height") or k in ("protrusion", "larynx")
-                 else ctl[k]) for k in ctl}
+    open_ = vowel or {k: (hi[k] if k in ("jaw", "lip_radius") else lo[k] if k.endswith("height") or
+                          k in ("protrusion", "larynx") else ctl[k]) for k in ctl}
     areas_c, lens_c, dist_c = P.tract(r, {k: np.array([v]) for k, v in ctl.items()})
     sealed = float(areas_c.min()) < P.A_CLOSE
     v1, glide, hold, burst, asp, v2 = 0.28, 0.06, 0.10, 0.025, 0.06, 0.32
@@ -710,7 +713,8 @@ def _course(r: P.Rig, ctl: dict[str, float], seed: int = 0, f0: float = 120.0) -
     t_rel = t_hold + (hold if sealed else 0.04)
     total = t_rel + burst + asp + glide + v2
     ts = np.arange(0, total + hop, hop)
-    w = np.where(ts < t_rel, np.clip((ts - t_in) / glide, 0, 1), np.clip(1 - (ts - t_rel) / (burst + asp + glide), 0, 1))
+    out_s = release if release is not None else burst + asp + glide
+    w = np.where(ts < t_rel, np.clip((ts - t_in) / glide, 0, 1), np.clip(1 - (ts - t_rel) / max(out_s, 0.005), 0, 1))
     post = {k: np.array([(1 - x) * open_[k] + x * ctl[k] for x in w]) for k in ctl}
     areas, lens, dist = P.tract(r, post)
     gains = P.transfer_db(np.maximum(areas, 0.08), lens)  # (frames, FREQ)
@@ -764,7 +768,9 @@ def _tube(r: P.Rig, task: Task, areas: np.ndarray, dist: np.ndarray, note: str, 
     far = float(dist.max()) + 0.4
     x_of = lambda cm: 30 + (far - cm) * PX_CM  # noqa: E731 (distance behind the teeth -> x; lips to the right)
     yc, bore = 92, P.BORE * PX_CM
-    zone = P.PLACES.get(task.data.get("place", ""), None) if task.data["kind"] == "stop" else None
+    kind = task.data["kind"]
+    zone = (P.PLACES.get(task.data["place"]) if kind == "stop" else tuple(task.data["place"]) if kind == "fricative"
+            else P.PLACES[task.data["stop"]["place"]] if kind == "syllable" else None)
     edges = np.concatenate([[far], (dist[:-1] + dist[1:]) / 2, [float(dist.min()) - 0.3]])
     for i, a_cm2 in enumerate(areas):
         x0, x1 = x_of(edges[i]), x_of(edges[i + 1])
@@ -781,7 +787,9 @@ def _tube(r: P.Rig, task: Task, areas: np.ndarray, dist: np.ndarray, note: str, 
         lo, hi = zone
         x_a, x_b = x_of(min(hi, far)), x_of(max(lo, float(dist.min()) - 0.3))
         d.rectangle([x_a, yc - bore - 24, x_b, yc + bore + 10], fill=(24, 140, 70, 46), outline=GOOD, width=2)
-        d.text((x_a + 4, yc - bore - 22), f"/{task.group}/ must seal here", fill=GOOD, font=_font(12, True))
+        what = f"/{task.group}/: a channel here" if kind == "fricative" else f"/{task.group}/ must seal here"
+        x_l = min(x_a + 4, w - 4 - _font(12, True).getlength(what))
+        d.text((x_l, yc - bore - 22), what, fill=GOOD, font=_font(12, True))
     i = int(np.argmin(areas))
     xi = (x_of(edges[i]) + x_of(edges[i + 1])) / 2
     shut = areas[i] < P.A_CLOSE
@@ -799,6 +807,45 @@ def _tube(r: P.Rig, task: Task, areas: np.ndarray, dist: np.ndarray, note: str, 
     d.text((34, h - 26), "2 cm", fill=(90, 90, 90), font=_font(11))
     d.text((140, h - 28), note, fill=PAPER, font=_font(14, True))
     return np.asarray(im)
+
+
+def _hiss_band(task: Task, peak: float, w: int, h: int = 64) -> np.ndarray:
+    """A fricative's hiss: where it peaks (a dot) against its band (green), log scale 1-10 kHz."""
+    from PIL import Image, ImageDraw
+
+    im = Image.new("RGB", (w, h), (250, 250, 247))
+    d = ImageDraw.Draw(im)
+    lo, hi = math.log(1000), math.log(10000)
+
+    def x_of(hz):
+        return 40 + (w - 60) * (math.log(min(max(hz, 1000), 10000)) - lo) / (hi - lo)
+    d.line([(x_of(1000), 34), (x_of(10000), 34)], fill=(170, 170, 170), width=1)
+    for hz in (1000, 2000, 4000, 8000):
+        d.line([(x_of(hz), 30), (x_of(hz), 38)], fill=(150, 150, 150))
+        d.text((x_of(hz) - 14, 42), f"{hz // 1000} kHz", fill=(120, 120, 120), font=_font(10))
+    f_lo, f_hi = task.data["band"]
+    d.rectangle([x_of(f_lo), 26, x_of(f_hi), 42], fill=(200, 232, 206))
+    d.text((x_of(f_lo), 6), "where the hiss must peak", fill=GOOD, font=_font(11, True))
+    if not np.isnan(peak):
+        ok = f_lo <= peak <= f_hi
+        d.ellipse([x_of(peak) - 6, 28, x_of(peak) + 6, 40], fill=GOOD if ok else BAD)
+    d.text((40, 6), "dot: where this shape's hiss peaks", fill=(90, 90, 90), font=_font(10))
+    return np.asarray(im)
+
+
+def _hiss(r: P.Rig, arr: dict[str, np.ndarray], seconds: float, rng: np.random.Generator) -> np.ndarray:
+    """Turbulent noise at the narrowest point through the cavity in front of it (``P.noise_peak``'s filter)."""
+    areas, lens, _ = P.tract(r, arr)
+    i = int(np.argmin(areas[0]))
+    front = np.where(np.arange(areas.shape[1]) > i, lens[0], 0.0)
+    g = P.transfer_db(np.maximum(areas, 0.08), front[None], P.FREQ_HI)[0]
+    n = int(seconds * SR)
+    f = np.fft.rfftfreq(n, 1 / SR)
+    gain = 10 ** (np.interp(f, P.FREQ_HI, g, left=g[0] - 12, right=g[-1]) / 20)
+    out = np.fft.irfft(np.fft.rfft(rng.standard_normal(n)) * gain, n)
+    t = np.arange(n) / SR
+    out *= np.clip(np.minimum(t / 0.06, (seconds - t) / 0.08), 0, 1)
+    return (0.8 * out / max(np.abs(out).max(), 1e-9)).astype(np.float32)
 
 
 def _formants(task: Task, f: np.ndarray, w: int, h: int = 64) -> np.ndarray:
@@ -834,11 +881,31 @@ def phonology(body: Body, task: Task, controls: dict[str, float], seed: int = 0,
     from sea.design.cad import render
 
     r = P.rig(body)
-    ctl = {k: float(np.clip(controls.get(k, (lo + hi) / 2), lo, hi)) for k, (lo, hi) in r.controls.items()}
+    kind = task.data["kind"]
+
+    def posture(prefix: str) -> dict[str, float]:
+        return {k: float(np.clip(controls.get(prefix + k, (lo + hi) / 2), lo, hi)) for k, (lo, hi) in r.controls.items()}
+
+    ctl = posture("c." if kind == "syllable" else "")
     arr = {k: np.array([v]) for k, v in ctl.items()}
     f, clo = P.acoustics(r, arr)
-    ok = float(P.PhonologyWorld._errors(task, f, clo, P.clash(r, arr)[0])[0]) <= 1.0
-    said = P.PhonologyWorld._said(task, f[0], clo[0])
+    first = task.data["stop"] if kind == "syllable" else task.data
+    peak = P.noise_peak(r, arr) if kind == "fricative" else None
+    ok = float(P.PhonologyWorld._errors(first, f, clo, P.clash(r, arr)[0], peak)[0]) <= 1.0
+    said = P.PhonologyWorld._said(first, f[0], clo[0], None if peak is None else float(peak[0]))
+    vowel, release = None, None
+    if kind == "syllable":  # the vowel it opens into, and how long its servos take to get there
+        vowel = posture("v.")
+        varr = {k: np.array([v]) for k, v in vowel.items()}
+        fv, cv = P.acoustics(r, varr)
+        ok = ok and float(P.PhonologyWorld._errors(task.data["vowel"], fv, cv, P.clash(r, varr)[0])[0]) <= 1.0
+        names, a0 = linkages.servo_angles(r, body.parts, arr)
+        a1 = linkages.servo_angles(r, body.parts, varr)[1]
+        turn = float(np.abs(a1 - a0).max(initial=0.0))
+        ok = ok and turn <= P.TURN
+        release = turn / linkages.SERVO_SPEED
+        said = (f"closure: {said}; vowel: {P.PhonologyWorld._said(task.data['vowel'], fv[0], cv[0])}; the servos "
+                f"take {1000 * release:.0f} ms between them")
     w, h = size
     model = C.phonology(body, ctl)
     tw = w - 640
@@ -854,6 +921,17 @@ def phonology(body: Body, task: Task, controls: dict[str, float], seed: int = 0,
         canvas[(h - th) // 2:(h - th) // 2 + th, w - thumb.shape[1]:] = thumb[:th]
         return canvas
 
+    if kind == "fricative":
+        areas, _, dist = P.tract(r, arr)
+        audio = _hiss(r, arr, 1.2, np.random.default_rng(seed))
+        img = frame(_tube(r, task, areas[0], dist[0], "air through a narrow channel: a hiss", h=h - 64),
+                    _hiss_band(task, float(peak[0]), 640))
+        n = int(len(audio) * FPS / SR)
+        sym = P.FRICATIVES[task.group][0]
+        headline = (f"Hisses like /{sym}/: a channel in its place, the hiss peaking in its band" if ok else
+                    f"Not /{sym}/ yet: " + ("no channel in its place" if not (P.A_CLOSE <= clo[0][0] < P.A_VOWEL)
+                                            else "the hiss peaks outside its band"))
+        return Clip([img] * n, ok, said, audio, headline=headline)
     if task.data["kind"] == "vowel":
         areas, lens, dist = P.tract(r, arr)
         audio = _speak(P.transfer_db(np.maximum(areas, 0.08), lens)[0])
@@ -862,7 +940,7 @@ def phonology(body: Body, task: Task, controls: dict[str, float], seed: int = 0,
         headline = (f"Sounds like /{P.VOWELS[task.group][0]}/: both resonances inside their targets" if ok else
                     f"Not /{P.VOWELS[task.group][0]}/ yet: a resonance falls outside its target")
         return Clip([img] * n, ok, said, audio, headline=headline)
-    c = _course(r, ctl, seed)
+    c = _course(r, ctl, seed, vowel=vowel, release=release)
     frames = []
     for k in range(int(len(c["audio"]) * FPS / SR)):
         t = k / FPS
@@ -885,9 +963,16 @@ def phonology(body: Body, task: Task, controls: dict[str, float], seed: int = 0,
     still = [frame(_tube(r, task, areas[0], dist[0], "the shape System 1 found", h=h), None)] * int(0.6 * FPS)
     gap = np.zeros(int(len(still) * SR / FPS), np.float32)
     frames, audio = still + frames + still, np.concatenate([gap, c["audio"], gap])
-    where = P.PLACES[task.data["place"]]
+    where = P.PLACES[first["place"]]
     shut = float(clo[0][0]) < P.A_CLOSE
     in_place = where[0] <= float(clo[0][1]) <= where[1]
+    if kind == "syllable":
+        slow = release is not None and release > P.TURN / linkages.SERVO_SPEED
+        headline = (f"A clean /{task.group}/: sealed, released and into the vowel in {1000 * release:.0f} ms" if ok
+                    else f"Too slow for /{task.group}/: the servos take {1000 * release:.0f} ms to open into the "
+                         "vowel, heard as a glide" if slow else f"Not /{task.group}/ yet: the closure or the vowel "
+                                                                "misses")
+        return Clip(frames, ok, said, audio, headline=headline)
     headline = (f"Seals the tube in the right place: a clean /{task.group}/" if ok else
                 "Never seals the tube, so no /" + task.group + "/: the voice runs straight through" if not shut else
                 "Seals the tube in the wrong place: that is not /" + task.group + "/" if not in_place else

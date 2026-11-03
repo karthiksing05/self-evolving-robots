@@ -371,3 +371,51 @@ def faults(r, parts: dict) -> list[str]:
             out.append(f"larynx slide: lowering the larynx {need:.0f} mm and the {PINION_R:g} mm pinion moves the "
                        f"rack {PINION_R * SPAN:.0f} mm over the servo's travel")
     return out
+
+
+# ---------------------------------------------------------------- how far each servo turns (D-072)
+SERVO_SPEED = math.radians(60.0) / 0.1  # an MG90S at 4.8 V: 60 degrees in 0.1 s
+
+
+def _near(a: list[float], ref: float) -> np.ndarray:
+    """Angles on the branch within half a turn of ``ref``: every drive turns less than that over its range."""
+    return ref + (np.asarray(a) - ref + math.pi) % (2 * math.pi) - math.pi
+
+
+def servo_angles(r, parts: dict, ctl: dict[str, np.ndarray]) -> tuple[list[str], np.ndarray]:
+    """Each servo's angle (rad) at a batch of postures, each on the branch around its angle mid-range: the names, and
+    (B, S).  A pneumatic tongue has no servos; its valves are not timed."""
+    from sea.worlds import phonology as P
+
+    to, li = parts["tongue"], parts["lips"]
+    names, cols = [], []
+    if "larynx" in ctl:
+        names.append("larynx servo")
+        cols.append(np.array([pinion_angle(10 * v) for v in ctl["larynx"]]))
+    if to.type != "pneumatic_tongue":
+        ck, stroke = rail_crank(to.params["rail_start"], to.type), to.params["stroke"]
+        names += ["rail servo", "cam servo"]
+        cols.append(np.array([ck.angle(sled_pin(p)) for p in ctl["tongue_place"]]))
+        cols.append(np.array([cam_angle(stroke, 10 * min(h, stroke)) for h in ctl["tongue_height"]]))
+    if to.type == "tip_tongue":
+        pins = [tip_pin(p, h) for p, h in zip(ctl["tip_place"], ctl["tip_height"], strict=True)]
+        mid = tip_pin(sum(r.controls["tip_place"]) / 2, sum(r.controls["tip_height"]) / 2)
+        for k, d in enumerate(TIP_DYADS):
+            names.append(f"tip servo {k + 1}")
+            cols.append(_near([d.horn(p) for p in pins], d.horn(mid)))
+    if "jaw" in ctl:
+        span, tube = P.JAW[li.type]
+        d, pin0 = jaw_dyad(10 * tube, li.params["rest_area"], span)
+        names.append("jaw servo")
+        pin = lambda j: pin0 - np.array([0.0, jaw_drop(li.params["rest_area"], span, j)])  # noqa: E731
+        cols.append(_near([d.horn(pin(j)) for j in ctl["jaw"]], d.horn(pin(0.5))))
+    if li.type == "round_lips":
+        d = protrusion_dyad(li.params["max_protrusion"], P.RING / 2)
+        lo, hi = r.controls["lip_radius"]
+        names += ["protrusion servo", "drawstring servo"]
+        ref = d.horn(ring_clip((lo + hi) / 2, sum(r.controls["protrusion"]) / 2))
+        cols.append(_near([d.horn(ring_clip(a, p)) for a, p in zip(ctl["lip_radius"], ctl["protrusion"], strict=True)],
+                          ref))
+        cols.append(np.array([spool_angle(a, lo, hi) for a in ctl["lip_radius"]]))
+    n = len(next(iter(ctl.values())))
+    return names, (np.stack(cols, 1) if cols else np.zeros((n, 0)))
