@@ -61,6 +61,8 @@ def to_design(body: Body) -> Design:
         kw["link_mm"] = jaw.params["link_mm"]
     if jaw.type == "prismatic":  # a module-1 pinion: pitch radius teeth/2 mm (sim/jaws.py builds it, D-058)
         kw["drive_mm_per_rad"] = round(jaw.params["pinion_teeth"]) / 2
+    if jaw.type == "long_slide":  # a module-1 gear sector: whole teeth at the radius asked (D-064)
+        kw.update(jaw="prismatic", drive_mm_per_rad=round(2 * jaw.params["sector_radius_mm"]) / 2, sector=True)
     if pads.type == "pads":
         kw.update({k: float(v) for k, v in pads.params.items()})
     volts = {j: (12.0 if servos.type == "servos_12v" and j in LIFT_JOINTS else 7.4) for j in ARM_JOINTS}
@@ -125,6 +127,17 @@ def _jaw_summary(cs: list[tuple[float, float, float, str]]) -> tuple[float, floa
     return f, zc, nz, parts
 
 
+def _part(geom: str) -> str:
+    """A robot geom's part, in words."""
+    from sea.mechanism.gripper import _label
+
+    if "pad" in geom:
+        return "a pad"
+    if geom.startswith(("jaw_fixed", "jaw_moving")):
+        return f"the {geom.split('_')[1]} jaw"
+    return _label(geom, "")
+
+
 def diagnose(rows: list[dict[str, Any]], note: str, fing: FingerSpec, height_m: float, mass_g: float) -> tuple[str, str]:
     """(mechanism, detail) for one failed pick, from the replayed contacts.  A stalled arm joint is labelled by
     what the jaws were doing: pressing on the object's top stalls the arm without any payload."""
@@ -136,7 +149,13 @@ def diagnose(rows: list[dict[str, Any]], note: str, fing: FingerSpec, height_m: 
         return "start_collision", "the robot touches the object at the start of the episode"
     if note == "force_limit":
         r = max(rows, key=lambda r: sum(c[0] for k in r["cons"] for c in r["cons"][k]))
-        return "force_limit", f"a contact exceeded the force limit at t={r['t']:.2f} s (squeezing or pressing down)"
+        cs = [c for k in r["cons"] for c in r["cons"][k]]
+        if not cs:
+            return "force_limit", f"a contact exceeded the force limit at t={r['t']:.2f} s (squeezing or pressing down)"
+        f, zc, nz, name = max(cs)  # the hardest-pressing part (D-064: name it, so a redesign can move it)
+        where = "down on its top" if nz < -0.7 else "up under it" if nz > 0.7 else "on its side"
+        return "force_limit", (f"{_part(name)} pressed {f:.0f} N {where} at t={r['t']:.2f} s, {zc:+.0f} mm from the "
+                               f"object's centre (top at {height_m * 500:+.0f}); the force limit stopped the attempt")
     ctrl = np.array([r["ctrl"] for r in rows])
     peak = int(np.argmax(ctrl))  # the descent opening; closing starts when the command falls from it
     after = np.nonzero(ctrl[peak:] < ctrl[peak] - 0.05)[0]
@@ -241,6 +260,14 @@ class GripperWorld:
                                                    "with it (servo torque / radius), and the pinion is teeth + 2 mm "
                                                    "across")},
                      provides="a finger that neither turns nor rises as it opens"),
+            PartType(name="long_slide", slot="jaw",
+                     doc="the slide's carriage and rack on two 3 x 150 mm steel rods, driven by a printed module-1 "
+                         "gear sector on the servo horn: teeth only over the arc in mesh, so it clears what a whole "
+                         "pinion of that size would hit; the finger slides straight along the closing axis",
+                     params={"sector_radius_mm": Param(lo=30, hi=50, unit="mm", doc="the sector's pitch radius: the "
+                                                       "finger travels this many mm per servo radian; the opening grows "
+                                                       "with it, the squeeze falls with it (servo torque / radius)")},
+                     provides="a finger that neither turns nor rises, over a long travel"),
             PartType(name="none", slot="pads", stock=True, doc="the bare stock jaw faces (PLA)"),
             PartType(name="pads", slot="pads", doc="printed pads over the bottom of each jaw face (design/fingers.py)",
                      params=pad_params, provides="contact shape, extension and friction at the fingertips"),
@@ -266,6 +293,11 @@ class GripperWorld:
                             note="carriage, rack, pinion, rod clamps"),
                     BomLine(item="steel_rod_3x100", qty=2, slot="jaw"), BomLine(item="lm3uu_bearing", qty=2, slot="jaw"),
                     BomLine(item="m3_screw", qty=6, slot="jaw")]
+        if jaw.type == "long_slide":
+            out += [BomLine(item="print:PLA", qty=round(24 + 0.012 * jaw.params["sector_radius_mm"] ** 2, 1), slot="jaw",
+                            note="carriage, rack, gear sector, rod clamp"),
+                    BomLine(item="steel_rod_3x150", qty=2, slot="jaw"), BomLine(item="lm3uu_bearing", qty=2, slot="jaw"),
+                    BomLine(item="m3_screw", qty=6, slot="jaw")]
         if body.parts["pads"].type == "pads":
             _, pla, tpu, _ = finger_estimate(to_design(body))
             out.append(BomLine(item="print:PLA", qty=round(pla, 2), slot="pads"))
@@ -290,6 +322,7 @@ class GripperWorld:
                 "psu_12v": {"on_hand": 0, "usd": 14.0, "lead_days": 3, "doc": "12 V 5 A supply"},
                 "m2_screw": {"on_hand": 50}, "m3_screw": {"on_hand": 50},
                 "steel_rod_3x100": {"on_hand": 0, "usd": 1.5, "lead_days": 2, "doc": "3 mm ground steel rod"},
+                "steel_rod_3x150": {"on_hand": 0, "usd": 2.0, "lead_days": 2, "doc": "3 mm ground steel rod"},
                 "lm3uu_bearing": {"on_hand": 0, "usd": 1.2, "lead_days": 3, "doc": "3 mm linear bushing"},
                 "mr63_bearing": {"on_hand": 0, "usd": 0.9, "lead_days": 3, "doc": "3 mm pivot bearing"},
                 "mgn7_rail": {"on_hand": 0, "doc": "miniature linear rail (none on the bench)"},
@@ -328,6 +361,9 @@ class GripperWorld:
                "parallelogram": f"parallelogram linkage, link {f.link_mm:g} mm",
                "prismatic": f"rack-and-pinion slide, {2 * f.drive_mm_per_rad:g}-tooth pinion, "
                             f"{f.drive_mm_per_rad:g} mm per servo radian"}[f.jaw]
+        if f.sector:
+            jaw = (f"long slide: a {f.drive_mm_per_rad:g} mm gear sector on 150 mm rods, "
+                   f"{f.drive_mm_per_rad:g} mm per servo radian")
         widest = F.fingertips(f, hi)[0] * 1000
         pads = ("bare stock faces, PLA friction 0.45" if not F.has_pads(f) else
                 f"pads {F.thickness(f) * 1000:.0f} mm thick per face, friction {0.9 if f.pad_tpu_mm > 0 else 0.45}, "

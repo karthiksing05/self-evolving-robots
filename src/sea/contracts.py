@@ -140,10 +140,11 @@ class FingerSpec(_Model):
     width_mm: float = 0.0  # pad width across the jaw (0: the default 12 mm)
     # The moving jaw's joint (D-042).  revolute: the stock hinge.  parallelogram: two links of length
     # link_mm keep the finger's orientation while it swings.  prismatic: a rack and pinion slides the
-    # finger drive_mm_per_rad per servo radian.
+    # finger drive_mm_per_rad per servo radian; sector: its gear is a sector on 150 mm rods (the long slide, D-064).
     jaw: Literal["revolute", "parallelogram", "prismatic"] = "revolute"
     link_mm: float = 0.0
     drive_mm_per_rad: float = 0.0
+    sector: bool = False
 
 
 class ArmSpec(_Model):

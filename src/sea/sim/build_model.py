@@ -459,7 +459,7 @@ def _jaw_joint(spec: mujoco.MjSpec, f) -> list[tuple[str, float]]:
     joints with their units per servo radian.  The gripper joint stays the servo's output, a hinge in
     radians: the slide's pinion turns on it (D-058), and the parallelogram's driving links (D-057)."""
     if f.jaw == "prismatic":
-        return slide(spec, f.drive_mm_per_rad * MM)
+        return slide(spec, f.drive_mm_per_rad * MM, f.sector)
     if f.jaw == "parallelogram":
         return four_bar(spec, f.link_mm)
     return []

@@ -174,6 +174,25 @@ def test_the_mechanism_laws_refuse_what_cannot_be_assembled_and_pass_what_can():
     assert "mechanism law (carried): the carriage" in b021
 
 
+def test_the_long_slide_passes_the_laws_up_to_the_wrist_and_opens_past_the_mustard_bottle():
+    """D-064: a gear sector clears what a whole pinion of its size hits.  At 47 mm it passes every law and
+    opens 98 mm with the fingertip level; at 50 mm the sector meets the rolled wrist, named with its numbers."""
+    from sea.design import fingers as F
+    from sea.worlds.gripper import to_design
+
+    world = GripperWorld()
+    long47 = _jaw(world, "long_slide", sector_radius_mm=47)
+    assert world.check(long47) == []
+    f = to_design(long47).fingers
+    assert f.jaw == "prismatic" and f.sector and f.drive_mm_per_rad == 47
+    hi = F.Q_RANGES["prismatic"][1]
+    assert F.fingertips(f, hi)[0] * 1000 == pytest.approx(98, abs=1.5)
+    assert abs(F.fingertips(f, hi)[1] * 1000) < 3  # neither turns nor rises
+    wrist = world.check(_jaw(world, "long_slide", sector_radius_mm=50))
+    assert len(wrist) == 1 and "the wrist and the pinion share material" in wrist[0] and "wrist rolled" in wrist[0]
+    assert {"steel_rod_3x150", "lm3uu_bearing"} <= {b.item for b in world.bom(long47)}
+
+
 def test_a_four_bar_near_toggle_breaks_the_transmission_law(monkeypatch):
     from sea.mechanism import gripper as G
     from sea.sim import jaws

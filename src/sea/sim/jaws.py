@@ -289,6 +289,16 @@ BACKLASH = 0.6 * MM  # flank to flank in mesh, both gears together
 GEAR_Y = (-34.5 * MM, -28.5 * MM)  # the pinion's and rack's face
 HUB_R = 8.0 * MM  # the pinion's hub on the horn, through the frame's cut-out around it (clear to 12 mm)
 ROD_Y, ROD_R, ROD_LEN = -40.0 * MM, 1.5 * MM, 100.0 * MM  # the two 3 x 100 mm steel rods of the bill of materials
+LONG_ROD = 150.0 * MM  # the long slide's rods (D-064)
+SECTOR_TEETH = 2  # a sector's teeth beyond the arc in mesh, each end
+# The long slide's rack hangs a sector radius below the hinge, near the fingertips: its rods run outboard of a
+# 102 mm deep object (y = -56 mm) and above the rack's pitch line, the carriage block beside the gear plane,
+# so the lowest moving part is the arm under the rack.  The clamp sits beside the fixed finger, its bracket
+# crossing the gear plane between the rack's teeth and the sector's sweep to the finger's outer face (y about
+# -8 mm there, from the frame mesh): behind the hinge the sector sweeps where the short slide's bracket ran.
+LONG_ROD_Y, LONG_ROD_RISE = -56.0 * MM, (4.0 * MM, 16.0 * MM)  # the rods' heights above the rack's pitch line
+CLAMP_X = (-19.0 * MM, -12.0 * MM)
+FINGER_FACE_Y = -8.0 * MM
 ROD_DROP = (10.0 * MM, 22.0 * MM)  # the rods' heights below the rack's pitch line
 CARRIAGE_X = (8.0 * MM, 28.0 * MM)  # over the blade
 CARRIAGE_Y = (-45.0 * MM, GEAR_Y[1])
@@ -341,15 +351,22 @@ def module_for(r_pitch: float) -> tuple[int, float]:
     return n, 2 * r_pitch / n
 
 
-def gear(r_pitch: float, width: float) -> tuple[np.ndarray, np.ndarray]:
-    """A spur gear on z: a root disc and whole teeth, a gap facing -y (where it meets the rack at q = 0)."""
+def gear(r_pitch: float, width: float, arc: tuple[float, float] | None = None) -> tuple[np.ndarray, np.ndarray]:
+    """A spur gear on z: a root disc and whole teeth, a gap facing -y (where it meets the rack at q = 0).  With
+    ``arc`` (gear-frame angles, at most half a turn) a sector: a wedge from the axis and the teeth inside it."""
     n, m = module_for(r_pitch)
     rf = r_pitch - 1.25 * m
-    a = np.linspace(0.0, 2 * math.pi, 4 * n, endpoint=False)
-    disc = np.c_[rf * np.cos(a), rf * np.sin(a)]
+    if arc is None:
+        a = np.linspace(0.0, 2 * math.pi, 4 * n, endpoint=False)
+        disc = np.c_[rf * np.cos(a), rf * np.sin(a)]
+    else:
+        a = np.linspace(*arc, max(int(4 * n * (arc[1] - arc[0]) / (2 * math.pi)), 8))
+        disc = np.r_[[[0.0, 0.0]], np.c_[rf * np.cos(a), rf * np.sin(a)]]
     teeth = []
     for k in range(n):
         t = -math.pi / 2 + 2 * math.pi * (k + 0.5) / n
+        if arc is not None and (t - arc[0]) % (2 * math.pi) > arc[1] - arc[0]:
+            continue
         out, along = np.array([math.cos(t), math.sin(t)]), np.array([-math.sin(t), math.cos(t)])
         teeth.append(_tooth(0.0, along, out, (rf - 0.2 * m) * out, m))
     return _prisms([disc, *teeth], width)
@@ -365,11 +382,12 @@ def rack_teeth(x0: float, x1: float, x_mesh: float, z_pitch: float, width: float
     return v[:, [0, 2, 1]] * [1.0, -1.0, 1.0], f[:, ::-1]  # x-z outline, extruded along y (mirrored: flip faces)
 
 
-def slide(spec: mujoco.MjSpec, r_pitch: float) -> list[tuple[str, float]]:
+def slide(spec: mujoco.MjSpec, r_pitch: float, sector: bool = False) -> list[tuple[str, float]]:
     """Rebuild the moving jaw as a rack and pinion on two rods (D-058).  The servo's hinge turns a pinion of
     pitch radius ``r_pitch`` on its horn; the rack's carriage runs on the rods ``r_pitch`` per radian and
     carries the stock finger's blade.  A stiff joint equality is the teeth: tooth contact itself is too
-    fine for a 2 ms step."""
+    fine for a 2 ms step.  ``sector``: the long slide (D-064), a gear sector with teeth only over the arc in
+    mesh, on 150 mm rods clamped beside the fixed finger."""
     jaw = spec.body(JAW_MESH)
     for g in [g for g in spec.geoms if g.parent.name == JAW_MESH and g.meshname == JAW_MESH]:
         spec.delete(g)
@@ -380,11 +398,16 @@ def slide(spec: mujoco.MjSpec, r_pitch: float) -> list[tuple[str, float]]:
     hub = (HORN_SIDE[0], HINGE[1] - GEAR_Y[1])
     jaw.add_geom(name="jaw_pinion_hub", type=mujoco.mjtGeom.mjGEOM_CYLINDER, size=[HUB_R, (hub[1] - hub[0]) / 2],
                  pos=[0.0, 0.0, sum(hub) / 2], rgba=PRINTED, group=2, mass=0.0)
-    gv, gf = gear(r_pitch, width)
+    n_teeth, _ = module_for(r_pitch)
+    pitch = 2 * math.pi / n_teeth
+    # the gear's angle in mesh (at the bottom) is -pi/2 - q: over the range, plus a margin of teeth
+    arc = (-math.pi / 2 - hi - SECTOR_TEETH * pitch, -math.pi / 2 - lo + SECTOR_TEETH * pitch) if sector else None
+    gv, gf = gear(r_pitch, width, arc)
     spec.add_mesh(name="jaw_pinion", uservert=gv.ravel().tolist(), userface=gf.ravel().tolist())
     jaw.add_geom(name="jaw_pinion_gear", type=mujoco.mjtGeom.mjGEOM_MESH, meshname="jaw_pinion",
                  pos=[0.0, 0.0, HINGE[1] - sum(GEAR_Y) / 2], rgba=PRINTED, group=2, mass=0.0)
-    jaw.mass, jaw.explicitinertial = _box_mass(math.pi * (HUB_R**2 * (hub[1] - hub[0]) + r_pitch**2 * width)), True
+    share = 1.0 if arc is None else (arc[1] - arc[0]) / (2 * math.pi)
+    jaw.mass, jaw.explicitinertial = _box_mass(math.pi * (HUB_R**2 * (hub[1] - hub[0]) + share * r_pitch**2 * width)), True
     jaw.ipos, jaw.iquat, jaw.fullinertia = [0.0, 0.0, HINGE[1] - sum(GEAR_Y) / 2], [1.0, 0.0, 0.0, 0.0], [math.nan] * 6
     jaw.inertia = [jaw.mass * r_pitch**2 / 4 + 1e-7] * 2 + [jaw.mass * r_pitch**2 / 2 + 1e-7]
 
@@ -403,20 +426,36 @@ def slide(spec: mujoco.MjSpec, r_pitch: float) -> list[tuple[str, float]]:
                   userface=tf.ravel().tolist())
     car.add_geom(name="jaw_rack_teeth", type=mujoco.mjtGeom.mjGEOM_MESH, meshname="jaw_rack_teeth", contype=0,
                  conaffinity=0, rgba=PRINTED, group=2, mass=0.0)
-    # the carriage block under the rack, with a square bore for each rod's bushing
-    rods = [z_pitch - d for d in ROD_DROP]
-    top, bottom = root - 5 * MM, rods[1] - 6 * MM
-    x0, x1 = CARRIAGE_X
-    for k, (z0, z1) in enumerate([(rods[0] + BORE, top), (rods[1] + BORE, rods[0] - BORE), (bottom, rods[1] - BORE)]):
-        vol += _box(car, f"jaw_carriage{k}", [x0, CARRIAGE_Y[0], z0], [x1, CARRIAGE_Y[1], z1], PRINTED, True)
-    for k, zr in enumerate(rods):
-        for side, (y0, y1) in (("out", (CARRIAGE_Y[0], ROD_Y - BORE)), ("in", (ROD_Y + BORE, CARRIAGE_Y[1]))):
-            vol += _box(car, f"jaw_carriage_bore{k}_{side}", [x0, y0, zr - BORE], [x1, y1, zr + BORE], PRINTED, True)
-    # the arm across to the blade, at a height where both are
-    arm_z = min(max(z_pitch - 15 * MM, -95 * MM), -62 * MM)
-    arm_x1 = 19 * MM if arm_z < -88 * MM else 26 * MM
-    vol += _box(car, "jaw_carriage_arm", [12 * MM, CARRIAGE_Y[1], arm_z - 4 * MM], [arm_x1, -6 * MM, arm_z + 4 * MM],
-                PRINTED, True)
+    if sector:
+        # the block beside the gear plane, from under the rack to above the upper rod, a bore round each rod;
+        # the arm under the rack carries the blade
+        rod_y = LONG_ROD_Y
+        rods = [z_pitch + d for d in LONG_ROD_RISE]
+        y0, y1 = rod_y - 5 * MM, GEAR_Y[0]
+        bottom, top = root - 13 * MM, rods[1] + 6 * MM
+        x0, x1 = CARRIAGE_X
+        for k, (z0, z1) in enumerate([(bottom, rods[0] - BORE), (rods[0] + BORE, rods[1] - BORE), (rods[1] + BORE, top)]):
+            vol += _box(car, f"jaw_carriage{k}", [x0, y0, z0], [x1, y1, z1], PRINTED, True)
+        for k, zr in enumerate(rods):
+            for side, (ya, yb) in (("out", (y0, rod_y - BORE)), ("in", (rod_y + BORE, y1))):
+                vol += _box(car, f"jaw_carriage_bore{k}_{side}", [x0, ya, zr - BORE], [x1, yb, zr + BORE], PRINTED, True)
+        vol += _box(car, "jaw_carriage_arm", [12 * MM, y1, bottom], [26 * MM, -6 * MM, root - 5 * MM], PRINTED, True)
+    else:
+        # the carriage block under the rack, with a square bore for each rod's bushing
+        rod_y = ROD_Y
+        rods = [z_pitch - d for d in ROD_DROP]
+        top, bottom = root - 5 * MM, rods[1] - 6 * MM
+        x0, x1 = CARRIAGE_X
+        for k, (z0, z1) in enumerate([(rods[0] + BORE, top), (rods[1] + BORE, rods[0] - BORE), (bottom, rods[1] - BORE)]):
+            vol += _box(car, f"jaw_carriage{k}", [x0, CARRIAGE_Y[0], z0], [x1, CARRIAGE_Y[1], z1], PRINTED, True)
+        for k, zr in enumerate(rods):
+            for side, (y0, y1) in (("out", (CARRIAGE_Y[0], ROD_Y - BORE)), ("in", (ROD_Y + BORE, CARRIAGE_Y[1]))):
+                vol += _box(car, f"jaw_carriage_bore{k}_{side}", [x0, y0, zr - BORE], [x1, y1, zr + BORE], PRINTED, True)
+        # the arm across to the blade, at a height where both are
+        arm_z = min(max(z_pitch - 15 * MM, -95 * MM), -62 * MM)
+        arm_x1 = 19 * MM if arm_z < -88 * MM else 26 * MM
+        vol += _box(car, "jaw_carriage_arm", [12 * MM, CARRIAGE_Y[1], arm_z - 4 * MM], [arm_x1, -6 * MM, arm_z + 4 * MM],
+                    PRINTED, True)
     verts, faces = blade_mesh()
     spec.add_mesh(name="jaw_blade", uservert=verts.ravel().tolist(), userface=faces.ravel().tolist(),
                   inertia=mujoco.mjtMeshInertia.mjMESH_INERTIA_SHELL)
@@ -427,26 +466,37 @@ def slide(spec: mujoco.MjSpec, r_pitch: float) -> list[tuple[str, float]]:
         car.add_geom(name=f"jaw_moving_{k}", type=mujoco.mjtGeom.mjGEOM_MESH, meshname=f"jaw_blade_cvx{k}",
                      condim=4, group=3, mass=0.0)
     car.mass = blade_mass() + _box_mass(vol) + 2 * BUSHING_KG
-    car.explicitinertial, car.ipos = True, _to_jaw(np.array([sum(CARRIAGE_X) / 2, -20 * MM, (top + bottom) / 2]))
+    y_mid = (rod_y - 5 * MM + GEAR_Y[0]) / 2 if sector else -20 * MM
+    car.explicitinertial, car.ipos = True, _to_jaw(np.array([sum(CARRIAGE_X) / 2, y_mid, (top + bottom) / 2]))
     car.inertia = [car.mass * 4e-4] * 3
 
     # the rods, their clamp and its bracket to the frame, on the gripper; the rods end just past the
     # carriage fully open, so a long travel leaves the carriage off their back end when closed
     front = CARRIAGE_X[1] + s_hi + 2 * MM
+    rod_len = LONG_ROD if sector else ROD_LEN
     for k, zr in enumerate(rods):
-        grip.add_geom(name=f"jaw_rod{k}", type=mujoco.mjtGeom.mjGEOM_CYLINDER, size=[ROD_R, ROD_LEN / 2],
-                      pos=[front - ROD_LEN / 2, ROD_Y, zr], quat=[math.sqrt(0.5), 0.0, math.sqrt(0.5), 0.0],
+        grip.add_geom(name=f"jaw_rod{k}", type=mujoco.mjtGeom.mjGEOM_CYLINDER, size=[ROD_R, rod_len / 2],
+                      pos=[front - rod_len / 2, rod_y, zr], quat=[math.sqrt(0.5), 0.0, math.sqrt(0.5), 0.0],
                       rgba=STEEL, group=2, mass=0.0)
-    back = front - ROD_LEN
-    clamp_top = -31 * MM  # the bracket's top meets the frame's horn side (y = -28 mm, down to z = -37 mm)
-    cvol = _box(grip, "jaw_clamp", [back, CARRIAGE_Y[0], rods[1] - 5 * MM], [back + 8 * MM, ROD_Y + 5 * MM, clamp_top],
-                PRINTED, False)
-    # the bracket crosses the gear plane behind the pinion to reach the frame (x >= -19.5 mm there): a
-    # pinion too large leaves it no room, and the clamp hangs from nothing
-    reach = min(max(back + 8 * MM, -15 * MM), HINGE[0] - r_pitch - 2 * m - 1 * MM)
-    cvol += _box(grip, "jaw_clamp_bracket", [back, CARRIAGE_Y[0], clamp_top], [max(reach, back + 1 * MM), -28.0 * MM,
-                                                                             clamp_top + 6 * MM], PRINTED, False)
-    _carry(grip, _box_mass(cvol) + 2 * STEEL_KG_M3 * math.pi * ROD_R**2 * ROD_LEN)
+    if sector:
+        # the clamp grips both rods beside the fixed finger; its bracket runs in over the rack's teeth (1 mm
+        # clear) and under the sector's sweep to the finger
+        cvol = _box(grip, "jaw_clamp", [CLAMP_X[0], rod_y - 5 * MM, rods[0] - 5 * MM],
+                    [CLAMP_X[1], rod_y + 5 * MM, rods[1] + 5 * MM], PRINTED, False)
+        cvol += _box(grip, "jaw_clamp_bracket", [CLAMP_X[0], rod_y + 5 * MM, z_pitch + m + 1 * MM],
+                     [CLAMP_X[1], FINGER_FACE_Y, z_pitch + m + 8 * MM], PRINTED, False)
+        _carry(grip, _box_mass(cvol) + 2 * STEEL_KG_M3 * math.pi * ROD_R**2 * rod_len)
+    else:
+        back = front - ROD_LEN
+        clamp_top = -31 * MM  # the bracket's top meets the frame's horn side (y = -28 mm, down to z = -37 mm)
+        cvol = _box(grip, "jaw_clamp", [back, CARRIAGE_Y[0], rods[1] - 5 * MM], [back + 8 * MM, ROD_Y + 5 * MM, clamp_top],
+                    PRINTED, False)
+        # the bracket crosses the gear plane behind the pinion to reach the frame (x >= -19.5 mm there): a
+        # pinion too large leaves it no room, and the clamp hangs from nothing
+        reach = min(max(back + 8 * MM, -15 * MM), HINGE[0] - r_pitch - 2 * m - 1 * MM)
+        cvol += _box(grip, "jaw_clamp_bracket", [back, CARRIAGE_Y[0], clamp_top], [max(reach, back + 1 * MM), -28.0 * MM,
+                                                                                 clamp_top + 6 * MM], PRINTED, False)
+        _carry(grip, _box_mass(cvol) + 2 * STEEL_KG_M3 * math.pi * ROD_R**2 * ROD_LEN)
 
     # the teeth: as stiff as printed teeth in mesh (about 1.5 N/um on a 6 mm face: 0.07 mm at 110 N here)
     spec.add_equality(type=mujoco.mjtEq.mjEQ_JOINT, name1="jaw_slide", name2="gripper",

@@ -1725,3 +1725,27 @@ Three fixes failed on the way, each for a reason:
   - seed 1 chose two Li-ion cells (7.4 V), inside D-062's range.
   - No seed used the parameter-only routes physics opened (big fast wheels, a sliding belly). System 2 reasoned to the redesign the failures named.
   - The films replay the MuJoCo episodes; the deepest a robot part sits in the ground is 0.84 mm.
+
+## D-064 A long slide: a gear sector on the horn drives the rack on 150 mm rods (judge: world_gripper)
+
+**Why.** Under the mechanism laws every gripper seed stopped at 17/21. The four groups still lost are the pudding box (90 mm), sugar box (92), mustard bottle (96) and tuna can (85). The hinged jaw's fingertip rises 28–33 mm at those widths and tilts 32–42°, and it opens at most 91 mm. The catalogue slide does not rise, but a full pinion is capped at 60 teeth (it would otherwise clear neither the rod clamp's bracket nor the wrist), so it stops at 58 mm. All three seeds recorded the same need as an idea: a straight slide with about 90 mm of travel. Seed 0 (iteration 11) proposed the form adopted here: a printed module-1 gear *sector* of 42 mm pitch radius on the servo horn, with teeth only over the arc the jaw sweeps, driving the catalogue rack and carriage on longer rods. A step-up gear stage (seeds 0 and 1) needs a second shaft on bearings beside the gripper frame. Every place to carry it there is taken by the gears' own planes, the rods or the wrist, so the sector is the buildable form of the same request. The redesign stays System 2's: the catalogue only gains the part.
+
+**Change.**
+- New catalogue part `long_slide` (jaw slot), with param `sector_radius_mm` from 30 to 50. The finger travels that many mm per servo radian, and squeeze is servo torque / radius.
+- The sector carries teeth over the jaw's range plus two teeth either side, on a web to the horn hub. The rack and carriage are the catalogue slide's. The rods are 3 × 150 mm (new manifest item `steel_rod_3x150`, $2.00).
+- The same laws apply: carried, no interference through the jaw's range and the wrist's roll, and the stop.
+
+**Prediction.**
+- A sector of 40–48 mm passes every law. Above about 48 mm the sector or the rack meets the wrist or the clamp's bracket, and is refused with numbers.
+- At 45 mm the widest opening is about 95 mm, and the fingertip stays within ±3 mm of level at every width.
+- The campaign (three seeds, as before): System 2 picks the long slide within two iterations and gains the tuna can and the pudding and sugar boxes. The mustard bottle (96 mm) is marginal. Small objects (dice, 17 mm) may be lost to the coarser resolution: 45 mm per radian puts a 1° servo error at 0.8 mm. I expect 19–21/21 train.
+
+**Measured, before the campaign.**
+- Laws: sectors of 30–47 mm and 49 mm pass. At 48 and 50 mm the sector's last tooth meets the wrist rolled to −2.74 rad, by 1.3–1.6 mm, and is refused with those numbers. That boundary is not monotonic because whole teeth move the sector's ends. At 47 mm the fingertips open 98 mm and the moving fingertip stays +1 mm of level at every width; squeeze is 34 N.
+- My first layout hung the rods under the rack, 12–24 mm above the fingertips at a 47 mm sector, and the lower rod pressed on the tuna can's rim (the force limit). Re-laid, before any campaign: the rods run outboard of a 102 mm deep object (y = −56 mm) and above the rack's pitch line. The carriage block sits beside the gear plane, and the clamp's bracket crosses that plane between the rack's teeth and the sector's sweep, to the fixed finger's outer face. The lowest moving part is now about 25 mm above the fingertips.
+- Single trials at 47 mm:
+  - **Bare PLA faces** held the pudding box, sugar box, mustard bottle, tuna can and dice. The potted meat can (102 mm deep) failed because the carriage pressed 20 N on its top edge.
+  - **0.5 mm TPU pads** held the potted meat can, but the pads close the opening to 91 mm, which loses the sugar box and the mustard bottle.
+
+  That is a real trade-off, and it is left to System 2.
+- **The force-limit diagnosis now names the part.** It used to read "a contact exceeded the force limit". It now says, for example, "the carriage pressed 20 N on its side … +42 mm from the object's centre (top at +42)", so a redesign can move the part that pressed.
