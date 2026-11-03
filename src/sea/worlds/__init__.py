@@ -29,7 +29,14 @@ def _mobile():
     return MobileWorld()
 
 
+def _me2110():
+    from sea.worlds.me2110 import ME2110World
+
+    return ME2110World()
+
+
 register("gripper", _gripper)
 register("gripper_dense", _gripper_dense)
 register("phonology", _phonology)
 register("mobile", _mobile)
+register("me2110", _me2110)

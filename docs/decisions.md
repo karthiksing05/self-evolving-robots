@@ -2119,3 +2119,78 @@ As predicted. Under real linkages, a sled clear of the glottis, and a blade that
 - **The conflict was not the predicted one.** /s/ was held on every seed. The last group was /ta/ each time, at the 30° edge, and the syllables are what the test split loses.
 - **System 2 found the lever:** the cast's length and where the rail starts, so /ɑ/ reaches its F1 with the tip blade held higher. s0 and s2 found settings that work. s1 tried rail starts of 3.5–4.0 cm on 13.25–13.4 cm casts, and less protrusion. Each missed /ta/ by a few degrees or lost /ka/. It never tried 3.5 cm on the 13.5 cm cast, which holds all 17.
 - **A harness fault:** in s0's second call, System 2 wrote three proposals whose values were only in their prose (rail_start 3.25 → 4.0, a shorter cast), with an empty `edits` list. The loop refused each as "the edit leaves the body unchanged" and the iteration was lost. The refusal should name the fault, no edits given, so the next call can correct it.
+
+## D-073 A fourth world: the ME 2110 competition robot, every task in one 40 s match (world: me2110)
+
+**Why.** The three worlds each test one capability: grasping, crossing ground, shaping a tract. A real design brief asks one machine to do several things at once, sharing its actuators, its envelope, its budget and its time. The ME 2110 "Pirates of the Caribbean" brief (`ME2110_Fall_2026_Final_Project_v1.3.pdf`, used here as an example brief, not a class) is such a brief. Six scored tasks share one 40 s match. The kit supplies 2 gearmotors, 2 pneumatic pistons, 4 mousetraps and 5 rubber bands. The robot starts inside a 12 × 24 × 18 in box, and the parts bought must cost under $120.
+
+**Change.**
+- **A new world, `me2110`** (`src/sea/worlds/me2110.py`, simulator `src/sea/sim/me2110_model.py`, judge component `world_me2110`). The arena is built in MuJoCo from the brief's figures, in inches:
+  - the start line, the 30 in dock, and the quadrant's diagonals;
+  - the fortress: 24 in across and 13 in tall, turning clockwise at a constant speed, with four cannon ports. Each port is a 4 in gap in the wall, its barrier at the colour's tab height (6, 7, 8 or 8.75 in), and a receptacle behind it;
+  - the 4 in square flagpole up to 72 in, and the tentacles: 14 in across, up to 24 in;
+  - 10 coins (2.5 × 0.5 in) and 5 jewels (1.5 in) on the fortress top's rim;
+  - the mermaid and merman (3.5 and 3.7 in bases, 7 in tall), 20 in apart and 20 in out;
+  - the chest (4.7 × 3.2 × 3.6 in), its lid propped open, 19.9 in out, with the heart (1.35 × 2.5 in) inside 0.5 in below the lip;
+  - the gold and jewel mounds (3.5 × 4 in tops, a 1 in scoring border).
+- **The robot is real mechanisms on kit actuators.**
+  - **Gearmotors** run on a DC torque-speed line.
+  - **Pistons** push P·A at up to 7 bar, through pinned closed linkages (a cylinder, its rod, the lever it drives). Their air comes from one tank, and each stroke spends it.
+  - **Mousetraps** follow their spring's torque-angle line. **Rubber bands** are springs.
+  - **Latches** are equalities released at a time, **magnets and clips** are equalities that break above their holding force, and **the chest's prop** gives way when the chest is jostled.
+  - The slots and their stock parts:
+    - frame: a plywood frame;
+    - drive: two gearmotors on wheels;
+    - mermaid: a push bar;
+    - release: latches tripped when the drive arrives;
+    - cannon, flag, heart, treasure: none.
+  - The catalogue's alternatives:
+    - drive: a mousetrap car, or a static base;
+    - mermaid: two arms swung by mousetraps;
+    - cannon: a gated chute on a piston escapement, timed by the IR sensor seeing the port's tab;
+    - flag: a piston-raised boom, or a telescoping mast extended by rubber bands;
+    - heart: a hook boom dropped by gravity and raised by a piston;
+    - treasure: a peel blade on a fold-out trough with a size sieve and two side troughs to the mounds;
+    - release: a cam timer on a gearmotor.
+- **The brief's rules become laws.** Before trial:
+  - the folded envelope fits the box, in either orientation;
+  - kit actuators within the kit's counts; every stored-energy part has a release;
+  - the parts bought under $120, prints at $0.05 per gram;
+  - the pistons' air within the tank;
+  - no magnets on the robot.
+
+  In the episode:
+  - projectiles fly at most 12 in unsupported and never upward;
+  - the robot never deliberately leaves its quadrant;
+  - at 40 s it is static, its pistons are retracted and its motors are off;
+  - any part inside the fortress's cylinder at 40 s voids the cannonballs.
+- **Seven groups.** A task is achieved when it scores at least half its maximum points:
+  - activate: leave the dock, 11 → 6;
+  - gold and jewels: 175 → 88;
+  - flag: affixed above 24 in, 40 → 20;
+  - cannonballs: 36 → 18;
+  - mermaids: 24 → 12;
+  - Davy Jones' heart: 61 → 31;
+  - the match: all six achieved in one 40 s run.
+
+  Train tasks are two port colours at 3 rpm. Test tasks are the other two colours at 2 and 4.5 rpm: the brief says only that the speed differs between tracks.
+- **System 1** places the robot in the dock (any lateral position, as the brief allows) and chooses where it parks, its drive duty and each mechanism's timing (local search, as in the mobile world).
+- **Assumed, because the brief does not give them**, each a constant in the module:
+  - the kit's gearmotor (12 V, about 1.2 N·m stall, 160 rpm);
+  - the piston (3/4 in bore, 4 in stroke) and the 1 L tank;
+  - the mousetrap's spring;
+  - a rubber band's stiffness;
+  - the masses of the arena's pieces;
+  - the magnet's and the clip's holding forces;
+  - that the flagpole turns with the fortress.
+
+**Prediction.**
+- **The stock holds activate and mermaids (2 of 7).** It drives out and pushes one merfolk over with its bar, starting 10 in to one side. It cannot reach the others: it has no mechanism for them.
+- **System 2 reaches each of the six tasks on some seed.** Gold and jewels and the heart come last: each needs a fold-out mechanism with several parameters placed within an inch.
+- **The match is the hard group.** Each task wants the robot somewhere different:
+  - the troughs want its centre over the mounds' line, 14 in out;
+  - the flag wants it near the fortress;
+  - the heart wants it at the chest and then back in the dock.
+
+  The peel blade left over the fortress at 40 s voids the cannonballs. Four pistons' worth of mechanisms compete for two pistons. At most one seed in three reaches the match.
+- **A solve takes about a minute per task** (40 s episodes at a 2 ms step take about a second, plus the search). A campaign seed takes hours, not minutes, so each campaign is asked for before it runs.
