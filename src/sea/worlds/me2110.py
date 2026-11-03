@@ -306,16 +306,6 @@ def _space(body: Body, task: str) -> tuple[dict[str, tuple[float, float]], dict[
     if P["cannon"].type == "gate_chute" and want & {"cannon"}:
         sp.update(gate_delay=(0.0, 2.0), gate_open=(0.2, 1.5))
         st.update(gate_delay=0.3, gate_open=0.7)
-    if P["treasure"].type == "peel_chute" and want & {"treasure"} and "park_x" in sp:
-        # the controller parks the chute's tip just short of the fortress's rim, its blade over the top
-        reach = P["frame"].params["length"] / 2 + P["treasure"].params["reach"]
-        st["park_x"] = min(max(MM.XF - MM.RF - 0.2 - reach, sp["park_x"][0]), sp["park_x"][1])
-    if P["flag"].type in FLAG_BOOMS and want & {"flag"} and "park_x" in sp:
-        # the controller aims the raised flag at the pole: its face 0.6 in into the near face (the boom presses it flat), centred across it
-        fp, L = P["flag"].params, P["frame"].params["length"]
-        reach = L / 2 - 0.5 + fp["boom_len"] * math.cos(math.radians(fp["raise_deg"])) + 0.4 + MM.FLAG_T
-        st["park_x"] = min(max(MM.XF - MM.POLE_HALF - reach + 0.6, sp["park_x"][0]), sp["park_x"][1])
-        st["y0"] = min(max(3.0, sp["y0"][0]), sp["y0"][1])
     if P["flag"].type == "piston_boom" and want & {"flag"}:
         sp.update(flag_at=(0.2, 20.0), flag_hold=(0.3, 15.0))
         st.update(flag_at=1.0, flag_hold=4.0)
