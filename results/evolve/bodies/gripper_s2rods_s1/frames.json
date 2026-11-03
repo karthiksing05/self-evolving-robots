@@ -1,0 +1,84 @@
+{
+ "run": "gripper_s2rods_s1",
+ "world": "gripper",
+ "frames": [
+  {
+   "iteration": 0,
+   "id": "stock",
+   "held": 16,
+   "groups": 21,
+   "changes": [],
+   "body": {
+    "id": "stock",
+    "parent": null,
+    "parts": {
+     "jaw": {
+      "type": "revolute",
+      "params": {}
+     },
+     "pads": {
+      "type": "none",
+      "params": {}
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "file": "00_stock.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 4,
+   "id": "b030",
+   "held": 17,
+   "groups": 21,
+   "changes": [
+    "pads: none \u2192 pads (groove_mm 0, lip_mm 0, pad_angle_deg 30, pad_tpu_mm 1.5, reach_mm 0, width_mm 12)"
+   ],
+   "body": {
+    "id": "b030",
+    "parent": "b020",
+    "parts": {
+     "jaw": {
+      "type": "revolute",
+      "params": {}
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 0.0,
+       "pad_angle_deg": 30.0,
+       "groove_mm": 0.0,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 1.5,
+       "width_mm": 12.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "swap",
+   "gained": [
+    "gelatin_box"
+   ],
+   "lost": [],
+   "cost": "$0.00, 9 machine min",
+   "why": [
+    "At 30 deg the moving face is roughly -10 deg at the banana's 40-45 mm (pushing up slightly, held by mu 0.9) instead of about -20 deg, and the heel sticks out less at the open pose. At 73 mm (gelatin) the face is about +15 deg with the fingertip around +9 mm, below the top at +15, so it holds by friction. At 85 mm the fingertip drops by about 6 mm to about +17, borderline for tuna (top +17). Cheaper moves are exhausted: 9 trials at 39.6-45 deg with widths of 8-17 mm, reach of 0-6 mm and a 0.76 mm TPU skin all lost the banana in the same way. Width 12 stays above the 9.3 mm that lost the potted meat can. A 30 deg wedge makes the closed heel smaller than the 45 deg one, so the 1.5 mm TPU skin should not cause the pad interference that grooves did."
+   ],
+   "file": "01_b030.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  }
+ ]
+}

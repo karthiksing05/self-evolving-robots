@@ -1,0 +1,78 @@
+{
+ "run": "gripper_s2rods_s0",
+ "world": "gripper",
+ "films": [
+  {
+   "frame": 3,
+   "id": "b040",
+   "group": "tuna_fish_can",
+   "task": "reg_tuna_fish_can",
+   "file": "03_b040_tuna_fish_can.mp4",
+   "poster": "03_b040_tuna_fish_can.jpg",
+   "seconds": 12.3,
+   "sound": false,
+   "clipping_mm": 0.21,
+   "change": "What changed: pads: reach mm 11 → 17",
+   "before": {
+    "ok": false,
+    "verdict": "squeezed down out (stuck (slip))",
+    "headline": "The tuna fish can is squeezed out downward as the fingers close",
+    "recorded": "squeezed_down_out"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the tuna fish can for the full second",
+    "recorded": true
+   }
+  },
+  {
+   "frame": 4,
+   "id": "b060",
+   "group": "pudding_box",
+   "task": "rva000_pudding_box",
+   "file": "04_b060_pudding_box.mp4",
+   "poster": "04_b060_pudding_box.jpg",
+   "seconds": 11.7,
+   "sound": false,
+   "clipping_mm": 0.15,
+   "change": "What changed: pads: pad angle deg 28 → 31",
+   "before": {
+    "ok": false,
+    "verdict": "moving jaw on top face (stuck (slip))",
+    "headline": "The pudding box is not held (moving jaw on top face)",
+    "recorded": "moving_jaw_on_top_face"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the pudding box for the full second",
+    "recorded": true
+   }
+  },
+  {
+   "frame": 4,
+   "id": "b060",
+   "group": "sugar_box",
+   "task": "rva000_sugar_box",
+   "file": "04_b060_sugar_box.mp4",
+   "poster": "04_b060_sugar_box.jpg",
+   "seconds": 7.8,
+   "sound": false,
+   "clipping_mm": 0.1,
+   "change": "What changed: pads: pad angle deg 28 → 31",
+   "before": {
+    "ok": false,
+    "verdict": "moving jaw on top face (stuck (slip))",
+    "headline": "The sugar box is not held (moving jaw on top face)",
+    "recorded": "moving_jaw_on_top_face"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the sugar box for the full second",
+    "recorded": true
+   }
+  }
+ ]
+}
