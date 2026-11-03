@@ -1,0 +1,2288 @@
+{
+ "run": "me2110_s2_s1",
+ "summary": {
+  "world": "me2110",
+  "arm": "s2",
+  "seed": 1,
+  "final_body": {
+   "id": "b000",
+   "parent": "stock",
+   "parts": {
+    "frame": {
+     "type": "ply_frame",
+     "params": {
+      "length": 11.0,
+      "width": 12.0,
+      "deck_z": 8.0
+     }
+    },
+    "drive": {
+     "type": "wheels2",
+     "params": {
+      "wheel_r": 1.5
+     }
+    },
+    "mermaid": {
+     "type": "push_bar",
+     "params": {
+      "bar_z": 7.5,
+      "bar_w": 22.0
+     }
+    },
+    "cannon": {
+     "type": "no_cannon",
+     "params": {}
+    },
+    "flag": {
+     "type": "no_flag",
+     "params": {}
+    },
+    "heart": {
+     "type": "no_heart",
+     "params": {}
+    },
+    "treasure": {
+     "type": "no_treasure",
+     "params": {}
+    },
+    "release": {
+     "type": "drive_trip",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 1,
+    "tasks_passed": 1,
+    "sim_s": 50.1,
+    "wall_s": 31.8
+   },
+   {
+    "iteration": 1,
+    "body": "b000",
+    "held_groups": 2,
+    "tasks_passed": 2,
+    "sim_s": 192.6,
+    "wall_s": 182.1
+   },
+   {
+    "iteration": 2,
+    "body": "b000",
+    "held_groups": 2,
+    "tasks_passed": 2,
+    "sim_s": 192.6,
+    "wall_s": 355.4
+   },
+   {
+    "iteration": 3,
+    "body": "b000",
+    "held_groups": 2,
+    "tasks_passed": 2,
+    "sim_s": 264.3,
+    "wall_s": 564.0
+   },
+   {
+    "iteration": 4,
+    "body": "b000",
+    "held_groups": 2,
+    "tasks_passed": 2,
+    "sim_s": 264.3,
+    "wall_s": 855.0
+   },
+   {
+    "iteration": 5,
+    "body": "b000",
+    "held_groups": 2,
+    "tasks_passed": 2,
+    "sim_s": 363.4,
+    "wall_s": 1319.7
+   },
+   {
+    "iteration": 6,
+    "body": "b000",
+    "held_groups": 2,
+    "tasks_passed": 2,
+    "sim_s": 495.1,
+    "wall_s": 1602.7
+   },
+   {
+    "iteration": 7,
+    "body": "b000",
+    "held_groups": 2,
+    "tasks_passed": 2,
+    "sim_s": 687.5,
+    "wall_s": 2043.9
+   },
+   {
+    "iteration": 8,
+    "body": "b000",
+    "held_groups": 2,
+    "tasks_passed": 2,
+    "sim_s": 834.0,
+    "wall_s": 2391.1
+   },
+   {
+    "iteration": 9,
+    "body": "b000",
+    "held_groups": 2,
+    "tasks_passed": 2,
+    "sim_s": 906.9,
+    "wall_s": 2711.9
+   },
+   {
+    "iteration": 10,
+    "body": "b000",
+    "held_groups": 2,
+    "tasks_passed": 2,
+    "sim_s": 1178.6,
+    "wall_s": 3046.5
+   }
+  ],
+  "train_groups": 7,
+  "final_held_train": [
+   "activate",
+   "mermaids"
+  ],
+  "test": {
+   "final_held": [
+    "activate"
+   ],
+   "stock_held": [
+    "activate"
+   ],
+   "final_tasks": 3,
+   "stock_tasks": 2,
+   "n": 14
+  },
+  "spent": {
+   "usd": 0.0,
+   "fab_minutes": 38.1,
+   "lead_days": 0.0,
+   "owned": {
+    "wheel_pair": 1.0,
+    "ball_caster": 1.0,
+    "plywood_in2": 288.0,
+    "m3_screw": 16.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 1361.3,
+  "attempts": 697,
+  "proposals": {
+   "total": 27,
+   "tried": 15,
+   "refused": 12,
+   "ideas": 0,
+   "kept": 1,
+   "rejected_regression": 7,
+   "moves": {
+    "params": 1,
+    "swap": 26,
+    "idea": 0,
+    "tune": 0,
+    "merge": 0
+   },
+   "mean_prediction_precision": 0.067
+  },
+  "frontier": [],
+  "wall_s": 3126.3,
+  "llm": {
+   "calls": 10,
+   "tokens_in": 130551,
+   "tokens_out": 222890,
+   "usd_list_price": 5.327
+  }
+ },
+ "final_body": "cannon: no_cannon; drive: wheels2 (wheel_r=1.5); flag: no_flag; frame: ply_frame (deck_z=8, length=11, width=12); heart: no_heart; mermaid: push_bar (bar_w=22, bar_z=7.5); release: drive_trip; treasure: no_treasure",
+ "final_bom": [
+  {
+   "item": "plywood_in2",
+   "qty": 288.0,
+   "slot": "frame",
+   "note": ""
+  },
+  {
+   "item": "m3_screw",
+   "qty": 16.0,
+   "slot": "frame",
+   "note": ""
+  },
+  {
+   "item": "print:PLA",
+   "qty": 38.1,
+   "slot": "mermaid",
+   "note": ""
+  },
+  {
+   "item": "wheel_pair",
+   "qty": 1.0,
+   "slot": "drive",
+   "note": ""
+  },
+  {
+   "item": "ball_caster",
+   "qty": 1.0,
+   "slot": "drive",
+   "note": ""
+  }
+ ],
+ "stock_bom": [
+  {
+   "item": "plywood_in2",
+   "qty": 288.0,
+   "slot": "frame",
+   "note": ""
+  },
+  {
+   "item": "m3_screw",
+   "qty": 16.0,
+   "slot": "frame",
+   "note": ""
+  },
+  {
+   "item": "print:PLA",
+   "qty": 22.6,
+   "slot": "mermaid",
+   "note": ""
+  },
+  {
+   "item": "wheel_pair",
+   "qty": 1.0,
+   "slot": "drive",
+   "note": ""
+  },
+  {
+   "item": "ball_caster",
+   "qty": 1.0,
+   "slot": "drive",
+   "note": ""
+  }
+ ],
+ "judge_key": "41cbf6574cd8",
+ "iterations": [
+  {
+   "iteration": 0,
+   "body": "cannon: no_cannon; drive: wheels2 (wheel_r=1.5); flag: no_flag; frame: ply_frame (deck_z=8, length=11, width=12); heart: no_heart; mermaid: push_bar (bar_w=12, bar_z=4); release: drive_trip; treasure: no_treasure",
+   "held": [
+    "activate"
+   ],
+   "failing_mechanisms": {
+    "no_treasure_mechanism": 1,
+    "no_flag_mechanism": 1,
+    "no_cannon_mechanism": 1,
+    "merfolk_moved_not_toppled": 1,
+    "no_heart_mechanism": 1,
+    "points_short; scored nothing at:treasure,flag,cannon,heart": 1
+   },
+   "failing": {
+    "treasure_train0": {
+     "mechanism": "no_treasure_mechanism",
+     "detail": "0 of 175 points: the body has no treasure mechanism"
+    },
+    "flag_train0": {
+     "mechanism": "no_flag_mechanism",
+     "detail": "0 of 40 points: the body has no flag mechanism"
+    },
+    "cannon_train0": {
+     "mechanism": "no_cannon_mechanism",
+     "detail": "0 of 36 points: the body has no cannon mechanism"
+    },
+    "mermaids_train0": {
+     "mechanism": "merfolk_moved_not_toppled",
+     "detail": "5 of 24 points: the mermaid moved 6.66 in, standing; the merman untouched (moved 0.00 in, tilted 0 deg)"
+    },
+    "heart_train0": {
+     "mechanism": "no_heart_mechanism",
+     "detail": "0 of 61 points: the body has no heart mechanism"
+    },
+    "match_train0": {
+     "mechanism": "points_short; scored nothing at:treasure,flag,cannon,heart",
+     "detail": "16 of 347 points (needs 174): activate 11: left the dock fully; the frame ended at x = -7.0 in; treasure 0: 0 coins on the mound, 0 in its border, 10 still on the fortress; 0 jewels on the mound, 0 in its border, 5 still on the fortress; flag 0: no flag mechanism; cannon 0: no cannon mechanism; mermaids 5: the mermaid untouched (moved 0.00 in, tilted 0 deg); the merman moved 2.49 in, standing; hea"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "mermaid (bar_w=22, bar_z=7.5)",
+     "base": null,
+     "mechanism": "merfolk_moved_not_toppled: the bar contacts below the figures' centre of mass (bar_z 4 in), so the mermaid slid 6.66 in standing; the 12 in bar covers y \u00b16 in and cannot reach both figures at y = \u00b110 in in one pass",
+     "principle": "A standing figure topples when a push above its centre of mass tips it past its base edge; a push below it slides it. To strike both figures, the bar has to span both of them across their bases (3.5 / 3.7 in).",
+     "hypothesis": "Raise the bar to 7.5 in, near the top of its range and just under the 8 in deck, so the push lands above the figures' centre of mass and tips them. Widen it to 22 in, covering \u00b111 in: that reaches past both figure centres at \u00b110 in, and with y0 near 0 both bases (inner edges about \u00b18.2 in) get hit at once. The folded width becomes 22 in, which fits the box's 24 in side. No swap is needed: trap_arms would use both mousetraps and add a release problem for no gain over a bar that can already reach.",
+     "predicted_gains": [
+      "mermaids"
+     ],
+     "risks": [
+      "activate: a 22 in bar is wider when leaving the dock. It still fits the 24 in box side, the bar sits on the frame front and adds no mass worth counting, and the drive (63 N at stall) is unchanged, so leaving the dock should still pass."
+     ],
+     "idea": null,
+     "result": "KEPT: gained mermaids, lost none; costs $0.00, 38 machine min",
+     "gained": [
+      "mermaids"
+     ],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "mermaids"
+      ],
+      "hit": [
+       "mermaids"
+      ],
+      "missed": [],
+      "unpredicted": [],
+      "precision": 1.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 38.1,
+      "lines": [
+       "ball_caster x1: provided (reused)",
+       "m3_screw x16: provided (reused)",
+       "plywood_in2 x288: provided (reused)",
+       "wheel_pair x1: provided (reused)",
+       "print:PLA 38.1 g for mermaid: 38 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "no_cannon_mechanism",
+      "no_flag_mechanism",
+      "no_heart_mechanism",
+      "no_treasure_mechanism",
+      "points_short; scored nothing at:treasure,flag,cannon,heart"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "treasure -> peel_chute (junction_z=7, reach=10, side_deg=30, side_len=11, sieve_gap=2, slope_deg=28, width=3.2)",
+     "base": null,
+     "mechanism": "no_treasure_mechanism: 0 of 175 points, with coins and jewels still riding the fortress rim",
+     "principle": "A figure on a turning table moves with it. A fixed blade in its path pushes it off along the blade, and a trough below the table catches it if the trough floor is lower and slopes steeply enough to slide. Pieces separate through a slot wider than the small one (1.5 in jewel) and narrower than the large one (2.5 in coin).",
+     "hypothesis": "The fortress turns at 3 rpm, so one 20 s turn brings the whole rim past a fixed blade, and no actuator is needed. The outer section stays folded up inside the box and falls forward when drive_trip fires at parking. Parameter choices: (a) reach 10 in, putting the blade over the rim with the frame front parked a few inches short of the 27.6 in fortress edge; (b) a 28 deg slope, above the slide angle of acrylic; (c) sieve_gap 2.0 in, between jewel (1.5) and coin (2.5); (d) width 3.2 in, so a 2.5 in coin passes; (e) side troughs 11 in long at 30 deg, which reach from the deck sides at \u00b16 in out toward the mounds at y = \u00b115 when parked near x = 14 in. Exact parking is left to System 1. This uses the free drive_trip release and no kit actuator.",
+     "predicted_gains": [
+      "treasure"
+     ],
+     "risks": [
+      "activate: adds about 325 g of PLA plus acrylic. The 63 N stall push leaves plenty of margin at 0.5 friction, and the outer section is folded within the box until parked.",
+      "mermaids, if tried with the bar change: the side troughs fold down at the deck sides, which is above and behind the push bar at 7.5 in, so they should not collide."
+     ],
+     "idea": null,
+     "result": "refused before trial: folded it is 15.5 x 16.5 x 22.5 in; the go/no-go box is 12 x 24 x 18 in (either way round, 18 in tall); the side troughs would end -4.6 in up; the junction is too low for them to fall that far at their slope; the jewel funnel would pass through the base plate; raise the junction or flatten the side slope",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 11.0,
+      "lead_days": 2.0,
+      "fab_minutes": 369.1,
+      "lines": [
+       "acrylic_sheet x1: 0 provided, buy 1 at $8 ($8.00, 2 days)",
+       "ball_caster x1: provided (reused)",
+       "hinge x3: 0 provided, buy 3 at $1 ($3.00, 2 days)",
+       "m3_screw x16: provided (reused)",
+       "plywood_in2 x288: provided (reused)",
+       "wheel_pair x1: provided (reused)",
+       "print:PLA 369.1 g for treasure: 369 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    },
+    {
+     "k": 2,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "cannon -> gate_chute (exit_z=9, reach=0.3)",
+     "base": null,
+     "mechanism": "no_cannon_mechanism: 0 of 36 points, all four cannonballs still held",
+     "principle": "A gravity-fed release must be timed to a moving target. A piston-raised gate at the chute's exit, fired from the IR sensor seeing our port's tab, drops the balls as the port passes. Nothing may reach into the fortress cylinder at 40 s, and the piston must be retracted.",
+     "hypothesis": "gate_chute uses one of the two unused pistons. Exit height 9 in clears the 7 in port barrier. Reach 0.3 in keeps the folded length inside the box's 12 in side (now 11.8 in) and keeps the exit outside the fortress cylinder when parked with the front just short of 27.6 in, so the 40 s rule is safe. The port comes round every 20 s, so the 40 s match gives at least one sensed pass to time the drop. A 9 in fall takes about 0.21 s.",
+     "predicted_gains": [
+      "cannon"
+     ],
+     "risks": [
+      "activate: adds about 66 g of PLA plus a piston, a small mass increase. Folded length stays about 11.8 to 12 in, which could be tight in the box; if refused for size, shorten the frame length next.",
+      "mermaids: the exit sits 2.5 in left of centre at 9 in, above the 7.5 in bar, so the two do not interfere."
+     ],
+     "idea": null,
+     "result": "rejected: gained nothing; still failing: merfolk_moved_not_toppled, no_flag_mechanism, no_heart_mechanism, no_treasure_mechanism, port_never_seen, rule_broken",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "cannon"
+      ],
+      "hit": [],
+      "missed": [
+       "cannon"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 1.0,
+      "lead_days": 2.0,
+      "fab_minutes": 45.9,
+      "lines": [
+       "ball_caster x1: provided (reused)",
+       "hinge x1: 0 provided, buy 1 at $1 ($1.00, 2 days)",
+       "m3_screw x16: provided (reused)",
+       "plywood_in2 x288: provided (reused)",
+       "wheel_pair x1: provided (reused)",
+       "print:PLA 45.9 g for cannon: 46 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "merfolk_moved_not_toppled",
+      "no_flag_mechanism",
+      "no_heart_mechanism",
+      "no_treasure_mechanism",
+      "port_never_seen",
+      "rule_broken"
+     ]
+    }
+   ],
+   "accepted": "b000",
+   "notes": "Diagnosis. Five of the six failing groups have no mechanism at all. The only one with a mechanism that fails is mermaids: the merfolk get pushed but not toppled. The push bar is the problem twice over. (1) At bar_z = 4 in it hits the figures below their centre of mass, so it slides them: the mermaid moved 6.66 in and stayed standing. (2) It is 12 in wide, covering only \u00b16 in, but the merfolk sit at y = \u00b110 in, 20 in apart. One pass can therefore reach only one figure: the other was untouched in the mermaids trial and not hit at all in the match. Both causes are inside push_bar's own range (bar_z up to 8, bar_w up to 24), so the fix is a params move.\n\nTreasure (175 points) and cannon (36 points) get cheap catalogue swaps. Neither needs an actuator the drive uses: peel_chute runs off the free drive_trip release, and gate_chute uses one of the two unused pistons.\n\nFlag is deliberately left for later. The pole face is at x \u2248 37.6 in, about 10 in past the fortress wall, and the flag top must reach 24 in. A piston boom that long cannot fold into the 11.8 in box length while the frame plus wheels are 14.7 in wide. Fixing that means turning the robot round in the box (frame narrower than about 9 in, length up to 24). That would conflict with the wide push bar, so it waits until the mermaid result is in.\n\nHeart is also deferred. hook_boom needs a piston, and that only makes sense once we know whether the cannon keeps its piston.\n\nSpend if all three are kept: $12.00 (acrylic sheet $8, 4 hinges $4), 391 of 900 machine minutes, 2 days lead time.",
+   "llm": {
+    "tag": "iter00",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 71.5,
+    "tokens_in": 9937,
+    "tokens_out": 6374,
+    "usd_list_price": 0.1892,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 182.1,
+   "stop": null
+  },
+  {
+   "iteration": 1,
+   "body": "cannon: no_cannon; drive: wheels2 (wheel_r=1.5); flag: no_flag; frame: ply_frame (deck_z=8, length=11, width=12); heart: no_heart; mermaid: push_bar (bar_w=22, bar_z=7.5); release: drive_trip; treasure: no_treasure",
+   "held": [
+    "activate",
+    "mermaids"
+   ],
+   "failing_mechanisms": {
+    "no_treasure_mechanism": 1,
+    "no_flag_mechanism": 1,
+    "no_cannon_mechanism": 1,
+    "no_heart_mechanism": 1,
+    "points_short; scored nothing at:treasure,flag,cannon,heart": 1
+   },
+   "failing": {
+    "treasure_train0": {
+     "mechanism": "no_treasure_mechanism",
+     "detail": "0 of 175 points: the body has no treasure mechanism"
+    },
+    "flag_train0": {
+     "mechanism": "no_flag_mechanism",
+     "detail": "0 of 40 points: the body has no flag mechanism"
+    },
+    "cannon_train0": {
+     "mechanism": "no_cannon_mechanism",
+     "detail": "0 of 36 points: the body has no cannon mechanism"
+    },
+    "heart_train0": {
+     "mechanism": "no_heart_mechanism",
+     "detail": "0 of 61 points: the body has no heart mechanism"
+    },
+    "match_train0": {
+     "mechanism": "points_short; scored nothing at:treasure,flag,cannon,heart",
+     "detail": "35 of 347 points (needs 174): activate 11: left the dock fully; the frame ended at x = -6.5 in; treasure 0: 0 coins on the mound, 0 in its border, 10 still on the fortress; 0 jewels on the mound, 0 in its border, 5 still on the fortress; flag 0: no flag mechanism; cannon 0: no cannon mechanism; mermaids 24: the mermaid toppled (100 deg); the merman toppled (101 deg); heart 0: the heart lies at (25"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "flag -> band_mast (bands=3, lean_deg=22, stage_len=10, stages=3)",
+     "base": null,
+     "mechanism": "no_flag_mechanism: 0 of 40 points; nothing lifts the flag to the pole face, which is 2 in from the fortress centre, at x = 37.6 in, with the flag's top needed at least 24 in up.",
+     "principle": "A rubber band's pull, released by a latch, can extend nested tubes with no kit actuator. A magnet only holds when its face lies flat on the iron. If the mast keeps the flag pressed toward the pole from a fixed direction, a pole face turns square to it every quarter turn (5 s at 3 rpm), and the magnet catches then.",
+     "hypothesis": "band_mast with 3 stages of 10 in tubes (1.5 in overlap) extends to 27 in. Leaning 22\u00b0 from the deck's front edge at 8 in, its top sits about 10.1 in ahead of the frame front and about 33 in up. With the front parked at about 27.3 in (still past the merfolk, so the bar still sweeps them), the top lands at the face at 37.6 in, well above 24 in. Stowed height is 8 + 10\u00b7cos22\u00b0 = 17.3 in, under the 18 in limit. It needs no piston or gearmotor (both gearmotors are taken by the drive). The existing drive_trip releases it 0.2 s after parking. Cheaper moves won't work: there is no flag part to tune. sensed_boom costs $18 and a piston, and piston_boom can't reach a 24 in top at 11.7 in ahead from a pivot at 8 in or less without a boom longer than the 12 x 24 in box allows when folded back.",
+     "predicted_gains": [
+      "flag_train0"
+     ],
+     "risks": [
+      "activate: the stowed mast adds height (17.3 in of 18) and about 0.2 kg, and stays inside the box; the drive's 63 N stall push is far more than it needs",
+      "mermaids: the mast sits above the 7.5 in bar and leaves the bar's width and height unchanged; the park needed (front \u2248 27.3 in) is still beyond the merfolk at x = 20 in"
+     ],
+     "idea": null,
+     "result": "refused before trial: folded it is 14.3 x 22.0 x 17.9 in; the go/no-go box is 12 x 24 x 18 in (either way round, 18 in tall)",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 7.5,
+      "lead_days": 2.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "alu_tube x3: 0 provided, buy 3 at $2.5 ($7.50, 2 days)",
+       "ball_caster x1: provided (reused)",
+       "m3_screw x16: provided (reused)",
+       "plywood_in2 x288: provided (reused)",
+       "wheel_pair x1: provided (reused)"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    },
+    {
+     "k": 1,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "heart -> hook_boom (boom_len=6, drop_deg=45, hook_depth=3)",
+     "base": null,
+     "mechanism": "no_heart_mechanism: 0 of 61 points; in the match the bar shoved the chest and closed its lid, and the heart was left on the floor at (25.9, 6.7) in, right at the bar's face, with nothing to pick it up.",
+     "principle": "A hook on a boom pivoting down from the deck's front edge reaches what is just ahead and below. Pulling the boom back up drags the toe back toward the robot and into the deck tray. The drive already returns the robot behind the start line, which turns 39 points into 61.",
+     "hypothesis": "hook_boom on one of the two unused pistons. boom_len 6 in, drop 45\u00b0: the tip comes 4.2 in ahead of the front at about 3.8 in high, and a 3 in hook reaches down to about 0.8 in. That covers the band just ahead of the bar, where the heart (or the chest) ends up after the push. Stowed upright it is 8 + 6 = 14 in tall, under 18. System 1 can time the hook's stroke between parking and the return it already makes (return_at \u2248 3.9 s). No parameter move works because there is no heart part yet. This is the only heart part in the catalogue.",
+     "predicted_gains": [
+      "heart_train0"
+     ],
+     "risks": [
+      "mermaids: the boom stands above the deck, behind the bar's line, and only drops after parking, so the bar's sweep through x = 20 in is unchanged",
+      "activate: about 0.15 kg added and folded height 14 in; the drive's margin is large"
+     ],
+     "idea": null,
+     "result": "refused before trial: the hook_boom's rod meets the boom at 16 degrees at worst over its swing; below 20 the piston pushes along the boom and cannot steer it",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 3.5,
+      "lead_days": 2.0,
+      "fab_minutes": 20.0,
+      "lines": [
+       "ball_caster x1: provided (reused)",
+       "dowel x1: 0 provided, buy 1 at $1 ($1.00, 2 days)",
+       "hinge x2: 0 provided, buy 2 at $1 ($2.00, 2 days)",
+       "m3_screw x16: provided (reused)",
+       "plywood_in2 x288: provided (reused)",
+       "steel_hook x1: 0 provided, buy 1 at $0.5 ($0.50, 2 days)",
+       "wheel_pair x1: provided (reused)",
+       "print:PLA 20.0 g for heart: 20 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    },
+    {
+     "k": 2,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "frame (deck_z=6, length=23, width=9); mermaid -> trap_arms (arm_len=8, arm_z=9); treasure -> peel_chute (junction_z=9.6, reach=3.5, side_deg=15, side_len=11, sieve_gap=2, slope_deg=10, width=3)",
+     "base": null,
+     "mechanism": "no_treasure_mechanism: 0 of 175 points. The last peel_chute was refused on geometry: folded it was 22.5 in tall; its side troughs ended 4.6 in below the floor because the junction was too low; and its funnel passed through the base plate. Beyond that, the side troughs leave at the frame's centre, which on an 11 in frame parked near the fortress is at x \u2248 21 in, while the mounds are at x = 14 in.",
+     "principle": "A fixed blade in the path of a turning table pushes the pieces off along it, a slot sorts them by size, and troughs carry them only to where they end. So the side troughs have to start above the mounds (frame centre near x = 14) while the blade is over the rim (x > 27.6). That takes a frame about 23 in long, and that only fits the 24 in side of the box if the robot is no more than about 10 in wide. A 22 in push bar can't be kept, so the merfolk have to be struck from the sides instead.",
+     "hypothesis": "Frame 23 x 9 in, deck 6 in. Parked with its centre at x \u2248 14, its front is at about 25.5, and the chute's 3.5 in reach puts the blade at about 29, over the rim. trap_arms, 8 in long at 9 in high, pivot at the front corners (\u00b14.5 in) and swing out from folded along the sides. A figure at (20, \u00b110) is 7.8 in from a corner, so the arm's arc hits it above its centre of mass and tips it, the job the 7.5 in bar did. The frame's sides at \u00b14.5 pass the bases' inner edges at \u00b18.25 when driving out. Chute geometry: junction 9.6 in, slope 10\u00b0. The inner section climbs to about 11.6 in at the front, and the 3.5 in outer section folded up keeps the stack near 17.7 in. The higher junction raises the side troughs. At 11 in long and 15\u00b0 they end about 0.65 in up, at y \u2248 \u00b115.1 over the mounds, where they used to go 4.6 in below the floor. Sieve gap 2 in (jewel 1.5 in, coin 2.5 in), width 3 in. drive_trip releases the chute and both mousetrap arms at parking. No parameter value fixes this, because there is no treasure part. A wide frame keeps the junction about 7 in short of the mounds whatever the treasure values are, so the frame and the mermaid part have to change together.",
+     "predicted_gains": [
+      "treasure_train0",
+      "mermaids"
+     ],
+     "risks": [
+      "mermaids: the 22 in bar is replaced by mousetrap arms. If the arms' hit lands below the figures' centre of mass, or they swing past them, mermaids is lost. The loop's 4 refit trials can tune arm_len and arm_z, and park_x and y0 are in System 1's hands",
+      "activate: frame about 23.8 in long folded, near the 24 in limit; about 0.6 kg added (the 63 N stall push should cope); a 6 in deck lowers the mounting height",
+      "likely to be refused before trial if the funnel depth or folded-chute height I estimated are off; the refusal message would still pin down the geometry"
+     ],
+     "idea": null,
+     "result": "refused before trial: folded it is 25.5 x 13.5 x 18.8 in; the go/no-go box is 12 x 24 x 18 in (either way round, 18 in tall)",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 11.6,
+      "lead_days": 2.0,
+      "fab_minutes": 443.6,
+      "lines": [
+       "acrylic_sheet x1: 0 provided, buy 1 at $8 ($8.00, 2 days)",
+       "ball_caster x1: provided (reused)",
+       "drawer_pin x2: 0 provided, buy 2 at $0.3 ($0.60, 2 days)",
+       "hinge x3: 0 provided, buy 3 at $1 ($3.00, 2 days)",
+       "m3_screw x16: provided (reused)",
+       "plywood_in2 x432: provided (reused)",
+       "wheel_pair x1: provided (reused)",
+       "print:PLA 84.0 g for mermaid: 84 machine minutes",
+       "print:PLA 359.6 g for treasure: 360 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    }
+   ],
+   "accepted": null,
+   "notes": "The two held groups, activate and mermaids, both depend on the push bar and the drive out to a park position near front \u2248 25.9 in. Proposals 1 and 2 add parts but leave the frame, drive, bar and release alone. Neither uses a gearmotor. The band mast uses 3 of the 5 rubber bands and the hook boom uses 1 of the 2 pistons, so they don't compete for actuators. Both mount on the deck's front edge, so if both are kept and tried together they may collide; the mast leans forward and the hook boom stands upright, and their stowed and raised positions would need checking. Proposal 3 goes after the biggest task (treasure, 175 points, which the match needs). It changes three slots and is the one most likely to be refused on geometry. Several of its numbers are estimates I worked back from the last refusal message: the funnel depth (about 6 in, from the side troughs ending at -4.6 in) and the extra height of the folded chute (about 2.6 in). The fortress top's height is not in the brief, which is the biggest unknown for the blade's height. I'm not proposing cannon again until the port's position and why the IR sensor never saw it are known (last time: port_never_seen, rule_broken). Spend if every proposal is kept: $7.50 + $3.50 + $11.60 = $22.60, 441 machine minutes, 2 days lead time.",
+   "llm": {
+    "tag": "iter01",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 173.3,
+    "tokens_in": 10751,
+    "tokens_out": 16107,
+    "usd_list_price": 0.3904,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 173.3,
+   "stop": null
+  },
+  {
+   "iteration": 2,
+   "body": "cannon: no_cannon; drive: wheels2 (wheel_r=1.5); flag: no_flag; frame: ply_frame (deck_z=8, length=11, width=12); heart: no_heart; mermaid: push_bar (bar_w=22, bar_z=7.5); release: drive_trip; treasure: no_treasure",
+   "held": [
+    "activate",
+    "mermaids"
+   ],
+   "failing_mechanisms": {
+    "no_treasure_mechanism": 1,
+    "no_flag_mechanism": 1,
+    "no_cannon_mechanism": 1,
+    "no_heart_mechanism": 1,
+    "points_short; scored nothing at:treasure,flag,cannon,heart": 1
+   },
+   "failing": {
+    "treasure_train0": {
+     "mechanism": "no_treasure_mechanism",
+     "detail": "0 of 175 points: the body has no treasure mechanism"
+    },
+    "flag_train0": {
+     "mechanism": "no_flag_mechanism",
+     "detail": "0 of 40 points: the body has no flag mechanism"
+    },
+    "cannon_train0": {
+     "mechanism": "no_cannon_mechanism",
+     "detail": "0 of 36 points: the body has no cannon mechanism"
+    },
+    "heart_train0": {
+     "mechanism": "no_heart_mechanism",
+     "detail": "0 of 61 points: the body has no heart mechanism"
+    },
+    "match_train0": {
+     "mechanism": "points_short; scored nothing at:treasure,flag,cannon,heart",
+     "detail": "35 of 347 points (needs 174): activate 11: left the dock fully; the frame ended at x = -6.5 in; treasure 0: 0 coins on the mound, 0 in its border, 10 still on the fortress; 0 jewels on the mound, 0 in its border, 5 still on the fortress; flag 0: no flag mechanism; cannon 0: no cannon mechanism; mermaids 24: the mermaid toppled (100 deg); the merman toppled (101 deg); heart 0: the heart lies at (25"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "frame (deck_z=8, length=7, width=12); flag -> band_mast (bands=4, lean_deg=28, stage_len=8, stages=4)",
+     "base": null,
+     "mechanism": "no_flag_mechanism. The iteration-2 band_mast was refused only because it did not fit folded: 14.3 in long, against the 12 in box side. The frame alone is 11.8 in folded, so any forward lean that reaches the pole sticks out past 12 in.",
+     "principle": "Every part must fit the box folded. A leaning mast adds about stage_len\u00b7sin(lean) to the folded length and about stage_len\u00b7cos(lean) to the folded height above the deck. It unfolds after a released spring (the bands) fires, which drive_trip does 0.2 s after parking, with no actuator.",
+     "hypothesis": "Shorten the frame from 11 to 7 in so there is room for the lean: about 7.8 in folded, plus 8\u00b7sin28 = 3.8 in of mast, gives about 11.6 in, under 12. Keep the deck at 8 in so the 7.5 in push bar stays below the deck. Folded height is about 8 + 8\u00b7cos28 (7.1) + 0.6 = about 15.7 in, under 18. Four stages of 8 in, minus 4.5 in of overlap, extend to 27.5 in. At 28\u00b0 lean the top is 12.9 in ahead of the front and 32.3 in up. To meet the pole face at 37.6 in, the front parks at about 24.7 in. That is outside the 27.6 in fortress edge and past the merfolk bases (20 + 3.5 = 23.5), so the same drive also sweeps the merfolk. The flag top ends near 32 in, above the 24 in minimum. Four of the five rubber bands are free to extend it. A frame parameter change alone cannot do this: there is still no flag part. The catalogue's other flag types each need a piston or a $15 sensor, and they meet the same folded-length limit.",
+     "predicted_gains": [
+      "flag_train0"
+     ],
+     "risks": [
+      "mermaids: the bar now sits 3.5 in ahead of the frame centre instead of 5.5 in, which changes the mass under the bar; System 1 re-fits park_x so the front ends near 24.7 in, still past the bases. bar_z (7.5) and bar_w (22) are unchanged, so the push height above the figures' centre of mass is the same.",
+      "activate: a shorter, lighter frame leaves the dock more easily; low risk.",
+      "Stability: the extended mast puts weight forward, but tubes are light compared with the 1.6 kg body."
+     ],
+     "idea": null,
+     "result": "rejected: lost activate, mermaids (activate: never_left_dock, 1 of 11 points: never fully left the dock; the frame ended at x = 0.9 in; mermaids: merfolk_not_reached, 0 of 24 points: the mermaid untouched (moved 0.00 in, tilted 0 deg); the merman untouched (moved 0.00 in, tilted 0 deg))",
+     "gained": [],
+     "lost": [
+      "activate",
+      "mermaids"
+     ],
+     "prediction": {
+      "predicted": [
+       "flag_train0"
+      ],
+      "hit": [],
+      "missed": [
+       "flag_train0"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": [
+       "activate",
+       "mermaids"
+      ]
+     },
+     "resources": {
+      "usd": 10.0,
+      "lead_days": 2.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "alu_tube x4: 0 provided, buy 4 at $2.5 ($10.00, 2 days)",
+       "ball_caster x1: provided (reused)",
+       "m3_screw x16: provided (reused)",
+       "plywood_in2 x192: provided (reused)",
+       "wheel_pair x1: provided (reused)"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "flag_never_met_pole_square",
+      "merfolk_not_reached",
+      "never_left_dock",
+      "no_cannon_mechanism",
+      "no_heart_mechanism",
+      "no_treasure_mechanism",
+      "rule_broken"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "heart -> hook_boom (boom_len=6, drop_deg=10, hook_depth=5.5)",
+     "base": null,
+     "mechanism": "no_heart_mechanism. The iteration-2 hook_boom was refused because the piston rod met the boom at 16\u00b0 at worst over its swing, under the 20\u00b0 minimum. That swing ran from upright down to 45\u00b0 below level, 135\u00b0 in all.",
+     "principle": "A piston pushes through a lever. The closer the rod lies along the boom, the less torque it gives, and the ends of a long swing are where it lines up. A shorter swing keeps the rod further from those ends.",
+     "hypothesis": "Cut drop_deg from 45 to 10, which shrinks the swing from 135\u00b0 to 100\u00b0. Keep boom_len at 6 in. The tip lands 5.9 in ahead of the deck front at about 7.0 in high, and a 5.5 in hook reaches down to about 1.5 in. In the last match the bar pushed the chest ahead of it, so the chest sits just in front of the bar. The hook drops behind its 3.2 in depth, and the toe pulls the chest (or the heart) back to the tray. The drive's return then brings it behind the start line: 32 points for the chest, up to 61 for the heart. Stowed upright it stands 8 + 6 = 14 in tall, under 18. It uses one of the two free pistons, which ends retracted with the boom pulled up.",
+     "predicted_gains": [
+      "heart_train0"
+     ],
+     "risks": [
+      "mermaids: the hook's piston is timed independently of the bar, but a boom dropping while the bar is still pushing could catch a merfolk figure; System 1 times it after the stop.",
+      "activate: about 0.1 kg is added at the front; low risk.",
+      "If tried together with the band_mast, both mount on the deck's front edge and may collide; each is tried on its own first."
+     ],
+     "idea": null,
+     "result": "refused before trial: the mermaid (push_bar)'s push bar and the heart (hook_boom) pass 0.33 in into each other with the heart 75 % deployed, the rest stowed; two parts cannot be in one place",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 3.5,
+      "lead_days": 2.0,
+      "fab_minutes": 20.0,
+      "lines": [
+       "ball_caster x1: provided (reused)",
+       "dowel x1: 0 provided, buy 1 at $1 ($1.00, 2 days)",
+       "hinge x2: 0 provided, buy 2 at $1 ($2.00, 2 days)",
+       "m3_screw x16: provided (reused)",
+       "plywood_in2 x288: provided (reused)",
+       "steel_hook x1: 0 provided, buy 1 at $0.5 ($0.50, 2 days)",
+       "wheel_pair x1: provided (reused)",
+       "print:PLA 20.0 g for heart: 20 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    },
+    {
+     "k": 2,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "treasure -> peel_chute (junction_z=11, reach=4, side_deg=22, side_len=8, sieve_gap=2, slope_deg=22, width=3.2)",
+     "base": null,
+     "mechanism": "no_treasure_mechanism. The iteration-1 peel_chute was refused on geometry: it was too big folded, the side troughs ended 4.6 in below the floor, and the jewel funnel passed through the base plate. The fix it suggested was to raise the junction or flatten the side slope.",
+     "principle": "A fixed blade over a turning table pushes the figures off along it. A trough catches them only if its floor stays above the floor everywhere and slopes steeply enough to slide. Pieces separate through a gap wider than a jewel (1.5 in) and narrower than a coin (2.5 in).",
+     "hypothesis": "Apply the refusal's own fix, with a margin. Last time the side troughs needed about 6.1 in of drop beyond side_len\u00b7sin(side_deg). Here: junction_z 11 (was 7); side troughs 8 in at 22\u00b0 (3.0 in of drop, was 5.5), so they end about 1.9 in up; side reach about 7.4 in from the frame sides, to about \u00b113.4 in, toward the mounds at \u00b115. Shrink the folded height: the inner front sits at 11 + 5.5\u00b7tan22 = 13.2 in, and with reach 4 in the folded outer section tops out near 17.2 in, under 18. The blade lands about 3.7 in ahead of the front, over the rim, with the front parked near 25 in. A slope of 22\u00b0 is steep enough to slide on acrylic. Sieve gap 2 in, width 3.2 in. No actuator is needed: drive_trip drops the outer section, and the 3 rpm fortress feeds a full rim past the blade every 20 s.",
+     "predicted_gains": [
+      "treasure_train0"
+     ],
+     "risks": [
+      "mermaids: the side troughs fold down past the deck sides at \u00b16 in; the merfolk are at \u00b110 in and are hit by the bar before the troughs drop (drive_trip fires 0.2 s after parking). A trough landing on a figure still standing is possible; the bar pushes it first.",
+      "activate: about 0.4 kg added; the drive gives 63 N at stall, ample.",
+      "It may still be refused for folded size if the side troughs fold up above the deck. With side_len 8 they would reach 16 in."
+     ],
+     "idea": null,
+     "result": "refused before trial: folded it is 13.7 x 22.0 x 19.0 in; the go/no-go box is 12 x 24 x 18 in (either way round, 18 in tall)",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 11.0,
+      "lead_days": 2.0,
+      "fab_minutes": 258.4,
+      "lines": [
+       "acrylic_sheet x1: 0 provided, buy 1 at $8 ($8.00, 2 days)",
+       "ball_caster x1: provided (reused)",
+       "hinge x3: 0 provided, buy 3 at $1 ($3.00, 2 days)",
+       "m3_screw x16: provided (reused)",
+       "plywood_in2 x288: provided (reused)",
+       "wheel_pair x1: provided (reused)",
+       "print:PLA 258.4 g for treasure: 258 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    }
+   ],
+   "accepted": null,
+   "notes": "I'm proposing three body changes, one each for flag, heart and treasure. None has been trialled yet, so all the numbers below are my geometry estimates. Each change is tried on its own; one is kept only if it gains a group and the two held groups (activate and mermaids) still pass.\n\n**1. Flag: shorter frame plus a leaning band mast (most likely to work).** The mast I proposed last time only failed because it didn't fit the box folded: 14.3 in long against the 12 in limit.\n- Shortening the frame from 11 to 7 in makes room for the lean. With four 8 in tubes leaning 28\u00b0, I estimate the folded size at about 11.6 in long and 15.7 in tall, inside the 12 x 18 in limits.\n- Extended, the mast is 27.5 in long. Its top lands about 12.9 in ahead of the robot's front and 32 in up, so the robot parks with its front near 24.7 in. That is outside the fortress wall at 27.6 in and past the merfolk, so the push bar still knocks them over on the same drive.\n- It uses four of the five rubber bands and no motor or piston; the existing release lets it go when the robot parks.\n- Cost: four aluminium tubes, $10.\n\n**2. Heart: hook boom with a shorter swing.** Last time this was refused because the piston rod lined up too closely with the boom (16\u00b0, under the 20\u00b0 minimum) over a 135\u00b0 swing.\n- Swinging down only 10\u00b0 instead of 45\u00b0 cuts the swing to 100\u00b0. That should keep the rod angle above 20\u00b0, though the brief doesn't give the piston mounting, so this may fail the same way.\n- In the last match the push bar shut the chest lid, so the realistic target is pulling the whole chest back (32 points) rather than the heart (61).\n- It uses one of the two free pistons and costs $3.50.\n\n**3. Treasure: sorting chute resized to fit (riskiest).** I made the change the refusal suggested: raised the trough's low end from 7 to 11 in and shortened and flattened the side troughs (8 in at 22\u00b0).\n- On my estimate the side troughs now end about 1.9 in above the floor and the chute folds to about 17.2 in tall. Both figures depend on extra height losses I could only infer from the last refusal.\n- If the side troughs fold up above the deck, they would reach 16 in and it may be refused for size again.\n- The troughs end at about \u00b113.4 in sideways, short of the mounds at \u00b115 in, so pieces may not land on the mounds.\n- Cost: $11 and 325 machine minutes.\n\nAll three together cost $24.50 in parts with a 2-day lead time, well within $120 and the 7 days.\n\n**If more than one is kept:** the mast and the hook both mount on the deck's front edge and could collide when tried together. If the flag change is kept, the chute's geometry also shifts with the 7 in frame.\n\n**Not proposed: the cannon.** The last chute trial never saw our port and broke a rule. I haven't worked out why yet, so I left it out.\n\n**Overall:** even if flag and heart both work, that is about 35 + 40 + 32\u201361 points, still short of the 174 the match needs. Treasure (175 points available) has to work for the match to pass.",
+   "llm": {
+    "tag": "iter02",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 163.9,
+    "tokens_in": 11541,
+    "tokens_out": 15000,
+    "usd_list_price": 0.3746,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 208.6,
+   "stop": null
+  },
+  {
+   "iteration": 3,
+   "body": "cannon: no_cannon; drive: wheels2 (wheel_r=1.5); flag: no_flag; frame: ply_frame (deck_z=8, length=11, width=12); heart: no_heart; mermaid: push_bar (bar_w=22, bar_z=7.5); release: drive_trip; treasure: no_treasure",
+   "held": [
+    "activate",
+    "mermaids"
+   ],
+   "failing_mechanisms": {
+    "no_treasure_mechanism": 1,
+    "no_flag_mechanism": 1,
+    "no_cannon_mechanism": 1,
+    "no_heart_mechanism": 1,
+    "points_short; scored nothing at:treasure,flag,cannon,heart": 1
+   },
+   "failing": {
+    "treasure_train0": {
+     "mechanism": "no_treasure_mechanism",
+     "detail": "0 of 175 points: the body has no treasure mechanism"
+    },
+    "flag_train0": {
+     "mechanism": "no_flag_mechanism",
+     "detail": "0 of 40 points: the body has no flag mechanism"
+    },
+    "cannon_train0": {
+     "mechanism": "no_cannon_mechanism",
+     "detail": "0 of 36 points: the body has no cannon mechanism"
+    },
+    "heart_train0": {
+     "mechanism": "no_heart_mechanism",
+     "detail": "0 of 61 points: the body has no heart mechanism"
+    },
+    "match_train0": {
+     "mechanism": "points_short; scored nothing at:treasure,flag,cannon,heart",
+     "detail": "35 of 347 points (needs 174): activate 11: left the dock fully; the frame ended at x = -6.5 in; treasure 0: 0 coins on the mound, 0 in its border, 10 still on the fortress; 0 jewels on the mound, 0 in its border, 5 still on the fortress; flag 0: no flag mechanism; cannon 0: no cannon mechanism; mermaids 24: the mermaid toppled (100 deg); the merman toppled (101 deg); heart 0: the heart lies at (25"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "frame (deck_z=7, length=20, width=6.5); mermaid -> trap_arms (arm_len=11, arm_z=8); flag -> piston_boom (boom_len=20, fold_deg=155, pivot_z=8, raise_deg=45)",
+     "base": null,
+     "mechanism": "no_flag_mechanism (0 of 40), which comes from a length limit. The body is folded 11.8 x 22.0 in. The 22 in push bar takes the box's 24 in side, so frame + bar + any flag part must fit in 12 in. A flag must reach the pole face at 37.625 in, at least 10.6 in past a front that cannot pass the fortress edge at 27.6 in, and reach about 24 in up. With an 11 in frame, the longest boom that folds into 12 x 18 is about 11 in on a 16 in pivot. That puts its tip at the pole face at only about 19 in. Shortening the frame instead (iteration 3, frame 7) lost activate and mermaids.",
+     "principle": "Every part must fit the 12 x 24 x 18 box folded. If the robot is turned so that its length uses the 24 in side, its width must stay under 12 in. The merfolk at y = \u00b110 then have to be reached by something that unfolds after the start: two mousetrap arms folded along the sides and released by drive_trip. A piston boom's reach goes as boom_len, and its folded length behind the pivot as boom_len\u00b7|cos fold|, so a 20 in frame can carry a 20 in boom.",
+     "hypothesis": "Change frame, mermaid and flag together. Frame: 20 in long, 6.5 in wide, deck at 7 in. Folded width is 6.5 plus the trap hardware. Iteration 2 suggests about 2.25 in per side (frame 9 folded to 13.5), so about 11 in, under 12. Folded length is about 21 in, under 24. Mermaid: trap_arms, 11 in long at 8 in high, pivoting at the front corners and folded back along the sides. The robot is 11 in wide, so it drives between the merfolk bases (inner edges at \u00b18.2) without touching them. With the front parked at 25\u201327 in, each figure sits 8.4\u20139.7 in from its pivot. The arms are released 0.2 s after parking, swing back\u2192out\u2192forward, and strike each figure at 8 in, above its centre of mass, pushing it forward and outward. That is the same height that toppled them to 100\u00b0 with the bar. Flag: piston_boom, 20 in long, pivot at 8 in, folded at 155\u00b0 and raised to 45\u00b0. The swing is 110\u00b0: a hook_boom swinging 135\u00b0 was refused for its rod angle, and one swinging 100\u00b0 passed that check. Folded, the boom sits about 8 + 20\u00b7sin155 = 16.5 in high, under 18, and reaches 18.1 in back over a 20 in deck. Coming down, the tip meets the pole face where 20\u00b7cos\u03b8 equals the gap. For gaps of 10.6, 12 and 13.2 in (front at 27, 25.6 and 24.4), the tip lands at 25.0, 24.0 and 23.0 in, plus the clipped flag's half-height. That clears 24 in across the whole park range System 1 might choose. System 1 times the piston to a square pole face, which comes round every 5 s. Parts to buy: dowel, 2 hinges, 2 drawer pins, about $3.60, 2 days lead, 96 min of printing. Plywood: 2 x 130 in\u00b2 from stock.",
+     "predicted_gains": [
+      "flag_train0"
+     ],
+     "risks": [
+      "mermaids: the 22 in bar is replaced by mousetrap arms that hit the figures at an angle (forward and outward) instead of square on. If the hit is too glancing, a figure may only slide. arm_len and arm_z can be refit across 11\u201316 / 7\u201310 in, and System 1 can move the park so the strike point is near mid-swing.",
+      "activate: the robot becomes a narrow 6.5 in track with a 20 in boom folded back over the deck. The boom's weight sits behind the wheels, and on a straight run there is no sideways load, so it should still drive out. The 20 in length is fully past x = 0 for any park_x > 10."
+     ],
+     "idea": null,
+     "result": "refused before trial: folded it is 20.0 x 9.2 x 19.5 in; the go/no-go box is 12 x 24 x 18 in (either way round, 18 in tall)",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 3.6,
+      "lead_days": 2.0,
+      "fab_minutes": 108.0,
+      "lines": [
+       "ball_caster x1: provided (reused)",
+       "dowel x1: 0 provided, buy 1 at $1 ($1.00, 2 days)",
+       "drawer_pin x2: 0 provided, buy 2 at $0.3 ($0.60, 2 days)",
+       "hinge x2: 0 provided, buy 2 at $1 ($2.00, 2 days)",
+       "m3_screw x16: provided (reused)",
+       "plywood_in2 x281: provided (reused)",
+       "wheel_pair x1: provided (reused)",
+       "print:PLA 108.0 g for mermaid: 108 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    },
+    {
+     "k": 1,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "frame (deck_z=8, length=20, width=6.5); mermaid -> trap_arms (arm_len=11, arm_z=8); flag -> band_mast (bands=4, lean_deg=35, stage_len=6, stages=4)",
+     "base": null,
+     "mechanism": "no_flag_mechanism, from the same 12 in length limit. Here the hedge is against the piston boom's unknown rod-angle limit and its 40 s retraction. A band_mast needs no piston and stays up on its own.",
+     "principle": "Rubber bands extend nested tubes along a fixed lean, and the mast stays extended after release. A lean of about 35\u00b0 from the deck's front edge carries the top forward and up onto the pole face. The folded mast adds only stage_len\u00b7sin(lean) to the length, which a 20 in frame in the 24 in box can afford. The merfolk are handled by mousetrap arms, as in proposal 1.",
+     "hypothesis": "Frame: 20 x 6.5 in, deck at 8 in. trap_arms: 11 in long at 8 in high, as in proposal 1. band_mast: 4 stages of 6 in tubes (1.5 in overlap), extending to 19.5 in, leaning 35\u00b0, driven by 4 bands. Folded, the mast adds 6\u00b7sin35 = 3.4 in ahead of the front, about 24 in total including the 20 in frame and hardware. That is at the limit; iteration 2 suggests the added length is only about 2/3 of the projection, so about 23 in. Folded height is 8 + 6\u00b7cos35 = 12.9 in. Extended, the top meets the pole face at z = 8 + gap/tan35 = 8 + 1.43\u00b7gap: 23.2 in for a 10.6 in gap, 25.2 in for 12, 26.9 in for 13.2, and it stays there. Release is by drive_trip 0.2 s after parking. System 1 can set the phase to a square face through duty and park_x. A mast left inside the fortress only voids cannonballs, and we have no cannon. Parts to buy: 4 aluminium tubes and 2 drawer pins, $10.60, 2 days lead, 96 min of printing.",
+     "predicted_gains": [
+      "flag_train0"
+     ],
+     "risks": [
+      "mermaids: the same as in proposal 1 (glancing mousetrap-arm strike instead of the bar). It can be refit by arm_len and arm_z.",
+      "activate: iteration 3's short-frame mast failed to leave the dock. Here the frame is 20 in long, so the forward-leaning mast's mass sits well inside a long wheelbase and should not tip the robot.",
+      "The folded length is close to 24 in. If the fit check refuses it, the fix is stage_len 5 with lean 35."
+     ],
+     "idea": null,
+     "result": "refused before trial: the mermaid (trap_arms) and the flag (band_mast) pass 0.34 in into each other with the mermaid 17 % deployed, the rest stowed; two parts cannot be in one place",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 10.6,
+      "lead_days": 2.0,
+      "fab_minutes": 108.0,
+      "lines": [
+       "alu_tube x4: 0 provided, buy 4 at $2.5 ($10.00, 2 days)",
+       "ball_caster x1: provided (reused)",
+       "drawer_pin x2: 0 provided, buy 2 at $0.3 ($0.60, 2 days)",
+       "m3_screw x16: provided (reused)",
+       "plywood_in2 x284: provided (reused)",
+       "wheel_pair x1: provided (reused)",
+       "print:PLA 108.0 g for mermaid: 108 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    }
+   ],
+   "accepted": null,
+   "notes": "Diagnosis behind both proposals: the main limit on this body is the box. The 22 in bar takes the box's 24 in side, so everything else must fit in 12 in of length. Within that, no flag (and no cannon reach) can work. The best piston_boom on an 11 in frame touches the pole at about 19 in high, below the 24 in needed. So both proposals turn the robot to use the 24 in side for length: a 6.5 in wide, 20 in long frame, with mousetrap arms in place of the bar for the merfolk. This also opens a path to the match group. Without treasure the match can reach at most 172 of the 174 points it needs, so the peel_chute has to come next. The long frame gives it the deck length it lacks; earlier chute attempts were refused for being 13.7\u201315.5 in long. Cannon (gate_chute reach) and heart (hook_boom clear of the bar) also become possible on the long frame in later iterations.",
+   "llm": {
+    "tag": "iter03",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 291.0,
+    "tokens_in": 12430,
+    "tokens_out": 27438,
+    "usd_list_price": 0.6306,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 291.0,
+   "stop": null
+  },
+  {
+   "iteration": 4,
+   "body": "cannon: no_cannon; drive: wheels2 (wheel_r=1.5); flag: no_flag; frame: ply_frame (deck_z=8, length=11, width=12); heart: no_heart; mermaid: push_bar (bar_w=22, bar_z=7.5); release: drive_trip; treasure: no_treasure",
+   "held": [
+    "activate",
+    "mermaids"
+   ],
+   "failing_mechanisms": {
+    "no_treasure_mechanism": 1,
+    "no_flag_mechanism": 1,
+    "no_cannon_mechanism": 1,
+    "no_heart_mechanism": 1,
+    "points_short; scored nothing at:treasure,flag,cannon,heart": 1
+   },
+   "failing": {
+    "treasure_train0": {
+     "mechanism": "no_treasure_mechanism",
+     "detail": "0 of 175 points: the body has no treasure mechanism"
+    },
+    "flag_train0": {
+     "mechanism": "no_flag_mechanism",
+     "detail": "0 of 40 points: the body has no flag mechanism"
+    },
+    "cannon_train0": {
+     "mechanism": "no_cannon_mechanism",
+     "detail": "0 of 36 points: the body has no cannon mechanism"
+    },
+    "heart_train0": {
+     "mechanism": "no_heart_mechanism",
+     "detail": "0 of 61 points: the body has no heart mechanism"
+    },
+    "match_train0": {
+     "mechanism": "points_short; scored nothing at:treasure,flag,cannon,heart",
+     "detail": "35 of 347 points (needs 174): activate 11: left the dock fully; the frame ended at x = -6.5 in; treasure 0: 0 coins on the mound, 0 in its border, 10 still on the fortress; 0 jewels on the mound, 0 in its border, 5 still on the fortress; flag 0: no flag mechanism; cannon 0: no cannon mechanism; mermaids 24: the mermaid toppled (100 deg); the merman toppled (101 deg); heart 0: the heart lies at (25"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "frame (deck_z=8, length=8.5, width=12); cannon -> gate_chute (exit_z=10.5, reach=2.9)",
+     "base": null,
+     "mechanism": "no_cannon_mechanism. The one earlier try (gate_chute, reach 0.3, exit_z 9) failed with port_never_seen and rule_broken. A reach of 0.3 in puts the exit at front + 0.3. The robot's front gets to about 25.9 in, held back by the chest pushed ahead of the bar. At y = 2.5 the fortress edge is at 39.625 \u2212 \u221a(144 \u2212 6.25) \u2248 27.9 in, so the exit hung about 1.7 in outside the fortress and never over the port.",
+     "principle": "Something dropped by gravity lands under its exit. To put the cannonballs into the port behind its 7 in barrier, the exit has to sit inside the fortress edge and above the barrier when the cue comes. Every part must also fit the box folded, so the chute's reach has to come out of the frame's length.",
+     "hypothesis": "The bar is 22 in wide, so the box must be oriented with the robot's length along its 12 in side. The current fold is 11.8 in, and the extra 0.8 in is the bar ahead of the frame: frame 11 with reach 0.3 was not refused, so the 0.3 in reach was hidden inside that 0.8 in. No reach above about 0.8 fits on an 11 in frame, which is why a params move cannot fix this. Shortening the frame to 8.5 in allows a 2.9 in reach, giving 8.5 + 2.9 + lip \u2248 11.4\u201311.9 in folded. With the front at about 25.9 the exit sits at about 28.8, about 0.9 in inside the edge at y = 2.5, and System 1 can park closer if the chest allows. exit_z 10.5 is 3.5 in above the 7 in barrier and above the 8 in deck and the 7.5 in bar. The 4-ball chute on its 8\u00b0 slope then tops out near 12 in, well under 18. The iteration-1 port_never_seen happened when the low bar was sliding the merfolk ahead and stopping the robot short. The bar now topples them, so the sensor can get close. The rule_broken came from the exit being left in the cylinder at 40 s. System 1 already uses return_at and can back off after the drop.",
+     "predicted_gains": [
+      "cannon"
+     ],
+     "risks": [
+      "activate: a shorter wheelbase (the wheels sit 2.1 in behind the centre instead of 2.75) reduces the margin against the front lifting under acceleration or while pushing at 7.5 in. The cantilevered chute and balls move the centre of mass forward, which helps, and System 1 can lower the duty. Iteration 3's failure on a 7 in frame came with a tall leaning band mast, not a short frame alone.",
+      "mermaids: the bar's width and height are unchanged, and the chute sits at y = 2.5, well inside the merfolk at \u00b110. The figures are toppled by the same 22 in bar at 7.5 in, but on a lighter, shorter body with less weight to resist the push."
+     ],
+     "idea": null,
+     "result": "rejected: gained nothing; still failing: balls_missed_port, no_flag_mechanism, no_heart_mechanism, no_treasure_mechanism, rule_broken",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "cannon"
+      ],
+      "hit": [],
+      "missed": [
+       "cannon"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 1.0,
+      "lead_days": 2.0,
+      "fab_minutes": 53.7,
+      "lines": [
+       "ball_caster x1: provided (reused)",
+       "hinge x1: 0 provided, buy 1 at $1 ($1.00, 2 days)",
+       "m3_screw x16: provided (reused)",
+       "plywood_in2 x228: provided (reused)",
+       "wheel_pair x1: provided (reused)",
+       "print:PLA 53.7 g for cannon: 54 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "balls_missed_port",
+      "no_flag_mechanism",
+      "no_heart_mechanism",
+      "no_treasure_mechanism",
+      "rule_broken"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "frame (deck_z=7, length=20, width=6.5); mermaid -> trap_arms (arm_len=11, arm_z=9); flag -> piston_boom (boom_len=22, fold_deg=162, pivot_z=7, raise_deg=62)",
+     "base": null,
+     "mechanism": "no_flag_mechanism. The current layout cannot hold any flag part. The 22 in bar forces a folded length of 12 in or less, and a boom pivoting at the front edge has to fold within about 11 in back and 15 in up (about 3 in of the fold height goes to the clipped flag, per iteration 4). That caps it at L\u00b2 \u2264 121 + (15 \u2212 p)\u00b2, and with the pivot at its 15 in limit it reaches only 9.8 in ahead at a 20 in tip height. The pole face is 11.7 in ahead of the 25.9 in front. A band mast has the same problem: it needs about 3.2 in of lean in the fold, which forces a frame of about 7 in, and that is iteration 3's failure.",
+     "principle": "A boom reaches \u221a(L\u00b2 \u2212 \u0394z\u00b2) ahead, so reaching the pole at 24 in or more needs L of about 20 in. The box allows 24 in of length only if the width is 12 in or less, which means dropping the 22 in bar. The merfolk at \u00b110 must then be struck from beside the front corners by mousetrap arms pushing above their centre of mass, as the 7.5 in bar did.",
+     "hypothesis": "Frame 20 \u00d7 6.5 in. Iteration 4 measured this layout at 9.2 in wide folded, so the box can turn round to 24 in of length. The boom is 22 in, folded at 162\u00b0 from a 7 in pivot. Folded it is 22\u00b7cos18 = 20.9 in long, and 7 + 22\u00b7sin18 = 13.8 in plus the 3 in flag gives about 16.9 in high, both inside 24 \u00d7 18. Iteration 4 was refused for 19.5 in of height with fold 155 and pivot 8; this fixes that. The swing is 162 \u2212 62 = 100\u00b0, the same swing that passed the rod-angle check in iteration 3 (135\u00b0 failed). Raised to 62\u00b0, the tip is 10.3 in ahead at 26.4 in high, so with the front at about 26.9 the flag meets the pole face at 37.6. The frame corners at y = \u00b13.25 face a fortress edge at 28.1 in, which leaves room. The chest (y 4.35\u20139.05) passes beside the 6.5 in frame. Trap arms, 11 in long at 9 in high, are freed by drive_trip on parking. A figure at (20, \u00b110) sits (\u22126.9, 6.75) from the front corner, 9.65 in out at 133\u00b0, so the arm hits it 1.35 in short of its tip on its way forward, above the 7.5 in that already toppled it and above the chest. System 1 times the boom to a quarter-turn of the pole and backs away at return_at; the magnet holds the flag once the piston retracts.",
+     "predicted_gains": [
+      "flag"
+     ],
+     "risks": [
+      "mermaids: the bar is replaced by mousetrap arms. If a trap's torque at a 9.65 in radius is too weak to tip a figure past its 3.5\u20133.7 in base, the group is lost. The loop's follow-up trials can refit arm_len and arm_z (2\u201310 in high, up to 16 in long). Iteration 4's collision was between the arms and the band mast; this boom swings in the centre plane at y = 0, away from the arms at \u00b13.25.",
+      "activate: the frame is longer, lower and heavier. The wheelbase is 20 in, which removes any wheelie risk, and 2 \u00d7 130 in\u00b2 of plywood is on hand. The trap arms meet the fortress at about 45\u00b0 and stop there. They must be pulled out by the return drive, which System 1 already uses."
+     ],
+     "idea": null,
+     "result": "refused before trial: the mermaid (trap_arms) and the flag (piston_boom) pass 0.30 in into each other with the flag 0 % deployed, the rest stowed; two parts cannot be in one place",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 3.6,
+      "lead_days": 2.0,
+      "fab_minutes": 108.0,
+      "lines": [
+       "ball_caster x1: provided (reused)",
+       "dowel x1: 0 provided, buy 1 at $1 ($1.00, 2 days)",
+       "drawer_pin x2: 0 provided, buy 2 at $0.3 ($0.60, 2 days)",
+       "hinge x2: 0 provided, buy 2 at $1 ($2.00, 2 days)",
+       "m3_screw x16: provided (reused)",
+       "plywood_in2 x281: provided (reused)",
+       "wheel_pair x1: provided (reused)",
+       "print:PLA 108.0 g for mermaid: 108 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    },
+    {
+     "k": 2,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "frame (deck_z=7, length=20, width=6.5); mermaid -> trap_arms (arm_len=11, arm_z=9); flag -> piston_boom (boom_len=22, fold_deg=162, pivot_z=7, raise_deg=62); cannon -> gate_chute (exit_z=11, reach=3)",
+     "base": null,
+     "mechanism": "no_flag_mechanism and no_cannon_mechanism together. Proposals 1 and 2 both change the frame slot, so the loop will not try them together. This combines them on the narrow body, where the 24 in box length leaves room for the chute's reach.",
+     "principle": "Each mechanism needs its own actuator: the boom and the gate take one piston each (2 of 2), the arms take both mousetraps, and the drive takes both gearmotors. Parts cannot overlap stowed, on their way, or deployed: the boom swings at y = 0, the chute sits at y = 1.5\u20133.5 and at least 11 in up, and the arms swing outward of y = \u00b13.25 at 9 in.",
+     "hypothesis": "This is the same narrow body as proposal 2, plus a gate_chute reaching 3 in. 20 + 3 in is under 24 in, so the folded length is no problem here. With the front at about 26.9 the exit is at 29.9 in, 2 in inside the 27.9 in fortress edge at y = 2.5, so it is over the port. exit_z 11 is 4 in above the barrier and 2 in above the arms at 9 in, which reach no closer to the centreline than y = 3.25. The folded boom lies on the centreline, and its flag is 20 in back, behind the chute. The sequence: park; the arms fire 0.2 s later; the boom places the flag at a pole quarter-turn; the gate opens when the IR sees our port's tab (at least one pass in 20 s); return_at backs the chute and arms out of the cylinder before 40 s with both pistons retracted. Purchases: 3 hinges, 1 dowel, 2 drawer pins, $4.60 in all; 162 machine minutes of PLA; 2 days' lead.",
+     "predicted_gains": [
+      "flag",
+      "cannon"
+     ],
+     "risks": [
+      "mermaids: the same arm-strength risk as proposal 2.",
+      "activate: the same as proposal 2. The 66 g chute and its balls sit at the front of a 20 in base, so tipping is not a concern.",
+      "cannon: if the return drive comes too late, the chute or the arms are still inside the cylinder at 40 s and rule_broken recurs. System 1 controls return_at."
+     ],
+     "idea": null,
+     "result": "refused before trial: folded it is 25.0 x 9.2 x 16.8 in; the go/no-go box is 12 x 24 x 18 in (either way round, 18 in tall)",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 4.6,
+      "lead_days": 2.0,
+      "fab_minutes": 162.0,
+      "lines": [
+       "ball_caster x1: provided (reused)",
+       "dowel x1: 0 provided, buy 1 at $1 ($1.00, 2 days)",
+       "drawer_pin x2: 0 provided, buy 2 at $0.3 ($0.60, 2 days)",
+       "hinge x3: 0 provided, buy 3 at $1 ($3.00, 2 days)",
+       "m3_screw x16: provided (reused)",
+       "plywood_in2 x281: provided (reused)",
+       "wheel_pair x1: provided (reused)",
+       "print:PLA 108.0 g for mermaid: 108 machine minutes",
+       "print:PLA 54.0 g for cannon: 54 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    }
+   ],
+   "accepted": null,
+   "notes": "Diagnosis\n- The two held groups depend on the 22 in push bar. Because of that bar, the box must take the robot's length along its 12 in side, and that cap blocks the flag and cannon parts.\n- The cannon's earlier failure, port_never_seen, came from the exit sitting about 1.7 in outside the fortress edge (front at about 25.9, chute reach 0.3, edge at about 27.9 at y = 2.5).\n- No flag boom or band mast fits the current frame's length while still reaching the pole 11.7 in ahead at 24 in up; the geometry bound is in proposal 2.\n\nProposals\n1. **Proposal 1 (cheapest):** shorten the frame to 8.5 in so the cannon chute can reach 2.9 in ahead, and keep the bar.\n2. **Proposal 2:** turn the robot round to 20 \u00d7 6.5 in, using the box's 24 in side for length. This makes room for a 22 in flag boom. Mousetrap arms replace the bar for the merfolk.\n3. **Proposal 3:** the body from proposal 2 plus the chute from proposal 1. Proposals 1 and 2 share the frame slot, so the loop would not otherwise try them together.\n\nWhat I left out\n- **Heart:** not proposed. The chest sits at the same x as the merfolk, and the bar shuts its lid. A hook boom long enough to clear the bar would come down inside the fortress, and a shorter one would need too large a swing for the rod angle.\n- **Treasure:** peel_chute was refused three times for its folded size. It should be retried once the body is settled, possibly on the narrow-long frame.",
+   "llm": {
+    "tag": "iter04",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 399.0,
+    "tokens_in": 13053,
+    "tokens_out": 38904,
+    "usd_list_price": 0.865,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 464.7,
+   "stop": null
+  },
+  {
+   "iteration": 5,
+   "body": "cannon: no_cannon; drive: wheels2 (wheel_r=1.5); flag: no_flag; frame: ply_frame (deck_z=8, length=11, width=12); heart: no_heart; mermaid: push_bar (bar_w=22, bar_z=7.5); release: drive_trip; treasure: no_treasure",
+   "held": [
+    "activate",
+    "mermaids"
+   ],
+   "failing_mechanisms": {
+    "no_treasure_mechanism": 1,
+    "no_flag_mechanism": 1,
+    "no_cannon_mechanism": 1,
+    "no_heart_mechanism": 1,
+    "points_short; scored nothing at:treasure,flag,cannon,heart": 1
+   },
+   "failing": {
+    "treasure_train0": {
+     "mechanism": "no_treasure_mechanism",
+     "detail": "0 of 175 points: the body has no treasure mechanism"
+    },
+    "flag_train0": {
+     "mechanism": "no_flag_mechanism",
+     "detail": "0 of 40 points: the body has no flag mechanism"
+    },
+    "cannon_train0": {
+     "mechanism": "no_cannon_mechanism",
+     "detail": "0 of 36 points: the body has no cannon mechanism"
+    },
+    "heart_train0": {
+     "mechanism": "no_heart_mechanism",
+     "detail": "0 of 61 points: the body has no heart mechanism"
+    },
+    "match_train0": {
+     "mechanism": "points_short; scored nothing at:treasure,flag,cannon,heart",
+     "detail": "35 of 347 points (needs 174): activate 11: left the dock fully; the frame ended at x = -6.5 in; treasure 0: 0 coins on the mound, 0 in its border, 10 still on the fortress; 0 jewels on the mound, 0 in its border, 5 still on the fortress; flag 0: no flag mechanism; cannon 0: no cannon mechanism; mermaids 24: the mermaid toppled (100 deg); the merman toppled (101 deg); heart 0: the heart lies at (25"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "frame (deck_z=8, length=8.5, width=12); flag -> band_mast (bands=5, lean_deg=22, stage_len=8.8, stages=4)",
+     "base": null,
+     "mechanism": "no_flag_mechanism: 0 of 40 points because the body has nothing that lifts the flag. The pole face is about 37.6 in out (centre 39.625 less 2 in). The frame front can park no further than about 26.8 in, because the bar sits about 0.8 in ahead of the front and the fortress edge is at 27.6. So the flag has to go about 11 in ahead of the deck's front edge with its top at 24 in or higher.",
+     "principle": "Every part must fit the 12 x 24 x 18 in box folded, and anything larger must unfold after the start by a released spring. Rubber bands extend nested tubes after drive_trip fires at parking. The 22 in bar puts the robot's length on the box's 12 in side, so the forward lean of the folded stage has to be paid for by a shorter frame.",
+     "hypothesis": "First I ruled out the other routes. A piston boom cannot do it in a 12 in length. Folded upright, its raised height is at most its folded height (\u226418 in) plus the flag, which is under 24. Folded back at 175\u00b0, a boom of about 11.5 in or less needs its pivot above about 17 in to reach 11 in out and 24 in up, and then the folded height goes past 18. A 3-stage mast also falls short: if s\u00b7sin(lean) \u2264 3.4, its reach is under 9 in. That leaves a 4-stage mast on a shorter frame. In iteration 2, frame 11 with s=10 at 22\u00b0 was refused at 14.3 in, which fits folded length \u2248 frame + s\u00b7sin(lean) \u2212 0.45. Here that gives 8.5 + 3.30 \u2212 0.45 \u2248 11.35 in, under 12. Folded height is 8 + 8.8\u00b7cos22 (8.16) + 0.6 \u2248 16.8 in, under 18. Extended length is 4\u00b78.8 \u2212 3\u00b71.5 = 30.7 in. The top lands 30.7\u00b7sin22 = 11.5 in ahead and 8 + 28.5 = 36.5 in up, which clears 24 by a wide margin and should help with 'highest flag'. With the front parked at about 26.1, the top meets the pole face at 37.6. A lean of 22\u00b0 (rather than 30\u00b0) keeps the mast at about 11.7 in high where it crosses the fortress edge. Five bands (all five are unused) pull out the longer stages. Bill: 4 alu_tube at $2.50, so $10 and 2 days. The bands come from the kit; there is no printing and no actuator.",
+     "predicted_gains": [
+      "flag_train0"
+     ],
+     "risks": [
+      "activate: in iteration 3, frame 7 with a mast lost activate and mermaids, and I can't tell why from the record. But frame 8.5 in iteration 5 (with a gate chute) lost neither group, so this frame length drives. The mast stays latched until drive_trip fires after parking, so it doesn't move while driving.",
+      "mermaids: the bar is unchanged (22 in at 7.5 in). The front is now at park_x + 4.25, and System 1 re-fits park_x so the bar still runs past the figures at x = 20. The extended mast weighs only a few tubes, but it does lean forward, so tipping after parking is a small risk. That happens after the merfolk have already been struck."
+     ],
+     "idea": null,
+     "result": "rejected: lost mermaids (mermaids: merfolk_not_reached, 0 of 24 points: the mermaid untouched (moved 0.02 in, tilted 0 deg); the merman untouched (moved 0.00 in, tilted 0 deg))",
+     "gained": [],
+     "lost": [
+      "mermaids"
+     ],
+     "prediction": {
+      "predicted": [
+       "flag_train0"
+      ],
+      "hit": [],
+      "missed": [
+       "flag_train0"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": [
+       "mermaids"
+      ]
+     },
+     "resources": {
+      "usd": 10.0,
+      "lead_days": 2.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "alu_tube x4: 0 provided, buy 4 at $2.5 ($10.00, 2 days)",
+       "ball_caster x1: provided (reused)",
+       "m3_screw x16: provided (reused)",
+       "plywood_in2 x228: provided (reused)",
+       "wheel_pair x1: provided (reused)"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "flag_never_met_pole_square",
+      "merfolk_not_reached",
+      "no_cannon_mechanism",
+      "no_heart_mechanism",
+      "no_treasure_mechanism",
+      "rule_broken"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "frame (deck_z=8, length=8.5, width=12); flag -> band_mast (bands=4, lean_deg=28, stage_len=7.2, stages=4)",
+     "base": null,
+     "mechanism": "no_flag_mechanism: nothing lifts the flag the roughly 11 in past the deck's front edge and the 24 in or more of height it needs to reach the pole face at about 37.6 in, given that the frame front stops at about 26.8 in or less.",
+     "principle": "Fold to fit the box and extend by released bands. Shorter stages at a steeper lean trade height for a shorter, lighter folded package with more length margin, in case my folded-length estimate is off.",
+     "hypothesis": "This is the fallback to proposal 1 in case its length or weight is the problem. Stages of 7.2 in at 28\u00b0: folded length \u2248 8.5 + 7.2\u00b7sin28 (3.38) \u2212 0.45 \u2248 11.4 in. Folded height is 8 + 7.2\u00b7cos28 (6.36) + 0.6 \u2248 15.0 in, so there is 3 in of height margin. Extended length is 4\u00b77.2 \u2212 4.5 = 24.3 in. The top is 24.3\u00b7sin28 = 11.4 in ahead and 8 + 21.5 = 29.5 in up, above the 24 in minimum, and it reaches the pole face with the front parked at about 26.2. The mast is shorter and lighter than in iteration 3 (8 in stages at 28\u00b0 on a 7 in frame), and the 8.5 in frame has already been shown to drive. Four bands, with one left in the kit. Bill: 4 alu_tube at $2.50, so $10 and 2 days.",
+     "predicted_gains": [
+      "flag_train0"
+     ],
+     "risks": [
+      "activate and mermaids, for the same reasons as proposal 1: frame 8.5 kept both groups in iteration 5, and the mast deploys only after parking. The steeper lean puts the mast lower where it crosses the fortress edge (about 9.5 in), so it may rest on the fortress rim. That would cost the flag but not a held group."
+     ],
+     "idea": null,
+     "result": "rejected: gained nothing; still failing: flag_never_met_pole_square, no_cannon_mechanism, no_heart_mechanism, no_treasure_mechanism, rule_broken",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "flag_train0"
+      ],
+      "hit": [],
+      "missed": [
+       "flag_train0"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 10.0,
+      "lead_days": 2.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "alu_tube x4: 0 provided, buy 4 at $2.5 ($10.00, 2 days)",
+       "ball_caster x1: provided (reused)",
+       "m3_screw x16: provided (reused)",
+       "plywood_in2 x228: provided (reused)",
+       "wheel_pair x1: provided (reused)"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "flag_never_met_pole_square",
+      "no_cannon_mechanism",
+      "no_heart_mechanism",
+      "no_treasure_mechanism",
+      "rule_broken"
+     ]
+    }
+   ],
+   "accepted": null,
+   "notes": "I'm sending two proposals, both for the flag: a band mast on a frame cut from 11 in to 8.5 in, which is the only thing I found that fits the box. They change the same slots, so they will be tried separately. They cost $10 each and 2 days of lead time, with no printing; the five rubber bands come from the kit.\n\n**Why the flag, and why a band mast**\n- **Piston boom:** it can't fit. Folded upright, it can't get the flag to 24 in. Folded back on an 11.5 in or shorter boom, the pivot would have to sit above 17 in, which breaks the 18 in height limit.\n- **Sensed boom:** it has the same boom geometry, so the same problem.\n- **Three-stage mast:** it reaches less than 9 in forward, short of the roughly 11 in needed.\n- **Four-stage mast:** it works, but only on a frame about 8.5 in long. The 22 in bar forces the robot's length onto the box's 12 in side.\n\n**Folded-length estimate.** My rule is folded length \u2248 frame length + stage length \u00d7 sin(lean) \u2212 0.45 in. It comes from one data point, the iteration 2 refusal at 14.3 in, so the 8.5 in frame leaves about 0.6 in of margin.\n\n**Risk to held groups.** The 8.5 in frame kept activate and mermaids in iteration 5. In iteration 3, a 7 in frame with a mast lost both, and I can't tell why from the record. That uncertainty is why I'm sending a lighter, shorter second variant.\n\n**Unknown height.** The record doesn't give the fortress's height. A mast at 22\u201328\u00b0 crosses the fortress edge at about 9.5\u201311.7 in high; if the fortress is taller than that, the mast rests on its edge and the flag misses.\n\n**Tasks I'm not proposing for this round**\n- **Treasure (175 points):** every peel_chute layout I worked through breaks either the 18 in height limit or the side-trough drop. The refusals point to about 6 in of drop beyond the side trough's own slope, which isn't explained.\n- **Heart:** the hook boom only reaches the pushed chest if it is short, and short is exactly where it hit the push bar in iteration 3.\n- **Cannon:** both gate_chute trials broke a rule, and I have no diagnosis that would change the exit settings.",
+   "llm": {
+    "tag": "iter05",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 204.7,
+    "tokens_in": 13950,
+    "tokens_out": 18950,
+    "usd_list_price": 0.4731,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 283.0,
+   "stop": null
+  },
+  {
+   "iteration": 6,
+   "body": "cannon: no_cannon; drive: wheels2 (wheel_r=1.5); flag: no_flag; frame: ply_frame (deck_z=8, length=11, width=12); heart: no_heart; mermaid: push_bar (bar_w=22, bar_z=7.5); release: drive_trip; treasure: no_treasure",
+   "held": [
+    "activate",
+    "mermaids"
+   ],
+   "failing_mechanisms": {
+    "no_treasure_mechanism": 1,
+    "no_flag_mechanism": 1,
+    "no_cannon_mechanism": 1,
+    "no_heart_mechanism": 1,
+    "points_short; scored nothing at:treasure,flag,cannon,heart": 1
+   },
+   "failing": {
+    "treasure_train0": {
+     "mechanism": "no_treasure_mechanism",
+     "detail": "0 of 175 points: the body has no treasure mechanism"
+    },
+    "flag_train0": {
+     "mechanism": "no_flag_mechanism",
+     "detail": "0 of 40 points: the body has no flag mechanism"
+    },
+    "cannon_train0": {
+     "mechanism": "no_cannon_mechanism",
+     "detail": "0 of 36 points: the body has no cannon mechanism"
+    },
+    "heart_train0": {
+     "mechanism": "no_heart_mechanism",
+     "detail": "0 of 61 points: the body has no heart mechanism"
+    },
+    "match_train0": {
+     "mechanism": "points_short; scored nothing at:treasure,flag,cannon,heart",
+     "detail": "35 of 347 points (needs 174): activate 11: left the dock fully; the frame ended at x = -6.5 in; treasure 0: 0 coins on the mound, 0 in its border, 10 still on the fortress; 0 jewels on the mound, 0 in its border, 5 still on the fortress; flag 0: no flag mechanism; cannon 0: no cannon mechanism; mermaids 24: the mermaid toppled (100 deg); the merman toppled (101 deg); heart 0: the heart lies at (25"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "frame (deck_z=9, length=11, width=12); heart -> hook_boom (boom_len=4.5, drop_deg=22, hook_depth=6)",
+     "base": null,
+     "mechanism": "no_heart_mechanism. In the last match the heart ended at (25.9, 6.7) with the lid shut. 25.9 in is exactly the frame front (park_x 20.4 + 5.5), so the low base plate pushed the chest about 3 in and the bump shut the lid. Nothing on the body can lift anything.",
+     "principle": "Every moving mechanism needs its own actuator, and both pistons are free. Two parts cannot be in one place: the refusal in iteration 3 says the boom clashed with the push bar by 0.33 in when the boom's pivot sat at deck_z = 8, only 0.5 in above the 7.5 in bar. Keeping the swing short keeps the piston rod steered: a 135\u00b0 swing gave a 16\u00b0 rod angle and was refused, a 100\u00b0 swing passed.",
+     "hypothesis": "Add hook_boom and raise the deck from 8 to 9 in, with the bar staying at 7.5 in. This lifts the pivot and the whole swing about 1 in clear of the bar, where 0.33 in was the overlap. At x = 0.8 in the boom now sits at 9 \u2212 0.8\u00b7tan22 = 8.68 in, against 7.86 in in iteration 3. drop_deg 22 gives a 112\u00b0 swing, inside the range that passed the rod check. boom_len 4.5 at \u221222\u00b0 puts the tip 4.17 in ahead of the frame front and 7.31 in up. The 6 in hook reaches down to 1.31 in. The heart task has its own System 1 search, so it can park the front between about 16 and 18.6 in. There the frame and the bar face (front + 0.8 < 19.4 in) stop short of the chest at 19.9 in, and the lid stays propped open. The hook falls at front + 4.17 \u2248 21.5 in, inside the chest (19.9\u201323.1 in). As the piston pulls the hook back up, the arc sweeps the toe back toward the robot, which scoops the heart into the deck tray. Then the robot drives back behind the line, for 61 points. Folded, the boom stands 9 + 4.5 = 13.5 in tall, under 18. Parameters alone cannot do this, because there is no heart part at all.",
+     "predicted_gains": [
+      "heart"
+     ],
+     "risks": [
+      "mermaids: the deck is 1 in higher and about 50 g heavier, but the bar keeps its 7.5 in height and 22 in width, and the boom stays stowed during that task",
+      "activate: a slightly higher centre of mass on the same wheelbase and drive. Raising the deck does not touch the length that lost activate in iteration 3"
+     ],
+     "idea": null,
+     "result": "rejected: gained nothing; still failing: chest_lid_shut, no_cannon_mechanism, no_flag_mechanism, no_treasure_mechanism, points_short; scored nothing at:treasure,flag,cannon,heart",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "heart"
+      ],
+      "hit": [],
+      "missed": [
+       "heart"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 3.5,
+      "lead_days": 2.0,
+      "fab_minutes": 20.0,
+      "lines": [
+       "ball_caster x1: provided (reused)",
+       "dowel x1: 0 provided, buy 1 at $1 ($1.00, 2 days)",
+       "hinge x2: 0 provided, buy 2 at $1 ($2.00, 2 days)",
+       "m3_screw x16: provided (reused)",
+       "plywood_in2 x291: provided (reused)",
+       "steel_hook x1: 0 provided, buy 1 at $0.5 ($0.50, 2 days)",
+       "wheel_pair x1: provided (reused)",
+       "print:PLA 20.0 g for heart: 20 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "chest_lid_shut",
+      "no_cannon_mechanism",
+      "no_flag_mechanism",
+      "no_treasure_mechanism",
+      "points_short; scored nothing at:treasure,flag,cannon,heart"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "frame (deck_z=10, length=11, width=12); heart -> hook_boom (boom_len=5.5, drop_deg=25, hook_depth=6)",
+     "base": null,
+     "mechanism": "no_heart_mechanism. This is the same diagnosis as proposal 1, a fallback in case its geometry is refused or the hook misses the chest's floor.",
+     "principle": "Two parts cannot be in one place, so lift the pivot further from the bar. The swing stays under about 115\u00b0 so the piston can still steer the boom.",
+     "hypothesis": "Deck at 10 in, so the pivot is 2.5 in above the bar and no swinging part can come near its height. boom_len 5.5 with drop_deg 25 (a 115\u00b0 swing) puts the tip at 4.98 in ahead and 10 \u2212 2.32 = 7.68 in up, and the 6 in hook reaches down to 1.68 in. Folded height is 10 + 5.5 = 15.5 in, under 18. The parking window for a hook inside the chest is front \u2248 15.2\u201317.8 in. The trade is a hook bottom about 0.4 in higher than proposal 1's, against a wider margin from the bar.",
+     "predicted_gains": [
+      "heart"
+     ],
+     "risks": [
+      "mermaids and activate: the deck is 2 in higher, so the centre of mass rises. The bar is unchanged and the boom is stowed during those runs",
+      "the heart itself: the 115\u00b0 swing is closer to the 135\u00b0 that failed the rod check"
+     ],
+     "idea": null,
+     "result": "rejected: gained nothing; still failing: chest_lid_shut, no_cannon_mechanism, no_flag_mechanism, no_treasure_mechanism, rule_broken",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "heart"
+      ],
+      "hit": [],
+      "missed": [
+       "heart"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 3.5,
+      "lead_days": 2.0,
+      "fab_minutes": 20.0,
+      "lines": [
+       "ball_caster x1: provided (reused)",
+       "dowel x1: 0 provided, buy 1 at $1 ($1.00, 2 days)",
+       "hinge x2: 0 provided, buy 2 at $1 ($2.00, 2 days)",
+       "m3_screw x16: provided (reused)",
+       "plywood_in2 x294: provided (reused)",
+       "steel_hook x1: 0 provided, buy 1 at $0.5 ($0.50, 2 days)",
+       "wheel_pair x1: provided (reused)",
+       "print:PLA 20.0 g for heart: 20 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "chest_lid_shut",
+      "no_cannon_mechanism",
+      "no_flag_mechanism",
+      "no_treasure_mechanism",
+      "rule_broken"
+     ]
+    },
+    {
+     "k": 2,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "frame (deck_z=8, length=9, width=12); treasure -> peel_chute (junction_z=10, reach=3, side_deg=20, side_len=9, sieve_gap=2, slope_deg=20, width=3.2)",
+     "base": null,
+     "mechanism": "no_treasure_mechanism, 175 points, and the main source of the match shortfall. Earlier peel_chute tries were refused for fold size: 13.7 \u00d7 22 \u00d7 19.0 in with frame 11, junction 11, reach 4, slope 22, and in iteration 1 for side troughs ending 4.6 in below the floor.",
+     "principle": "Every part must fit the box folded. The refusals show the folded outer section adds about reach + 2 to 2.6 in above the inner trough's front edge, and about 1.5 + 0.3\u00b7reach in ahead of the frame. The side troughs start about 6.1 in below the junction and must end above the floor. A trough below a turning table catches what a fixed blade peels off.",
+     "hypothesis": "Shorten the frame to 9 in. A length of 8.5 kept activate and mermaids in iteration 5. Reach 3 then folds to about 9 + 2.4 = 11.4 in, under 12. Junction 10 at slope 20: front-edge height 10 + 4.5\u00b7tan20 = 11.64 in, plus 3 of reach and 2.6 of margin, folds to about 17.2 in, under 18. The side troughs start near 3.9 in: 9 in at 20\u00b0 drops 3.1 in, so they end about 0.8 in up, about 8.5 in out from the \u00b16 in sides, near the mounds' y = \u00b115. A 2 in sieve gap passes 1.5 in jewels and stops 2.5 in coins, and a 3.2 in width passes the coins. Parked against the fortress wall, the blade (front + 3) sits about 2 in over the rim, and drive_trip drops it 0.2 s after parking. Over one 20 s turn the whole rim passes the blade. The main uncertainties are the table's height and where the side troughs land in x relative to the mounds at x = 14 in. If the chute peels but misses, the loop's fitting trials can retune it.",
+     "predicted_gains": [
+      "treasure"
+     ],
+     "risks": [
+      "activate and mermaids: a 9 in frame with about 400 g more at the front. Iteration 5's 8.5 in frame kept both, and the bar is unchanged",
+      "mermaids: the folded outer section above the deck front must not shift the bar; it is mounted above the bar at about 11.6 in"
+     ],
+     "idea": null,
+     "result": "rejected: gained nothing; still failing: figures_missed_blade, no_cannon_mechanism, no_flag_mechanism, no_heart_mechanism, points_short; scored nothing at:treasure,flag,cannon,heart",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "treasure"
+      ],
+      "hit": [],
+      "missed": [
+       "treasure"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 11.0,
+      "lead_days": 2.0,
+      "fab_minutes": 257.1,
+      "lines": [
+       "acrylic_sheet x1: 0 provided, buy 1 at $8 ($8.00, 2 days)",
+       "ball_caster x1: provided (reused)",
+       "hinge x3: 0 provided, buy 3 at $1 ($3.00, 2 days)",
+       "m3_screw x16: provided (reused)",
+       "plywood_in2 x240: provided (reused)",
+       "wheel_pair x1: provided (reused)",
+       "print:PLA 257.1 g for treasure: 257 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "figures_missed_blade",
+      "no_cannon_mechanism",
+      "no_flag_mechanism",
+      "no_heart_mechanism",
+      "points_short; scored nothing at:treasure,flag,cannon,heart"
+     ]
+    }
+   ],
+   "accepted": null,
+   "notes": "The heart is first because the last match showed why it fails: the frame's low base plate (front at 25.9 in) pushes the chest and shuts the lid. The heart task gets its own System 1 search, so it can park short of the chest. I am not proposing a flag on this body. With a 22 in bar the robot must fold to 12 in long, and in that length a piston boom cannot reach 10.8 in forward and 22.5 in up from the frame front. band_mast fires on drive_trip at parking, with no timing to when a pole face is square. A cam_timer would need a third gearmotor. I am not repeating the cannon either: the record shows port_never_seen and balls_missed_port, plus rule_broken every time, and does not say where the port sits. The heart buys: 1 dowel $1, 2 hinges $2, 1 steel hook $0.50, all 2 days, plus 20 g of PLA. The treasure buys: 1 acrylic sheet $8 and 3 hinges $3, both 2 days, plus 325 g of PLA (325 machine minutes).",
+   "llm": {
+    "tag": "iter06",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 330.3,
+    "tokens_in": 14535,
+    "tokens_out": 32767,
+    "usd_list_price": 0.7542,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 441.2,
+   "stop": null
+  },
+  {
+   "iteration": 7,
+   "body": "cannon: no_cannon; drive: wheels2 (wheel_r=1.5); flag: no_flag; frame: ply_frame (deck_z=8, length=11, width=12); heart: no_heart; mermaid: push_bar (bar_w=22, bar_z=7.5); release: drive_trip; treasure: no_treasure",
+   "held": [
+    "activate",
+    "mermaids"
+   ],
+   "failing_mechanisms": {
+    "no_treasure_mechanism": 1,
+    "no_flag_mechanism": 1,
+    "no_cannon_mechanism": 1,
+    "no_heart_mechanism": 1,
+    "points_short; scored nothing at:treasure,flag,cannon,heart": 1
+   },
+   "failing": {
+    "treasure_train0": {
+     "mechanism": "no_treasure_mechanism",
+     "detail": "0 of 175 points: the body has no treasure mechanism"
+    },
+    "flag_train0": {
+     "mechanism": "no_flag_mechanism",
+     "detail": "0 of 40 points: the body has no flag mechanism"
+    },
+    "cannon_train0": {
+     "mechanism": "no_cannon_mechanism",
+     "detail": "0 of 36 points: the body has no cannon mechanism"
+    },
+    "heart_train0": {
+     "mechanism": "no_heart_mechanism",
+     "detail": "0 of 61 points: the body has no heart mechanism"
+    },
+    "match_train0": {
+     "mechanism": "points_short; scored nothing at:treasure,flag,cannon,heart",
+     "detail": "35 of 347 points (needs 174): activate 11: left the dock fully; the frame ended at x = -6.5 in; treasure 0: 0 coins on the mound, 0 in its border, 10 still on the fortress; 0 jewels on the mound, 0 in its border, 5 still on the fortress; flag 0: no flag mechanism; cannon 0: no cannon mechanism; mermaids 24: the mermaid toppled (100 deg); the merman toppled (101 deg); heart 0: the heart lies at (25"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "frame (deck_z=9, length=11, width=8); mermaid -> trap_arms (arm_len=8.5, arm_z=7.5); heart -> hook_boom (boom_len=4.5, drop_deg=22, hook_depth=6)",
+     "base": null,
+     "mechanism": "heart_train0: chest_lid_shut. In both iteration-7 hook_boom trials the hook was never the problem. The 22 in push bar at 7.5 in sweeps the whole path between the merfolk, so it hits the chest (19.9-23.1 in out) at the same x as the merfolk (20 in). A 0.4 in bump shuts the lid, and the bar shoves the chest on: the heart ended at (25.9, 6.7). A second effect: the chest pushed ahead of the bar jams against the fortress, which also limits how far forward every other mechanism can reach.",
+     "principle": "Two parts cannot be in one place, and a push bar pushes whatever the drive drives it into. To topple the merfolk without touching the chest, the strike has to come from beside the robot's front corners, not across its front. A standing figure topples when pushed above its centre of mass. The bar did that at 7.5 in (both figures went to about 100\u00b0), so an arm at the same height does the same.",
+     "hypothesis": "Narrow the frame to 8 in wide and replace the push bar with trap_arms: 8.5 in arms at 7.5 in high, pivoting at the front corners (y = \u00b14 in). Add the hook_boom from iteration 7 (boom 4.5 in, drop 22\u00b0, hook 6 in, deck 9 in); that geometry passed the collision and rod-angle checks.\n- Approach: System 1 parks with the front at about 19.5 in, just short of the chest at 19.9.\n- Merfolk: 0.2 s after the stop, drive_trip fires both mousetraps. Each arm swings from back along the side, out, then forward. A figure at (20, \u00b110) sits about 6 in out from its pivot, inside the 8.5 in reach, so the arm sweeps through it moving forward (+x) at 7.5 in, above its centre of mass.\n- Heart: the piston swings the boom down. Its tip lands 4.5\u00b7cos22 = 4.2 in ahead, over the chest (front + 0.4 to 3.6 in), at 9 \u2212 1.7 = 7.3 in high, and the hook reaches down to 1.3 in. Pulling back up, the toe brings the heart into the deck tray. The robot then drives back behind the start line for 61 points. Nothing ever touches the chest's lid.\n- Fit: folded width is about 8 + 2.7 = 10.7 in (iteration 4 measured 6.5 \u2192 9.2 in with these arms), under 12. Length is 11 in. Height is 9 + 4.5 = 13.5 in, under 18.\n- Clearances: the hook is at y = 0 and the deployed arms at y = \u00b14, which leaves room for a 4.7 in chest. An arm tip at front + 8.5 = 28 in just meets the fortress edge at y = 4 (28.0 in). That only matters after the strike, and there is no cannon to void.\n- Why cheaper moves will not do: no bar_z or bar_w removes the chest from the bar's path, because the bar must span \u00b110 in to reach the merfolk.",
+     "predicted_gains": [
+      "heart_train0"
+     ],
+     "risks": [
+      "mermaids: the strike now comes from a mousetrap arm, not the drive's 63 N. If the arm passes beside a figure or only slides it, mermaids is lost. They should survive: the push is at the same 7.5 in that toppled both to about 100\u00b0. For a chest centre c, the merfolk sit 10 \u2213 c in from the centreline, inside the arms' reach of 5.9-12.5 in for c between about \u22122.5 and +3.6, and the loop's 4 refit trials cover the mermaid and frame values.",
+      "activate: the frame is narrower (8 in) and lighter without the bar, and still uses both gearmotors on wheels2. Leaving the dock should be unaffected."
+     ],
+     "idea": null,
+     "result": "rejected: lost mermaids (mermaids: merfolk_moved_not_toppled, 5 of 24 points: the mermaid moved 1.77 in, standing; the merman untouched (moved 0.00 in, tilted 0 deg))",
+     "gained": [],
+     "lost": [
+      "mermaids"
+     ],
+     "prediction": {
+      "predicted": [
+       "heart_train0"
+      ],
+      "hit": [],
+      "missed": [
+       "heart_train0"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": [
+       "mermaids"
+      ]
+     },
+     "resources": {
+      "usd": 4.1,
+      "lead_days": 2.0,
+      "fab_minutes": 108.0,
+      "lines": [
+       "ball_caster x1: provided (reused)",
+       "dowel x1: 0 provided, buy 1 at $1 ($1.00, 2 days)",
+       "drawer_pin x2: 0 provided, buy 2 at $0.3 ($0.60, 2 days)",
+       "hinge x2: 0 provided, buy 2 at $1 ($2.00, 2 days)",
+       "m3_screw x16: provided (reused)",
+       "plywood_in2 x203: provided (reused)",
+       "steel_hook x1: 0 provided, buy 1 at $0.5 ($0.50, 2 days)",
+       "wheel_pair x1: provided (reused)",
+       "print:PLA 88.0 g for mermaid: 88 machine minutes",
+       "print:PLA 20.0 g for heart: 20 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "chest_lid_shut",
+      "merfolk_moved_not_toppled",
+      "no_cannon_mechanism",
+      "no_flag_mechanism",
+      "no_treasure_mechanism",
+      "rule_broken"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "frame (deck_z=8, length=8.3, width=12); flag -> band_mast (bands=4, lean_deg=34, stage_len=7, stages=4)",
+     "base": null,
+     "mechanism": "flag_train0: flag_never_met_pole_square, plus no_flag_mechanism on the current body. In iteration 6 the 4 \u00d7 7.2 in mast at 28\u00b0 put its top only 11.4 in ahead of the frame front. The square pole face is at 37.6 in, so the front had to reach 26.2 in. The bar shoving the chest toward the fortress held the front at about 25.9 in (the last match parked there), so the flag reached the pole at most for an instant, and never while a face was square.",
+     "principle": "A magnet holds only when its face lies flat on the iron, and a turning square pole presents a square face once per quarter turn (every 5 s at 3 rpm). A rubber band pulls in proportion to its stretch. A mast built to over-reach the pole therefore rests against it under band preload until a face comes square, then holds. That replaces split-second timing, which drive_trip cannot give and cam_timer cannot have, since both gearmotors drive the wheels.",
+     "hypothesis": "Use frame 8.3 \u00d7 12 in, deck 8 in, keeping the push bar so the held groups keep their mechanism. Add a band_mast: 4 stages \u00d7 7 in, lean 34\u00b0, 4 bands.\n- Extended reach: 4\u00b77 \u2212 3\u00b71.5 = 23.5 in. The top is 23.5\u00b7sin34 = 13.1 in ahead of the front and 8 + 23.5\u00b7cos34 = 27.5 in up, above the 24 in flag-top rule.\n- Contact: the front is at park_x + 4.15, so a square face (37.6 in) is touched once the front is at 24.5 in. At the usual 25.5-25.9 in the mast over-reaches by 1-1.4 in. It bears on the pole as the pole turns (the corners are at 36.8 in), and the magnet catches within 5 s.\n- Fit: folded length is about 8.3 + 7\u00b7sin34 (3.9) \u2212 0.45 = 11.8 in, under 12; folded height is about 8 + 7\u00b7cos34 (5.8) + 0.6 = 14.4 in, under 18.\n- Cost: 4 alu tubes, $10.\n- Why cheaper moves will not do: on the 11 in frame, any lean that reaches the pole folds longer than 12 in, and no catalogue flag part can be timed to the pole with this drive.",
+     "predicted_gains": [
+      "flag_train0"
+     ],
+     "risks": [
+      "mermaids: iteration 6 lost them once with a heavier mast (5 bands, 8.8 in stages, top 36 in up), but kept them with the lighter 7.2 in / 4-band mast on the same 8.5 in frame. This mast is lighter than either and the bar is unchanged (22 in at 7.5 in).",
+      "activate: iteration 3's 7 in frame never left the dock, but the 8.5 in frame did in iterations 5 and 6. At 8.3 in it is close to the frame that worked."
+     ],
+     "idea": null,
+     "result": "rejected: lost activate, mermaids (activate: never_left_dock, 1 of 11 points: never fully left the dock; the frame ended at x = 3.1 in; mermaids: merfolk_moved_not_toppled, 5 of 24 points: the mermaid moved 2.40 in, standing; the merman untouched (moved 0.00 in, tilted 0 deg))",
+     "gained": [],
+     "lost": [
+      "activate",
+      "mermaids"
+     ],
+     "prediction": {
+      "predicted": [
+       "flag_train0"
+      ],
+      "hit": [],
+      "missed": [
+       "flag_train0"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": [
+       "activate",
+       "mermaids"
+      ]
+     },
+     "resources": {
+      "usd": 10.0,
+      "lead_days": 2.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "alu_tube x4: 0 provided, buy 4 at $2.5 ($10.00, 2 days)",
+       "ball_caster x1: provided (reused)",
+       "m3_screw x16: provided (reused)",
+       "plywood_in2 x223.2: provided (reused)",
+       "wheel_pair x1: provided (reused)"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "flag_never_met_pole_square",
+      "merfolk_moved_not_toppled",
+      "never_left_dock",
+      "no_cannon_mechanism",
+      "no_heart_mechanism",
+      "no_treasure_mechanism",
+      "rule_broken"
+     ]
+    }
+   ],
+   "accepted": null,
+   "notes": "I'm sending two proposals for iteration 8. Both change the frame, so the loop can't combine them; each is tried on its own.\n\n1. **Heart:** trap_arms plus hook_boom on an 8 in wide frame. Every heart attempt so far failed only because the push bar shut the chest lid. Mousetrap arms at the robot's front corners would topple the merfolk from beside the chest without touching it. If this body is kept, it is also the better base for the treasure chute and the cannon: those are now cut short by the chest jamming in front of the bar.\n2. **Flag:** a band_mast that over-reaches the pole by about 1 in. Band tension holds it against the turning pole until a face comes square, so it no longer depends on precise timing.\n\n**Parts to buy (all 2-day lead time):**\n- **Proposal 1:** 2 drawer pins, 1 dowel, 2 hinges and 1 steel hook ($4.10), plus 116 g of PLA (116 machine minutes).\n- **Proposal 2:** 4 aluminium tubes ($10).\n\n**Treasure isn't attempted this round.** In iteration 7 the blade missed the coins and jewels, and I can't tell whether its height or its reach was wrong. The fortress top's height isn't known, and the robot can't get closer while the bar is pushing the chest.",
+   "llm": {
+    "tag": "iter07",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 250.0,
+    "tokens_in": 14695,
+    "tokens_out": 24478,
+    "usd_list_price": 0.5897,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 347.3,
+   "stop": null
+  },
+  {
+   "iteration": 8,
+   "body": "cannon: no_cannon; drive: wheels2 (wheel_r=1.5); flag: no_flag; frame: ply_frame (deck_z=8, length=11, width=12); heart: no_heart; mermaid: push_bar (bar_w=22, bar_z=7.5); release: drive_trip; treasure: no_treasure",
+   "held": [
+    "activate",
+    "mermaids"
+   ],
+   "failing_mechanisms": {
+    "no_treasure_mechanism": 1,
+    "no_flag_mechanism": 1,
+    "no_cannon_mechanism": 1,
+    "no_heart_mechanism": 1,
+    "points_short; scored nothing at:treasure,flag,cannon,heart": 1
+   },
+   "failing": {
+    "treasure_train0": {
+     "mechanism": "no_treasure_mechanism",
+     "detail": "0 of 175 points: the body has no treasure mechanism"
+    },
+    "flag_train0": {
+     "mechanism": "no_flag_mechanism",
+     "detail": "0 of 40 points: the body has no flag mechanism"
+    },
+    "cannon_train0": {
+     "mechanism": "no_cannon_mechanism",
+     "detail": "0 of 36 points: the body has no cannon mechanism"
+    },
+    "heart_train0": {
+     "mechanism": "no_heart_mechanism",
+     "detail": "0 of 61 points: the body has no heart mechanism"
+    },
+    "match_train0": {
+     "mechanism": "points_short; scored nothing at:treasure,flag,cannon,heart",
+     "detail": "35 of 347 points (needs 174): activate 11: left the dock fully; the frame ended at x = -6.5 in; treasure 0: 0 coins on the mound, 0 in its border, 10 still on the fortress; 0 jewels on the mound, 0 in its border, 5 still on the fortress; flag 0: no flag mechanism; cannon 0: no cannon mechanism; mermaids 24: the mermaid toppled (100 deg); the merman toppled (101 deg); heart 0: the heart lies at (25"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "frame (deck_z=8, length=8.5, width=12); cannon -> gate_chute (exit_z=13.5, reach=3.3)",
+     "base": null,
+     "mechanism": "no_cannon_mechanism, and in iteration 5 balls_missed_port: the 2.9 in reach at a 10.5 in exit dropped the balls short of the receptacle",
+     "principle": "A ball leaving an 8 degree chute has some forward speed. It falls in sqrt(2h/g), and its throw is that speed times the fall time. A higher exit and a longer reach both carry the drop further past the 7 in barrier into the receptacle. The IR cue on the port's tab already handles the turning fortress.",
+     "hypothesis": "The 8.5 in frame is the only short frame that has kept activate and mermaids (iterations 5 and 6). The 22 in bar sets the box orientation, so folded length has to stay at 12 in or less. Iteration 5 showed that frame 8.5 with reach 2.9 fits, and the reach can hide inside the bar's roughly 0.8 in overhang, so reach 3.3 should still fit at about 11.8 in. Rolling down a ~6 in chute at 8 degrees, a ball leaves at about 20 in/s. From 13.5 in it takes about 0.2 s to fall to receptacle height, so it travels about 4 in forward: the exit at front+3.3 puts the landing 4 to 6 in inside the 27.6 in edge, where the 10.5 in exit landed about 1 in shorter. Folded height is about 14.5 in, under 18. System 1 must still return the robot after the drop so nothing is inside the cylinder at 40 s. Fitting parameters cannot fix this, because the body currently has no cannon at all.",
+     "predicted_gains": [
+      "cannon_train0"
+     ],
+     "risks": [
+      "activate: the frame stays at 8.5 in, the length that kept activate in iterations 5 and 6, and the chute weighs only about 66 g",
+      "mermaids: the bar is unchanged at 22 in and 7.5 in, and frame 8.5 kept mermaids before; the chute sits on the deck above the bar, so it cannot touch the merfolk"
+     ],
+     "idea": null,
+     "result": "refused before trial: folded it is 12.1 x 22.0 x 15.7 in; the go/no-go box is 12 x 24 x 18 in (either way round, 18 in tall)",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 1.0,
+      "lead_days": 2.0,
+      "fab_minutes": 54.9,
+      "lines": [
+       "ball_caster x1: provided (reused)",
+       "hinge x1: 0 provided, buy 1 at $1 ($1.00, 2 days)",
+       "m3_screw x16: provided (reused)",
+       "plywood_in2 x228: provided (reused)",
+       "wheel_pair x1: provided (reused)",
+       "print:PLA 54.9 g for cannon: 55 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    },
+    {
+     "k": 1,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "frame (deck_z=8, length=8.5, width=12); cannon -> gate_chute (exit_z=8, reach=3.3)",
+     "base": null,
+     "mechanism": "no_cannon_mechanism, and in iteration 5 balls_missed_port (this is the opposite hedge: the drop may have overshot)",
+     "principle": "The throw is the exit speed times sqrt(2h/g). Lowering the exit to just above the 7 in barrier cuts the throw to about 2 in, so the balls drop right behind the barrier instead of flying past the receptacle.",
+     "hypothesis": "Iteration 5 does not say whether the 10.5 in drop fell short or went too far. This proposal is the low-exit twin of proposal 1, so one trial covers each direction. From 8 in the ball clears the 7 in barrier by its own height and falls in about 0.1 s, about 2 in forward, so it lands about 5 in past the frame front, just inside the barrier. Reach 3.3 and frame 8.5 fit as in proposal 1.",
+     "predicted_gains": [
+      "cannon_train0"
+     ],
+     "risks": [
+      "mermaids: an exit at 8 in is 0.5 in above the 7.5 in bar and 3.3 in ahead of it, but it sits 2.5 in left of centre, inside the 22 in bar's span, and stays above it, so it cannot reach the merfolk at y = \u00b110 below the bar",
+      "activate: same frame as before, which held"
+     ],
+     "idea": null,
+     "result": "refused before trial: folded it is 12.1 x 22.0 x 10.2 in; the go/no-go box is 12 x 24 x 18 in (either way round, 18 in tall)",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 1.0,
+      "lead_days": 2.0,
+      "fab_minutes": 54.9,
+      "lines": [
+       "ball_caster x1: provided (reused)",
+       "hinge x1: 0 provided, buy 1 at $1 ($1.00, 2 days)",
+       "m3_screw x16: provided (reused)",
+       "plywood_in2 x228: provided (reused)",
+       "wheel_pair x1: provided (reused)",
+       "print:PLA 54.9 g for cannon: 55 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    },
+    {
+     "k": 2,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "frame (deck_z=8, length=8.5, width=12); flag -> band_mast (bands=5, lean_deg=26, stage_len=7.5, stages=4)",
+     "base": null,
+     "mechanism": "flag_never_met_pole_square (iteration 6, proposal 2): the mast reached the pole but was not pressed against it long enough for a face to come square",
+     "principle": "On a square pole turning at 3 rpm, a face is square to a fixed direction every 5 s. A magnet pressed steadily against the pole will lie flat on a face within one quarter turn, as long as the push holds it there.",
+     "hypothesis": "Iteration 6, proposal 2 (4 bands, 7.2 in stages, 28 degrees, frame 8.5) kept both held groups and got the mast to the pole, but it never met a face square. This version uses 5 bands so the fully extended mast keeps pushing on the pole instead of bouncing off, and 7.5 in stages at 26 degrees. Extended length is 4\u00d77.5 \u2212 4.5 = 25.5 in: 11.2 in ahead and 30.9 in up, so the flag top clears 24 in with the front parked about 26.4 in out. Folded it is about 8.5 + 3.3 \u2212 0.45 = 11.3 in long and 8 + 6.7 + 0.6 = 15.3 in high. The lean stays below the 34 and 28 degrees that, on frames of 8.3 and 7 in, lost activate. System 1 then has to set return_at at least 5 s after the release.",
+     "predicted_gains": [
+      "flag_train0"
+     ],
+     "risks": [
+      "mermaids: iteration 6's 5-band, 8.8 in variant lost them because the robot fell short of x = 20. These stages are shorter and the lean is smaller, close to the 7.2 in / 28 degree mast that held, and with front at 26.4 the bar still passes x = 21.75",
+      "activate: frame 8.5 with a mast of 26 degrees or less held activate before; leaning further forward on a shorter frame lost it"
+     ],
+     "idea": null,
+     "result": "rejected: lost mermaids (mermaids: merfolk_moved_not_toppled, 5 of 24 points: the mermaid moved 2.50 in, standing; the merman untouched (moved 0.00 in, tilted 0 deg))",
+     "gained": [],
+     "lost": [
+      "mermaids"
+     ],
+     "prediction": {
+      "predicted": [
+       "flag_train0"
+      ],
+      "hit": [],
+      "missed": [
+       "flag_train0"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": [
+       "mermaids"
+      ]
+     },
+     "resources": {
+      "usd": 10.0,
+      "lead_days": 2.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "alu_tube x4: 0 provided, buy 4 at $2.5 ($10.00, 2 days)",
+       "ball_caster x1: provided (reused)",
+       "m3_screw x16: provided (reused)",
+       "plywood_in2 x228: provided (reused)",
+       "wheel_pair x1: provided (reused)"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "flag_never_met_pole_square",
+      "merfolk_moved_not_toppled",
+      "no_cannon_mechanism",
+      "no_heart_mechanism",
+      "no_treasure_mechanism",
+      "rule_broken"
+     ]
+    }
+   ],
+   "accepted": null,
+   "notes": "I've proposed three body changes for this iteration: two versions of a cannon chute and a retuned flag mast. All three use the same 8.5 in frame, the only short frame that has kept both activate and mermaids, so the loop can try a cannon and the flag together. Nothing needs to be bought beyond what is listed: $1 for the chute's hinge plus 66 g of PLA for each cannon version, and $7.50 for three aluminium tubes for the mast.\n\nI left out treasure and heart because the numbers say neither can work with this body:\n- **Treasure:** the side troughs drop the pieces at the robot's parked position, but the mounds are at x = 14 in. Parking that close puts the frame front about 18.5 in out, short of the merfolk at x = 20 in, and short of the fortress rim at about 28 in. Shifting the peel chute's parameters will not fix this; it needs a different layout.\n- **Heart:** the chest sits at y = 4.4 to 9.1 in, and the mermaid's base spans y = 8.3 to 11.8 in. Any bar that reaches the mermaid also hits the chest, and that knocks the lid shut. This needs a different mermaid mechanism, which risks the mermaid points we already hold.\n\nThe two cannon versions test the two possible reasons iteration 5's balls missed the port. One has a high exit (13.5 in) for a longer throw, in case the balls fell short. The other has a low exit (8 in) that drops them just over the 7 in barrier, in case they overshot.\n\nFor the flag, the mast reached the pole last time but never met a face square to it. This version uses 5 bands instead of 4 so it keeps pushing on the pole through a full quarter turn (5 s). It only works if System 1 waits at least 5 s after the mast is released before driving back.",
+   "llm": {
+    "tag": "iter08",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 276.0,
+    "tokens_in": 14906,
+    "tokens_out": 26351,
+    "usd_list_price": 0.6289,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 320.8,
+   "stop": null
+  },
+  {
+   "iteration": 9,
+   "body": "cannon: no_cannon; drive: wheels2 (wheel_r=1.5); flag: no_flag; frame: ply_frame (deck_z=8, length=11, width=12); heart: no_heart; mermaid: push_bar (bar_w=22, bar_z=7.5); release: drive_trip; treasure: no_treasure",
+   "held": [
+    "activate",
+    "mermaids"
+   ],
+   "failing_mechanisms": {
+    "no_treasure_mechanism": 1,
+    "no_flag_mechanism": 1,
+    "no_cannon_mechanism": 1,
+    "no_heart_mechanism": 1,
+    "points_short; scored nothing at:treasure,flag,cannon,heart": 1
+   },
+   "failing": {
+    "treasure_train0": {
+     "mechanism": "no_treasure_mechanism",
+     "detail": "0 of 175 points: the body has no treasure mechanism"
+    },
+    "flag_train0": {
+     "mechanism": "no_flag_mechanism",
+     "detail": "0 of 40 points: the body has no flag mechanism"
+    },
+    "cannon_train0": {
+     "mechanism": "no_cannon_mechanism",
+     "detail": "0 of 36 points: the body has no cannon mechanism"
+    },
+    "heart_train0": {
+     "mechanism": "no_heart_mechanism",
+     "detail": "0 of 61 points: the body has no heart mechanism"
+    },
+    "match_train0": {
+     "mechanism": "points_short; scored nothing at:treasure,flag,cannon,heart",
+     "detail": "35 of 347 points (needs 174): activate 11: left the dock fully; the frame ended at x = -6.5 in; treasure 0: 0 coins on the mound, 0 in its border, 10 still on the fortress; 0 jewels on the mound, 0 in its border, 5 still on the fortress; flag 0: no flag mechanism; cannon 0: no cannon mechanism; mermaids 24: the mermaid toppled (100 deg); the merman toppled (101 deg); heart 0: the heart lies at (25"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "frame (deck_z=8, length=7.5, width=12); cannon -> gate_chute (exit_z=10, reach=4)",
+     "base": null,
+     "mechanism": "no_cannon_mechanism. The one gate_chute that ran (iteration 5: frame 8.5, reach 2.9, exit_z 10.5) failed as balls_missed_port plus rule_broken.",
+     "principle": "A gravity-fed release only scores if its exit is over the target when the gate opens. The 7 in barrier stands at the fortress edge, 27.6 in out. The frame's front can come no closer than about 0.8 in behind the bar. So how far the exit sits past the barrier depends only on reach, and reach is limited by the box length: folded length = frame + reach + 0.3 in. That rule fits iteration 5 (8.5 + 2.9 gave 11.7, fit) and iteration 9 (8.5 + 3.3 gave 12.1, refused).",
+     "hypothesis": "In iteration 5 the 2.9 in reach put the exit only about 2 in past the fortress edge (front at about 26.8 + 2.9 = 29.7 in). That is barely one 1.57 in ball inside the barrier, so the balls landed on or short of the barrier lip. Shortening the frame to 7.5 in frees length for reach 4.0. The fold is 7.5 + 4.0 + 0.3 = 11.8 in, which fits the 12 in side; the 22 in bar still takes the 24 in side. The exit now lands about 3 in inside the edge. exit_z 10 is 3 in above the 7 in barrier, and folded height is about 10 + 2.2 = 12.2 in, under 18. A drop of about 3 in takes sqrt(2\u00b73/386) \u2248 0.12 s. In that time the fortress rim moves about 0.5 in at 3.77 in/s (radius 12 in, 20 s per turn), so the IR tab timing still holds. In iteration 5 the rule_broken came from the exit being left in the fortress cylinder. System 1 already uses return_at, so it can back out after the gate drops, and the piston can retract before 40 s. A params move can't do this: the current body has no cannon at all. A gate_chute at frame 8.5 can't reach further than 2.9\u20133.2 in.",
+     "predicted_gains": [
+      "cannon_train0"
+     ],
+     "risks": [
+      "activate: the frame is 7.5 in instead of 8.5. Frame 8.5 with gate_chute kept activate in iteration 5. The drive, wheel radius and caster are unchanged and the robot is lighter, so it should still leave the dock.",
+      "mermaids: the bar is unchanged (22 in at 7.5 in), and the bar is what topples them. The 8.5 frame with this same chute kept mermaids in iteration 5, so the shorter frame only changes where the bar sits relative to park_x, and System 1 sets that."
+     ],
+     "idea": null,
+     "result": "rejected: gained nothing; still failing: no_flag_mechanism, no_heart_mechanism, no_treasure_mechanism, port_never_seen, rule_broken",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "cannon_train0"
+      ],
+      "hit": [],
+      "missed": [
+       "cannon_train0"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 1.0,
+      "lead_days": 2.0,
+      "fab_minutes": 57.0,
+      "lines": [
+       "ball_caster x1: provided (reused)",
+       "hinge x1: 0 provided, buy 1 at $1 ($1.00, 2 days)",
+       "m3_screw x16: provided (reused)",
+       "plywood_in2 x204: provided (reused)",
+       "wheel_pair x1: provided (reused)",
+       "print:PLA 57.0 g for cannon: 57 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "no_flag_mechanism",
+      "no_heart_mechanism",
+      "no_treasure_mechanism",
+      "port_never_seen",
+      "rule_broken"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "frame (deck_z=8, length=6.5, width=12); cannon -> gate_chute (exit_z=9, reach=5)",
+     "base": null,
+     "mechanism": "no_cannon_mechanism. The earlier attempt failed as balls_missed_port because the exit was too short of the port behind the 7 in barrier.",
+     "principle": "Same as proposal 1: the exit has to be over the receptacle, and the folded length limits frame + reach + 0.3 to 12 in or less. A lower exit also means a shorter fall, so the ball drifts less on the turning fortress.",
+     "hypothesis": "This is the far-reach twin of proposal 1, in case 3 in past the edge still isn't over the cup. Frame 6.5 and reach 5.0 fold to 6.5 + 5.0 + 0.3 = 11.8 in. The exit lands about 4 in inside the fortress edge. exit_z 9 leaves 2 in of clearance over the 7 in barrier, above one ball's 1.57 in height. The fall into the port takes about 0.1 s, so the ball drifts less than 0.4 in on the rim. Folded height is about 11.2 in. Together, the two proposals cover both 'just over the barrier' and 'well inside it'.",
+     "predicted_gains": [
+      "cannon_train0"
+     ],
+     "risks": [
+      "activate: 6.5 in is the shortest frame tried. The wheels sit at the rear quarter and the caster at the front, and the chute's balls ride ahead of the caster. The ball load is small, so forward tipping on braking is the main risk. System 1 can lower the duty if needed.",
+      "mermaids: the 22 in bar at 7.5 in is unchanged, so they should still topple as before. The only risk is that a lighter robot pushes less hard (stall push is 63 N, far more than a toppling push needs)."
+     ],
+     "idea": null,
+     "result": "rejected: lost mermaids (mermaids: merfolk_moved_not_toppled, 5 of 24 points: the mermaid untouched (moved 0.00 in, tilted 0 deg); the merman moved 2.06 in, standing)",
+     "gained": [],
+     "lost": [
+      "mermaids"
+     ],
+     "prediction": {
+      "predicted": [
+       "cannon_train0"
+      ],
+      "hit": [],
+      "missed": [
+       "cannon_train0"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": [
+       "mermaids"
+      ]
+     },
+     "resources": {
+      "usd": 1.0,
+      "lead_days": 2.0,
+      "fab_minutes": 60.0,
+      "lines": [
+       "ball_caster x1: provided (reused)",
+       "hinge x1: 0 provided, buy 1 at $1 ($1.00, 2 days)",
+       "m3_screw x16: provided (reused)",
+       "plywood_in2 x180: provided (reused)",
+       "wheel_pair x1: provided (reused)",
+       "print:PLA 60.0 g for cannon: 60 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "merfolk_moved_not_toppled",
+      "no_flag_mechanism",
+      "no_heart_mechanism",
+      "no_treasure_mechanism",
+      "port_never_seen",
+      "rule_broken"
+     ]
+    },
+    {
+     "k": 2,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "frame (deck_z=8, length=7, width=12); cannon -> gate_chute (exit_z=12, reach=4.5)",
+     "base": null,
+     "mechanism": "no_cannon_mechanism, with balls_missed_port when it was tried. This proposal tests a different cause: the exit, rather than the ball, may have struck the fortress wall or the rim structure above the port.",
+     "principle": "An exit that sits higher clears more of the fortress structure. The 8\u00b0 chute launches the ball forward, so a higher drop carries it further in. Folded length stays at frame + reach + 0.3 = 11.8 in.",
+     "hypothesis": "If the port sits further inside the barrier, a higher exit helps the ball reach it. exit_z 12 gives a 5 in fall over the barrier, about 0.16 s. The ball's forward speed off the slope then carries it further in, and reach 4.5 already puts the exit about 3.5 in inside the edge. Folded height is about 14.2 in and length 11.8 in. This brackets proposals 1 and 2 from above.",
+     "predicted_gains": [
+      "cannon_train0"
+     ],
+     "risks": [
+      "activate and mermaids: same as proposals 1 and 2. The frame is 7 in, between the two, and the bar is unchanged. The higher chute moves the centre of mass up by less than an inch of the robot's mass."
+     ],
+     "idea": null,
+     "result": "rejected: lost mermaids (mermaids: merfolk_moved_not_toppled, 5 of 24 points: the mermaid untouched (moved 0.00 in, tilted 0 deg); the merman moved 8.63 in, standing)",
+     "gained": [],
+     "lost": [
+      "mermaids"
+     ],
+     "prediction": {
+      "predicted": [
+       "cannon_train0"
+      ],
+      "hit": [],
+      "missed": [
+       "cannon_train0"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": [
+       "mermaids"
+      ]
+     },
+     "resources": {
+      "usd": 1.0,
+      "lead_days": 2.0,
+      "fab_minutes": 58.5,
+      "lines": [
+       "ball_caster x1: provided (reused)",
+       "hinge x1: 0 provided, buy 1 at $1 ($1.00, 2 days)",
+       "m3_screw x16: provided (reused)",
+       "plywood_in2 x192: provided (reused)",
+       "wheel_pair x1: provided (reused)",
+       "print:PLA 58.5 g for cannon: 58 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "merfolk_moved_not_toppled",
+      "no_flag_mechanism",
+      "no_heart_mechanism",
+      "no_treasure_mechanism",
+      "points_short; scored nothing at:treasure,flag,cannon,mermaids,heart",
+      "port_never_seen"
+     ]
+    }
+   ],
+   "accepted": null,
+   "notes": "I've proposed three variations of one change for this final iteration: a gate_chute cannon on a shorter frame. All three could fail, and the trials decide what's kept.\n\n**What I chose and why.** The only cannon that ran before scored nothing: the balls missed the port and a rule was broken. My reading, which no trial has shown yet, is that its exit stopped about 2 in past the fortress edge, which is too short. Length is the limit: the 22 in bar forces the robot's length onto the box's 12 in side, and the past folds fit folded length = frame + reach + 0.3 in. So the only way to reach further is a shorter frame. Every proposal keeps frame + reach at 11.5 in (11.8 in folded) and varies the frame (6.5 to 7.5 in), the reach (4.0 to 5.0 in) and the exit height (9 to 12 in) to bracket where the port is. The rule break was most likely the chute still reaching into the fortress at 40 s. That is System 1's job to fix: it already drives back, and it must retract the piston before 40 s.\n\n**Held groups at risk.** Neither held group is safe by inspection:\n- **Leaving the dock:** 7.5, 7 and 6.5 in are all shorter than any frame tried. Frame 8.5 with this same chute kept both held groups in iteration 5. The 6.5 in frame carries the most risk of the robot tipping forward on braking.\n- **Toppling the merfolk:** the 22 in bar at 7.5 in is unchanged, but this group was lost in several earlier trials where the bar hadn't changed either.\n\n**Cost:** about $1 (one hinge), 2 days' lead time and 66 g of PLA (66 machine minutes) for any of the three.\n\n**What I left out, with reasons:**\n- **Flag:** a boom that folds into the 12 x 22 x 18 in box can't reach 10.8 in forward to the pole and also put the flag's top 24 in up. The band mast reached the pole but never met a face square to it, and two of its later variants lost the merfolk.\n- **Heart:** the 22 in bar has to cross x = 20 to topple the merfolk, and the chest sits at 19.9 to 23.1 in. In the full-match trial the bar shut the lid and knocked the heart to (25.9, 6.7). The two hook-boom attempts were also scored as a shut lid.\n- **Treasure:** the sorting chute's blade missed the figures. Its height can't be fitted without knowing the height of the fortress top.\n\n**Match task:** reaching 174 points is out of reach this iteration. A working cannon would add at most 36 to the current 35.",
+   "llm": {
+    "tag": "iter09",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 173.1,
+    "tokens_in": 14753,
+    "tokens_out": 16521,
+    "usd_list_price": 0.4311,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 334.6,
+   "stop": null
+  },
+  {
+   "iteration": 10,
+   "body": "cannon: no_cannon; drive: wheels2 (wheel_r=1.5); flag: no_flag; frame: ply_frame (deck_z=8, length=11, width=12); heart: no_heart; mermaid: push_bar (bar_w=22, bar_z=7.5); release: drive_trip; treasure: no_treasure",
+   "held": [
+    "activate",
+    "mermaids"
+   ],
+   "failing_mechanisms": {
+    "no_treasure_mechanism": 1,
+    "no_flag_mechanism": 1,
+    "no_cannon_mechanism": 1,
+    "no_heart_mechanism": 1,
+    "points_short; scored nothing at:treasure,flag,cannon,heart": 1
+   },
+   "failing": {
+    "treasure_train0": {
+     "mechanism": "no_treasure_mechanism",
+     "detail": "0 of 175 points: the body has no treasure mechanism"
+    },
+    "flag_train0": {
+     "mechanism": "no_flag_mechanism",
+     "detail": "0 of 40 points: the body has no flag mechanism"
+    },
+    "cannon_train0": {
+     "mechanism": "no_cannon_mechanism",
+     "detail": "0 of 36 points: the body has no cannon mechanism"
+    },
+    "heart_train0": {
+     "mechanism": "no_heart_mechanism",
+     "detail": "0 of 61 points: the body has no heart mechanism"
+    },
+    "match_train0": {
+     "mechanism": "points_short; scored nothing at:treasure,flag,cannon,heart",
+     "detail": "35 of 347 points (needs 174): activate 11: left the dock fully; the frame ended at x = -6.5 in; treasure 0: 0 coins on the mound, 0 in its border, 10 still on the fortress; 0 jewels on the mound, 0 in its border, 5 still on the fortress; flag 0: no flag mechanism; cannon 0: no cannon mechanism; mermaids 24: the mermaid toppled (100 deg); the merman toppled (101 deg); heart 0: the heart lies at (25"
+    }
+   },
+   "proposals": [],
+   "accepted": null,
+   "notes": "",
+   "llm": {},
+   "seconds": null,
+   "stop": "iterations"
+  }
+ ],
+ "llm_calls": [
+  {
+   "tag": "iter00",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 71.5,
+   "tokens_in": 9937,
+   "tokens_out": 6374,
+   "usd_list_price": 0.1892,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter01",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 173.3,
+   "tokens_in": 10751,
+   "tokens_out": 16107,
+   "usd_list_price": 0.3904,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter02",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 163.9,
+   "tokens_in": 11541,
+   "tokens_out": 15000,
+   "usd_list_price": 0.3746,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter03",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 291.0,
+   "tokens_in": 12430,
+   "tokens_out": 27438,
+   "usd_list_price": 0.6306,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter04",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 399.0,
+   "tokens_in": 13053,
+   "tokens_out": 38904,
+   "usd_list_price": 0.865,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter05",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 204.7,
+   "tokens_in": 13950,
+   "tokens_out": 18950,
+   "usd_list_price": 0.4731,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter06",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 330.3,
+   "tokens_in": 14535,
+   "tokens_out": 32767,
+   "usd_list_price": 0.7542,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter07",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 250.0,
+   "tokens_in": 14695,
+   "tokens_out": 24478,
+   "usd_list_price": 0.5897,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter08",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 276.0,
+   "tokens_in": 14906,
+   "tokens_out": 26351,
+   "usd_list_price": 0.6289,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter09",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 173.1,
+   "tokens_in": 14753,
+   "tokens_out": 16521,
+   "usd_list_price": 0.4311,
+   "billing": "plan",
+   "error": ""
+  }
+ ]
+}

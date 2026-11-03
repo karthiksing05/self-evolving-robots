@@ -2279,3 +2279,19 @@ The review also found two places where the model itself broke the law, through n
   - parts of different mechanisms still do not collide in the dynamic sim. The sweep covers each mechanism's designed path, not a boom knocked off it;
   - latches release at exact times;
   - the magnet welds within 25° and 0.12 in.
+
+**Campaign under D-075** (three System 2 seeds, 10 iterations each, 4 workers each; `results/evolve/me2110_s2_s{0,1,2}.json`):
+- **Final bodies:** every seed held 2 of 7 train groups (activate and mermaids) from iteration 1 to the end. Each final body is the stock with a wider, higher push bar (22–23.5 in, at 6.5–7.5 in). The best match on every seed was 35 of 347 points.
+- **Test:** seed 0 held both groups on test; seeds 1 and 2 held activate only (the merfolk on the test placements). Test tasks held: 4, 3 and 3 of 14, against the stock's 2.
+- **Proposals:** 84 in total. 34 were refused before trial: at least 23 for the fold-up box and 7 for the new interference law. 46 were rejected after trial; 4 were kept-eligible. All 4 kept-eligible proposals were the push bar.
+- **Cost:** 10 System 2 calls per seed, 52–68 min wall time each.
+- **D-074's prediction failed.** No body gave up a piston task to score the cannon and flag. No piston or chute mechanism ever held.
+- **Why** (from the prompts and answers, not a guess):
+  - The first, free win (the 22–24 in bar) fills the box's 24 in side. Every catalogue mechanism mounts on the deck's front edge and needs room ahead of the frame, so none fits. Seed 1 wrote this itself in iteration 5: "No reach above about 0.8 fits".
+  - The keep rule never trades a held group (the merfolk's 24 points) for room to try the treasure (175).
+  - Further limits on the harness and the brief, which are the levers to test next, one at a time:
+    - each refusal costs one of three proposals in an iteration;
+    - a swap that scores some points but does not pass is thrown away rather than tuned;
+    - the brief gives computed facts only for parts on the body, never the feasible ranges of a candidate part (the hook boom passes only at drops of 32° or less);
+    - the brief never says where our cannon port is.
+  - The match has no verified gold body under D-075 (lever 6), so it is not yet shown that 174 points is reachable with two pistons inside the box.
