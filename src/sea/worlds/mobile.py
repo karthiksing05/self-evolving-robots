@@ -7,7 +7,9 @@ the line through an opening, the approach duty at an edge and the speed in the d
 (terrain dimensions ±2 %, traction ±3 %, steering error), and must repeat a success on fresh seeds.
 
 The simulator walks the route feature by feature with quasi-static vehicle mechanics (plain Python, tens of
-microseconds per attempt).  Speed follows a linear DC-motor curve, v = v0 (duty - F / F_stall); energy is
+microseconds per attempt).  The pack's cells are in series and its voltage drives the motors: stall force
+and no-load speed scale with volts / the winding's rated volts, which must lie in 0.5-1.5 times it (D-062).
+Speed follows a linear DC-motor curve, v = v0 (duty - F / F_stall); energy is
 F d / eta plus electronics power times time, against 85 % of the pack.
 
 - step (height, edge mu): a driven wheel climbs while h <= r (1 - cos a), a = atan(mu_e) + atan(mu (1-f) / f),
@@ -65,6 +67,9 @@ DRIVER = {"n20_gearmotor": ("driver_tb6612", 8.0), "n20_encoder_gearmotor": ("dr
           "jga25_gearmotor": ("driver_l298n", 30.0)}  # a dual H-bridge board per two motors, and its mass (g)
 CELL = {"nimh_pack": ("nimh_aa", 2.4, 27.0, 7.3, 4.0), "liion_pack": ("cell_18650", 9.4, 46.0, 12.0, 10.0)}
 # cell item, Wh per cell, g per cell, footprint cm^2, the pack's maximum current (A)
+VOLTS = {"nimh_pack": (1.2, 1.4), "liion_pack": (3.7, 4.2)}  # a cell's nominal and full-charge volts; cells in series
+WINDING = {"n20_gearmotor": 6.0, "n20_encoder_gearmotor": 6.0, "jga25_gearmotor": 12.0}  # V: MOTOR's numbers hold here
+V_RANGE = (0.5, 1.5)  # the supply a winding takes, as fractions of its rated voltage (full charge at the top)
 SENSOR = {  # range in the dark (m), height above the tub (cm), g, W, item, count
     "bump_switch": (0.0, 0.0, 5.0, 0.0, "bump_switch", 2), "ultrasonic": (2.0, 0.0, 9.0, 0.08, "hc_sr04", 1),
     "camera": (0.12, 2.5, 15.0, 0.7, "camera_module", 1), "lidar": (6.0, 4.0, 45.0, 1.5, "lidar_ld06", 1)}
@@ -130,6 +135,7 @@ class Spec:
     wh: float  # Wh, pack capacity
     p_w: float  # W, electronics and sensor
     area: float  # cm^2, contact area on soft ground
+    volts: float = 6.0  # V, the pack's nominal voltage across the motors
     f: float = 0.5  # weight share on the climbing wheels
     edge: float = 1.0  # traction factor of a wheel on a step edge
     loose: float = 1.0  # traction factor on loose ground
@@ -200,10 +206,11 @@ def _spec(body: Body) -> Spec:
         kw = {"area": 4 * side * 0.5 * r * (0.5 if mec else 1.0), "base": ln - 2.0}
         if mec:
             kw.update(edge=0.6, loose=0.55)  # rollers spin free at an edge
-    ratio = _ratio(dr)
+    ratio, volts = _ratio(dr), _cells(bt) * VOLTS[bt.type][0]
+    k = volts / WINDING[dr.type]  # a DC motor's stall torque and no-load speed both scale with its supply
     return Spec(loco=lo.type, m=grams / 1000, width=w + 2 * side, height=height, length=ln, belly=belly, r=r, n=n,
-                f_stall=n * tau * ratio * geta / (r / 100), v_nl=w0 / ratio * r / 100, eta=0.7 * geta,
-                drift=drift * steer, sense=sense, wh=_cells(bt) * cell_wh, p_w=ELEC_W + sp, **kw)
+                f_stall=k * n * tau * ratio * geta / (r / 100), v_nl=k * w0 / ratio * r / 100, eta=0.7 * geta,
+                drift=drift * steer, sense=sense, wh=_cells(bt) * cell_wh, p_w=ELEC_W + sp, volts=volts, **kw)
 
 
 # ---------------------------------------------------------------- terrain mechanics
@@ -448,20 +455,22 @@ CATALOGUE = [
              params={"track_length": _p(14, 32, "cm", "ground contact length"),
                      "idler_height": _p(2, 8, "cm", "height of the front idler's axle; the track stands 1.5 cm "
                                         "above it")}),
-    PartType(name="n20_gearmotor", slot="drive", stock=True, doc="N20 micro gearmotors, 11 g each, one per driven "
-             "wheel or track, on TB6612 dual drivers", provides="light drive, 0.75 A stall current per motor",
+    PartType(name="n20_gearmotor", slot="drive", stock=True, doc="N20 micro gearmotors with 6 V windings, 11 g each, "
+             "one per driven wheel or track, on TB6612 dual drivers; torque and speed scale with the pack's voltage, "
+             "which must be 3-9 V", provides="light drive, 0.75 A stall current per motor at 6 V",
              params={"gear_ratio": _p(50, 298, "", _RATIO_DOC.format("50, 100, 150, 298"))}),
     PartType(name="n20_encoder_gearmotor", slot="drive", doc="N20 gearmotors with magnetic encoders for closed-loop "
              "wheel speed", provides="the same force and speed as the plain N20, with 40% less steering error",
              params={"gear_ratio": _p(50, 298, "", _RATIO_DOC.format("50, 100, 150, 298"))}),
-    PartType(name="jga25_gearmotor", slot="drive", doc="25 mm metal gearmotors, 95 g each, on L298N drivers",
-             provides="about 6.5 times the N20's shaft torque; 2.2 A stall current per motor",
+    PartType(name="jga25_gearmotor", slot="drive", doc="25 mm metal gearmotors with 12 V windings, 95 g each, on "
+             "L298N drivers; torque and speed scale with the pack's voltage, which must be 6-18 V",
+             provides="about 6.5 times the N20's shaft torque at 12 V; 2.2 A stall current per motor at 12 V",
              params={"gear_ratio": _p(21, 90, "", _RATIO_DOC.format("21, 34, 46, 90"))}),
-    PartType(name="nimh_pack", slot="battery", stock=True, doc="AA NiMH cells, 2.4 Wh and 27 g each",
+    PartType(name="nimh_pack", slot="battery", stock=True, doc="AA NiMH cells in series, 1.2 V (1.4 V charged), 2.4 Wh and 27 g each",
              provides="energy at about 11 g per Wh; at most 4 A", params={
                  "capacity": _p(2.4, 19.2, "Wh", "pack energy, rounded up to whole 2.4 Wh cells; each adds 27 g")}),
-    PartType(name="liion_pack", slot="battery", doc="18650 Li-ion cells with a protection board, 9.4 Wh and 46 g "
-             "each", provides="energy at about 5 g per Wh; up to 10 A", params={
+    PartType(name="liion_pack", slot="battery", doc="18650 Li-ion cells in series with a protection board, 3.7 V "
+             "(4.2 V charged), 9.4 Wh and 46 g each", provides="energy at about 5 g per Wh; up to 10 A", params={
                  "capacity": _p(9.4, 28.2, "Wh", "pack energy, rounded up to whole 9.4 Wh cells; each adds 46 g")}),
     PartType(name="bump_switch", slot="sensor", stock=True, doc="two microswitches behind a sprung front bumper",
              provides="detects an obstacle by touching it, at up to 0.25 m/s"),
@@ -506,7 +515,7 @@ class MobileWorld:
             "chassis": Part(type="printed_tub", params={"width": 18.0, "length": 20.0, "ride_height": 2.0}),
             "locomotion": Part(type="wheels4", params={"wheel_radius": 3.0}),
             "drive": Part(type="n20_gearmotor", params={"gear_ratio": 100.0}),
-            "battery": Part(type="nimh_pack", params={"capacity": 4.8}),
+            "battery": Part(type="nimh_pack", params={"capacity": 9.6}),
             "sensor": Part(type="bump_switch")})
 
     def solve(self, body: Body, task: Task, seed: int = 0) -> Outcome:
@@ -534,7 +543,7 @@ class MobileWorld:
         edges = sorted({f["s"] for f in feats if f["k"] in ("step", "trench")}, key=lambda x: SURF[x][0])
         rows = [f"mass {s.m:.2f} kg; {s.width:.1f} cm wide overall, {s.length:.1f} cm long, {s.height:.1f} cm tall; "
                 f"belly clearance {s.belly:.1f} cm",
-                f"drive: {s.n} motors; stall force at the ground {s.f_stall:.1f} N ({s.f_stall / (s.m * G):.2f} of its "
+                f"drive: {s.n} motors at {s.volts:.1f} V; stall force at the ground {s.f_stall:.1f} N ({s.f_stall / (s.m * G):.2f} of its "
                 f"weight); no-load speed {s.v_nl:.2f} m/s",
                 "edges it can climb: " + ", ".join(f"{_step_max(s, _mu(s, e)):.2f} cm on {e} (mu {_mu(s, e):.2f})"
                                                      for e in edges)]
@@ -637,7 +646,12 @@ class MobileWorld:
                 errs.append(f"the tub hangs between the track frames: its belly can be at most {hi + 1.5:.1f} cm up")
         if lo.type == "rocker_bogie6" and ln < lo.params["bogie_length"] + 2:
             errs.append(f"the rocker pivots need a tub at least {lo.params['bogie_length'] + 2:.1f} cm long")
-        amps, cap = n * MOTOR[dr.type][4], CELL[bt.type][4]
+        lo_v, hi_v = (f * WINDING[dr.type] for f in V_RANGE)
+        full = _cells(bt) * VOLTS[bt.type][1]
+        if s.volts < lo_v or full > hi_v:
+            errs.append(f"{_cells(bt)} {bt.type} cells in series give {s.volts:.1f} V ({full:.1f} V charged); the "
+                        f"{WINDING[dr.type]:.0f} V {dr.type} winding takes {lo_v:.1f}-{hi_v:.1f} V")
+        amps, cap = n * MOTOR[dr.type][4] * s.volts / WINDING[dr.type], CELL[bt.type][4]
         if amps > cap:
             errs.append(f"{n} {dr.type} motors draw up to {amps:.1f} A at stall; the {bt.type} supplies at most "
                         f"{cap:.0f} A")

@@ -1651,3 +1651,24 @@ Three fixes failed on the way, each for a reason:
 - Padded four-bars and slides pass.
 - Test: `test_mechanism.py::test_the_fingers_meeting_as_the_jaw_closes_is_its_stop_not_interference`, which also checks the open-jaw twin.
 - The aborted campaign start (seed 0, iteration 0, three refusals) was set aside and the campaign restarted under this key.
+
+## D-062 The pack's voltage drives the motors (judge: world_mobile)
+**Observed.** The mobile world had no voltage. The stock pack, two AA NiMH cells (2.4 V), drove 6 V N20 motors at their rated torque, and seed 2's three Li-ion cells (11.1 V) drove the same 6 V motors at the same torque (audit, D-051).
+
+**Change.**
+- A pack's cells are in series. Nominal 1.2 V per NiMH cell and 3.7 V per Li-ion cell; 1.4 V and 4.2 V charged.
+- The motor table holds at the winding's rated voltage: 6 V for the N20s, 12 V for the JGA25. A DC motor's stall torque and no-load speed are both proportional to its supply, so the drive's stall force and no-load speed scale by pack volts / rated volts. Stall current scales the same way in the pack-current check.
+- A new check: the pack must give at least half the winding's rated voltage, and at most 1.5 times it when charged. The 1.5 is a hobby rule of thumb, not a datasheet limit (a thin spot): above it, windings and brushes wear fast.
+- The stock pack becomes four NiMH cells (9.6 Wh, 4.8 V), because two cells (2.4 V) fall below a 6 V winding's 3 V floor.
+- The catalogue's docs and the brief state the voltages.
+
+**Prediction.**
+- The old stock body is refused (2.4 V nominal, under 3 V). The new stock pushes 0.8 times the old force at 0.8 times the speed and carries 54 g more. On the analytic ruler it holds 3 or 4 of the 10 train routes, against 4 before; the 5.5 cm porch step and the lawn are still out of reach.
+- Seed 0's final body (five NiMH cells, 6.0 V) is unchanged. Seed 1's (six cells, 7.2 V) is 1.2 times stronger. Seed 2's (three Li-ion cells, 11.1 V, 12.6 V charged) is refused.
+
+**Measured.**
+- The old stock body is refused: "2 nimh_pack cells in series give 2.4 V (2.8 V charged); the 6 V n20_gearmotor winding takes 3.0-9.0 V".
+- The new stock: 4.8 V, 12.8 N of stall force, 0.75 m/s at no load, 0.43 kg. It holds **5** train routes, not the predicted 3–4: kitchen, living room, under the sofa, the shed, and now the lawn. The miss is the energy. Four cells double the pack (9.6 Wh), and that, not the force, decides the 5 km survey.
+- Seed 0's final body is unchanged (13.3 N). Seed 1's pushes 16.0 N. Seed 2's is refused, as predicted.
+- A side effect: at 4.8 V, six rocker-bogie motors draw 3.6 A at stall, under the NiMH pack's 4 A, so that check no longer refuses the rocker-bogie on the stock pack. At 7.2 V they draw 5.4 A and are refused.
+- Tests: `test_world_mobile.py::test_the_pack_voltage_drives_the_motors_within_the_winding_range`; three tests updated for the new stock body.

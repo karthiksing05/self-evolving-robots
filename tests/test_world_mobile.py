@@ -7,6 +7,7 @@ import itertools
 import time
 
 import numpy as np
+import pytest
 
 from sea.evolve.core import Body, Edit, World, apply
 from sea.evolve.loop import RunConfig, held_groups, run
@@ -89,10 +90,10 @@ def test_width_ground_pressure_trench_and_energy():
 
 def test_stock_holds_the_floors_and_fails_the_rest_for_physical_reasons():
     held, outs = _held(W.stock())
-    assert held == {"kitchen", "living_room", "under_sofa", "shed"}
+    assert held == {"kitchen", "living_room", "under_sofa", "shed", "lawn"}  # four cells (D-062) reach the lawn's end
     assert {g: o.mechanism for g, o in outs.items() if g not in held} == {
         "bedroom": "chassis_wider_than_gap", "hallway": "sensing_range_short", "porch": "step_higher_than_climbable",
-        "garden": "gap_longer_than_support", "sandbox": "sinks_in_sand", "lawn": "battery_exhausted"}
+        "garden": "gap_longer_than_support", "sandbox": "sinks_in_sand"}
     for g, o in outs.items():
         if g not in held:
             assert o.score < 1 and any(c.isdigit() for c in o.detail) and ("cm" in o.detail or " s " in o.detail
@@ -150,12 +151,12 @@ def test_bom_check_and_manifest():
     stock, man = W.stock(), W.manifest()
     bom = W.bom(stock)
     items = {b.item: b.qty for b in bom if not b.item.startswith("print:")}
-    assert items == {"n20_gearmotor_100": 4, "driver_tb6612": 2, "nimh_aa": 2, "bump_switch": 2, "tire_oring": 4}
+    assert items == {"n20_gearmotor_100": 4, "driver_tb6612": 2, "nimh_aa": 4, "bump_switch": 2, "tire_oring": 4}
     assert {b.slot for b in bom if b.item == "print:PLA"} == {"chassis", "locomotion"}
     assert all(i in man["items"] for i in items) and set(man["budget"]) == {"usd", "lead_days", "fab_minutes"}
     assert _cost(stock).ok and _cost(stock).usd == 0
-    rb = _body(Edit(slot="locomotion", type="rocker_bogie6"))
-    assert any("supplies at most 4 A" in e for e in W.check(rb))  # six motors overload the NiMH pack
+    rb = _body(Edit(slot="locomotion", type="rocker_bogie6"), Edit(slot="battery", params={"capacity": 14.4}))
+    assert any("supplies at most 4 A" in e for e in W.check(rb))  # six motors at 7.2 V: 5.4 A, over the NiMH 4 A
     bad = _body(Edit(slot="locomotion", type="tracks", params={"track_length": 30.0, "idler_height": 6.0}))
     assert any("track frames mount" in e for e in W.check(bad))  # a 30 cm track on a 20 cm tub
     tiny = _body(Edit(slot="drive", type="jga25_gearmotor"), Edit(slot="battery", type="liion_pack"),
@@ -164,6 +165,18 @@ def test_bom_check_and_manifest():
     res = _cost(_body(Edit(slot="locomotion", type="rocker_bogie6"), Edit(slot="drive", type="jga25_gearmotor"),
                       Edit(slot="battery", type="liion_pack", params={"capacity": 28.2})))
     assert not res.ok and any("left" in e for e in res.errors)  # the expensive redesign is over budget
+
+
+def test_the_pack_voltage_drives_the_motors_within_the_winding_range():
+    stock = _spec(W.stock())
+    two = _body(Edit(slot="battery", params={"capacity": 4.8}))  # two NiMH cells: 2.4 V on a 6 V winding
+    assert any("2.4 V" in e and "3.0-9.0 V" in e for e in W.check(two))
+    six = _spec(_body(Edit(slot="battery", params={"capacity": 14.4})))  # 7.2 V: 1.5 times the four cells' push
+    assert six.f_stall == pytest.approx(1.5 * stock.f_stall) and six.v_nl == pytest.approx(1.5 * stock.v_nl)
+    li = _body(Edit(slot="battery", type="liion_pack", params={"capacity": 28.2}))  # 12.6 V charged on 6 V
+    assert any("12.6 V charged" in e for e in W.check(li))
+    assert not any("V charged" in e for e in W.check(_body(Edit(slot="battery", type="liion_pack",
+                                                                    params={"capacity": 18.8}))))  # 8.4 V: in range
 
 
 def test_mechanism_names_the_body_or_the_search():
@@ -183,7 +196,7 @@ def test_speed_and_the_loop(tmp_path):
     s = run(RunConfig(world="mobile", arm="random", iterations=2, seed=1), tmp_path / "random", world=MobileWorld(),
             log=lambda m: None)
     assert s["arm"] == "random" and len(s["curve"]) >= 2 and s["test"]["n"] == 20
-    assert s["test"]["stock_held"] == ["kitchen", "living_room", "shed", "under_sofa"]
+    assert s["test"]["stock_held"] == ["kitchen", "lawn", "living_room", "shed", "under_sofa"]
     s1 = run(RunConfig(world="mobile", arm="s1", iterations=2), tmp_path / "s1", world=MobileWorld(),
              log=lambda m: None)
-    assert s1["final_held_train"] == ["kitchen", "living_room", "shed", "under_sofa"] and len(s1["curve"]) == 1
+    assert s1["final_held_train"] == ["kitchen", "lawn", "living_room", "shed", "under_sofa"] and len(s1["curve"]) == 1
