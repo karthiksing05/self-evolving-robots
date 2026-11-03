@@ -114,7 +114,4 @@ for the gripper, a gold re-record.
    the face plate. The drawing keeps the stem at least 10 mm behind the teeth and lets the blade reach forward to
    the commanded place.
 
-The drawn pads also carry material the simulator does not have: the shoe that wraps the jaw and its screws, a
-few grams and a few millimetres around the finger. The mechanism laws (D-059) read the simulated boxes, not the
-shoe. Under invariant 11 the shoe belongs in the simulator as well; until then it is listed in
-[harness.md](harness.md) under "Where the harness is still thin".
+The pad's shoe and its screws are simulated since D-066 (`sim/shoe.py`): the shoe's outside collides like the pad behind the land's face, the screw heads are finger parts, and their mass rides the jaw. The drawing reads its sections, socket and screws from the same module.

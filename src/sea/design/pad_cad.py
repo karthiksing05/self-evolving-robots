@@ -1,4 +1,4 @@
-"""The printed finger pads as they would be built (docs/design-language.md), drawn for pictures and never simulated.
+"""The printed finger pads as they would be built (docs/design-language.md), drawn for pictures.
 
 The simulator's pads are the boxes ``design/fingers.py`` builds.  This module draws the part those boxes stand for,
 and keeps every surface an object can touch where the simulator has it:
@@ -7,7 +7,8 @@ and keeps every surface an object can touch where the simulator has it:
   simulated faces and end where those end, outside the jaw.  The underside lies in the boxes' bottom plane, so the
   pad reaches exactly as low as simulated.  ``width_mm`` is the land's width; the rounds that soften its sides lie
   outside it.
-- **Shoe.** A PLA shoe slides over the stock jaw's tapered tip.  Its socket is the jaw's own CAD (the convex hull of
+- **Shoe.** A PLA shoe slides over the stock jaw's tapered tip (simulated too: ``sim/shoe.py``, D-066, whose
+  sections, socket and screw positions this draws).  Its socket is the jaw's own CAD (the convex hull of
   the tip, grown by the slip-fit clearance), its walls wrap the tip, and two M2 cap screws (two of the bill of
   materials' four) hold it from behind.  Below the tip it tapers to the land; it is printed lying on its back.
 - **Skin.** With ``pad_tpu_mm`` the land's outer layer and the lip are TPU, printed onto the shoe.
@@ -18,9 +19,6 @@ stops at the jaw: the buried part has no surface to draw.
 
 from __future__ import annotations
 
-import math
-from dataclasses import dataclass
-
 import cadquery as cq
 import numpy as np
 import trimesh
@@ -30,98 +28,16 @@ from sea.design import fingers as F
 from sea.design import language as L
 from sea.design.cad import CadPart
 from sea.design.language import tessellate as to_mesh
+from sea.sim.shoe import SCREW, WALL, PadFrame, boxes, frames, screw_poses, sections, socket_hull  # noqa: F401
+from sea.sim.shoe import profile as _profile
 
 V = cq.Vector
-R_EDGE = L.EDGE_R["printed"]
-WALL = 1.6  # mm, four perimeters around the host
-ARC = 8  # segments per round
-SCREW = (1.0, 1.9, 2.0, 3.0)  # M2 cap screw: shank radius, head radius, head height, thread engaged in the jaw
-
-
-@dataclass(frozen=True)
-class PadFrame:
-    """A pad's own frame in its jaw body's frame (mm): x out of the land, y up the jaw from the pad's bottom, z
-    across.  The simulated boxes are ``fingers._face_boxes`` in it."""
-
-    kind: str  # "jaw_fixed" | "jaw_moving"
-    body: str
-    rot: np.ndarray  # pad axes (columns) in the body frame
-    origin: np.ndarray  # mm
-    length: float  # mm the pad reaches past the stock tip
-
-
-def frames(spec: FingerSpec) -> list[PadFrame]:
-    """The two pad frames, as ``fingers.pad_geoms`` places the boxes."""
-    rf = np.column_stack([[1.0, 0.0, 0.0], [0.0, 0.0, 1.0], [0.0, -1.0, 0.0]])
-    fixed = PadFrame("jaw_fixed", "gripper", rf, 1000 * np.array([F.FIXED_FACE_X, 0.0, F.FIXED_TIP_Z - spec.reach_mm * F.MM]),
-                     spec.reach_mm)
-    tilt = F._rz(-math.radians(spec.pad_angle_deg))
-    rm = tilt @ np.column_stack([[-1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, -1.0]])
-    lm = F.moving_reach(spec)
-    corner = np.array([F.MOVING_FACE_X, F.MOVING_TIP_Y, F.MOVING_MID_Z])
-    shift = -F.link_vec(spec) if spec.jaw == "parallelogram" else np.zeros(3)
-    moving = PadFrame("jaw_moving", F.moving_body(spec), rm, 1000 * (corner + tilt @ np.array([0.0, -lm, 0.0]) + shift),
-                      1000 * lm)
-    return [fixed, moving]
-
-
-def boxes(spec: FingerSpec, fr: PadFrame) -> list[tuple[np.ndarray, np.ndarray, np.ndarray]]:
-    """The simulated boxes in the pad frame (mm): centre, half sizes, rotation."""
-    return [(1000 * c, 1000 * h, r) for c, h, r in F._face_boxes(spec, fr.length / 1000)]
-
-
-# ---------------------------------------------------------------- the shoe's sections
-def _host_extent(host: trimesh.Trimesh, ys: list[float]) -> tuple[float, float] | None:
-    """Over the planes y = each of ``ys`` (pad frame), the host's rearmost x and widest |z| near the pad."""
-    pts = []
-    for y in ys:
-        sec = host.section(plane_origin=[0.0, y, 0.0], plane_normal=[0.0, 1.0, 0.0])
-        if sec is not None:
-            p = np.asarray(sec.vertices)
-            pts.append(p[(np.abs(p[:, 0]) < 40) & (np.abs(p[:, 2]) < 40)])
-    pts = [p for p in pts if len(p)]
-    if not pts:
-        return None
-    p = np.vstack(pts)
-    return float(p[:, 0].min()), float(np.abs(p[:, 2]).max())
-
-
-def _profile(t: float, w: float, g: float, r: float, xb: float) -> list[tuple[float, float]]:
-    """A section of the shoe in (x, z): the land in front (flat, or a V of depth ``g``), rounds of radius ``r`` that
-    start where the land ends and turn back to the side walls, and a back at ``xb`` with rounded corners."""
-    half = w / 2
-    d = np.array([g, half]) / math.hypot(g, half) if g > 0 else np.array([0.0, 1.0])  # the land's direction at its edge
-    left = np.array([-d[1], d[0]])
-    c = np.array([t, half]) + r * left
-    a0 = math.atan2(-left[1], -left[0])
-    side = [tuple(c + r * np.array([math.cos(a), math.sin(a)])) for a in np.linspace(a0, math.pi / 2, ARC + 1)]
-    zs = c[1] + r
-    rb = max(0.3, min(3.0, 0.45 * (c[0] - xb), 0.45 * zs))
-    back = [(xb + rb + rb * math.cos(a), zs - rb + rb * math.sin(a)) for a in np.linspace(math.pi / 2, math.pi, ARC + 1)]
-    plus = side + back
-    minus = [(x, -z) for x, z in reversed(plus)]
-    return plus + minus + ([(t - g, 0.0)] if g > 0 else [])
-
-
-def _hull(host: trimesh.Trimesh, top: float, grid: float = 0.25) -> trimesh.Trimesh:
-    """The host below ``top`` (pad frame) as a convex mesh grown by the slip-fit clearance.  The tip's points are
-    snapped to ``grid`` (the STL is dense where it is round) and the hull is grown by that error too, so it still
-    holds the whole tip."""
-    v = np.asarray(host.vertices)
-    near = (v[:, 1] <= top) & (np.abs(v[:, 0]) < 40) & (np.abs(v[:, 2]) < 40)
-    pts = [v[near]]
-    sec = host.section(plane_origin=[0.0, top, 0.0], plane_normal=[0.0, 1.0, 0.0])
-    if sec is not None:
-        pts.append(np.asarray(sec.vertices))
-    hull = trimesh.convex.convex_hull(np.unique(np.round(np.vstack(pts) / grid) * grid, axis=0))
-    grow = (L.CLEARANCE + grid * math.sqrt(3) / 2) / 0.85  # vertex normals lean up to ~30 deg off their faces
-    return trimesh.convex.convex_hull(hull.vertices + grow * hull.vertex_normals)
 
 
 def socket(host: trimesh.Trimesh, top: float, grid: float = 0.25) -> cq.Solid:
-    """``_hull`` as a solid, to cut from the shoe."""
+    """``shoe.socket_hull`` as a solid, to cut from the shoe."""
     faces = [cq.Face.makeFromWires(cq.Wire.makePolygon([V(*p) for p in tri], close=True))
-             for tri in _hull(host, top, grid).triangles]
+             for tri in socket_hull(host, top, grid).triangles]
     return cq.Solid.makeSolid(cq.Shell.makeShell(faces))
 
 
@@ -143,18 +59,12 @@ def _slab(t: float, w: float, g: float, depth: float, h: float) -> cq.Solid:
     return out
 
 
-def _screws(sections: list[tuple[float, float]], ys: list[float]) -> tuple[cq.Shape, cq.Shape]:
+def _screws(poses: list[tuple[np.ndarray, np.ndarray]]) -> tuple[cq.Shape, cq.Shape]:
     """Two M2 cap screws through the shoe's back into the jaw, square to the back: the screws, and their holes."""
-    yb, xb = np.array([s[0] for s in sections]), np.array([s[1] for s in sections])
     r, rh, hh, bite = SCREW
     screws, holes = [], []
-    for y in ys:
-        k = int(np.clip(np.searchsorted(yb, y) - 1, 0, len(yb) - 2))
-        d = np.array([xb[k + 1] - xb[k], yb[k + 1] - yb[k]])
-        d /= np.linalg.norm(d)
-        n = np.array([-d[1], d[0]])  # out of the back (toward -x: the sections climb in y)
-        x = float(np.interp(y, yb, xb))
-        p, nn = V(x, y, 0.0), V(n[0], n[1], 0.0)
+    for c, n in poses:
+        p, nn = V(*c), V(*n)
         head = cq.Solid.makeCylinder(rh, hh, p, nn)
         key = cq.Workplane(cq.Plane(origin=p + nn * hh, xDir=V(0, 0, 1), normal=nn)).polygon(6, 1.7).extrude(-1.2).val()
         shank = cq.Solid.makeCylinder(r, WALL + L.CLEARANCE + bite, p, -nn)
@@ -166,30 +76,16 @@ def _screws(sections: list[tuple[float, float]], ys: list[float]) -> tuple[cq.Sh
 def pad(spec: FingerSpec, fr: PadFrame, host: trimesh.Trimesh) -> list[CadPart]:
     """One pad in its own frame (mm): the shoe (PLA), the skin (TPU, if any) and its screws.  ``host`` is the jaw's
     mesh in the pad frame."""
-    t, tpu, w, g = 1000 * F.thickness(spec), spec.pad_tpu_mm, 1000 * F.width(spec), spec.groove_mm
-    length, h = fr.length, fr.length + 1000 * F.COVER
-    bx = boxes(spec, fr)
-    corners = np.vstack([c + (np.array([[a, b, e] for a in (-1, 1) for b in (-1, 1) for e in (-1, 1)]) * hf) @ r.T
-                         for c, hf, r in bx])
-    xb0 = min(0.0, float(corners[:, 0].min()))  # the boxes' rearmost point: the underside covers theirs
-    ys = [0.0] + ([length] if length > 0.5 else []) + [y for y in np.arange(length + 2.0, h - 0.9, 2.0)] + [h]
-    sections, wires = [], []
-    half_g = g / math.hypot(g, w / 2) if g > 0 else 0.0
-    hull = _hull(host, h + 3.0)  # the socket: walls are measured from it, so none is thinner than WALL
-    for y in ys:
-        ext = _host_extent(hull, [min(max(y + dy, 0.0), h) for dy in (-1.0, 0.0, 1.0)])
-        xb, r = xb0, R_EDGE
-        if ext is not None:
-            xb = min(xb0, ext[0] - WALL)
-            r = max(R_EDGE, (ext[1] + WALL - w / 2) / (1 + half_g))
-        sections.append((y, xb))
-        wires.append(cq.Wire.makePolygon([V(x, y, z) for x, z in _profile(t, w, g, r, xb)], close=True))
+    sec = sections(spec, fr, host)
+    t, tpu, w, g, h = sec.t, spec.pad_tpu_mm, sec.w, sec.g, sec.height
+    wires = [cq.Wire.makePolygon([V(x, y, z) for x, z in _profile(t, w, g, r, xb)], close=True)
+             for y, xb, r in zip(sec.ys, sec.xb, sec.r, strict=True)]
     shoe = cq.Solid.makeLoft(wires, True)
     if spec.lip_mm > 0:
         lip = spec.lip_mm
         shoe = shoe.fuse(cq.Solid.makeBox(t + lip, F.LIP_THICK * 1000, w, V(t / 2, 0, -w / 2)))
     shoe = shoe.cut(socket(host, h + 3.0))
-    screws, holes = _screws(sections, [length + 0.3 * F.COVER * 1000, length + 0.72 * F.COVER * 1000])
+    screws, holes = _screws(screw_poses(sec, fr.length))
     shoe = shoe.cut(holes)
     side = "fixed" if fr.kind == "jaw_fixed" else "moving"
     out = []

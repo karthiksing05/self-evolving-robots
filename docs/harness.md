@@ -153,7 +153,7 @@ These are known gaps. Each one makes a verdict less trustworthy in a specific wa
 | World model (3.6) | Not built (M10, optional) | — |
 | Gripper laws are geometric only | Interference, carried and transmission angle refuse a body (D-059); tooth bending, pin shear, torque and power are not laws yet | decisions.md D-059 |
 | Long four-bar links outreach the finger | Above about 78 mm the coupler's pins hang below the stock fingertip and meet the table first; the finger's mount is not yet a part parameter | decisions.md D-057 |
-| Pad shoes, screws and the rig's mounts are drawn, not simulated | The simulated pad is its land boxes: the shoe that wraps the jaw, its screws and its mass are in the pictures only, so neither the physics nor the mechanism laws see them | [design-language.md](design-language.md) |
+| The rig's mounts are drawn, not simulated | The pad shoe and its screws are simulated since D-066; the mounts that hold the rig's parts are still in the pictures only | [design-language.md](design-language.md) |
 | Some simulated pad and rig geometry cannot be built | Grooves deeper than 1.6 mm, a tilted moving pad partly inside the jaw, the lip box t/2 too long, overlapping tip and body tongue ranges: each scores a body no one could build | [design-language.md](design-language.md) |
 | Mobile and talking-robot bodies are not mechanisms yet | The mobile world is analytic with drawn tracks; the talking robot's articulators are free positions | plan P4, P5 |
 

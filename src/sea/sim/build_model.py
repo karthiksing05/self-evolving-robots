@@ -18,6 +18,7 @@ Rack tools are all attached to the gripper at build time; only the mounted one c
 
 from __future__ import annotations
 
+import math
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from functools import lru_cache
@@ -89,6 +90,66 @@ def _jaw_parts(mesh: str) -> list[np.ndarray]:
         data = np.load(COLLISION_DIR / f"{mesh}.npz")
         _JAW_CACHE[mesh] = [data[k] for k in sorted(data.files, key=lambda s: int(s.split("_")[1]))]
     return _JAW_CACHE[mesh]
+
+
+FINGER_MESHES = ("wrist_roll_follower_so101_v1", "moving_jaw_so101_v1", "jaw_blade")  # what a pad's shoe wraps
+
+
+def _finger_hosts(spec: mujoco.MjSpec) -> tuple:
+    """Each jaw body's finger mesh in the body's frame (m), as ``sim/shoe.shoes`` caches on it."""
+    import trimesh
+
+    out = []
+    for g in spec.geoms:
+        if g.meshname not in FINGER_MESHES or g.parent.name in [h[0] for h in out]:
+            continue
+        mesh = spec.mesh(g.meshname)
+        if mesh.file:
+            m = trimesh.load(STOCK_MJCF.parent / "assets" / Path(mesh.file).name, process=False)
+            v, f = np.asarray(m.vertices) * np.asarray(mesh.scale), np.asarray(m.faces)
+        else:
+            v, f = np.asarray(mesh.uservert).reshape(-1, 3), np.asarray(mesh.userface).reshape(-1, 3)
+        v = (quat_wxyz_to_mat(np.asarray(g.quat)) @ v.T).T + np.asarray(g.pos)
+        out.append((g.parent.name, np.ascontiguousarray(v, dtype=np.float64).tobytes(),
+                    np.ascontiguousarray(f, dtype=np.int64).tobytes()))
+    return tuple(out)
+
+
+def _shoes(spec: mujoco.MjSpec, fingers) -> dict[str, float]:
+    """The pads' printed shoes (D-066): their outsides as convex pieces that collide like the pads, the screws'
+    heads behind the jaw, and their mass on the jaw body.  Returns each piece's friction (PLA)."""
+    from sea.design.fingers import PLA_FRICTION, has_pads
+    from sea.sim import shoe
+
+    if not has_pads(fingers):
+        return {}
+    mu = {}
+    for fr, sh in shoe.shoes(fingers, _finger_hosts(spec)):
+        body = spec.body(fr.body)
+        for k, verts in enumerate(sh.pieces):
+            name = f"{fr.kind}_pad_shoe{k}"
+            spec.add_mesh(name=name, uservert=np.asarray(verts).ravel().tolist())
+            body.add_geom(name=name, type=mujoco.mjtGeom.mjGEOM_MESH, meshname=name, contype=ROBOT_BITS[0],
+                          conaffinity=ROBOT_BITS[1], condim=4, group=2, mass=0.0, rgba=[0.93, 0.91, 0.86, 1.0])
+            mu[name] = PLA_FRICTION
+        r, rh, hh, _ = shoe.SCREW
+        for k, (c, n) in enumerate(sh.screws):
+            body.add_geom(name=f"{fr.kind}_pad_screw{k}", type=mujoco.mjtGeom.mjGEOM_CYLINDER,
+                          size=[rh * 1e-3, hh * 0.5e-3], pos=c.tolist(), quat=list(_z_to(n)), contype=0, conaffinity=0,
+                          group=2, mass=0.0, rgba=[0.3, 0.3, 0.32, 1.0])
+        body.mass = float(body.mass) + sh.grams * 1e-3
+    return mu
+
+
+def _z_to(n: np.ndarray) -> np.ndarray:
+    """The quaternion (wxyz) that turns +z onto ``n``."""
+    n = n / np.linalg.norm(n)
+    a = np.cross([0.0, 0.0, 1.0], n)
+    s, c = float(np.linalg.norm(a)), float(n[2])
+    if s < 1e-9:
+        return np.array([1.0, 0.0, 0.0, 0.0]) if c > 0 else np.array([0.0, 1.0, 0.0, 0.0])
+    half = math.atan2(s, c) / 2
+    return np.concatenate([[math.cos(half)], math.sin(half) * a / s])
 
 
 @dataclass
@@ -515,6 +576,7 @@ def build_model(design: Design, panel: PanelSpec | None = None, tools: list | No
                                     quat=list(pg.quat), contype=ROBOT_BITS[0], conaffinity=ROBOT_BITS[1], condim=4,
                                     group=2, mass=0.0, rgba=[0.95, 0.55, 0.15, 1.0])
         jaw_mu[pg.name] = pg.friction
+    jaw_mu.update(_shoes(spec, design.fingers))
     spec.worldbody.add_light(pos=[0.2, 0.0, 1.0], dir=[0, 0, -1], type=mujoco.mjtLightType.mjLIGHT_DIRECTIONAL)
 
     site = next(s for s in spec.sites if s.name == MJCF_TOOL_SITE)

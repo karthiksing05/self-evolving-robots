@@ -1803,3 +1803,34 @@ Three fixes failed on the way, each for a reason:
   - The bare long slide gains the apple, soup can and potted meat can (a shallower grip keeps the rack and carriage off their tops) and keeps every wide box.
   - `test_world_gripper::test_solve_reads_the_failure` now reads the stock's failure on the pudding box instead.
 
+
+## D-066 The pad's printed shoe is simulated (world: physics)
+
+**Why.** A pad was simulated as its land boxes alone. The pad as built (`design/pad_cad.py`) is a PLA shoe that slides over the stock jaw's tapered tip, with the land in front, a TPU skin and two M2 cap screws behind:
+- its socket is the tip's convex hull grown by the slip fit;
+- its walls are at least 1.6 mm thick round the tip.
+
+The pictures drew the shoe, but the physics and the mechanism laws never saw it: a "thin spot" in harness.md, and against invariant 11 (what is drawn is what is simulated).
+
+**Change.**
+- New `sim/shoe.py` (component `physics`) holds the shoe's sections, socket and screw positions; `pad_cad` now draws from them, so the picture and the simulation share one set of numbers.
+- The simulator adds, on the jaw body that carries each pad:
+  - the shoe's outside as convex pieces between successive sections, colliding like the pads (`jaw_*_pad_shoe*`, PLA friction). They stop 0.3 mm behind the land's face, so an object still meets the land and the skin's friction.
+  - the two screw heads, as cylinders (`jaw_*_pad_screw*`). Fastened to the finger, they are finger parts for the stop rule (D-061).
+  - the mass of the shoe (its loft less the socket), the skin and both screws: about 2 g a finger.
+- `test_shoe.py`:
+  - the shoe keeps the design language's slip fit and edge round;
+  - stock fingers have none;
+  - every padded finger has pieces, two screws and 1.5–6 g;
+  - every piece stops behind its land;
+  - the socket holds the tip: over 97 % of the tip's vertices lie inside the shoe's outside.
+
+**Prediction** (written before the measurement below; the laws were run on six bodies while building it).
+- Over the 21 groups (System 1's full search, each group's first train placement, seed 0), stock, the hinged jaw with 30° pads, the bare long slide and the long slide with 20 mm pads each change by at most one group. The shoe sits behind and beside the land, and adds 2 g against a 30–500 g object.
+- The bodies that passed the laws still pass. The four-bar at 89 mm with pads was already refused (its coupler meets the fixed pad); its shoe adds a second line to that refusal.
+
+**Measured.**
+- Over the 21 groups, every body holds exactly what it held under D-065, group for group: stock 17, the hinged jaw with 30° pads 17, the bare long slide 20, the long slide with 20 mm pads 18. The prediction held.
+- Every test passed, including the golden grasps.
+- Model builds take 0.03–0.06 s, with the shoes cached per finger spec.
+- What the shoe changes is what the films show and what the laws check: the shoe and screws, no longer boxes alone.

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+import re
 from pathlib import Path
 
 import numpy as np
@@ -76,7 +77,7 @@ def test_the_pads_are_jaw_geoms_with_their_material_friction():
 
     sim = build_model(Design(id="p", fingers=PADS), table_panel("t", "train", 0, object_spec("box", 40, 40, 100, 0.6)))
     m = sim.model
-    pads = [i for i in range(m.ngeom) if m.geom(i).name.startswith("jaw_") and "_pad" in m.geom(i).name]
+    pads = [i for i in range(m.ngeom) if re.fullmatch(r"jaw_(fixed|moving)_pad\d", m.geom(i).name)]  # the lands, not the shoe (D-066)
     assert len(pads) == 2 and {sim.geom_kind[i] for i in pads} == {"jaw_fixed", "jaw_moving"}
     names = {(m.geom(int(a)).name, m.geom(int(b)).name): k for k, (a, b) in enumerate(zip(m.pair_geom1, m.pair_geom2,
                                                                                           strict=True))}
