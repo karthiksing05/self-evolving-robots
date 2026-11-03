@@ -235,6 +235,24 @@ def pair(before: Clip, after: Clip, title: str, labels: tuple[str, str], hold_s:
     return [np.concatenate([head, f]) for f in frames], audio
 
 
+def solo(clip: Clip, title: str, label: str, hold_s: float = 1.6) -> tuple[list[np.ndarray], np.ndarray | None]:
+    """One body on one task, for a gallery: the task above, the body named over its picture, the outcome below
+    it once the attempt ends, in plain words over the judge's numbers."""
+    w = clip.frames[0].shape[1]
+    hold = int(hold_s * FPS)
+    name = _band(w, LABEL, PAPER, [(label, 14, True, INK)])
+    idle = _band(w, FOOT, PAPER, [])
+    end = _band(w, FOOT, GOOD if clip.ok else BAD, [(("✓ " if clip.ok else "✗ ") + (clip.headline or clip.verdict), 15,
+                                                     True, INK)] + ([(clip.verdict, 12, False, INK)] if clip.headline else []))
+    n = len(clip.frames)
+    head = _band(w, 12 + 20 * len(_wrap(title, w - 20, 16, True)[:2]), PAPER, [(title, 16, True, INK)])
+    frames = [np.concatenate([head, name, clip.frames[min(i, n - 1)], end if i >= n else idle]) for i in range(n + hold)]
+    audio = None
+    if clip.audio is not None:
+        audio = np.concatenate([clip.audio, np.zeros(int(hold * SR / FPS), np.float32)])
+    return frames, audio
+
+
 def encode(frames: list[np.ndarray], path: Path, audio: np.ndarray | None = None) -> None:
     """An H.264 MP4 (with AAC sound when there is audio), and a JPEG poster of the last frame beside it."""
     from PIL import Image
