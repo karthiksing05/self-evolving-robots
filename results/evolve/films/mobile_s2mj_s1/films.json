@@ -1,0 +1,90 @@
+{
+ "run": "mobile_s2mj_s1",
+ "world": "mobile",
+ "films": [
+  {
+   "frame": 1,
+   "id": "b00m",
+   "group": "garden",
+   "task": "garden_train0",
+   "file": "01_b00m_garden.mp4",
+   "poster": "01_b00m_garden.jpg",
+   "seconds": 6.1,
+   "sound": false,
+   "clipping_mm": 0.04,
+   "before": {
+    "ok": false,
+    "verdict": "belly hits step edge: the tub's belly at 2.0 cm grounded on the 9.0 cm wide, 5.0 cm deep trench (edge mu 0.75), at approach duty 0.43: stuck 12.3 cm along, its running gear turning at 0.24 m/s",
+    "recorded": "belly_hits_step_edge"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "reached in 14 s of 60, using 0.012 Wh",
+    "recorded": true
+   }
+  },
+  {
+   "frame": 1,
+   "id": "b00m",
+   "group": "hallway",
+   "task": "hallway_train0",
+   "file": "01_b00m_hallway.mp4",
+   "poster": "01_b00m_hallway.jpg",
+   "seconds": 2.4,
+   "sound": false,
+   "clipping_mm": 0.01,
+   "before": {
+    "ok": false,
+    "verdict": "sensing range short: reached the end in 78 s (76 s at best); 45 s allowed; in the dark it sees 0.00 m ahead, less than its 0.20 m length, so it touches each of 10 obstacles at <= 0.25 m/s and backs off (40 s)",
+    "recorded": "sensing_range_short"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "reached in 31 s of 45, using 0.025 Wh",
+    "recorded": true
+   }
+  },
+  {
+   "frame": 1,
+   "id": "b00m",
+   "group": "sandbox",
+   "task": "sandbox_train0",
+   "file": "01_b00m_sandbox.mp4",
+   "poster": "01_b00m_sandbox.jpg",
+   "seconds": 4.0,
+   "sound": false,
+   "clipping_mm": 0.27,
+   "before": {
+    "ok": false,
+    "verdict": "sinks in sand: ground pressure 2.84 kPa on 15 cm2 of contact sinks it 3.79 cm; it climbs out of 2.00 cm (belly clearance 2.0 cm)",
+    "recorded": "sinks_in_sand"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "reached in 14 s of 60, using 0.012 Wh",
+    "recorded": true
+   }
+  },
+  {
+   "frame": 2,
+   "id": "b010",
+   "group": "bedroom",
+   "task": "bedroom_train0",
+   "file": "02_b010_bedroom.mp4",
+   "poster": "02_b010_bedroom.jpg",
+   "seconds": 3.3,
+   "sound": false,
+   "clipping_mm": 0.01,
+   "before": {
+    "ok": false,
+    "verdict": "chassis wider than gap: the robot is 24.0 cm wide overall; the opening is 20.0 cm",
+    "recorded": "chassis_wider_than_gap"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "reached in 15 s of 60, using 0.012 Wh",
+    "recorded": true
+   }
+  }
+ ]
+}

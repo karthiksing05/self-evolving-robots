@@ -1,0 +1,181 @@
+{
+ "run": "mobile_s2mj_s2",
+ "world": "mobile",
+ "frames": [
+  {
+   "iteration": 0,
+   "id": "stock",
+   "held": 5,
+   "groups": 10,
+   "changes": [],
+   "body": {
+    "id": "stock",
+    "parent": null,
+    "parts": {
+     "chassis": {
+      "type": "printed_tub",
+      "params": {
+       "width": 18.0,
+       "length": 20.0,
+       "ride_height": 2.0
+      }
+     },
+     "locomotion": {
+      "type": "wheels4",
+      "params": {
+       "wheel_radius": 3.0
+      }
+     },
+     "drive": {
+      "type": "n20_gearmotor",
+      "params": {
+       "gear_ratio": 100.0
+      }
+     },
+     "battery": {
+      "type": "nimh_pack",
+      "params": {
+       "capacity": 9.6
+      }
+     },
+     "sensor": {
+      "type": "bump_switch",
+      "params": {}
+     }
+    }
+   },
+   "file": "00_stock.png",
+   "views": [
+    "three-quarter",
+    "side"
+   ]
+  },
+  {
+   "iteration": 1,
+   "id": "b00m",
+   "held": 9,
+   "groups": 10,
+   "changes": [
+    "battery: capacity 9.6 \u2192 14.4",
+    "chassis: ride_height 2 \u2192 3, width 18 \u2192 12",
+    "locomotion: wheels4 \u2192 tracks (idler_height 6.5, track_length 24)",
+    "sensor: bump_switch \u2192 ultrasonic"
+   ],
+   "body": {
+    "id": "b00m",
+    "parent": "stock",
+    "parts": {
+     "chassis": {
+      "type": "printed_tub",
+      "params": {
+       "width": 12.0,
+       "length": 20.0,
+       "ride_height": 3.0
+      }
+     },
+     "locomotion": {
+      "type": "tracks",
+      "params": {
+       "track_length": 24.0,
+       "idler_height": 6.5
+      }
+     },
+     "drive": {
+      "type": "n20_gearmotor",
+      "params": {
+       "gear_ratio": 100.0
+      }
+     },
+     "battery": {
+      "type": "nimh_pack",
+      "params": {
+       "capacity": 14.4
+      }
+     },
+     "sensor": {
+      "type": "ultrasonic",
+      "params": {}
+     }
+    }
+   },
+   "move": "merge",
+   "gained": [
+    "garden",
+    "hallway",
+    "porch",
+    "sandbox"
+   ],
+   "lost": [],
+   "cost": "$16.50, 172 machine min",
+   "why": [
+    "Wheels cannot fix this at any value. At radius 4.5 they climb about 5.4 cm (short of 5.5) and span 9.0 cm (short of 9.2). Clearing the 5.5 cm edge needs a 6 cm belly clearance, which makes the robot 10 cm tall and fails under_sofa's 9 cm. Rocker-bogie is limited to wheel radius 3.4 cm or less by the sofa height (2r+2), and a wheel never climbs more than r. Tracks: idler height 6.5 lets the front run meet a 5.5 cm step, with the track top at 8.0 cm, under 9. A 24 cm contact length bridges about 10.8 cm, more than 9.2. Two long patches give roughly 150-200 cm2 against 15 cm2 now, so pressure falls below about 0.4 kPa and sinkage below 0.6 cm. Ride height 3 puts the tub top at 7 cm. Tub width 12 keeps the tracked robot narrow for the garden gate (28 cm) and possibly the bedroom. Tracks add mass and rolling resistance, so the pack goes from 4 to 6 NiMH cells (14.4 Wh, 7.2 V). That restores lawn range, about 12.2 Wh usable or roughly 6 km at about 7 J/m. The 7.2 V also lifts the 1.8 cm sprocket's speed to about 0.67 m/s, above the lawn's 0.35 m/s requirement. It stays inside the N20's 3-9 V range. Cost: $14 track kit, $5 for 2 cells, 4 days, about 220 min of printing.",
+    "The bump switch has no parameter, so no params move changes its 0 m range. The camera's LED reaches only 0.12 m in the dark, less than the 0.20 m body. The lidar is not provided. The ultrasonic sensor ($2.50, 2 days) ranges 2 m in any light and adds no height. With it, 11 m at about 0.6-0.7 m/s takes about 18 s, well under 45 s."
+   ],
+   "file": "01_b00m.png",
+   "views": [
+    "three-quarter",
+    "side"
+   ]
+  },
+  {
+   "iteration": 2,
+   "id": "b010",
+   "held": 10,
+   "groups": 10,
+   "changes": [
+    "chassis: width 12 \u2192 10"
+   ],
+   "body": {
+    "id": "b010",
+    "parent": "b00m",
+    "parts": {
+     "chassis": {
+      "type": "printed_tub",
+      "params": {
+       "width": 10.0,
+       "length": 20.0,
+       "ride_height": 3.0
+      }
+     },
+     "locomotion": {
+      "type": "tracks",
+      "params": {
+       "track_length": 24.0,
+       "idler_height": 6.5
+      }
+     },
+     "drive": {
+      "type": "n20_gearmotor",
+      "params": {
+       "gear_ratio": 100.0
+      }
+     },
+     "battery": {
+      "type": "nimh_pack",
+      "params": {
+       "capacity": 14.4
+      }
+     },
+     "sensor": {
+      "type": "ultrasonic",
+      "params": {}
+     }
+    }
+   },
+   "move": "params",
+   "gained": [
+    "bedroom"
+   ],
+   "lost": [],
+   "cost": "$0.00, 96 machine min",
+   "why": [
+    "Taking the tub from its current 12 cm to its minimum of 10 cm makes the robot 16.0 cm wide overall. That leaves about 1.9 cm per side, about 2 sigma at duty 0.68 and more than the 1.57 cm drift that jammed it, so bedroom should pass. Only the tub is reprinted, in stock PLA (about 150 g, about 150 machine minutes out of 428), and nothing is bought. This is the cheapest rung of the ladder. In iteration 1 the same kind of width cut gained bedroom on the old body. The track parts have no width parameter, and no driving change fixes this: System 1's 54 attempts topped out at 0.38."
+   ],
+   "file": "02_b010.png",
+   "views": [
+    "three-quarter",
+    "side"
+   ]
+  }
+ ]
+}

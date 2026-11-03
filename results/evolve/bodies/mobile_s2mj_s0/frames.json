@@ -1,0 +1,178 @@
+{
+ "run": "mobile_s2mj_s0",
+ "world": "mobile",
+ "frames": [
+  {
+   "iteration": 0,
+   "id": "stock",
+   "held": 5,
+   "groups": 10,
+   "changes": [],
+   "body": {
+    "id": "stock",
+    "parent": null,
+    "parts": {
+     "chassis": {
+      "type": "printed_tub",
+      "params": {
+       "width": 18.0,
+       "length": 20.0,
+       "ride_height": 2.0
+      }
+     },
+     "locomotion": {
+      "type": "wheels4",
+      "params": {
+       "wheel_radius": 3.0
+      }
+     },
+     "drive": {
+      "type": "n20_gearmotor",
+      "params": {
+       "gear_ratio": 100.0
+      }
+     },
+     "battery": {
+      "type": "nimh_pack",
+      "params": {
+       "capacity": 9.6
+      }
+     },
+     "sensor": {
+      "type": "bump_switch",
+      "params": {}
+     }
+    }
+   },
+   "file": "00_stock.png",
+   "views": [
+    "three-quarter",
+    "side"
+   ]
+  },
+  {
+   "iteration": 1,
+   "id": "b001",
+   "held": 6,
+   "groups": 10,
+   "changes": [
+    "sensor: bump_switch \u2192 ultrasonic"
+   ],
+   "body": {
+    "id": "b001",
+    "parent": "stock",
+    "parts": {
+     "chassis": {
+      "type": "printed_tub",
+      "params": {
+       "width": 18.0,
+       "length": 20.0,
+       "ride_height": 2.0
+      }
+     },
+     "locomotion": {
+      "type": "wheels4",
+      "params": {
+       "wheel_radius": 3.0
+      }
+     },
+     "drive": {
+      "type": "n20_gearmotor",
+      "params": {
+       "gear_ratio": 100.0
+      }
+     },
+     "battery": {
+      "type": "nimh_pack",
+      "params": {
+       "capacity": 9.6
+      }
+     },
+     "sensor": {
+      "type": "ultrasonic",
+      "params": {}
+     }
+    }
+   },
+   "move": "swap",
+   "gained": [
+    "hallway"
+   ],
+   "lost": [],
+   "cost": "$2.50, 0 machine min",
+   "why": [
+    "The HC-SR04 ranges to 2 m in any light, about 10 body lengths. The robot can then cruise the dark corridor near full speed and steer around obstacles without touching them, saving at least the 40 s of back-offs plus the speed cap. The camera is ruled out because its IR LED lights only 0.12 m in the dark, and the lidar is not provided. Cost: $2.50, 2 days lead time."
+   ],
+   "file": "01_b001.png",
+   "views": [
+    "three-quarter",
+    "side"
+   ]
+  },
+  {
+   "iteration": 2,
+   "id": "b010",
+   "held": 10,
+   "groups": 10,
+   "changes": [
+    "battery: capacity 9.6 \u2192 14.4",
+    "chassis: length 20 \u2192 24, ride_height 2 \u2192 3, width 18 \u2192 10",
+    "locomotion: wheels4 \u2192 tracks (idler_height 7, track_length 24)"
+   ],
+   "body": {
+    "id": "b010",
+    "parent": "b001",
+    "parts": {
+     "chassis": {
+      "type": "printed_tub",
+      "params": {
+       "width": 10.0,
+       "length": 24.0,
+       "ride_height": 3.0
+      }
+     },
+     "locomotion": {
+      "type": "tracks",
+      "params": {
+       "track_length": 24.0,
+       "idler_height": 7.0
+      }
+     },
+     "drive": {
+      "type": "n20_gearmotor",
+      "params": {
+       "gear_ratio": 100.0
+      }
+     },
+     "battery": {
+      "type": "nimh_pack",
+      "params": {
+       "capacity": 14.4
+      }
+     },
+     "sensor": {
+      "type": "ultrasonic",
+      "params": {}
+     }
+    }
+   },
+   "move": "swap",
+   "gained": [
+    "bedroom",
+    "garden",
+    "porch",
+    "sandbox"
+   ],
+   "lost": [],
+   "cost": "$14.00, 178 machine min",
+   "why": [
+    "Wheels can't climb an edge higher than their radius (4.5 cm at most), so no wheel radius reaches 5.5 cm, and a 9 cm wheel only just matches the trench. Tracks with idler height 7 cm meet the 5.5 cm step on their front run. A 24 cm contact length bridges 0.45\u00d724 = 10.8 cm, more than the 9.1 cm trench. Two 24 cm tracks give roughly 150\u2013200 cm\u00b2 of contact, so about 0.35 kPa and under 0.5 cm of sinkage. This avoids both reasons last round's version was refused. The tub is 24 cm long, which fits a 24 cm track. The NiMH pack is 6 cells: 7.2 V running, 8.4 V charged, under the N20's 9 V limit. Six cells instead of four give 1.5\u00d7 the speed and force, which makes up for the tracks' 1.8 cm sprocket and having only two motors. I estimate about 0.65 m/s top speed and about 15 N of force, and 12.2 Wh usable energy covers the 5 km lawn. Inner width 10 keeps the robot narrow for the bedroom. Ride height 3 puts the tub top at 7 cm, under the track's 8.5 cm. The 8 cells needed are already in the lab. The only purchase is the $14 track kit, with 4 days of lead time."
+   ],
+   "file": "02_b010.png",
+   "views": [
+    "three-quarter",
+    "side"
+   ]
+  }
+ ]
+}

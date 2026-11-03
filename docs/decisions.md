@@ -1719,3 +1719,9 @@ Three fixes failed on the way, each for a reason:
 - **Mecanum:** its wheels are cylinders with the world's reduced friction, not rollers. A thin spot under invariant 11, and the reason the mecanum distractor now matches the stock wheels instead of losing to them.
 - **Tests:** `test_world_mobile.py` rewritten from the closed-form rules to these outcomes (the climb, the stalled track, the trench, the distractors, the stock's mechanisms).
 - **Amendment, found by filming the replays: the ramp lay flat.** Its tilt went into the MJCF as radians, but MuJoCo reads `euler` in degrees. So a 22° ramp was built 0.38° off flat, hovering 19 cm up, and every robot drove under it. Every ramp verdict above was wrong. Fixed. Re-measured: stock 5/10 and the three track bodies 10/10, the same outcomes, now climbing the face: each robot's centre rides 5 cm above the slope (`test_world_mobile.py::test_a_ramp_is_climbed_on_its_surface_at_its_slope`). Lesson: a judge built on physics needs a picture of every episode type before any of its numbers are believed.
+- **Campaign under this key** (`results/evolve/mobile_s2mj_s{0,1,2}.json`; 3 minutes a seed, as the cached physics is shared across search):
+  - every seed went from the stock 5 to 10/10 train routes in two iterations, and 10/10 test against stock 5;
+  - every seed chose a sonar and tracks with a 6.5–7 cm idler on a narrower tub;
+  - seed 1 chose two Li-ion cells (7.4 V), inside D-062's range.
+  - No seed used the parameter-only routes physics opened (big fast wheels, a sliding belly). System 2 reasoned to the redesign the failures named.
+  - The films replay the MuJoCo episodes; the deepest a robot part sits in the ground is 0.84 mm.
