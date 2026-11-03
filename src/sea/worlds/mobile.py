@@ -37,6 +37,7 @@ controls: if the body hits a limit further on, that limit is the label; if not, 
 
 from __future__ import annotations
 
+import functools
 import math
 import time
 import zlib
@@ -48,6 +49,7 @@ import numpy as np
 
 from sea.evolve.core import Body, BomLine, Outcome, Param, Part, PartType, Task
 from sea.evolve.search import local_search
+from sea.sim import mobile_model as MM
 
 G = 9.81
 TUB_H = 4.0  # cm: depth of the chassis tub
@@ -69,6 +71,7 @@ CELL = {"nimh_pack": ("nimh_aa", 2.4, 27.0, 7.3, 4.0), "liion_pack": ("cell_1865
 # cell item, Wh per cell, g per cell, footprint cm^2, the pack's maximum current (A)
 VOLTS = {"nimh_pack": (1.2, 1.4), "liion_pack": (3.7, 4.2)}  # a cell's nominal and full-charge volts; cells in series
 WINDING = {"n20_gearmotor": 6.0, "n20_encoder_gearmotor": 6.0, "jga25_gearmotor": 12.0}  # V: MOTOR's numbers hold here
+ROTOR = {"n20_gearmotor": 5e-9, "n20_encoder_gearmotor": 5e-9, "jga25_gearmotor": 3.7e-7}  # kg m^2; unpublished, about
 V_RANGE = (0.5, 1.5)  # the supply a winding takes, as fractions of its rated voltage (full charge at the top)
 SENSOR = {  # range in the dark (m), height above the tub (cm), g, W, item, count
     "bump_switch": (0.0, 0.0, 5.0, 0.0, "bump_switch", 2), "ultrasonic": (2.0, 0.0, 9.0, 0.08, "hc_sr04", 1),
@@ -136,6 +139,9 @@ class Spec:
     p_w: float  # W, electronics and sensor
     area: float  # cm^2, contact area on soft ground
     volts: float = 6.0  # V, the pack's nominal voltage across the motors
+    tub_w: float = 18.0  # cm, the tub's inner width (the running gear adds ``(width - tub_w) / 2`` a side)
+    loco_g: float = 0.0  # g, the running gear: wheels, or both tracks' rollers, idlers and belts
+    rotor: float = 0.0  # kg m^2, a motor's rotor inertia seen at its wheel (J ratio^2)
     f: float = 0.5  # weight share on the climbing wheels
     edge: float = 1.0  # traction factor of a wheel on a step edge
     loose: float = 1.0  # traction factor on loose ground
@@ -210,7 +216,8 @@ def _spec(body: Body) -> Spec:
     k = volts / WINDING[dr.type]  # a DC motor's stall torque and no-load speed both scale with its supply
     return Spec(loco=lo.type, m=grams / 1000, width=w + 2 * side, height=height, length=ln, belly=belly, r=r, n=n,
                 f_stall=k * n * tau * ratio * geta / (r / 100), v_nl=k * w0 / ratio * r / 100, eta=0.7 * geta,
-                drift=drift * steer, sense=sense, wh=_cells(bt) * cell_wh, p_w=ELEC_W + sp, volts=volts, **kw)
+                drift=drift * steer, sense=sense, wh=_cells(bt) * cell_wh, p_w=ELEC_W + sp, volts=volts, tub_w=w,
+                loco_g=_loco_g(lo)[0], rotor=ROTOR[dr.type] * ratio ** 2, **kw)
 
 
 # ---------------------------------------------------------------- terrain mechanics
@@ -227,19 +234,35 @@ def _crr(s: Spec, surf: str) -> float:
     return c * 1.2 + 0.02 if s.loco == "mecanum4" else c + (0.008 if s.loco == "rocker_bogie6" else 0.0)
 
 
-def _step_max(s: Spec, mu: float) -> float:
-    """Highest edge (cm) the locomotion can climb by traction and geometry on an edge of friction ``mu``."""
-    if s.loco == "tracks":
-        return 0.9 * s.idler
-    a = math.atan(mu * s.edge) + math.atan(mu * (1 - s.f) / s.f)  # the edge's own friction, then the push
-    h = s.r * (1 - math.cos(min(a, math.pi / 2)))
-    return min(h, s.bogie * math.sin(math.radians(40))) if s.loco == "rocker_bogie6" else h
+def _robot(s: Spec, surf: str) -> MM.Robot:
+    """The body as the MuJoCo model takes it (SI units), on ``surf``."""
+    per = {"tracks": 2, "rocker_bogie6": 6}.get(s.loco, 4)
+    return MM.Robot(loco=s.loco, m=s.m, wheel_kg=s.loco_g / 1000 / per, width=s.tub_w / 100, length=s.length / 100,
+                    tub_h=TUB_H / 100, belly=s.belly / 100, r=s.r / 100, torque=s.f_stall / s.n * s.r / 100,
+                    omega0=s.v_nl / (s.r / 100), crr=_crr(s, surf), rotor=s.rotor, track=s.track / 100,
+                    idler=s.idler / 100, bogie=s.bogie / 100)
 
 
-def _belly_need(s: Spec, h: float) -> float:
-    """Belly clearance a rigid four-wheeler needs to carry its tub over an edge ``h`` (cm) as its rear wheels arrive."""
-    x = math.sqrt(max(0.0, 2 * s.r * h - h * h))
-    return h * (1 - min(x, s.base) / s.base)
+def _drive(s: Spec, kind: str, f: dict[str, Any], mu: float, duty: float, y0: float = 0.0,
+           standing: bool = False) -> MM.Episode:
+    """One MuJoCo episode at an obstacle, its arguments quantised so that search shares physics (D-063)."""
+    q = {"h": 0.1, "w": 0.1, "depth": 0.1, "deg": 0.25, "off": 0.25}  # cm, or degrees
+    items = tuple(sorted((k, round(f[k] / q[k]) * q[k]) for k in q if k in f))
+    return MM.cached(_robot(s, f["s"]), kind, items, round(mu / 0.03) * 0.03, round(duty / 0.05) * 0.05,
+                     round(y0 / 0.25) * 0.25 / 100, standing)
+
+
+@functools.cache
+def _climb(s: Spec, surf: str, standing: bool = False) -> float:
+    """The highest edge (cm) the body climbs at full duty on ``surf``, measured in MuJoCo by bisection: from a
+    run-up, or ``standing`` against it (out of its own rut, where there is no run-up)."""
+    mu = _mu(s, surf) * s.edge
+    lo, hi = 0.0, max(2.0 * s.r, s.idler, 2.0)
+    for _ in range(7):
+        h = (lo + hi) / 2
+        lo, hi = (h, hi) if _drive(s, "step", {"k": "step", "s": surf, "h": h}, mu, 1.0, standing=standing).ok \
+            else (lo, h)
+    return lo
 
 
 def _speed(s: Spec, duty: float, force: float) -> float:
@@ -267,38 +290,30 @@ def _desc(f: dict[str, Any]) -> str:
     return DESC[f["k"]].format(ln=f"{ln:.0f}" if ln >= 100 else f"{ln:.1f}", mu=SURF[f["s"]][0], **f)
 
 
-def _edge(s: Spec, h: float, mu: float, duty: float) -> tuple[str, str, float] | None:
-    """Climb an edge of ``h`` cm at approach ``duty``: None, or (mechanism, numbers, partial credit)."""
-    hmax = _step_max(s, mu)
-    if h > hmax:
-        how = (f"its front idler at {s.idler:.1f} cm meets edges up to {hmax:.2f} cm" if s.loco == "tracks" else
-               f"its {s.r:.1f} cm wheels climb at most {hmax:.2f} cm at edge mu {mu:.2f}")
-        return "step_higher_than_climbable", f"the edge is {h:.2f} cm; {how}", 0.0
-    if s.loco == "tracks":  # the track's front run takes the edge as a short ramp and absorbs the impact
-        need, v_max = s.m * G * (min(1.0, h / s.track) + _crr(s, "wood")), math.inf
-    else:
-        a0 = math.acos(max(-1.0, min(1.0, (s.r - h) / s.r)))
-        if s.loco in ("wheels4", "mecanum4") and s.belly < _belly_need(s, h):
-            return ("belly_hits_step_edge", f"the tub's belly at {s.belly:.1f} cm strikes the {h:.2f} cm edge "
-                    f"(it needs {_belly_need(s, h):.2f} cm with a {s.base:.0f} cm wheelbase)", 0.0)
-        me, load = mu * s.edge, s.f * s.m * G  # the climbing wheels' own traction, then the push from behind
-        need = me * load / (math.cos(a0) + me * math.sin(a0)) + load * math.tan(max(0.0, a0 - math.atan(me)))
-        v_max = math.sqrt(0.01 * G * s.r) / max(math.sin(a0), 1e-6)  # faster, and the wheel hops above r/2
-    lo, hi = need / s.f_stall, v_max / s.v_nl  # approach duties that push hard enough, and arrive slowly enough
-    if lo > 1:
-        return ("motor_torque_short_on_step", f"lifting over the {h:.2f} cm edge needs {need:.1f} N of push; the "
-                f"drive stalls at {s.f_stall:.1f} N", 0.0)
-    if lo >= hi:
-        return ("stall_or_bounce_at_step", f"lifting over the {h:.2f} cm edge needs duty >= {lo:.2f} ({need:.1f} N "
-                f"of the {s.f_stall:.1f} N stall force); above duty {hi:.2f} ({v_max:.2f} m/s) the {s.r:.1f} cm "
-                "wheels hop off it", 0.0)
-    if duty < lo:
-        return ("stalled_at_step", f"at approach duty {duty:.2f} the drive pushes {duty * s.f_stall:.1f} N; the edge "
-                f"needs {need:.1f} N", 0.5 * duty / lo)
-    if duty > hi:
-        return ("bounced_off_step", f"hit the edge at {duty * s.v_nl:.2f} m/s; above {v_max:.2f} m/s the "
-                f"{s.r:.1f} cm wheels hop off it", 0.5 * hi / duty)
-    return None
+def _edge(s: Spec, f: dict[str, Any], mu: float, duty: float) -> tuple[str, str, float] | None:
+    """Drive into a step or trench in MuJoCo at approach ``duty``: None, or (mechanism, numbers, partial credit)."""
+    ep = _drive(s, f["k"], f, mu, duty)
+    if ep.ok:
+        return None
+    what = (f"the {f['h']:.2f} cm edge" if f["k"] == "step" else f"the {f['w']:.1f} cm wide, {f['depth']:.1f} cm deep "
+            "trench") + f" (edge mu {mu:.2f}), at approach duty {duty:.2f}: {ep.detail}"
+    part = 0.5 * ep.progress
+    if ep.why == "belly":
+        return "belly_hits_step_edge", f"the tub's belly at {s.belly:.1f} cm grounded on {what}", part
+    if ep.why == "bounced":
+        return "bounced_off_step", f"thrown back off {what}", part
+    if ep.why == "tipped":
+        return "tipped_over", f"tipped over on {what}", part
+    if ep.why in ("stuck_stalled", "slow"):
+        if duty < 0.999:
+            return "stalled_at_step", f"the drive stalled on {what}", part
+        return "motor_torque_short_on_step", f"the drive stalls at {s.f_stall:.1f} N on {what}", part
+    climb = _climb(s, f["s"])
+    if f["k"] == "trench":
+        return "gap_longer_than_support", f"its running gear slipped in {what}; at full duty it climbs edges up " \
+            f"to {climb:.2f} cm", part
+    return "step_higher_than_climbable", f"its running gear slipped on {what}; at full duty it climbs edges up to " \
+        f"{climb:.2f} cm", part
 
 
 class _Calm:
@@ -326,21 +341,9 @@ def _attempt(s: Spec, route: list[dict[str, Any]], secs: float, ctl: dict[str, f
         mu, crr = _mu(s, surf) * (1 + rng.normal(0.0, 0.03)), _crr(s, surf)
         dist, force, duty = f.get("len", 0.3), crr * s.m * G, ctl["dark" if k == "dark" else "speed"]
         vsafe, steer, fail = math.inf, True, None
-        if k == "step":
-            fail = _edge(s, f["h"], mu, ctl["approach"])
-        elif k == "trench" and s.loco == "tracks":
-            if f["w"] > 0.45 * s.track:
-                fail = ("gap_longer_than_support", f"the {f['w']:.1f} cm trench is longer than the "
-                        f"{0.45 * s.track:.1f} cm the {s.track:.0f} cm tracks bridge with the centre of mass "
-                        "still supported", 0.0)
-        elif k == "trench":
-            half = f["w"] / 2
-            drop = f["depth"] if half >= s.r else min(f["depth"], s.r - math.sqrt(s.r ** 2 - half ** 2))
-            fail = _edge(s, drop, mu, ctl["approach"])
-            if fail and fail[0] == "step_higher_than_climbable":
-                fail = ("gap_longer_than_support", f"each {s.r:.1f} cm wheel spans {2 * s.r:.1f} cm, drops "
-                        f"{drop:.2f} cm into the {f['w']:.1f} cm trench and climbs out of at most "
-                        f"{_step_max(s, mu):.2f} cm", 0.0)
+        approach = 1.0 if probe else ctl.get("approach", 1.0)
+        if k in ("step", "trench"):
+            fail = _edge(s, f, mu * s.edge, approach)
         elif k == "gap":
             margin, sig = (f["w"] - s.width) / 2, s.drift * (0.3 + 0.7 * duty)
             err = (0.0 if probe else ctl["line"] - nominal["off"]) + rng.normal(0.0, sig)
@@ -348,22 +351,33 @@ def _attempt(s: Spec, route: list[dict[str, Any]], secs: float, ctl: dict[str, f
             if margin <= 0:
                 fail = ("chassis_wider_than_gap", f"the robot is {s.width:.1f} cm wide overall; the opening is "
                         f"{f['w']:.1f} cm", 0.0)
-            elif abs(err) >= margin or (probe and narrow):
-                fail = ("gap_margin_below_drift" if narrow else "clipped_gap_edge",
-                        f"{margin:.2f} cm to spare per side; it passed {err:+.2f} cm off centre (steering error "
-                        f"sigma {sig:.2f} cm at duty {duty:.2f})", 0.5 * max(0.0, 1 - (abs(err) - margin) / 5))
+            elif probe and narrow:
+                fail = ("gap_margin_below_drift", f"{margin:.2f} cm to spare per side; its steering error is sigma "
+                        f"{s.drift * 0.405:.2f} cm even at the slowest duty", 0.0)
+            else:  # it drives straight at the jambs from its line's error
+                ep = _drive(s, "gap", f | {"off": -err}, mu, 1.0 if probe else duty)
+                if not ep.ok:
+                    fail = ("gap_margin_below_drift" if narrow else "clipped_gap_edge",
+                            f"{margin:.2f} cm to spare per side; it came {err:+.2f} cm off centre (steering error "
+                            f"sigma {sig:.2f} cm at duty {duty:.2f}) and met the jamb: {ep.detail}", 0.5 * ep.progress)
         elif k == "ramp":
             th = math.radians(f["deg"])
-            need, force = math.tan(th) + crr, s.m * G * (math.sin(th) + crr * math.cos(th))
-            if need > mu:
-                fail = ("slips_on_ramp", f"holding the slope needs mu {need:.2f} (tan + rolling resistance); its "
-                        f"contacts give {mu:.2f} on {surf}", 0.0)
-            elif force > 0.95 * s.f_stall:
-                fail = ("motor_torque_short_on_ramp", f"climbing needs {force:.1f} N of push; the drive stalls at "
-                        f"{s.f_stall:.1f} N", 0.0)
+            force = s.m * G * (math.sin(th) + crr * math.cos(th))
+            ep = _drive(s, "ramp", f, mu, 1.0 if probe else duty)
+            what = f"the {f['deg']:.1f} deg {surf} ramp (mu {mu:.2f}) at duty {duty:.2f}: {ep.detail}"
+            if ep.ok:
+                pass
+            elif ep.why == "tipped":
+                fail = ("tipped_over", f"tipped over on {what}", 0.5 * ep.progress)
+            elif ep.why in ("stuck_stalled", "slow"):
+                fail = (("stalled_at_low_duty", f"the drive stalled on {what}") if duty < 0.999 and not probe else
+                        ("motor_torque_short_on_ramp", f"climbing needs {force:.1f} N of push; the drive stalls at "
+                         f"{s.f_stall:.1f} N; on {what}")) + (0.5 * ep.progress,)
+            else:
+                fail = ("slips_on_ramp", f"its contacts slipped on {what}", 0.5 * ep.progress)
         elif k == "sand":
             p = s.m * G / (s.area * 1e-4) / 1000
-            z, out = p / f["kmod"], s.belly if s.loco == "tracks" else min(s.belly, _step_max(s, mu))
+            z, out = p / f["kmod"], s.belly if s.loco == "tracks" else min(s.belly, _climb(s, surf, standing=True))
             if z > out:
                 fail = ("sinks_in_sand", f"ground pressure {p:.2f} kPa on {s.area:.0f} cm2 of contact sinks it "
                         f"{z:.2f} cm; it climbs out of {out:.2f} cm (belly clearance {s.belly:.1f} cm)", 0.0)
@@ -545,14 +559,11 @@ class MobileWorld:
                 f"belly clearance {s.belly:.1f} cm",
                 f"drive: {s.n} motors at {s.volts:.1f} V; stall force at the ground {s.f_stall:.1f} N ({s.f_stall / (s.m * G):.2f} of its "
                 f"weight); no-load speed {s.v_nl:.2f} m/s",
-                "edges it can climb: " + ", ".join(f"{_step_max(s, _mu(s, e)):.2f} cm on {e} (mu {_mu(s, e):.2f})"
-                                                     for e in edges)]
-        if s.loco in ("wheels4", "mecanum4"):
-            hs = [h for h in np.linspace(0.05, s.r, 200) if s.belly >= _belly_need(s, float(h))]
-            rows.append(f"the rigid tub clears edges up to {max(hs, default=0.0):.2f} cm with its {s.belly:.1f} cm "
-                        f"belly and {s.base:.0f} cm wheelbase")
-        rows.append(f"gaps: bridges {0.45 * s.track:.1f} cm with its centre of mass supported" if s.loco == "tracks"
-                    else f"gaps: a wheel spans {2 * s.r:.1f} cm; over a wider trench it drops to the bottom")
+                "edges it climbs at full duty, driven in MuJoCo: " + ", ".join(
+                    f"{_climb(s, e):.2f} cm on {e} (mu {_mu(s, e) * s.edge:.2f})" for e in edges)]
+        rows.append(f"gaps: a {s.track:.0f} cm track bridges about {0.45 * s.track:.1f} cm with its centre of mass "
+                    "supported" if s.loco == "tracks" else
+                    f"gaps: a wheel spans {2 * s.r:.1f} cm; over a wider trench it drops to the bottom")
         for surf in sorted({f["s"] for f in feats if f["k"] == "ramp"}):
             c, mu = _crr(s, surf), _mu(s, surf)
             arg = 0.95 * s.f_stall / (s.m * G * math.sqrt(1 + c * c))
@@ -561,7 +572,7 @@ class MobileWorld:
                         f"(mu {mu:.2f}, rolling resistance {c:.3f}); the stall force alone would climb {torque}")
         for kmod in sorted({round(f["kmod"], 2) for f in feats if f["k"] == "sand"}):
             p = s.m * G / (s.area * 1e-4) / 1000
-            out = s.belly if s.loco == "tracks" else min(s.belly, _step_max(s, _mu(s, "sand")))
+            out = s.belly if s.loco == "tracks" else min(s.belly, _climb(s, "sand", standing=True))
             rows.append(f"soft ground: {s.area:.0f} cm2 of contact, ground pressure {p:.2f} kPa; it would sink "
                         f"{p / kmod:.2f} cm where {kmod:.2f} kPa sinks 1 cm, and is stuck deeper than {out:.2f} cm "
                         + ("(its belly)" if s.loco == "tracks" else "(its belly, or the rut edge it can climb)"))

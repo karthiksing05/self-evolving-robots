@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import dataclasses
 import itertools
 import time
 
@@ -12,7 +11,8 @@ import pytest
 from sea.evolve.core import Body, Edit, World, apply
 from sea.evolve.loop import RunConfig, held_groups, run
 from sea.evolve.resources import check
-from sea.worlds.mobile import PROBE, ROUTES, SURF, MobileWorld, _attempt, _Calm, _spec, _step_max
+from sea.sim import mobile_model as MM
+from sea.worlds.mobile import PROBE, ROUTES, MobileWorld, _attempt, _Calm, _climb, _drive, _robot, _spec
 
 W = MobileWorld()
 CAT = {p.name: p for p in W.catalogue()}
@@ -54,22 +54,24 @@ def test_protocol_tasks_and_catalogue():
         assert not any(g in pt.provides or g.replace("_", " ") in pt.provides for g in GROUPS)
     assert 5 <= len(W.principles()) <= 8
     brief = W.brief(stock, TRAIN)
-    for fact in ("wide overall", "edges it can climb", "ground pressure", "Wh usable", "sensing in the dark"):
+    for fact in ("wide overall", "edges it climbs at full duty", "ground pressure", "Wh usable", "sensing in the dark"):
         assert fact in brief
     assert "swap" not in brief and "tracks" not in brief  # facts about this body, not advice
 
 
-def test_edge_climbing_follows_the_quasi_static_rule():
+def test_edges_are_driven_in_mujoco_and_climbed_as_a_vehicle_climbs_them():
     small = _spec(_body(Edit(slot="locomotion", params={"wheel_radius": 2.5})))
     big = _spec(_body(Edit(slot="locomotion", params={"wheel_radius": 4.5})))
-    assert _step_max(big, 0.6) > _step_max(small, 0.6) > _step_max(small, 0.4)  # radius and traction both help
-    alone = dataclasses.replace(small, f=1.0)  # nothing pushes from behind: the single-wheel result
-    assert abs(_step_max(alone, 0.6) - 2.5 * (1 - 1 / np.sqrt(1 + 0.36))) < 1e-9
-    assert _step_max(small, 0.6) > _step_max(alone, 0.6)  # all-wheel drive pushes the climbing wheel
-    assert all(_step_max(_spec(_body(Edit(slot="locomotion", params={"wheel_radius": r}))), mu) <= r + 1e-9
-               for r in (2.0, 3.0, 4.5) for mu in (0.5, 1.0, 3.0))  # never above the radius
-    tracks = _spec(_body(*GOLD))
-    assert _step_max(tracks, 0.6) == 0.9 * 6.6  # tracks: the edge must meet the sloped front run
+    assert _climb(big, "concrete") > _climb(small, "concrete") > _climb(small, "wood")  # radius and traction help
+    edge = {"k": "step", "s": "concrete", "h": 2.0}
+    assert _drive(small, "step", edge, 0.75, 1.0).ok and not _drive(small, "step", edge | {"h": 6.0}, 0.75, 1.0).ok
+    tracks, low = _spec(_body(*GOLD)), _spec(_body(*GOLD[1:], Edit(slot="locomotion", type="tracks",
+                                                                     params={"track_length": 24.0, "idler_height": 3.0})))
+    assert _climb(tracks, "concrete") > 5.5 > _climb(low, "concrete")  # the edge must meet the sloped front run
+    ep = MM.episode(_robot(tracks, "concrete"), "step", {"h": 5.5}, 0.75, 1.0, trace=True)
+    assert ep.ok and ep.qpos[-1][2] > 0.055  # it ends on top of the step, on its running gear
+    slow = _drive(tracks, "step", {"k": "step", "s": "concrete", "h": 5.5}, 0.75, 0.2)
+    assert not slow.ok and slow.why.startswith("stuck")  # at a low duty the drive cannot lift it over the edge
 
 
 def test_width_ground_pressure_trench_and_energy():
@@ -81,8 +83,9 @@ def test_width_ground_pressure_trench_and_energy():
     assert _spec(_body(*GOLD)).m / _spec(_body(*GOLD)).area < light.m / light.area / 3  # tracks spread it
     short = _body(*GOLD[1:], Edit(slot="locomotion", type="tracks", params={"track_length": 18.0,
                                                                               "idler_height": 6.0}))
-    out = W.solve(short, TASK["garden"])
-    assert not out.success and out.mechanism == "gap_longer_than_support"  # 9 cm > 0.45 x 18 cm
+    assert W.solve(short, TASK["garden"]).success  # a rigid run bridges a trench up to about half its length
+    out = W.solve(W.stock(), TASK["garden"])
+    assert not out.success and out.mechanism == "belly_hits_step_edge"  # 6 cm wheels drop into the 9 cm trench
     assert W.solve(_body(*GOLD), TASK["garden"]).success
     small, big = (W.solve(_body(Edit(slot="battery", params={"capacity": c})), TASK["lawn"]) for c in (4.8, 9.6))
     assert not small.success and small.mechanism == "battery_exhausted" and big.success
@@ -92,8 +95,8 @@ def test_stock_holds_the_floors_and_fails_the_rest_for_physical_reasons():
     held, outs = _held(W.stock())
     assert held == {"kitchen", "living_room", "under_sofa", "shed", "lawn"}  # four cells (D-062) reach the lawn's end
     assert {g: o.mechanism for g, o in outs.items() if g not in held} == {
-        "bedroom": "chassis_wider_than_gap", "hallway": "sensing_range_short", "porch": "step_higher_than_climbable",
-        "garden": "gap_longer_than_support", "sandbox": "sinks_in_sand"}
+        "bedroom": "chassis_wider_than_gap", "hallway": "sensing_range_short", "porch": "belly_hits_step_edge",
+        "garden": "belly_hits_step_edge", "sandbox": "sinks_in_sand"}
     for g, o in outs.items():
         if g not in held:
             assert o.score < 1 and any(c.isdigit() for c in o.detail) and ("cm" in o.detail or " s " in o.detail
@@ -105,20 +108,23 @@ def test_stock_holds_the_floors_and_fails_the_rest_for_physical_reasons():
         assert h == held | {gain}
 
 
-def test_no_parameter_setting_of_the_stock_parts_holds_everything():
-    s = _spec(_body(Edit(slot="locomotion", params={"wheel_radius": 4.5})))
-    assert _step_max(s, SURF["concrete"][0] * 1.1) < 5.5  # the largest wheel cannot meet the porch's edge
+def test_stock_parts_reach_the_porch_garden_and_sandbox_by_parameters_but_never_the_dark_hallway():
     loco = CAT["wheels4"].params["wheel_radius"]
     for r, w, ride, cap, gear in itertools.product(np.linspace(loco.lo, loco.hi, 4), (10.0, 18.0), (1.0, 4.0),
-                                                   (2.4, 19.2), (50.0, 298.0)):
+                                                   (9.6, 14.4), (50.0, 298.0)):  # 4.8 and 7.2 V (D-062)
         body = _body(Edit(slot="locomotion", params={"wheel_radius": float(r)}),
                      Edit(slot="chassis", params={"width": w, "ride_height": min(ride, float(r) + 1.5)}),
                      Edit(slot="battery", params={"capacity": cap}), Edit(slot="drive", params={"gear_ratio": gear}))
-        assert not any(W.solve(body, TASK[g]).success for g in ("porch", "garden", "hallway"))
-    best = _body(Edit(slot="locomotion", params={"wheel_radius": 4.2}), Edit(slot="battery", params={"capacity": 9.6}),
-                 Edit(slot="chassis", params={"width": 12.0, "ride_height": 4.0}))
-    held, outs = _held(best)
-    assert {"porch", "garden", "sandbox", "hallway"}.isdisjoint(held) and outs["sandbox"].mechanism == "sinks_in_sand"
+        assert not W.solve(body, TASK["hallway"]).success  # a bump switch cannot see: a part must change
+    # driven in MuJoCo (D-063), three routes the closed form called impossible yield to parameters:
+    hop = _body(Edit(slot="locomotion", params={"wheel_radius": 3.67}), Edit(slot="drive", params={"gear_ratio": 50.0}),
+                Edit(slot="chassis", params={"width": 10.0, "ride_height": 4.0}))
+    assert W.check(hop) == [] and W.solve(hop, TASK["porch"]).success  # fast big wheels hop the 5.5 cm edge
+    assert W.solve(hop, TASK["sandbox"]).success  # and pop a wheelie out of their own rut
+    sled = _body(Edit(slot="locomotion", params={"wheel_radius": 2.83}),
+                 Edit(slot="chassis", params={"width": 10.0, "ride_height": 1.0}))
+    assert W.check(sled) == [] and W.solve(sled, TASK["garden"]).success  # the low tub slides over the trench
+    assert not W.solve(W.stock(), TASK["porch"]).success
 
 
 def test_a_gold_body_from_the_catalogue_holds_every_group_within_budget():
@@ -132,14 +138,14 @@ def test_a_gold_body_from_the_catalogue_holds_every_group_within_budget():
 
 
 def test_distractors_cost_held_groups_or_cannot_be_built():
-    _, outs = _held(_body(Edit(slot="locomotion", type="mecanum4")))
-    assert not outs["kitchen"].success and not outs["shed"].success  # rollers: low edge and slope traction
+    mec, _ = _held(_body(Edit(slot="locomotion", type="mecanum4")))
+    assert mec <= _held(W.stock())[0]  # dearer wheels that gain nothing
     rb = _body(Edit(slot="locomotion", type="rocker_bogie6", params={"wheel_radius": 6.0, "bogie_length": 14.0}),
                Edit(slot="battery", type="liion_pack"))
     assert W.check(rb) == [] and W.solve(rb, TASK["garden"]).success
     out = W.solve(rb, TASK["under_sofa"])
     assert not out.success and out.mechanism == "too_tall_for_clearance"
-    assert W.solve(rb, TASK["porch"]).mechanism == "stall_or_bounce_at_step"  # geared too fast for its big wheels
+    assert W.solve(rb, TASK["porch"]).success  # 6 cm wheels behind a pushing bogie take the 5.5 cm step
     assert W.solve(_body(Edit(slot="sensor", type="ultrasonic")), TASK["hallway"]).success
     cam = W.solve(_body(Edit(slot="sensor", type="camera")), TASK["hallway"])
     assert not cam.success and cam.mechanism == "sensing_range_short"
@@ -186,13 +192,13 @@ def test_mechanism_names_the_body_or_the_search():
     assert not ok and mech == "clipped_gap_edge"  # the controls were wrong...
     assert _attempt(gold, bedroom, 60, PROBE, _Calm(), probe=True)[0]  # ...the body was fine
     ok, _, mech, _ = _attempt(stock, ROUTES["porch"][2], 40, PROBE, _Calm(), probe=True)
-    assert not ok and mech == "step_higher_than_climbable"
+    assert not ok and mech == "belly_hits_step_edge"  # at full duty the wheels hop the edge and the tub grounds
 
 
 def test_speed_and_the_loop(tmp_path):
     t0 = time.perf_counter()
     out = W.solve(W.stock(), TASK["porch"])
-    assert time.perf_counter() - t0 < 0.5 and out.attempts >= 24 and out.sim_s < 0.5
+    assert time.perf_counter() - t0 < 10 and out.attempts >= 24 and out.sim_s < 10  # MuJoCo at the step (D-063)
     s = run(RunConfig(world="mobile", arm="random", iterations=2, seed=1), tmp_path / "random", world=MobileWorld(),
             log=lambda m: None)
     assert s["arm"] == "random" and len(s["curve"]) >= 2 and s["test"]["n"] == 20

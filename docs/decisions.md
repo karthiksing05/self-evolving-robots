@@ -1672,3 +1672,49 @@ Three fixes failed on the way, each for a reason:
 - Seed 0's final body is unchanged (13.3 N). Seed 1's pushes 16.0 N. Seed 2's is refused, as predicted.
 - A side effect: at 4.8 V, six rocker-bogie motors draw 3.6 A at stall, under the NiMH pack's 4 A, so that check no longer refuses the rocker-bogie on the stock pack. At 7.2 V they draw 5.4 A and are refused.
 - Tests: `test_world_mobile.py::test_the_pack_voltage_drives_the_motors_within_the_winding_range`; three tests updated for the new stock body.
+
+## D-063 Steps, trenches, ramps and openings are driven in MuJoCo (judge: world_mobile)
+**Observed.** The mobile world walked every obstacle with closed-form vehicle mechanics. Its films were animations of the verdict. When a robot clipped a door jamb, the film drew the jamb through the robot (the user saw it), and the tracks floated beside the hull. The world's results could not be called physics.
+
+**Change.**
+- `src/sea/sim/mobile_model.py` (component `world_mobile`) builds the body in MuJoCo from the world's numbers in the CAD's layout:
+  - wheels on driven hinges;
+  - the rocker-bogie as real rockers and bogies on pivots, with the two rockers tied by a differential (q_left = −q_right);
+  - tracks as a dense row of rollers along the bottom run and up the sloped front run, each coupled to the drive sprocket at equal surface speed by a stiff joint equality (the belt is drawn only).
+- Each driven joint has a general actuator on the DC motor's torque-speed line at the pack's voltage (D-062), clamped at stall, with the rotor's inertia reflected through the gearbox. Rolling resistance is the world's C_rr as joint friction. Contacts are stiff (4 ms on a 1 ms step) with elliptic cones.
+- Every terrain edge is rounded 3 mm. A sharp MuJoCo box edge takes its contact normal from one face: a track met a step's corner with the normal pointing straight back, and was pushed off it.
+- An episode starts the robot 2 cm short of the obstacle, measured from its real extent, at the speed its motors hold on the flat at that duty. It ends when the rear is past, it is stuck (under 5 mm in 0.8 s), it tips past 70°, or time runs out.
+- What MuJoCo decides:
+  - **step and trench**, at the approach duty: past; the belly on the edge (`belly_hits_step_edge`); stalled below full duty (`stalled_at_step`, control-level) or at it (`motor_torque_short_on_step`); slipping (`step_higher_than_climbable`, or `gap_longer_than_support` in a trench); thrown back (`bounced_off_step`); tipped over (`tipped_over`, new);
+  - **ramp**, at the cruise duty: slipping (`slips_on_ramp`) or stalled;
+  - **opening**: the robot starts at its line's error and drives straight at two jambs, and a robot that touches one is stopped by it (`clipped_gap_edge`). A chassis wider than the opening is still refused geometrically.
+- Search sees the same physics. Each episode's arguments are quantised (duty 0.05, friction 0.03, heights 1 mm, line 2.5 mm) and cached, so attempts that differ by less share one episode.
+- The edge a body climbs (in the brief, and for climbing out of its own rut in sand) is measured in MuJoCo at full duty by bisection.
+- Sand (Winkler), the low overhang, the dark corridor and energy stay as they were: MuJoCo's soft contact is not sinkage, and the other three are geometry and bookkeeping.
+
+**Prediction.**
+- The stock body still holds kitchen, living room, under the sofa, the shed and the lawn, and still fails the porch on the step. MuJoCo lets its 3 cm wheels climb more than the closed form's 1.97 cm (about 2.5 cm on 0.7 friction), which is still short of 5.5 cm.
+- Seeds 0 and 1's track bodies (idlers 7.0 and 6.5 cm) still hold all 10 routes, but only near full approach duty on the porch. In the prototype a 6.5 cm idler climbed 5.5 cm at duty 1.0 and stalled at 0.5.
+- A solve takes seconds instead of milliseconds. A campaign seed runs 20–60 minutes instead of 2.
+
+**Measured.**
+- **Stock:** the same 5 routes, solved in 2.6 s, against milliseconds before. Its failures are now physical. On the porch it reaches the 5.5 cm edge at 0.89 duty, hops it, and grounds its 2 cm belly on the edge. In the garden it drops into the trench and grounds there. Both were `step_higher_than_climbable` and `gap_longer_than_support`.
+- **Seeds 0–2's track bodies:** 10/10 each, in 12–24 s. The prediction that the porch needs near-full duty was wrong: once the edges were rounded (below), a 6.5 cm idler climbs 5.5 cm at 0.4 duty and stalls at 0.2–0.3.
+- **Climb limits come from dynamics as well as statics.** The closed form allowed a 3 cm wheel 1.97 cm on a 0.7 edge; MuJoCo gives about 3.6 cm from a run-up. Two effects the closed form did not have:
+  - an impact's friction impulse lifts a wheel that meets an edge at speed (μ v up, here about 1 m/s);
+  - four N20s at stall from rest put about 0.38 N·m on a 0.43 kg chassis. That equals its weight's moment about the rear axle, so the nose lifts about 3 cm (a wheelie), and the front wheels land on top of an edge they could not roll up.
+
+  With near-zero friction, no wheel climbs any edge from rest (checked), so the lift is not a contact artifact.
+- **Found while building, not predicted: three contact artifacts, each fixed before measuring.**
+  - The motor rotor's inertia on all 26 coupled rollers of a track made it about 50 times harder to spin than the robot was to push. Only the sprocket now carries J × ratio².
+  - Measured from the tub, a track's front run started 2.7 cm inside the step and was launched backwards. Placement now uses the compiled model's real extent.
+  - A sharp box corner took its contact normal from one face: a wheel met a step corner with a normal of (0.41, −0.91) instead of the true (−0.94, 0.33), and was lifted by it. Every edge is now two boxes tangent to a 3 mm rounded nosing.
+  - Under load, the track couplings slip at most 0.64 mm of belt over a climb.
+- **What parameters alone now reach** (`test_world_mobile.py::test_stock_parts_reach_the_porch_garden_and_sandbox_by_parameters_but_never_the_dark_hallway`):
+  - 3.67 cm wheels at 50:1 with a 4 cm belly hop the porch and pop out of the sandbox rut;
+  - a tub with a 1 cm belly slides over the garden trench on its belly;
+  - no setting of the stock parts holds the dark hallway, which needs a sensor.
+
+  The closed form said four routes needed new parts; physics says one. The redesigns System 2 found (tracks, a sonar) remain one way through. The mobile campaign is re-run under this key.
+- **Mecanum:** its wheels are cylinders with the world's reduced friction, not rollers. A thin spot under invariant 11, and the reason the mecanum distractor now matches the stock wheels instead of losing to them.
+- **Tests:** `test_world_mobile.py` rewritten from the closed-form rules to these outcomes (the climb, the stalled track, the trench, the distractors, the stock's mechanisms).
