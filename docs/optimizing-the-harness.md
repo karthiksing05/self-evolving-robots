@@ -152,6 +152,16 @@ three System 2 seeds, 30 random-arm seeds and the stock body:
   - that is inside the 19–21 range of the two-placement seeds.
 
   Separating the two would take several seeds of each.
+- **The harder worlds, under the mechanism laws** (`results/evolve/mobile_randmj.json`,
+  `phonology_randsnd.json`; 30 random seeds each, at most 10 iterations, same screen and trials):
+  - mobile, 13 routes in MuJoCo: random held 8.8 train (7–12) and 8.3 test, solving 0 of 30. Patio
+    held on no seed, porch and sandbox on 7. System 2 held 13/13 on all three seeds in 2–3
+    iterations (test 13, 12, 13). The stock body holds 6.
+  - phonology, 17 sounds: random held 12.8 train (7–17) and 11.7 test, solving 2 of 30; /ta/ held
+    on 7. System 2 held 17, 16 and 17 in 9, 10 and 2 iterations, 15 test on every seed. The stock
+    holds 6.
+  - The gap is widest on the routes and sounds that need several slots changed together: the patio
+    (tracks, pack and clearance) and /ta/.
 
 ## Failure modes to watch
 
