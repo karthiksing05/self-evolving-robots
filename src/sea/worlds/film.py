@@ -10,9 +10,10 @@ Each film replays one attempt with the controls the run recorded, so nothing is 
   and the sound. The sound is a 120 Hz pulse train through the simulator's own transfer function. A
   stop is heard inside a vowel (/a·C·a/), with a release burst shaped by the cavity in front of the
   closure (`_utter`).
-- **Mobile explorer:** an animation of the simulator's verdict, not physics. The world is quasi-static,
-  so the CAD is posed over terrain built from the route's features, settled where its wheels or tracks
-  rest. It stops where the replayed attempt, at the route's nominal dimensions, failed.
+- **Mobile explorer:** the simulator itself (D-063). Each step, trench, ramp and opening on the route is the
+  judge's MuJoCo episode at the recorded controls, rerun with its trajectory, up to where the robot
+  stopped. A failure MuJoCo does not drive (sand, an overhang, the dark, the battery) ends on a still
+  with the world's numbers.
 
 This module is kept out of the world modules, as the CAD is (sea/worlds/cad.py): a film is not part of
 the ruler.  ``FILM`` maps a world's name to its function.
@@ -660,231 +661,111 @@ def phonology(body: Body, task: Task, controls: dict[str, float], seed: int = 0,
     return Clip([caption(img, bottom=said)] * int(len(audio) * FPS / SR), ok, said, audio)
 
 
-# ---------------------------------------------------------------- the mobile explorer: an animation of the verdict
-SHOW_M = {"floor": 0.35, "ramp": 0.45, "sand": 0.45, "low": 0.4, "dark": 0.55}  # metres shown of each long feature
-
-
-def _terrain(route: list[dict]) -> tuple[list[tuple[str, float, float, dict]], np.ndarray, np.ndarray]:
-    """Lay the route's features out along x (mm): each as (kind, start, end, feature), and the ground's height
-    profile (x, z), with long features shortened for the screen."""
-    x, z, out = 300.0, 0.0, []
-    xs, zs = [0.0], [0.0]
-    for f in route:
-        k = f["k"]
-        if k == "step":
-            xs += [x, x + 0.01]
-            zs += [z, z + 10 * f["h"]]
-            z += 10 * f["h"]
-            out.append((k, x, x + 1, f))
-            x += 120
-        elif k == "trench":
-            w, d = 10 * f["w"], 10 * f["depth"]
-            xs += [x, x + 0.01, x + w, x + w + 0.01]
-            zs += [z, z - d, z - d, z]
-            out.append((k, x, x + w, f))
-            x += w + 120
-        elif k == "ramp":
-            run = 1000 * SHOW_M["ramp"]
-            xs += [x, x + run]
-            zs += [z, z + run * math.tan(math.radians(f["deg"]))]
-            z = zs[-1]
-            out.append((k, x, x + run, f))
-            x += run
-        elif k == "gap":
-            out.append((k, x, x + 60, f))
-            x += 260
-        else:
-            run = 1000 * min(f.get("len", 0.3), SHOW_M.get(k, 0.35))
-            out.append((k, x, x + run, f))
-            x += run
-        xs.append(x)
-        zs.append(z)
-    xs.append(x + 400)
-    zs.append(z)
-    return out, np.array(xs), np.array(zs)
-
-
-def _settle(bottom: np.ndarray, com: np.ndarray, gx: np.ndarray, gz: np.ndarray, x0: float, sink: float = 0.0) -> tuple[float, float]:
-    """Pitch (rad) and lift (mm) that rest a body's side outline, shifted ``x0`` along the ground, on the
-    terrain with its centre of mass lowest (quasi-static).  The outline is every drawn point, not only the
-    lowest: a wheel's front or a track's leading run meets a step's riser above the body's bottom, and with
-    only the bottom points it was drawn through the riser."""
-    best = (math.inf, 0.0, 0.0)
-    for th in np.radians(np.arange(-40, 41, 1.0)):
-        c, s = math.cos(th), math.sin(th)
-        px = x0 + bottom[:, 0] * c - bottom[:, 1] * s
-        pz = bottom[:, 0] * s + bottom[:, 1] * c
-        lift = float(np.max(np.interp(px, gx, gz) - pz)) - sink
-        h = lift + com[0] * s + com[1] * c
-        if h < best[0] - 1e-6:
-            best = (h, th, lift)
-    return best[1], best[2]
+# ---------------------------------------------------------------- the mobile explorer: MuJoCo at each obstacle
+GROUND = {"concrete": (0.70, 0.70, 0.68), "tile": (0.86, 0.85, 0.81), "wood": (0.66, 0.52, 0.38),
+          "carpet": (0.55, 0.50, 0.60), "gravel": (0.60, 0.58, 0.54), "grass": (0.45, 0.62, 0.36),
+          "sand": (0.86, 0.78, 0.55)}
+RUBBER, JAMB = (0.13, 0.13, 0.14, 1.0), (0.62, 0.48, 0.34, 1.0)
+PHYSICAL = ("step", "trench", "ramp", "gap")  # what MuJoCo drives (D-063); the rest is the world's calculation
 
 
 @dataclass
-class Drive:
-    """A mobile film's course: the drawn body, the terrain, and the body's pose (x, pitch, lift) per frame."""
-
-    model: Any
-    feats: list[tuple[str, float, float, dict]]
-    gx: np.ndarray
-    gz: np.ndarray
-    poses: list[tuple[float, float, float]]
-    detail: str
-    ok: bool
-    mech: str
-    front: float
-    sink: float = 0.0  # mm the last pose sinks into sand: the verdict, drawn
-
-    def clipping_mm(self) -> float:
-        """Deepest a drawn point goes below the ground over the course, beyond the sand's sinkage."""
-        pts = np.vstack([p.mesh.vertices for p in self.model.parts])[:, [0, 2]]
-        deepest = 0.0
-        for x0, th, lift in self.poses:
-            c, s = math.cos(th), math.sin(th)
-            px, pz = x0 + pts[:, 0] * c - pts[:, 1] * s, pts[:, 0] * s + pts[:, 1] * c + lift
-            deepest = max(deepest, float(np.max(np.interp(px, self.gx, self.gz) - pz)))
-        return max(0.0, deepest - self.sink)
+class Leg:
+    feature: dict
+    ep: Any  # sea.sim.mobile_model.Episode, traced
 
 
-def drive(body: Body, task: Task, controls: dict[str, float]) -> Drive:
-    """Where the robot is in each frame: driven along its route as the simulator's verdict says, stopping
-    where the replayed attempt (at the route's nominal dimensions) failed."""
+def legs(body: Body, task: Task, controls: dict[str, float]) -> tuple[bool, str, str, list[Leg]]:
+    """The route at its nominal dimensions, as the world judges it, and the MuJoCo episode of every obstacle the
+    robot reached: (success, mechanism, detail, legs).  Each episode is the judge's own, rerun with its trace."""
     s = M._spec(body)
     route, secs = task.data["route"], float(task.data["secs"])
     ctl = {**M.PROBE, **controls}
     ok, _, mech, detail = M._attempt(s, route, secs, ctl, M._Calm())
     hit = re.search(r"stopped at feature (\d+)/", detail)
-    stop_at = int(hit.group(1)) - 1 if hit else None  # a run that is only too slow drives the whole route
-    feats, gx, gz = _terrain(route)
-    model = C.mobile(body)
-    verts = np.vstack([p.mesh.vertices for p in model.parts])
-    outline = verts[:, [0, 2]]
-    outline = outline[:: max(1, len(outline) // 4000)]
-    com = verts[:, [0, 2]].mean(0)
-    front = float(verts[:, 0].max())
-    sink = 0.0
-    if stop_at is None:
-        x_end = gx[-1] - 400 - front
-    else:
-        kind, a, b, f = feats[stop_at]
-        x_end = {"trench": a + 20, "sand": (a + b) / 2, "dark": b - 60}.get(kind, a - 5) - (0 if kind in ("trench", "sand", "dark") else front)
-        if kind == "sand":
-            sink = 10 * min(4.0, s.m * M.G / (s.area * 1e-4) / 1000 / f["kmod"])
-        if detail.find("ran out") >= 0:
-            x_end = (a + b) / 2 - front
-    xs = np.linspace(0.0, max(x_end, 0.0), max(12, int(abs(x_end) / 12)))
-    poses = [(float(x0), *_settle(outline, com, gx, gz, x0, sink if (i == len(xs) - 1 and sink) else 0.0))
-             for i, x0 in enumerate(xs)]
-    return Drive(model, feats, gx, gz, poses, detail, ok, mech, front, sink)
+    upto = int(hit.group(1)) if hit else len(route)
+    out = []
+    for f in route[:upto]:
+        k, mu = f["k"], M._mu(s, f["s"])
+        if k in ("step", "trench"):
+            out.append(Leg(f, M._drive(s, k, f, mu * s.edge, ctl["approach"], trace=True)))
+        elif k == "ramp":
+            out.append(Leg(f, M._drive(s, k, f, mu, ctl["speed"], trace=True)))
+        elif k == "gap" and f["w"] > s.width:
+            out.append(Leg(f, M._drive(s, k, f | {"off": f["off"] - ctl["line"]}, mu, ctl["speed"], trace=True)))
+    if not out or (not ok and route[upto - 1]["k"] not in PHYSICAL):  # it stopped where MuJoCo does not drive
+        last = route[upto - 1]
+        out.append(Leg(last, M._drive(s, "floor", {"k": "floor", "s": last["s"]}, M._mu(s, last["s"]), 0.0,
+                                      trace=True)))
+    return ok, mech, detail, out
 
 
-def mobile(body: Body, task: Task, controls: dict[str, float], seed: int = 0, size: tuple[int, int] = (480, 300)) -> Clip:
-    """The robot driven along its route as the simulator's verdict says (``drive``): it stops where the
-    replayed attempt (at the route's nominal dimensions, so ``seed`` is unused) failed, and says why."""
-    import vtk
-    from vtk.util.numpy_support import vtk_to_numpy
+def _dress_mobile(m, surf: str) -> None:
+    """Colours for the film's copy of an episode's model: visual fields only.  The jamb on the camera's side is
+    drawn translucent so it does not hide the robot passing it.  A plane's size is drawn only (it collides
+    everywhere), so the floor is drawn as a stage inside the studio lights."""
+    for g in range(m.ngeom):
+        name, body = m.geom(g).name, m.geom_bodyid[g]
+        if m.geom_type[g] == 0:  # the floor plane: a stage inside the lights, the backdrop beyond it
+            m.geom_size[g][:2] = (3.0, 3.0)
+        if body == 0:
+            jamb = name.startswith(("jamb", "obstacle")) and m.geom_size[g][2] > 0.1
+            m.geom_rgba[g] = ((*JAMB[:3], 0.28) if m.geom_pos[g][1] < 0 else JAMB) if jamb else \
+                (*GROUND.get(surf, (0.7, 0.7, 0.7)), 1.0)
+        elif name == "tub":
+            m.geom_rgba[g] = PLA
+        elif m.geom_type[g] == 5:  # cylinders: wheels, rollers
+            m.geom_rgba[g] = RUBBER
+        else:
+            m.geom_rgba[g] = (0.72, 0.72, 0.70, 1.0)
+    m.light_diffuse[:], m.light_specular[:], m.light_castshadow[:] = 0.12, 0.0, False
+    m.vis.headlight.ambient[:], m.vis.headlight.diffuse[:], m.vis.headlight.specular[:] = 0.34, 0.30, 0.05
+    m.vis.headlight.active = 1
+    m.vis.quality.shadowsize, m.vis.quality.offsamples = 8192, 4
+    m.vis.rgba.fog[:] = (*(CYC[1] / 255), 1.0)  # the floor fades into the backdrop instead of into the dark
+    m.vis.map.fogstart, m.vis.map.fogend = 0.8 / m.stat.extent, 2.2 / m.stat.extent
 
-    from sea.design.cad import MATERIALS, _polydata
+def mobile(body: Body, task: Task, controls: dict[str, float], seed: int = 0, size: tuple[int, int] = (640, 420)) -> Clip:
+    """Each obstacle on the route replayed in MuJoCo at the recorded controls, as the judge drove it (D-063),
+    up to where the robot stopped.  A failure MuJoCo does not drive (sand, an overhang, the dark, the battery)
+    ends on a still of the robot on that ground with the world's numbers.  ``seed`` is unused: the route
+    is replayed at its nominal dimensions."""
+    import mujoco
 
-    s = M._spec(body)
-    d = drive(body, task, controls)
-    model, feats, gx, gz, front, ok, detail, mech = d.model, d.feats, d.gx, d.gz, d.front, d.ok, d.detail, d.mech
-
-    ren = vtk.vtkRenderer()
-    ren.SetBackground(0.955, 0.95, 0.94)
-    kit = vtk.vtkLightKit()
-    kit.AddLightsToRenderer(ren)
-    actors = []
-    for p in model.parts:
-        mp = vtk.vtkPolyDataMapper()
-        mp.SetInputData(_polydata(p.mesh))
-        a = vtk.vtkActor()
-        a.SetMapper(mp)
-        a.GetProperty().SetColor(*MATERIALS.get(p.material, MATERIALS["printed"]))
-        ren.AddActor(a)
-        actors.append(a)
-    surf = {"grass": (0.55, 0.72, 0.45), "sand": (0.86, 0.78, 0.55), "concrete": (0.72, 0.72, 0.70),
-            "gravel": (0.62, 0.60, 0.56), "carpet": (0.66, 0.58, 0.70), "tile": (0.85, 0.84, 0.80)}
-    width = max(400.0, 10 * s.width + 200)
-    # the ground is cut away 15 mm outside the robot's near side, as a section: a step or a trench wall in front
-    # of the robot hid its lower half, which read as it sinking into the ground
-    near = float(min(p.mesh.vertices[:, 1].min() for p in model.parts)) - 15.0
-
-    def slab(x0, x1, z0, z1, y0, y1, rgb):
-        src = vtk.vtkCubeSource()
-        src.SetBounds(x0, x1, y0, y1, z0, z1)
-        mp = vtk.vtkPolyDataMapper()
-        mp.SetInputConnection(src.GetOutputPort())
-        a = vtk.vtkActor()
-        a.SetMapper(mp)
-        a.GetProperty().SetColor(*rgb)
-        ren.AddActor(a)
-
-    for i in range(len(gx) - 1):  # the ground, as columns under its profile
-        if gx[i + 1] - gx[i] < 0.5:
-            continue
-        mid = (gx[i] + gx[i + 1]) / 2
-        kind = next((f for k, a, b, f in feats if a <= mid <= b and k != "gap"), None)
-        rgb = surf.get(kind["s"], (0.8, 0.76, 0.68)) if kind else (0.8, 0.76, 0.68)
-        if kind and kind["k"] == "dark":
-            rgb = (0.25, 0.26, 0.30)
-        z0, z1 = gz[i], gz[i + 1]
-        n = max(1, int((gx[i + 1] - gx[i]) // 40)) if abs(z1 - z0) > 1 else 1
-        for j in range(n):
-            xa = gx[i] + (gx[i + 1] - gx[i]) * j / n
-            xb = gx[i] + (gx[i + 1] - gx[i]) * (j + 1) / n
-            za = np.interp((xa + xb) / 2, gx, gz)
-            slab(xa, xb, min(gz.min(), 0) - 40, za, near, width / 2, rgb)
-    for k, a, b, f in feats:
-        z = float(np.interp(a, gx, gz))
-        if k == "gap":  # a door left ajar: two leaves, the opening offset from the robot's line
-            half, off = 5 * f["w"], 10 * f["off"]
-            slab(a, a + 40, z, z + 260, off + half, width / 2, (0.78, 0.66, 0.50))
-            slab(a, a + 40, z, z + 260, -width / 2, off - half, (0.78, 0.66, 0.50))
-        elif k == "low":  # the sofa's underside
-            slab(a, b, z + 10 * f["clear"], z + 10 * f["clear"] + 120, -width / 2, width / 2, (0.45, 0.35, 0.55))
-        elif k == "dark":
-            for j in range(3):
-                slab(a + (j + 1) * (b - a) / 4, a + (j + 1) * (b - a) / 4 + 50, z, z + 80,
-                     -width / 2 + 20 + 60 * (j % 2), -width / 2 + 90 + 60 * (j % 2), (0.15, 0.15, 0.17))
-
-    win = vtk.vtkRenderWindow()
-    win.SetOffScreenRendering(1)
+    ok, mech, detail, route_legs = legs(body, task, controls)
     w, h = size
-    win.SetSize(w, h)
-    win.AddRenderer(ren)
-    cam = ren.GetActiveCamera()
-    cam.ParallelProjectionOn()
-    cam.SetParallelScale(170.0)
-    grab = vtk.vtkWindowToImageFilter()
-    grab.SetInput(win)
-    grab.ReadFrontBufferOff()
-    frames = []
-    for x0, th, lift in d.poses:
-        tf = vtk.vtkTransform()
-        tf.PostMultiply()
-        tf.RotateY(-math.degrees(th))
-        tf.Translate(x0, 0, lift)
-        for a in actors:
-            a.SetUserTransform(tf)
-        cx = x0 + front / 2
-        cz = float(np.interp(cx, gx, gz)) + 60
-        cam.SetFocalPoint(cx, 0, cz)
-        # nearly side-on: from ahead of the robot, a step or a ramp between the camera and the robot hid its
-        # rear, which read as the body sinking into the ground
-        cam.SetPosition(cx + 250, -1900, cz + 650)
-        cam.SetViewUp(0, 0, 1)
-        ren.ResetCameraClippingRange()
-        win.Render()
-        grab.Modified()
-        grab.Update()
-        img = vtk_to_numpy(grab.GetOutput().GetPointData().GetScalars()).reshape(h, w, -1)[::-1, :, :3].copy()
-        here = next((M._desc(f) for k, a, b, f in feats if a - front - 60 <= x0 <= b), "")
-        frames.append(caption(img, bottom=here))
-    win.Finalize()
+    frames: list[np.ndarray] = []
+    deepest = 0.0
+    for leg in route_legs:
+        m, ep = leg.ep.model, leg.ep
+        _dress_mobile(m, leg.feature["s"])
+        m.vis.global_.offwidth, m.vis.global_.offheight = max(m.vis.global_.offwidth, SS * w), max(m.vis.global_.offheight, SS * h)
+        d = mujoco.MjData(m)
+        view = _View(m, w, h)
+        cam, opt = mujoco.MjvCamera(), mujoco.MjvOption()
+        # a ramp is seen from uphill and above, looking down its face: from behind, the camera fell below the
+        # ramp's plane and saw its underside; side-on, the slab's near edge stood between camera and robot
+        ramp = leg.feature["k"] == "ramp"
+        cam.azimuth, cam.elevation, cam.distance = (232.0, -38.0, 0.9) if ramp else (62.0, -26.0, 0.8)
+        here = M._desc(leg.feature)
+        idx = range(0, len(ep.t), 2) if len(ep.t) else [None]
+        x_cam = None
+        for k in idx:
+            if k is not None:
+                d.qpos[:] = ep.qpos[k]
+            mujoco.mj_forward(m, d)
+            deepest = max(deepest, -min((c.dist for c in d.contact[:d.ncon]), default=0.0))
+            x = float(d.qpos[0])
+            x_cam = x if x_cam is None else 0.85 * x_cam + 0.15 * x
+            cam.lookat[:] = (x_cam + 0.05, 0.0, max(0.04, float(d.qpos[2])))
+            view.colour.scene.flags[mujoco.mjtRndFlag.mjRND_FOG] = 1
+            frames.append(caption(view.shot(d, cam, opt), bottom=f"{here}" + (f" · t {ep.t[k]:.1f} s" if k is not None else "")))
+        view.close()
+        if leg.feature["k"] in PHYSICAL:
+            tag = "past it" if ep.ok else f"stopped: {ep.detail}"
+            frames += [caption(frames[-1], bottom=f"{here} · MuJoCo: {tag}")] * int(0.6 * FPS)
     verdict = detail.split(": ", 1)[1] if (not ok and ": " in detail) else detail
-    return Clip(frames, ok, verdict if ok else f"{mech.replace('_', ' ')}: {verdict}", clipping_mm=d.clipping_mm())
+    return Clip(frames, ok, verdict if ok else f"{mech.replace('_', ' ')}: {verdict}", clipping_mm=1000 * deepest)
 
 
 FILM: dict[str, Callable[..., Clip]] = {"gripper": gripper, "gripper_dense": gripper, "mobile": mobile,

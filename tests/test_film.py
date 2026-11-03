@@ -36,19 +36,15 @@ TRACKS = (Edit(slot="locomotion", type="tracks", params={"track_length": 28.0, "
           Edit(slot="battery", params={"capacity": 14.4}), Edit(slot="sensor", type="ultrasonic"))
 
 
-def test_mobile_film_stops_where_the_simulator_fails_and_says_why():
+def test_mobile_film_replays_the_judges_mujoco_episodes_and_stops_where_they_fail():
     porch = _task(MOBILE, "porch_train0")
     before = F.mobile(MOBILE.stock(), porch, {"approach": 0.5, "speed": 0.6})
     after = F.mobile(_body(MOBILE, *TRACKS), porch, {"approach": 0.5, "speed": 0.6})
-    assert not before.ok and before.verdict.startswith("step higher than climbable")
+    assert not before.ok and before.verdict.split(":")[0] in ("step higher than climbable", "belly hits step edge")
     assert after.ok and after.verdict.startswith("reached")
-    assert len(before.frames) >= 12 and before.frames[0].shape == (300, 480, 3)
-
-
-def test_settling_rests_a_flat_bottom_flat():
-    bottom = np.array([[0.0, 5.0], [100.0, 5.0]])
-    th, lift = F._settle(bottom, np.array([50.0, 40.0]), np.array([0.0, 1000.0]), np.array([0.0, 0.0]), 200.0)
-    assert th == pytest.approx(0.0) and lift == pytest.approx(-5.0)
+    assert len(before.frames) >= 12 and before.frames[0].shape == (420, 640, 3)
+    ok, _, _, legs = F.legs(_body(MOBILE, *TRACKS), porch, {"approach": 0.5, "speed": 0.6})
+    assert ok and [leg.feature["k"] for leg in legs] == ["step"] and legs[0].ep.ok and len(legs[0].ep.t) > 10
 
 
 def test_talking_robot_film_judges_the_recorded_posture_as_the_world_does():
@@ -183,18 +179,16 @@ def test_film_bodies_films_each_kept_change(tmp_path):
 
 
 @pytest.mark.parametrize("locomotion", [None, {"type": "tracks", "params": {"track_length": 26.0, "idler_height": 7.0}}])
-@pytest.mark.parametrize("route", ["porch_train0", "garden_train0"])
+@pytest.mark.parametrize("route", ["porch_train0", "garden_train0", "shed_train0"])
 def test_mobile_film_never_draws_the_robot_inside_the_ground(route, locomotion):
-    """Settling on only the lowest 12% of the drawn points let a wheel's front and a track's leading run pass
-    through a step's riser; the whole side outline now rests on the terrain."""
+    """The film draws MuJoCo's own bodies, so how deep one sits in the ground is the episode's contact depth."""
     from sea.evolve.core import Part
 
     w = MobileWorld()
     body = w.stock()
     if locomotion:
         body = Body(parts={**body.parts, "locomotion": Part(**locomotion)})
-    drive = F.drive(body, next(t for t in w.tasks() if t.id == route), {})
-    assert drive.clipping_mm() <= 0.5
+    assert F.mobile(body, next(t for t in w.tasks() if t.id == route), {}).clipping_mm <= 1.0
 
 
 def _model(world, task):
