@@ -156,6 +156,8 @@ def diagnose(rows: list[dict[str, Any]], note: str, fing: FingerSpec, height_m: 
     start = [r for r in rows[:5] if sum(c[0] for k in ("jaw_fixed", "jaw_moving", "arm") for c in r["cons"][k]) > 50]
     if start:
         return "start_collision", "the robot touches the object at the start of the episode"
+    if note.startswith("unphysical"):  # the mechanism did what its real parts cannot (D-076)
+        return "unphysical", note.split(": ", 1)[1]
     if note == "force_limit":
         r = peak or max(rows, key=lambda r: sum(c[0] for k in r["cons"] for c in r["cons"][k]))
         cs = [c for k in r["cons"] for c in r["cons"][k]]
@@ -365,7 +367,8 @@ class GripperWorld:
             face = (f"{abs(tilt):.0f} deg off parallel, bottom swung {'out' if tilt > 0 else 'in'}" if abs(tilt) > 0.5
                     else "parallel to the fixed face")
             rows.append(f"  {w} mm: servo {q:.2f} rad; moving face {face}; "
-                        f"moving fingertip {rise:+.0f} mm vs the fixed one; squeeze {F.squeeze_n(f, q, GRIP_TORQUE_NM):.0f} N")
+                        f"moving fingertip {rise:+.0f} mm vs the fixed one; squeeze {F.squeeze_n(f, q, GRIP_TORQUE_NM):.0f} N"
+                        + _rods(f, q, hi))
         jaw = {"revolute": "hinged moving jaw (the stock part)",
                "parallelogram": f"parallelogram linkage, link {f.link_mm:g} mm",
                "prismatic": f"rack-and-pinion slide, {2 * f.drive_mm_per_rad:g}-tooth pinion, "
@@ -409,7 +412,7 @@ class GripperWorld:
                     continue
                 tilt = math.degrees(q) - f.pad_angle_deg if f.jaw == "revolute" else -f.pad_angle_deg
                 cells.append(f"{w} mm: face {tilt:+.0f} deg, tip {F.fingertips(f, q)[1] * 1000:+.0f} mm, "
-                             f"{F.squeeze_n(f, q, GRIP_TORQUE_NM):.0f} N")
+                             f"{F.squeeze_n(f, q, GRIP_TORQUE_NM):.0f} N" + _rods(f, q, hi))
             label = ", ".join(f"{k}={x:g}" for k, x in v.items() if k in pt.params and (pt.slot != "pads" or k ==
                                                                                        "pad_angle_deg")) or "as is"
             out.append(f"on this body, {label}: servo {lo:.2f}..{hi:.2f} rad, fingertips up to "
@@ -468,6 +471,19 @@ class GripperWorld:
                                     peak)
         return Outcome(task=task.id, success=False, score=score, mechanism=mech, detail=f"verdict {verdict}; {detail}",
                        controls=_flat(run.params), attempts=n, sim_s=round(sim_s, 2))
+
+
+def _rods(f, q: float, q_hi: float) -> str:
+    """A slide's rods at this opening: their overhang, and how far the squeeze lifts the rack off its gear (D-076)."""
+    from sea.sim import jaws
+
+    if f.jaw != "prismatic":
+        return ""
+    a, lift, bushing = jaws.rack_lift_mm(f.drive_mm_per_rad / 1000, f.sector, q, q_hi, GRIP_TORQUE_NM)
+    m = jaws.module_for(f.drive_mm_per_rad / 1000)[1] * 1000
+    return (f"; rods {a:.0f} mm out from their clamp: the squeeze lifts the rack up to {lift:.1f} mm off the gear "
+            f"(teeth skip past {jaws.TOOTH_SKIP * m:.1f}) and loads each bushing {bushing:.0f} N (rated "
+            f"{jaws.BUSHING_RATED_N:g})")
 
 
 def _flat(params: dict[str, dict[str, float]]) -> dict[str, float]:

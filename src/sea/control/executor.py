@@ -36,6 +36,10 @@ from sea.sim.sensors import (
 
 TICK_STEPS = 10  # sim steps per joint target (50 Hz targets at 500 Hz physics)
 TICK_DT = 0.002 * TICK_STEPS
+# Rigid parts cannot sink into each other.  MuJoCo's contacts are soft, so a grip could hold an object partly by
+# burying the jaws in it (D-051); with D-054's stiff contact a held object sinks under 0.5 mm.  An attempt in which
+# the robot stays more than SINK_MM inside what it handles for SINK_S has done what no real grip does (D-076).
+SINK_MM, SINK_S = 1.0, 0.2
 PINCH_WINDOW_S = 0.05
 TOOL_SWAP_S = 5.0
 CRUISE_FRACTION = 0.85  # commanded cruise speed / hard limit: margin for servo lag and catch-up (D-025)
@@ -167,6 +171,9 @@ class Episode:
         self.frame: SensorFrame | None = None  # the latest reading: what System 1's guards may use
         self._grip_prev = float(self.q_cmd[-1])
         self._losing_ticks = 0  # consecutive ticks with a stalled arm joint behind its command
+        self._sunk_ticks = 0  # consecutive ticks with the robot sunk past SINK_MM into what it handles
+        # held objects only: a grasp scene's contact is the stiff one (D-054); a panel's buttons and knobs keep theirs
+        self._grasp = sim.panel is not None and any(c.cls == GRASP_CLASS for c in sim.panel.controls)
         self._pads_gripped = False
         if cfg.sense:
             self.sensors = Sensors(sim, seed=cfg.sensor_seed, self_model=self_model_for(sim.design))
@@ -276,6 +283,13 @@ class Episode:
         unstable = sum(int(sim.data.warning[w].number) for w in bad) > getattr(self, "_bad0", 0)
         if unstable or not (np.isfinite(sim.data.qpos).all() and np.isfinite(sim.data.qvel).all()):
             raise Abort("sim_unstable")  # the only abort that leaves a trace incomplete (verdict 0)
+        if sim.rods is not None and (broke := sim.rods.broken()):
+            raise Abort(broke)
+        sunk = self._sunk_mm() if self._grasp else 0.0
+        self._sunk_ticks = self._sunk_ticks + 1 if sunk > SINK_MM else 0
+        if self._sunk_ticks * TICK_DT >= SINK_S:
+            raise Abort(f"unphysical: the robot stayed {sunk:.1f} mm inside the object for {SINK_S:g} s; rigid parts "
+                        f"meet at their surfaces (at most {SINK_MM:g} mm in the simulator's soft contact)")
         self.last_force = fmax
         self.t += TICK_DT
         self.ticks += 1
@@ -293,6 +307,20 @@ class Episode:
         while paused and self.cfg.thermal is not None:  # servo cool-down: time passes, no motion
             self.t_offset += 1.0
             paused = self.cfg.thermal.step(np.zeros(len(ARM_JOINTS)), 1.0)  # type: ignore[attr-defined]
+
+    def _sunk_mm(self) -> float:
+        """The deepest the robot is inside a body it handles (a panel control or a grasp target) this step, mm."""
+        sim, d, m = self.sim, self.sim.data, self.sim.model
+        worst = 0.0
+        for i in range(d.ncon):
+            c = d.contact[i]
+            if c.dist >= -SINK_MM / 1000:
+                continue
+            robot = c.geom1 in sim.geom_kind or c.geom2 in sim.geom_kind
+            handled = int(m.geom_bodyid[c.geom1]) in sim.body_to_control or int(m.geom_bodyid[c.geom2]) in sim.body_to_control
+            if robot and handled:
+                worst = max(worst, -1000 * float(c.dist))
+        return worst
 
     def _holding_reflexes(self, f: SensorFrame, holding: bool) -> None:
         """System 1's reflexes while the jaws hold a grasp target, on what the robot feels (D-036).
@@ -677,6 +705,8 @@ def reset_episode(sim: Sim, q_home: np.ndarray | None = None) -> None:
     """Arm at home, every control at rest, zero velocities."""
     q_home = home_q(sim) if q_home is None else q_home
     mujoco.mj_resetData(sim.model, sim.data)
+    if sim.rods is not None:
+        sim.rods.reset()
     for h in sim.controls.values():
         h.dyn.reset()
         sim.model.jnt_range[h.joint_id][1] = h.upper

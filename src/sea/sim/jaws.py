@@ -298,13 +298,158 @@ SECTOR_TEETH = 2  # a sector's teeth beyond the arc in mesh, each end
 # -8 mm there, from the frame mesh): behind the hinge the sector sweeps where the short slide's bracket ran.
 LONG_ROD_Y, LONG_ROD_RISE = -56.0 * MM, (4.0 * MM, 16.0 * MM)  # the rods' heights above the rack's pitch line
 CLAMP_X = (-19.0 * MM, -12.0 * MM)
-FINGER_FACE_Y = -8.0 * MM
+FRAME_MESH = "wrist_roll_follower_so101_v1"
+FRAME_POSE = ((8.32667e-17, -0.000218214, 0.000949706), (0.0, 1.0, 0.0, 0.0))  # its geom in the gripper (SO-101 MJCF)
+FIT = 0.3 * MM  # a bracket screwed to the frame seats this far into the frame mesh's face
+
+
+@lru_cache(maxsize=1)
+def _frame():
+    """The gripper frame's mesh in the gripper's frame (m)."""
+    import trimesh
+
+    from sea.control.frames import STOCK_MJCF
+
+    m = trimesh.load(STOCK_MJCF.parent / "assets" / f"{FRAME_MESH}.stl")
+    pos, quat = FRAME_POSE
+    t = np.eye(4)
+    t[:3, :3] = trimesh.transformations.quaternion_matrix(quat)[:3, :3]
+    t[:3, 3] = pos
+    m.apply_transform(t)
+    return m
+
+
+def frame_face_y(x: tuple[float, float], z: tuple[float, float], y_from: float) -> float | None:
+    """Where a bracket coming from ``y_from`` toward +y first meets the frame over its footprint (x, z): the
+    nearest the frame's material comes, so the bracket ends on the frame's face and nowhere enters it.  None if
+    no part of the footprint has frame behind it (D-076)."""
+    tri = np.asarray(_frame().triangles)  # (n, 3, xyz)
+    a, b, c = tri[:, 0], tri[:, 1], tri[:, 2]
+    det = (b[:, 0] - a[:, 0]) * (c[:, 2] - a[:, 2]) - (c[:, 0] - a[:, 0]) * (b[:, 2] - a[:, 2])
+    ok = np.abs(det) > 1e-14
+    a, b, c, det = a[ok], b[ok], c[ok], det[ok]
+    best = None
+    for px in np.linspace(*x, 7):
+        for pz in np.linspace(*z, 5):  # a ray along +y through (px, pz): the triangles whose x-z shadow holds it
+            u = ((px - a[:, 0]) * (c[:, 2] - a[:, 2]) - (c[:, 0] - a[:, 0]) * (pz - a[:, 2])) / det
+            v = ((b[:, 0] - a[:, 0]) * (pz - a[:, 2]) - (px - a[:, 0]) * (b[:, 2] - a[:, 2])) / det
+            inside = (u >= 0) & (v >= 0) & (u + v <= 1)
+            y = (a[:, 1] + u * (b[:, 1] - a[:, 1]) + v * (c[:, 1] - a[:, 1]))[inside]
+            y = y[y > y_from]
+            if len(y):
+                best = float(y.min()) if best is None else min(best, float(y.min()))
+    return best
 ROD_DROP = (10.0 * MM, 22.0 * MM)  # the rods' heights below the rack's pitch line
 CARRIAGE_X = (8.0 * MM, 28.0 * MM)  # over the blade
 CARRIAGE_Y = (-45.0 * MM, GEAR_Y[1])
 BORE = 1.6 * MM  # half the square bore each rod runs in: the LM3UU bushing's 3 mm bore with 0.1 mm clearance
 BUSHING_KG = 0.0014  # LM3UU, each
 STEEL_KG_M3 = 7850.0
+# The rods bend (D-076).  Each is a cantilever from the clamp, loaded at its free end by the carriage's bushing
+# (LM3UU: 10 mm long).  Ground steel, E = 200 GPa, 3 mm across: EI = 0.795 N m^2.
+ROD_EI = 200e9 * math.pi * ROD_R**4 / 4
+BUSHING_LEN = 10.0 * MM
+# The bushing's rated load: no LM3UU datasheet gives one; the 3 mm miniature LMS3UU is rated 37.4-52.9 N static
+# and 48.9-56.1 N dynamic (motion.com, sku 08943031).  Above its static rating the balls dent the rod.
+BUSHING_RATED_N = 52.9
+PRESSURE_ANGLE = math.radians(20.0)  # the teeth's: the mesh pushes the rack off the gear with tan(20) of its load
+TOOTH_SKIP = 0.5  # of a module: a rack pushed this far off the gear has lost most of its working depth (2 m)
+HOLD_STEPS = 10  # a lift or load counts once it lasts 20 ms, as the force limit's does: not an impact's spike
+
+
+def rod_stiffness(a: float) -> tuple[float, float]:
+    """The two rods' stiffness at overhang ``a`` (m), each mode held still: across them (N/m) and turning (N m/rad)."""
+    return 2 * 12 * ROD_EI / a**3, 2 * 4 * ROD_EI / a
+
+
+def rack_lift_mm(r_pitch: float, sector: bool, q: float, q_hi: float, torque: float) -> tuple[float, float, float]:
+    """A slide at jaw angle ``q`` with the servo at ``torque``, statically, as ``RodSprings`` loads it in the
+    simulator (D-076): the rods' overhang (mm), how far the rack lifts off the gear (mm) under the teeth's
+    separating force and the squeeze's couple (the pad grips below and beside the rods, worst sign), and the
+    load on each bushing (N)."""
+    centre = sum(CARRIAGE_X) / 2
+    z_pitch = HINGE[2] - r_pitch
+    if sector:
+        clamp, rod_y, rod_z = CLAMP_X[1], LONG_ROD_Y, z_pitch + sum(LONG_ROD_RISE) / 2
+    else:
+        clamp = CARRIAGE_X[1] + q_hi * r_pitch + 2 * MM - ROD_LEN + 8 * MM
+        rod_y, rod_z = ROD_Y, z_pitch - sum(ROD_DROP) / 2
+    s = q * r_pitch
+    a = max(centre + s - BUSHING_LEN / 2 - clamp, BUSHING_LEN / 2)
+    squeeze = torque / r_pitch
+    sep = squeeze * math.tan(PRESSURE_ANGLE)
+    dx = HINGE[0] - (centre + s)
+    tip = HINGE + R0 @ np.array([*blade_tip(), 0.0])  # where the pad meets the object, gripper frame
+    pitch, yaw = squeeze * (tip[2] - rod_z), squeeze * (tip[1] - rod_y)  # the squeeze's couples about y and z
+    k = 2 * ROD_EI / a**3 * np.array([[12.0, -6 * a], [-6 * a, 4 * a * a]])
+    lift = 0.0
+    for sign in (-1.0, 1.0):
+        v, t = np.linalg.solve(k, [-sep, -sep * dx + sign * pitch])
+        lift = max(lift, -(v + t * dx))
+    bushing = math.hypot(sep / 2 + abs(pitch) / 2 / BUSHING_LEN, abs(yaw) / 2 / BUSHING_LEN)
+    return a * 1000, lift * 1000, bushing
+
+
+class RodSprings:
+    """The rods' bending as forces on the carriage's four rod joints (D-076).  Per step, at the carriage's
+    overhang a from the clamp, each plane's deflection v and slope t are loaded by the two cantilevers'
+    stiffness 2 EI / a^3 [[12, -6a], [-6a, 4a^2]], and the teeth push the rack off the gear with tan(20) of the
+    force they carry.  ``broken`` names what a real slide could not do: a rack lifted ``TOOTH_SKIP`` of a module
+    off the gear skips its teeth; a bushing past its rated load dents the rods."""
+
+    JOINTS = ("jaw_rod_dy", "jaw_rod_yaw", "jaw_rod_dz", "jaw_rod_pitch")
+
+    def __init__(self, model: mujoco.MjModel):
+        self.clamp, self.centre, self.module, self.mesh_x = (float(x) for x in model.numeric("jaw_rods").data)
+        self.q = [int(model.jnt_qposadr[model.joint(n).id]) for n in self.JOINTS]
+        self.v = [int(model.jnt_dofadr[model.joint(n).id]) for n in self.JOINTS]
+        self.slide = int(model.jnt_qposadr[model.joint("jaw_slide").id])
+        slide_j = model.joint("jaw_slide").id
+        self.eq = next(i for i in range(model.neq) if model.eq_type[i] == mujoco.mjtEq.mjEQ_JOINT
+                       and model.eq_obj1id[i] == slide_j)
+        self.reset()
+
+    def reset(self) -> None:
+        self.lift_mm = 0.0
+        self.bushing_n = 0.0
+        self.at_mm = 0.0
+        self._recent: list[tuple[float, float, float]] = []  # (lift mm, bushing N, overhang mm) per step
+
+    def overhang(self, s: float) -> float:
+        return max(self.centre + s - BUSHING_LEN / 2 - self.clamp, BUSHING_LEN / 2)
+
+    def apply(self, d: mujoco.MjData) -> None:
+        s = float(d.qpos[self.slide])
+        a = self.overhang(s)
+        c = 2 * ROD_EI / a**3
+        load = []
+        for k in (0, 2):  # (dy, yaw), then (dz, pitch)
+            v, t = float(d.qpos[self.q[k]]), float(d.qpos[self.q[k + 1]])
+            f, m = c * (12 * v - 6 * a * t), c * (-6 * a * v + 4 * a * a * t)
+            d.qfrc_applied[self.v[k]], d.qfrc_applied[self.v[k + 1]] = -f, -m
+            load.append(abs(f) / 2 + abs(m) / 2 / BUSHING_LEN)  # per rod: its share, and the couple across a bushing
+        rows = (d.efc_type[: d.nefc] == mujoco.mjtConstraint.mjCNSTR_EQUALITY) & (d.efc_id[: d.nefc] == self.eq)
+        f_t = float(np.abs(d.efc_force[: d.nefc][rows]).sum()) if d.nefc else 0.0
+        dx = self.mesh_x - (self.centre + s)  # the mesh, from the carriage's centre (pitch turns about it)
+        sep = f_t * math.tan(PRESSURE_ANGLE)
+        d.qfrc_applied[self.v[2]] -= sep  # down: the rack hangs below the gear
+        d.qfrc_applied[self.v[3]] -= sep * dx
+        lift = -(float(d.qpos[self.q[2]]) + float(d.qpos[self.q[3]]) * dx)
+        self._recent = [*self._recent[-(HOLD_STEPS - 1):], (lift * 1000, math.hypot(*load), a * 1000)]
+        if len(self._recent) == HOLD_STEPS:  # what held over the last HOLD_STEPS steps
+            held_lift = min(r[0] for r in self._recent)
+            if held_lift > self.lift_mm:
+                self.lift_mm, self.at_mm = held_lift, self._recent[-1][2]
+            self.bushing_n = max(self.bushing_n, min(r[1] for r in self._recent))
+
+    def broken(self) -> str:
+        if self.lift_mm > TOOTH_SKIP * self.module * 1000:
+            return (f"unphysical: the rods let the rack lift {self.lift_mm:.1f} mm off the gear ({self.at_mm:.0f} mm "
+                    f"out from the clamp); past {TOOTH_SKIP * self.module * 1000:.1f} mm the teeth skip")
+        if self.bushing_n > BUSHING_RATED_N:
+            return (f"unphysical: a bushing carried {self.bushing_n:.0f} N; it is rated {BUSHING_RATED_N:g} N, past "
+                    "which it dents the rod")
+        return ""
 
 
 def _to_jaw(p: np.ndarray) -> np.ndarray:
@@ -483,8 +628,10 @@ def slide(spec: mujoco.MjSpec, r_pitch: float, sector: bool = False) -> list[tup
         # clear) and under the sector's sweep to the finger
         cvol = _box(grip, "jaw_clamp", [CLAMP_X[0], rod_y - 5 * MM, rods[0] - 5 * MM],
                     [CLAMP_X[1], rod_y + 5 * MM, rods[1] + 5 * MM], PRINTED, False)
-        cvol += _box(grip, "jaw_clamp_bracket", [CLAMP_X[0], rod_y + 5 * MM, z_pitch + m + 1 * MM],
-                     [CLAMP_X[1], FINGER_FACE_Y, z_pitch + m + 8 * MM], PRINTED, False)
+        bz = (z_pitch + m + 1 * MM, z_pitch + m + 8 * MM)
+        face = frame_face_y(CLAMP_X, bz, rod_y + 5 * MM)
+        cvol += _box(grip, "jaw_clamp_bracket", [CLAMP_X[0], rod_y + 5 * MM, bz[0]],
+                     [CLAMP_X[1], (rod_y + 6 * MM) if face is None else face + FIT, bz[1]], PRINTED, False)
         _carry(grip, _box_mass(cvol) + 2 * STEEL_KG_M3 * math.pi * ROD_R**2 * rod_len)
     else:
         back = front - ROD_LEN
@@ -493,10 +640,31 @@ def slide(spec: mujoco.MjSpec, r_pitch: float, sector: bool = False) -> list[tup
                     PRINTED, False)
         # the bracket crosses the gear plane behind the pinion to reach the frame (x >= -19.5 mm there): a
         # pinion too large leaves it no room, and the clamp hangs from nothing
-        reach = min(max(back + 8 * MM, -15 * MM), HINGE[0] - r_pitch - 2 * m - 1 * MM)
-        cvol += _box(grip, "jaw_clamp_bracket", [back, CARRIAGE_Y[0], clamp_top], [max(reach, back + 1 * MM), -28.0 * MM,
-                                                                                 clamp_top + 6 * MM], PRINTED, False)
+        reach = min(max(back + 8 * MM, -11.0 * MM), HINGE[0] - r_pitch - 2 * m - 1 * MM)
+        bx, bz = (back, max(reach, back + 1 * MM)), (clamp_top, clamp_top + 6 * MM)
+        face = frame_face_y(bx, bz, CARRIAGE_Y[0])
+        cvol += _box(grip, "jaw_clamp_bracket", [bx[0], CARRIAGE_Y[0], bz[0]],
+                     [bx[1], (CARRIAGE_Y[0] + 1 * MM) if face is None else face + FIT, bz[1]], PRINTED, False)
         _carry(grip, _box_mass(cvol) + 2 * STEEL_KG_M3 * math.pi * ROD_R**2 * ROD_LEN)
+
+    # the rods bend (D-076): the carriage rides the rods' free ends, so it moves across them (y, z) and turns
+    # (yaw about z, pitch about y) as two cantilevers from the clamp let it; ``RodSprings`` loads these joints
+    # each step with the cantilevers' stiffness at the carriage's current overhang
+    from sea.sim.build_model import TIMESTEP
+
+    c0 = _to_jaw(np.array([sum(CARRIAGE_X) / 2, rod_y, sum(rods) / 2]))
+    k_v, k_t = rod_stiffness(BUSHING_LEN)  # the stiffest the rods get: the armature that keeps each mode stable
+    for name, kind, axis, k in (("jaw_rod_dy", mujoco.mjtJoint.mjJNT_SLIDE, [0.0, 0.0, -1.0], k_v),
+                                ("jaw_rod_dz", mujoco.mjtJoint.mjJNT_SLIDE, [0.0, 1.0, 0.0], k_v),
+                                ("jaw_rod_yaw", mujoco.mjtJoint.mjJNT_HINGE, [0.0, 1.0, 0.0], k_t),
+                                ("jaw_rod_pitch", mujoco.mjtJoint.mjJNT_HINGE, [0.0, 0.0, 1.0], k_t)):
+        arm = k * TIMESTEP**2
+        car.add_joint(name=name, type=kind, axis=axis, pos=c0.tolist(), armature=arm, damping=[2 * k * TIMESTEP, 0.0, 0.0])
+    clamp = next(g for g in spec.geoms if g.name == "jaw_clamp")
+    # where the rods leave the clamp, the carriage's centre at s = 0, the teeth's module and where they mesh
+    # (gripper x): what ``RodSprings`` needs, carried in the model
+    spec.add_numeric(name="jaw_rods", data=[float(clamp.pos[0] + clamp.size[0]), sum(CARRIAGE_X) / 2, m,
+                                            float(HINGE[0])])
 
     # the teeth: as stiff as printed teeth in mesh (about 1.5 N/um on a 6 mm face: 0.07 mm at 110 N here)
     spec.add_equality(type=mujoco.mjtEq.mjEQ_JOINT, name1="jaw_slide", name2="gripper",

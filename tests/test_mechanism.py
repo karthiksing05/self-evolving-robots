@@ -85,16 +85,19 @@ def test_the_stock_jaw_rides_its_horn_and_a_slide_rides_its_rods():
     """D-058: a 40-tooth slide (20 mm/rad) is a pinion on the horn and a carriage on two rods, sharing material
     with nothing but the servo's spline at any wrist roll.  b021's 56 mm/rad (gripper_s2v3_s0, a 112-tooth
     pinion) cannot be built on the catalogue's 100 mm rods: the carriage runs into the rods' clamp, the
-    clamp's bracket has no way past a pinion 112 mm across, and the pinion meets the wrist."""
+    clamp's bracket has no way past a pinion 112 mm across to the frame, so the rods hang from nothing (D-076),
+    and the pinion meets the wrist."""
     world = GripperWorld()
     stock = audit_mechanism.gripper_geometry(world.stock())["carried"]["moving_jaw_so101_v1"]
     assert stock["joint"] == "hinge" and stock["worst_gap_mm"] == 0.0
     geo = audit_mechanism.gripper_geometry(_jaw(world, "prismatic", pinion_teeth=40))
     assert geo["carried"]["jaw_carriage"]["joint"] == "slide" and geo["carried"]["jaw_carriage"]["worst_gap_mm"] <= 0.1
     assert all(c["from_axis_mm"][1] <= 3.0 for c in geo["clashes"].values())
-    b021 = audit_mechanism.gripper_geometry(_jaw(world, "prismatic", pinion_teeth=112))["clashes"]
-    assert any(k.startswith("jaw_clamp / jaw_carriage") for k in b021) and "jaw_clamp_bracket / jaw_pinion" in b021
-    assert any("wrist" in c["bodies"] and c.get("at_roll") for c in b021.values())
+    big = _jaw(world, "prismatic", pinion_teeth=112)
+    b021 = audit_mechanism.gripper_geometry(big)
+    assert any(k.startswith("jaw_clamp / jaw_carriage") for k in b021["clashes"])
+    assert {"jaw_clamp", "jaw_clamp_bracket", "jaw_rod0", "jaw_rod1"} <= set(b021["loose"])
+    assert any("wrist" in c["bodies"] and c.get("at_pose") for c in b021["clashes"].values())
 
 
 def test_the_four_bar_is_built_from_parts_that_carry_each_other():
@@ -170,7 +173,8 @@ def test_the_mechanism_laws_refuse_what_cannot_be_assembled_and_pass_what_can():
     wrist = world.check(_jaw(world, "prismatic", pinion_teeth=44))  # a pinion 46 mm across reaches the rolled wrist
     assert len(wrist) == 1 and "the wrist and the pinion share material" in wrist[0] and "wrist rolled" in wrist[0]
     b021 = "\n".join(world.check(_jaw(world, "prismatic", pinion_teeth=112)))
-    assert "the clamp and the carriage share material" in b021 and "the clamp bracket and the pinion" in b021
+    assert "the clamp and the carriage share material" in b021
+    assert "mechanism law (mounted): the clamp bracket touches nothing that reaches the gripper frame" in b021
     assert "mechanism law (carried): the carriage" in b021
 
 
@@ -243,3 +247,20 @@ def test_the_fingers_meeting_as_the_jaw_closes_is_its_stop_not_interference():
     pads = Part(type="pads", params={"groove_mm": 0, "lip_mm": 0, "pad_angle_deg": 45, "pad_tpu_mm": 2, "reach_mm": 0,
                                      "width_mm": 12})
     assert world.check(Body(parts={**world.stock().parts, "pads": pads})) == []
+
+
+def test_a_slides_rods_bend_and_a_long_overhang_skips_its_teeth_or_dents_its_bushings():
+    """D-076: a slide's carriage rides two 3 mm rods cantilevered from their clamp.  At the long slide's wide
+    openings the squeeze's couple and the teeth's separating force bend them past what the parts allow: the
+    brief's static numbers say so, and the simulator, loading the rods as cantilevers each step, stops the pick."""
+    from sea.sim import jaws
+
+    a, lift, bushing = jaws.rack_lift_mm(0.046, True, 1.5, 1.75, 1.62)
+    assert a > 90 and lift > jaws.TOOTH_SKIP * 1.0 and bushing > jaws.BUSHING_RATED_N
+    a, lift, _ = jaws.rack_lift_mm(0.046, True, 0.03, 1.75, 1.62)
+    assert a < 30 and lift < jaws.TOOTH_SKIP * 1.0  # closed, the overhang is short and the rack stays in mesh
+    world = GripperWorld()
+    cube = next(t for t in world.tasks() if t.id == "reg_wood_block_cube")
+    assert world.solve(world.stock(), cube).success
+    out = world.solve(_jaw(world, "long_slide", sector_radius_mm=46.0), cube)
+    assert not out.success and out.mechanism == "unphysical" and ("bushing" in out.detail or "teeth skip" in out.detail)

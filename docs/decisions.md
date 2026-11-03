@@ -2295,3 +2295,57 @@ The review also found two places where the model itself broke the law, through n
     - the brief gives computed facts only for parts on the body, never the feasible ranges of a candidate part (the hook boom passes only at drops of 32° or less);
     - the brief never says where our cannon port is.
   - The match has no verified gold body under D-075 (lever 6), so it is not yet shown that 174 points is reachable with two pistons inside the box.
+
+## D-076 The gripper's slide rides real rods; fixed parts are mounted; held objects stay outside the jaws (judge: mechanism, world_gripper)
+
+**Why.** A render of b020 showed three things: an oversized sector gear, rods that seemed to pass through the fixed jaw, and a carriage that looked unsupported. A physics review then measured what the laws never checked:
+- **Parts on the gripper's own body were never checked against each other.** The rods, clamp, bracket, frame, servo and pads all sit on that body. No fixed part had to be mounted; the short slide's clamp bracket stood 4.7 mm off the frame, so its rods hung from nothing.
+- **The carriage rode an ideal slide.** It was rigid in its other five directions, so the 3 mm rods never bent.
+- **The rack and gear were a joint equality.** It carried the teeth's tangential force, but never pushed the rack off the gear.
+- **The interference sweep sampled nine jaw positions.** That is 11 mm of travel per step on the long slide.
+- **Contact penetration was measured, never enforced.**
+
+The long slide reached 20 of 21 groups (D-066) on exactly this idealisation.
+
+**Change.**
+- **Rods (simulator, `sim/jaws.py`).** The carriage gets four joints on its rods: across them in y and z, yaw and pitch. `RodSprings` loads them each step with two cantilevers' stiffness at the carriage's current overhang a from the clamp: 2EI/a³ [[12, -6a], [-6a, 4a²]] per plane, with EI = 0.795 N·m² for 3 mm steel. The teeth push the rack off the gear with tan 20° of the force the coupling carries. An armature of k·dt² keeps each mode stable, as for the finger's flex (D-054).
+  - An attempt is unphysical if, held for 20 ms, the rack lifts more than half a module off the gear (the teeth skip).
+  - It is also unphysical if a bushing carries more than 52.9 N. No LM3UU datasheet gives a rating; this is the static rating of the 3 mm miniature LMS3UU (37.4–52.9 N static, 48.9–56.1 N dynamic, motion.com). The bushing load is each rod's share of the force, plus the couple across its 10 mm length.
+- **Fixed parts (law, `mechanism/gripper.py`).** Parts on the gripper's body may share material only where one is fastened to another:
+  - a rod inside its clamp's bore;
+  - a pad seated on the finger it wraps, at most 2 mm;
+  - a printed bracket screwed to the frame or servo, at most 1 mm;
+  - otherwise only touching faces.
+
+  Every fixed part must reach the frame through parts that touch it, within 0.5 mm.
+- **Brackets (`sim/jaws.py`).** Both slides' clamp brackets now end on the frame mesh's face over their whole footprint, found by casting rays at the mesh. They had used hand-set faces: one 4.7 mm short, one 1.3 mm in, and wrong for any other gear size.
+- **Sweep.** The jaw's range starts at nine steps. A step is halved, up to four times, while some pair's clearances at its two ends add to less than the distance a point moves between them. Pairs in contact at both ends, at a seat, are left alone.
+- **Held objects (executor).** In grasp scenes, an attempt in which the robot stays more than 1 mm inside the object for 0.2 s is unphysical. Panel worlds keep their contact.
+- **Brief.** For a slide, each opening states:
+  - the rods' overhang;
+  - how far the squeeze lifts the rack, under the teeth's force and the squeeze's couple at the pad, worst sign;
+  - each bushing's load against its rating.
+
+  The same facts appear for candidate slides in the part facts.
+- **The lower arm is not added to the static sweep.** It is no parent of the jaw's bodies, so the simulator's contacts already stop a jaw that meets it, in the poses the arm actually takes. Requiring clearance over the whole wrist-flex range refused an 89 mm four-bar for poses System 1 never uses.
+
+**Prediction** (written with the change, before the full measurements below):
+- the stock, four-bar and revolute bodies are unchanged;
+- the long slide that reached 20/21 fails most picks on bushing load or tooth skip;
+- the short slide's clamp, now mounted, passes the laws;
+- held objects already sit under 1 mm, so the sinking guard changes no verdict.
+
+**Measured.**
+- **Long slide (`sector_radius_mm` 46, gripper_s2depth_s0's final pads):** 0 of 42 train picks. 20 failed on bushing load (59–174 N against 52.9) and 10 on tooth skip (the rack lifted 0.6–1.4 mm at 63–97 mm of overhang, against a 0.5 mm limit).
+  - The same body with near-rigid rods (EI × 1000, the checks off) held 36 of 42. So the new joints change nothing else: the bending is the difference.
+- **Statics:** the brief says 153 N per bushing at the long slide's 35 mm opening. A 40-tooth short slide sees 299 N at 25 mm. No slide in the catalogue's ranges stays within the bushing's rating: one bushing per rod cannot carry a squeeze applied 30–40 mm off the rods. A slide now needs a better guide, such as two bushings per rod or a miniature rail; that is a part for System 2 to propose as an idea, not one added here.
+- **Contact:** the stock and long-slide picks sink 0.13–0.41 mm into the object (95th percentile), so the guard changes no current verdict.
+- **Brackets:** both slides' brackets now seat 0.3–0.7 mm into the frame face for every gear size tried (17–60 teeth, sector 30–50 mm).
+- **Laws:**
+  - a 112-tooth pinion's clamp, bracket and rods are now refused as mounted on nothing; before, the bracket was drawn through the pinion;
+  - a 50 mm sector and a 60-tooth pinion still meet the rolled wrist;
+  - sweeps take 13–27 s per body, cached.
+- **Not modelled** (recorded):
+  - the overhung load of a large gear on the servo's spline: Feetech publishes no radial rating for the STS3215;
+  - tooth bending (D-059);
+  - belt or bushing friction.
