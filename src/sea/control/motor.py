@@ -539,7 +539,7 @@ def grasp(ep: Episode, cid: str, depth: float | None = None, side: float = PICK_
     v = min(speed, ep.cfg.limits.max_tip_speed_mps)
     ep.axis_ref, ep.roll_ref = down, roll  # type: ignore[attr-defined]
     yield from ep.set_gripper(opening, 0.3)
-    above = target - down * 0.04
+    above = target - down * max(0.04, depth + below + PICK_CLEAR)  # the lowest jaw part comes down from over the top (D-065)
     clip = float((ep.tip_cmd - ep.contact_point(cid)) @ down) + below + PICK_CLEAR
     if clip > 0:  # the jaws would pass lower than the object's top: rise to the approach height first
         yield from ep.move_to(ep.tip_cmd - down * max(0.0, float((ep.tip_cmd - above) @ down)), down, None, roll)

@@ -94,6 +94,8 @@ def default_value(name: str, param: str, sim, cid: str, cfg: EpisodeConfig) -> f
         return float(cfg.force_cap)
     if param == "speed":
         return {"push": 0.015, "hook_pull": 0.02, "slide": 0.02, "insert": 0.01}.get(name, cfg.limits.max_tip_speed_mps)
+    if name == "grasp" and param == "depth":  # searched: a jaw with parts low over the object grips shallower (D-065)
+        return motor.pick_depth(h.spec)
     if name == "push" and param == "depth":
         span = h.geo.lever_arm * travel if h.geo.rotary else travel
         return span * 1.25 + 3e-3

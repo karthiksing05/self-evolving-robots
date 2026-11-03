@@ -1761,7 +1761,7 @@ Three fixes failed on the way, each for a reason:
 
     These are recorded as untested ideas in each record, and they become D-065 and D-066.
 
-## D-065 The pick comes down from above its lowest part, and keeps the slide's rack off the object (skill: primitives, tools)
+## D-065 The pick comes down from above its lowest part, and System 1 searches its grip depth (skill: primitives)
 
 **Why.** Replaying D-064's rejected long-slide trials showed two faults in System 1's pick (`control/motor.py::grasp`). Neither is a fault of the body.
 - **The approach point was a fixed 40 mm above the grip.** The arm runs in a straight line from its start to that point, then descends.
@@ -1773,12 +1773,13 @@ Three fixes failed on the way, each for a reason:
   - The pick puts the tool point 17 mm below the object's top. Grip depth is not a control System 1 searches.
   - The slide's rack spans the gap between the fingers 22.5 mm above the tool point (a 46 mm sector). So on a tall object it came down to within 5 mm of the top, and the object rising in the squeeze closed that. A pick that knows its jaw keeps what spans the gap clear.
 
-**Change.**
+**Change** (as made; the prediction below was written for a first form, kept as written).
 - The approach point is `max(40 mm, depth + below + PICK_CLEAR)` above the grip, so the lowest jaw part passes `PICK_CLEAR` (10 mm) over the object's top.
-- The grip depth is at most the height of the lowest part spanning the gap above the tool point, less `PICK_CLEAR`: `fingers.gap_ceiling`.
-  - On a slide this is the rack's underside, read from the slide's own layout in `sim/jaws.py`.
-  - The hinged and parallelogram jaws have nothing over the gap.
-- The carriage beside the finger is not counted: an object deeper than about 69 mm meets it, but the task gives System 1 no object depth. The force-limit diagnosis names it when it presses, so a body can answer with pads.
+- System 1 searches the grasp's `depth`, which `configs/primitives.yaml` always declared (2–35 mm). Its start point is the pick's default, `pick_depth`. It had never been searched: `local_search.default_value` returned no number for a default computed per object, and parameters without one are skipped.
+- **First form, rejected on measurement.** It capped depth below the slide's rack (`fingers.gap_ceiling`, the rack's underside less 10 mm).
+  - Over the 21 groups (one train placement each, seed 0), the bare long slide fell from 17 to 15. A ball's top passes under the rack, which runs 28.5–34.5 mm to the side of the fingers' centre line. The cap made the slide grip lemons and plums above their equators.
+  - The class model cannot say which objects reach the rack: the soup can is classed a sphere but lies on its side, flat-topped along the rack.
+  - Searching depth lets each object find its own depth.
 
 **Prediction** (written before the change was made in the tree; the patch was tried on replays first, below).
 - Stock gold, the phase A/B sets and every test that uses the stock or short pads: unchanged, because neither rule binds there.
@@ -1789,3 +1790,16 @@ Three fixes failed on the way, each for a reason:
 - Long slide at 46 mm with 28 mm, 2 mm TPU pads, System 1's default first attempt:
   - Approach fix alone: tennis ball and cup are now held. The soup can and apple still fail, with the rack pressing 27 N and 8 N on their tops.
   - The stock hinged jaw with the same pads now holds the tennis ball as well.
+- **Over the 21 groups** (`GripperWorld.solve`, System 1's full search, on each group's first train placement, seed 0):
+
+  | body | before | after |
+  |---|---|---|
+  | stock | 16 | **17** (+gelatin box) |
+  | evolved hinged jaw, 30° 0.5 mm TPU pads (s0's b050) | 17 | 17 |
+  | long slide 47 mm, bare | 17 | **20**: all but the banana |
+  | long slide 47 mm, 20 mm 0.5 mm TPU pads | 16 | 18 |
+
+  - **The prediction missed on the stock:** depth is searched for every body, and the stock now grips the 30 mm gelatin box deeper, 20.5 mm (the table cap), so it holds it. That gelatin box is the group every seed's evolved pads had gained, so the evolved hinged bodies are now no better than the stock.
+  - The bare long slide gains the apple, soup can and potted meat can (a shallower grip keeps the rack and carriage off their tops) and keeps every wide box.
+  - `test_world_gripper::test_solve_reads_the_failure` now reads the stock's failure on the pudding box instead.
+
