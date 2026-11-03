@@ -900,7 +900,7 @@ GROUND = {"concrete": (0.70, 0.70, 0.68), "tile": (0.86, 0.85, 0.81), "wood": (0
           "carpet": (0.55, 0.50, 0.60), "gravel": (0.60, 0.58, 0.54), "grass": (0.45, 0.62, 0.36),
           "sand": (0.86, 0.78, 0.55)}
 RUBBER = (0.13, 0.13, 0.14, 1.0)
-PHYSICAL = ("step", "trench", "ramp", "gap")  # what MuJoCo drives (D-063); the rest is the world's calculation
+PHYSICAL = ("step", "trench", "stairs", "bump", "threshold", "ramp", "gap")  # what MuJoCo drives (D-063, D-069)
 
 
 @dataclass
@@ -921,7 +921,7 @@ def legs(body: Body, task: Task, controls: dict[str, float]) -> tuple[bool, str,
     out = []
     for f in route[:upto]:
         k, mu = f["k"], M._mu(s, f["s"])
-        if k in ("step", "trench"):
+        if k in M.MM.EDGES:
             out.append(Leg(f, M._drive(s, k, f, mu * s.edge, ctl["approach"], trace=True)))
         elif k == "ramp":
             out.append(Leg(f, M._drive(s, k, f, mu, ctl["speed"], trace=True)))
@@ -1008,6 +1008,12 @@ def _dimension(img: np.ndarray, scn, f: dict) -> np.ndarray:
         _arrow(d, pt(-0.012, y, 0.0), pt(-0.012, y, f["h"] / 100), f"{f['h']:.1f} cm step")
     elif f["k"] == "trench":
         _arrow(d, pt(0.0, y, 0.012), pt(f["w"] / 100, y, 0.012), f"{f['w']:.1f} cm wide, {f['depth']:.1f} cm deep")
+    elif f["k"] == "stairs":
+        _arrow(d, pt(-0.012, y, 0.0), pt(-0.012, y, f["h"] / 100), f"{f['n']:.0f} × {f['h']:.1f} cm, {f['run']:.0f} cm treads")
+    elif f["k"] == "bump":
+        _arrow(d, pt(-0.012, y, 0.0), pt(-0.012, y, f["d"] / 100), f"{f['d']:.1f} cm " + ("hose" if f["d"] >= 2 else "cord"))
+    elif f["k"] == "threshold":
+        _arrow(d, pt(-0.012, y, 0.0), pt(-0.012, y, f["h"] / 100), f"{f['h']:.1f} cm threshold strip")
     elif f["k"] == "ramp":
         x, yy = pt(0.12, y, 0.0)
         d.rectangle([x - 4, yy - 30, x + 110, yy - 10], fill=(255, 255, 255, 215))
@@ -1019,6 +1025,7 @@ def _dimension(img: np.ndarray, scn, f: dict) -> np.ndarray:
 
 
 THING = {"step": "the {h:.1f} cm step", "trench": "the {w:.1f} cm trench", "ramp": "the {deg:.0f}° ramp",
+         "stairs": "the {n:.0f} steps", "bump": "the {d:.1f} cm cord", "threshold": "the threshold strip",
          "gap": "the {w:.1f} cm doorway", "sand": "the sand", "dark": "the dark hallway", "low": "the low sofa",
          "floor": "the {s}"}
 # what a mobile failure looks like, in words: {thing} is where it stopped (the run's mechanism labels)
@@ -1090,7 +1097,8 @@ def mobile(body: Body, task: Task, controls: dict[str, float], seed: int = 0, si
         cam, opt = mujoco.MjvCamera(), mujoco.MjvOption()
         top = f["k"] == "gap"
         cam.azimuth, cam.elevation, cam.distance = (90.0, -72.0, 0.85) if top else (90.0, -9.0, 0.75)
-        centre = {"trench": f.get("w", 0) / 200, "ramp": 0.2}.get(f["k"], 0.0)
+        centre = {"trench": f.get("w", 0) / 200, "ramp": 0.2, "stairs": f.get("run", 0) * f.get("n", 1) / 200,
+                  "threshold": f.get("w", 0) / 200}.get(f["k"], 0.0)
         here = THING.get(f["k"], f["k"]).format(**f)
         idx = range(0, len(ep.t), 2) if len(ep.t) else [None]
         x_cam = None

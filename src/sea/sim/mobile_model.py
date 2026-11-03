@@ -1,4 +1,5 @@
-"""The mobile robot in MuJoCo at one obstacle (D-063): a step, a trench, a ramp or an opening.
+"""The mobile robot in MuJoCo at one obstacle (D-063, D-069): a step, a flight of stairs, a cable or hose, a
+threshold strip, a trench, a ramp or an opening.
 
 The robot is built from the world's numbers (``sea.worlds.mobile._spec``) with the CAD's layout
 (``sea.worlds.cad.mobile``), in metres:
@@ -152,6 +153,8 @@ def _robot_xml(rb: Robot) -> tuple[str, str, str, list[str]]:
     return tree, "".join(eqs), "".join(acts), driven
 
 
+EDGES = ("step", "trench", "stairs", "bump", "threshold")  # obstacles met at an approach duty, that can throw it back
+BEVEL = 30.0  # degrees: a threshold strip's two bevels
 NOSE = 0.003  # m: an edge's rounding (a sharp box edge gives contact normals from one face, not the corner)
 
 
@@ -180,6 +183,29 @@ def terrain_xml(kind: str, f: dict[str, float], mu: float) -> tuple[str, float]:
     if kind == "step":
         h = f["h"] / 100
         return floor.format(g=g) + _block("obstacle", 0.0, 2.0, 0.0, h, g, +1), 0.0
+    if kind == "stairs":  # n rises of h on treads of ``run``: the rear must be past the last nosing
+        h, run, n = f["h"] / 100, f["run"] / 100, int(round(f["n"]))
+        end = (n - 1) * run + 2.0
+        return floor.format(g=g) + "".join(_block("obstacle" if i == 0 else f"stair{i}", i * run, end, 0.0, (i + 1) * h,
+                                                  g, +1) for i in range(n)), (n - 1) * run
+    if kind == "bump":  # a cable or hose of diameter d lying across the path
+        r = f["d"] / 200
+        return floor.format(g=g) + (f'<geom name="obstacle" type="capsule" size="{r:.5f} 0.6" pos="{r:.5f} 0 {r:.5f}" '
+                                    f'zaxis="0 1 0" rgba="0.2 0.22 0.2 1" {g}/>'), 2 * r
+    if kind == "threshold":  # a strip h high and w wide: a BEVEL ramp up, a flat top, a BEVEL ramp down
+        h, w, th, t = f["h"] / 100, f["w"] / 100, math.radians(BEVEL), 0.01
+        b = h / math.tan(th)
+        top = max(w - 2 * b, 0.002)
+        rgba = 'rgba="0.62 0.5 0.36 1"'
+
+        def bevel(nm: str, x0: float, up: bool) -> str:
+            n = np.array([-math.sin(th), math.cos(th)]) if up else np.array([math.sin(th), math.cos(th)])
+            c = np.array([x0 + b / 2, h / 2]) - n * t / 2
+            return (f'<geom name="{nm}" type="box" size="{math.hypot(b, h) / 2:.5f} 0.6 {t / 2:.5f}" '
+                    f'euler="0 {-BEVEL if up else BEVEL:.4f} 0" pos="{c[0]:.5f} 0 {c[1]:.5f}" {rgba} {g}/>')
+        return (floor.format(g=g) + bevel("obstacle", 0.0, True)
+                + f'<geom name="strip_top" type="box" size="{top / 2:.5f} 0.6 {h / 2:.5f}" pos="{b + top / 2:.5f} 0 '
+                  f'{h / 2:.5f}" {rgba} {g}/>' + bevel("strip_down", b + top, False)), 2 * b + top
     if kind == "trench":
         w, d = f["w"] / 100, f["depth"] / 100
         return (f'<geom name="floor" type="plane" size="3 1 0.1" pos="0 0 {-d:.5f}" rgba="0.4 0.38 0.35 1" {g}/>'
@@ -255,7 +281,7 @@ def episode(rb: Robot, kind: str, f: dict[str, float], mu: float, duty: float, y
             qs.append(d.qpos.copy())
         x = d.qpos[0]
         best_x = max(best_x, x)
-        if best_x - x > 0.01 and kind in ("step", "trench"):
+        if best_x - x > 0.01 and kind in EDGES:
             bounced = True
         for c in d.contact[:d.ncon]:
             if tub in (c.geom1, c.geom2) and m.geom_bodyid[c.geom1 if c.geom2 == tub else c.geom2] == 0:
@@ -274,9 +300,9 @@ def episode(rb: Robot, kind: str, f: dict[str, float], mu: float, duty: float, y
                 spin = np.mean([abs(d.qvel[m.jnt_dofadr[j]]) * r for j, r in zip(jid, radii, strict=True)])
                 if kind == "gap":
                     why = "wall"
-                elif belly and kind in ("step", "trench"):
+                elif belly and kind in EDGES:
                     why = "belly"
-                elif bounced and kind in ("step", "trench"):
+                elif bounced and kind in EDGES:
                     why = "bounced"
                 else:
                     why = "stuck_slipping" if spin > 0.03 else "stuck_stalled"

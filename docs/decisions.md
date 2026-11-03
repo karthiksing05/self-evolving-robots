@@ -1881,3 +1881,50 @@ The pictures drew the shoe, but the physics and the mechanism laws never saw it:
   - `rva000_potted_meat_can`: "a pad pressed 25 N down on its top at t=0.89 s".
   - Both were "t=0.02 s" before.
 - `test_world_gripper` gains the case.
+
+## D-069 Harder routes: garden stairs, a power cord, a threshold strip and a hose (judge: world_mobile)
+
+**Why.** Under MuJoCo (D-063) every seed reached 10/10 in two iterations with the same answer: tracks, a sonar and a narrower tub. The routes test one edge at a time, with nothing between edges and nothing round. A house has:
+- flights of steps whose treads are shorter than a robot;
+- cords and hoses lying across the floor;
+- bevelled threshold strips where carpet meets tile.
+
+These test different things: pitch and tipping across several nosings, a round obstacle against belly clearance, and a ramp up and down.
+
+**Change.**
+- Three new obstacle kinds, driven in MuJoCo like the step and the trench:
+  - `stairs`: `n` steps of rise `h` and tread `run`, each nosing rounded like every edge;
+  - `bump`: a cable or hose of diameter `d` across the path, a capsule;
+  - `threshold`: a strip `h` high and `w` wide, with 20° bevels each side.
+- Three new routes (each with two test variants at ±5 %, as every route has):
+  - `patio`: 2 m of concrete, three 7.5 cm steps on 18 cm treads, 1 m of concrete; 60 s (first written as 5 cm on 24 cm: see below).
+  - `study`: 2 m of wood, a 1.2 cm power cord, 1 m of wood, a 1.4 cm threshold strip onto the rug, 2 m of carpet; 45 s.
+  - `greenhouse`: 2 m of grass, a 2.5 cm garden hose, 2.5 m of gravel; 60 s.
+- System 1's approach-duty control now applies at every edge kind.
+
+**Prediction.**
+- The stock (four 3 cm wheels, 2 cm belly) fails the patio and the greenhouse hose and passes the study, so it holds 6 of 13 train routes.
+- The three D-063 final bodies (tracks with 6.5–7 cm idlers on a narrow tub) hold the study and the greenhouse. They may fail the patio: a 20 cm tub on 24 cm treads pitches nose-down onto the second nosing.
+- A new three-seed campaign reaches 13/13 in at least two seeds, and its redesigns name the stairs (a longer track or a higher idler) if the patio fails.
+
+**Measured, before the campaign** (System 1's full search, each route's train placement).
+- **At first draft (5 cm steps on 24 cm treads):**
+  - The stock failed the patio ("its running gear slipped on the 3 4.9 cm steps") and grounded its 2 cm belly on the 2.5 cm hose. It passed the study. As predicted.
+  - All three D-063 final bodies passed all three routes: the patio did not trip them. A route that no evolved body fails tests nothing new, so it was steepened before any campaign.
+- **Steeper patio, probed on several bodies** (7.5 cm steps on 18 cm treads, the treads shorter than the robots):
+  - Seeds 0 and 1's final bodies slip on it (idlers 6.5–7 cm on 24 cm tracks).
+  - Tracks with an 8 cm idler on 30 cm passed, with or without a 4 cm ride height.
+  - A rocker-bogie with 6 cm wheels did not, even on 25 mm metal gearmotors.
+  - So the patio needs a redesign the catalogue can build.
+- **A 3.5 cm hose** stopped no tracked body, so the greenhouse keeps the 2.5 cm hose, which tests the stock's belly.
+- **No catalogue body holds every route now.**
+  - Climbing 7.5 cm stairs takes an 8 cm idler, and the track stands 1.5 cm above it.
+  - The sofa leaves 9 cm, so the most it allows is a 7.3 cm idler.
+  - Measured: tracks 8 cm × 30 cm on a 26 cm tub hold 12 of 13, all but the sofa ("the robot is 9.5 cm tall; the overhang is 9.0 cm"). The old gold body, 6.6 cm × 22 cm, holds 12 of 13, all but the patio. Seven sofa-height bodies tried slipped on the stairs.
+  - The steps were not lowered to remove the conflict. At 7.0 cm every D-063 final already climbs them, and the test would add nothing.
+  - A body that does both needs a mechanism the catalogue does not have. As with the gripper's long slide (D-064), the catalogue gains one only when System 2 asks for it.
+- **Tests:**
+  - `test_world_mobile` now counts 13 routes and 26 test tasks;
+  - the stock also holds the study, and fails the patio and greenhouse on its belly;
+  - the gold test records the conflict;
+  - a new test drives the cord, threshold, hose and stairs.

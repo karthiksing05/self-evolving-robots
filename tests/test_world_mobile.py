@@ -41,7 +41,7 @@ def _cost(body: Body):
 def test_protocol_tasks_and_catalogue():
     assert isinstance(W, World)
     tasks = W.tasks()
-    assert len(GROUPS) == len(ROUTES) == 10 and len({t.id for t in tasks}) == len(tasks)
+    assert len(GROUPS) == len(ROUTES) == 13 and len({t.id for t in tasks}) == len(tasks)
     assert {t.group for t in tasks if t.split == "test"} == GROUPS and len(tasks) == 3 * len(GROUPS)
     stock = W.stock()
     assert set(stock.parts) == {p.slot for p in W.catalogue()} and W.check(stock) == []
@@ -102,10 +102,11 @@ def test_width_ground_pressure_trench_and_energy():
 
 def test_stock_holds_the_floors_and_fails_the_rest_for_physical_reasons():
     held, outs = _held(W.stock())
-    assert held == {"kitchen", "living_room", "under_sofa", "shed", "lawn"}  # four cells (D-062) reach the lawn's end
+    assert held == {"kitchen", "living_room", "under_sofa", "shed", "lawn", "study"}  # four cells (D-062) reach the lawn's end
     assert {g: o.mechanism for g, o in outs.items() if g not in held} == {
         "bedroom": "chassis_wider_than_gap", "hallway": "sensing_range_short", "porch": "belly_hits_step_edge",
-        "garden": "belly_hits_step_edge", "sandbox": "sinks_in_sand"}
+        "garden": "belly_hits_step_edge", "sandbox": "sinks_in_sand", "patio": "belly_hits_step_edge",
+        "greenhouse": "belly_hits_step_edge"}
     for g, o in outs.items():
         if g not in held:
             assert o.score < 1 and any(c.isdigit() for c in o.detail) and ("cm" in o.detail or " s " in o.detail
@@ -136,10 +137,15 @@ def test_stock_parts_reach_the_porch_garden_and_sandbox_by_parameters_but_never_
     assert not W.solve(W.stock(), TASK["porch"]).success
 
 
-def test_a_gold_body_from_the_catalogue_holds_every_group_within_budget():
+def test_a_gold_body_from_the_catalogue_holds_every_group_but_one_within_budget():
+    """D-069: no catalogue body holds both the patio's 7.5 cm stairs and the 9 cm sofa.  Climbing the stairs takes
+    an 8 cm idler, and the track stands 1.5 cm above it; under the sofa, 9 cm is the most."""
     gold = _body(*GOLD)
     held, _ = _held(gold)
-    assert held == GROUPS and W.check(gold) == []
+    assert held == GROUPS - {"patio"} and W.check(gold) == []
+    tall = _body(Edit(slot="locomotion", type="tracks", params={"track_length": 30.0, "idler_height": 8.0}),
+                 Edit(slot="chassis", params={"width": 10.0, "length": 26.0, "ride_height": 3.0}), *GOLD[2:])
+    assert _held(tall)[0] == GROUPS - {"under_sofa"} and W.check(tall) == []
     res = _cost(gold)
     assert res.ok and 0 < res.usd <= W.manifest()["budget"]["usd"] and res.fab_minutes > 0
     test = [t for t in W.tasks() if t.split == "test"]
@@ -210,8 +216,25 @@ def test_speed_and_the_loop(tmp_path):
     assert time.perf_counter() - t0 < 10 and out.attempts >= 24 and out.sim_s < 10  # MuJoCo at the step (D-063)
     s = run(RunConfig(world="mobile", arm="random", iterations=2, seed=1), tmp_path / "random", world=MobileWorld(),
             log=lambda m: None)
-    assert s["arm"] == "random" and len(s["curve"]) >= 2 and s["test"]["n"] == 20
-    assert s["test"]["stock_held"] == ["kitchen", "lawn", "living_room", "shed", "under_sofa"]
+    assert s["arm"] == "random" and len(s["curve"]) >= 2 and s["test"]["n"] == 26
+    assert s["test"]["stock_held"] == ["kitchen", "lawn", "living_room", "shed", "study", "under_sofa"]
     s1 = run(RunConfig(world="mobile", arm="s1", iterations=2), tmp_path / "s1", world=MobileWorld(),
              log=lambda m: None)
-    assert s1["final_held_train"] == ["kitchen", "lawn", "living_room", "shed", "under_sofa"] and len(s1["curve"]) == 1
+    assert s1["final_held_train"] == ["kitchen", "lawn", "living_room", "shed", "study", "under_sofa"] and len(s1["curve"]) == 1
+
+
+def test_stairs_a_cord_a_threshold_and_a_hose_are_driven_in_mujoco():
+    """D-069: the stock crosses the study's cord and threshold but grounds its belly on the greenhouse hose and slips
+    on the patio's 7.5 cm stairs; tracks with an 8 cm idler on 30 cm climb the stairs."""
+    w = MobileWorld()
+    tasks = {t.id: t for t in w.tasks()}
+    stock = w.stock()
+    assert w.solve(stock, tasks["study_train0"]).success
+    hose = w.solve(stock, tasks["greenhouse_train0"])
+    assert not hose.success and hose.mechanism == "belly_hits_step_edge" and "hose" in hose.detail
+    assert not w.solve(stock, tasks["patio_train0"]).success
+    cat = {p.name: p for p in w.catalogue()}
+    tall = apply(stock, [Edit(slot="locomotion", type="tracks", params={"track_length": 30.0, "idler_height": 8.0}),
+                         Edit(slot="chassis", type="printed_tub", params={"width": 10.0, "length": 24.0, "ride_height": 3.0}),
+                         Edit(slot="sensor", type="ultrasonic", params={})], cat, "t")
+    assert w.solve(tall, tasks["patio_train0"]).success

@@ -113,6 +113,15 @@ ROUTES: dict[str, tuple[str, float, list[dict[str, Any]]]] = {  # target: (where
                                                      _f("floor", "grass", len=0.5)]),
     "shed": ("inside the garden shed", 60, [_f("floor", "grass", len=3.0), _f("ramp", "gravel", deg=22.0, len=1.5),
                                             _f("step", "wood", h=1.2)]),
+    # D-069: several edges in a row, round things across the floor, and a strip where carpet meets tile
+    "patio": ("the patio, up the three garden steps", 60, [_f("floor", "concrete", len=2.0),
+                                                          _f("stairs", "concrete", h=7.5, run=18.0, n=3),
+                                                          _f("floor", "concrete", len=1.0)]),
+    "study": ("the study, over the power cord and onto the rug", 45, [
+        _f("floor", len=2.0), _f("bump", d=1.2), _f("floor", len=1.0), _f("threshold", "carpet", h=1.4, w=6.0),
+        _f("floor", "carpet", len=2.0)]),
+    "greenhouse": ("the greenhouse, over the garden hose", 60, [_f("floor", "grass", len=2.0), _f("bump", "grass", d=2.5),
+                                                              _f("floor", "gravel", len=2.5)]),
     "lawn": ("every corner of the lawn (a survey)", 14400, [_f("floor", "concrete", len=1.0),
                                                            _f("step", "concrete", h=1.0),
                                                            _f("floor", "grass", len=5000.0)]),
@@ -247,7 +256,7 @@ def _drive(s: Spec, kind: str, f: dict[str, Any], mu: float, duty: float, y0: fl
            standing: bool = False, trace: bool = False) -> MM.Episode:
     """One MuJoCo episode at an obstacle, its arguments quantised so that search shares physics (D-063).  With
     ``trace`` (a film), the same episode run afresh with its trajectory kept."""
-    q = {"h": 0.1, "w": 0.1, "depth": 0.1, "deg": 0.25, "off": 0.25}  # cm, or degrees
+    q = {"h": 0.1, "w": 0.1, "depth": 0.1, "deg": 0.25, "off": 0.25, "run": 0.5, "n": 1.0, "d": 0.1}  # cm, deg, count
     items = tuple(sorted((k, round(f[k] / q[k]) * q[k]) for k in q if k in f))
     args = (_robot(s, f["s"]), kind, items, round(mu / 0.03) * 0.03, round(duty / 0.05) * 0.05,
             round(y0 / 0.25) * 0.25 / 100)
@@ -282,6 +291,9 @@ def _vsafe(s: Spec, mu: float) -> tuple[float, bool]:
 
 
 DESC = {"floor": "{ln} m of {s}", "step": "a {h:.1f} cm step up ({s}, mu {mu:.2f})",
+        "stairs": "{n:.0f} steps of {h:.1f} cm on {run:.0f} cm treads ({s}, mu {mu:.2f})",
+        "bump": "a {d:.1f} cm {thing} across the way ({s})", "threshold": "a {h:.1f} cm threshold strip, {w:.1f} cm wide, "
+        "onto {s}",
         "gap": "a {w:.1f} cm opening centred {off:+.1f} cm off the robot's line",
         "trench": "a {w:.1f} cm wide, {depth:.1f} cm deep trench ({s} edges, mu {mu:.2f})",
         "ramp": "a {deg:.1f} deg {s} ramp {ln} m long", "low": "{ln} m under a {clear:.1f} cm high overhang",
@@ -291,7 +303,8 @@ DESC = {"floor": "{ln} m of {s}", "step": "a {h:.1f} cm step up ({s}, mu {mu:.2f
 
 def _desc(f: dict[str, Any]) -> str:
     ln = f.get("len", 0.0)
-    return DESC[f["k"]].format(ln=f"{ln:.0f}" if ln >= 100 else f"{ln:.1f}", mu=SURF[f["s"]][0], **f)
+    return DESC[f["k"]].format(ln=f"{ln:.0f}" if ln >= 100 else f"{ln:.1f}", mu=SURF[f["s"]][0],
+                               thing="hose" if f.get("d", 0) >= 2 else "cord", **f)
 
 
 def _edge(s: Spec, f: dict[str, Any], mu: float, duty: float) -> tuple[str, str, float] | None:
@@ -299,8 +312,10 @@ def _edge(s: Spec, f: dict[str, Any], mu: float, duty: float) -> tuple[str, str,
     ep = _drive(s, f["k"], f, mu, duty)
     if ep.ok:
         return None
-    what = (f"the {f['h']:.2f} cm edge" if f["k"] == "step" else f"the {f['w']:.1f} cm wide, {f['depth']:.1f} cm deep "
-            "trench") + f" (edge mu {mu:.2f}), at approach duty {duty:.2f}: {ep.detail}"
+    what = {"step": "the {h:.2f} cm edge", "trench": "the {w:.1f} cm wide, {depth:.1f} cm deep trench",
+            "stairs": "the {n:.0f} {h:.1f} cm steps on {run:.0f} cm treads", "bump": "the {d:.1f} cm " + ("hose" if f.get("d", 0) >= 2 else "cord"),
+            "threshold": "the {h:.1f} cm threshold strip"}[f["k"]].format(**f) + \
+        f" (edge mu {mu:.2f}), at approach duty {duty:.2f}: {ep.detail}"
     part = 0.5 * ep.progress
     if ep.why == "belly":
         return "belly_hits_step_edge", f"the tub's belly at {s.belly:.1f} cm grounded on {what}", part
@@ -346,7 +361,7 @@ def _attempt(s: Spec, route: list[dict[str, Any]], secs: float, ctl: dict[str, f
         dist, force, duty = f.get("len", 0.3), crr * s.m * G, ctl["dark" if k == "dark" else "speed"]
         vsafe, steer, fail = math.inf, True, None
         approach = 1.0 if probe else ctl.get("approach", 1.0)
-        if k in ("step", "trench"):
+        if k in MM.EDGES:
             fail = _edge(s, f, mu * s.edge, approach)
         elif k == "gap":
             margin, sig = (f["w"] - s.width) / 2, s.drift * (0.3 + 0.7 * duty)
@@ -428,8 +443,8 @@ def _attempt(s: Spec, route: list[dict[str, Any]], secs: float, ctl: dict[str, f
 
 
 CONTROLS = {  # System 1's controls: range, starting value, the features that call for them
-    "speed": ((0.15, 1.0), 0.6, {"floor", "step", "gap", "trench", "ramp", "sand", "low", "dark"}),
-    "line": ((-6.0, 6.0), 0.0, {"gap"}), "approach": ((0.1, 1.0), 0.5, {"step", "trench"}),
+    "speed": ((0.15, 1.0), 0.6, {"floor", "gap", "ramp", "sand", "low", "dark", *MM.EDGES}),
+    "line": ((-6.0, 6.0), 0.0, {"gap"}), "approach": ((0.1, 1.0), 0.5, set(MM.EDGES)),
     "dark": ((0.1, 1.0), 0.5, {"dark"})}
 
 
@@ -558,7 +573,7 @@ class MobileWorld:
     def brief(self, body: Body, tasks: Sequence[Task]) -> str:
         s = _spec(body)
         feats = [f for t in ([t for t in tasks if t.split == "train"] or tasks) for f in t.data["route"]]
-        edges = sorted({f["s"] for f in feats if f["k"] in ("step", "trench")}, key=lambda x: SURF[x][0])
+        edges = sorted({f["s"] for f in feats if f["k"] in MM.EDGES}, key=lambda x: SURF[x][0])
         rows = [f"mass {s.m:.2f} kg; {s.width:.1f} cm wide overall, {s.length:.1f} cm long, {s.height:.1f} cm tall; "
                 f"belly clearance {s.belly:.1f} cm",
                 f"drive: {s.n} motors at {s.volts:.1f} V; stall force at the ground {s.f_stall:.1f} N ({s.f_stall / (s.m * G):.2f} of its "
