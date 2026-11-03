@@ -1,0 +1,3689 @@
+{
+ "run": "gripper_s2depth_s0",
+ "summary": {
+  "world": "gripper",
+  "arm": "s2",
+  "seed": 0,
+  "final_body": {
+   "id": "b130",
+   "parent": "b110",
+   "parts": {
+    "jaw": {
+     "type": "long_slide",
+     "params": {
+      "sector_radius_mm": 46.0
+     }
+    },
+    "pads": {
+     "type": "pads",
+     "params": {
+      "reach_mm": 12.0,
+      "pad_angle_deg": 0.0,
+      "groove_mm": 2.0,
+      "lip_mm": 0.0,
+      "pad_tpu_mm": 0.0,
+      "width_mm": 20.0
+     }
+    },
+    "arm_servos": {
+     "type": "servos_7v4",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 16,
+    "tasks_passed": 33,
+    "sim_s": 758.9,
+    "wall_s": 9.4
+   },
+   {
+    "iteration": 1,
+    "body": "b001",
+    "held_groups": 16,
+    "tasks_passed": 33,
+    "sim_s": 1372.6,
+    "wall_s": 69.3
+   },
+   {
+    "iteration": 2,
+    "body": "b001",
+    "held_groups": 16,
+    "tasks_passed": 33,
+    "sim_s": 4364.4,
+    "wall_s": 209.8
+   },
+   {
+    "iteration": 3,
+    "body": "b020",
+    "held_groups": 16,
+    "tasks_passed": 33,
+    "sim_s": 4924.4,
+    "wall_s": 277.8
+   },
+   {
+    "iteration": 4,
+    "body": "b032",
+    "held_groups": 17,
+    "tasks_passed": 34,
+    "sim_s": 5958.3,
+    "wall_s": 359.0
+   },
+   {
+    "iteration": 5,
+    "body": "b040",
+    "held_groups": 17,
+    "tasks_passed": 35,
+    "sim_s": 7433.3,
+    "wall_s": 489.9
+   },
+   {
+    "iteration": 6,
+    "body": "b050",
+    "held_groups": 17,
+    "tasks_passed": 35,
+    "sim_s": 8356.3,
+    "wall_s": 607.5
+   },
+   {
+    "iteration": 7,
+    "body": "b061",
+    "held_groups": 17,
+    "tasks_passed": 35,
+    "sim_s": 9566.0,
+    "wall_s": 743.5
+   },
+   {
+    "iteration": 8,
+    "body": "b071",
+    "held_groups": 17,
+    "tasks_passed": 35,
+    "sim_s": 10497.1,
+    "wall_s": 870.0
+   },
+   {
+    "iteration": 9,
+    "body": "b080",
+    "held_groups": 17,
+    "tasks_passed": 35,
+    "sim_s": 11649.2,
+    "wall_s": 1017.4
+   },
+   {
+    "iteration": 10,
+    "body": "b091",
+    "held_groups": 17,
+    "tasks_passed": 35,
+    "sim_s": 12781.2,
+    "wall_s": 1117.1
+   },
+   {
+    "iteration": 11,
+    "body": "b101",
+    "held_groups": 17,
+    "tasks_passed": 35,
+    "sim_s": 13913.9,
+    "wall_s": 1194.6
+   },
+   {
+    "iteration": 12,
+    "body": "b110",
+    "held_groups": 17,
+    "tasks_passed": 35,
+    "sim_s": 14876.6,
+    "wall_s": 1256.6
+   },
+   {
+    "iteration": 13,
+    "body": "b110",
+    "held_groups": 17,
+    "tasks_passed": 35,
+    "sim_s": 14876.6,
+    "wall_s": 1320.6
+   },
+   {
+    "iteration": 14,
+    "body": "b130",
+    "held_groups": 17,
+    "tasks_passed": 36,
+    "sim_s": 15769.8,
+    "wall_s": 1375.7
+   }
+  ],
+  "train_groups": 21,
+  "final_held_train": [
+   "apple",
+   "banana",
+   "cup",
+   "dice",
+   "flat_screwdriver",
+   "foam_brick",
+   "gelatin_box",
+   "golf_ball",
+   "large_marker",
+   "lemon",
+   "plum",
+   "racquetball",
+   "strawberry",
+   "tennis_ball",
+   "tomato_soup_can",
+   "tuna_fish_can",
+   "wood_block_cube"
+  ],
+  "test": {
+   "final_held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "tuna_fish_can",
+    "wood_block_cube"
+   ],
+   "stock_held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "foam_brick",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "potted_meat_can",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "final_tasks": 35,
+   "stock_tasks": 32,
+   "n": 42
+  },
+  "spent": {
+   "usd": 6.4,
+   "fab_minutes": 592.8,
+   "lead_days": 3.0,
+   "owned": {
+    "steel_rod_3x150": 2.0,
+    "lm3uu_bearing": 2.0,
+    "sts3215_7v4": 6.0
+   }
+  },
+  "ideas": [
+   {
+    "name": "fixed_jaw_offset_block",
+    "description": "A printed PLA spacer and face that bolts onto the stock fixed jaw with M3 screws. It carries the fixed contact face 8 mm further outward, still vertical, with the same TPU-skinned grooved pad. Paired with the long_slide, it shifts the whole opening range outward by 8 mm.",
+    "slot": "fixed_jaw",
+    "needs": [
+     {
+      "item": "print:PLA",
+      "qty": 12.0,
+      "usd_each": null,
+      "lead_days": null
+     },
+     {
+      "item": "print:TPU",
+      "qty": 1.0,
+      "usd_each": null,
+      "lead_days": null
+     },
+     {
+      "item": "m3_screw",
+      "qty": 2.0,
+      "usd_each": null,
+      "lead_days": null
+     },
+     {
+      "item": "m2_screw",
+      "qty": 2.0,
+      "usd_each": null,
+      "lead_days": null
+     }
+    ],
+    "test": "Model the fixed jaw with its face offset +8 mm along the closing axis, on the long_slide body (sector_radius 48.5, pad_angle 0). Check that it does not interfere with the wrist at full roll, then run mustard_bottle, sugar_box and dice.",
+    "iteration": 1,
+    "cost": {
+     "usd": 0.0,
+     "usd_estimated": 0.0,
+     "lead_days": 0.0,
+     "fab_minutes": 68.0,
+     "lines": [
+      "print:PLA 12 g: 60 machine min",
+      "print:TPU 1 g: 8 machine min",
+      "m3_screw x2: provided",
+      "m2_screw x2: provided"
+     ],
+     "new_items": [],
+     "missing": [],
+     "fits_budget": true
+    }
+   },
+   {
+    "name": "fixed_jaw_spacer_shim",
+    "description": "A 9 mm printed PLA spacer plate (about 20 x 30 mm, 40% infill) bolted between the gripper body and the fixed jaw with the jaw's existing screw pattern. It moves the fixed jaw's face 9 mm outward along the closing axis. The slide's travel is unchanged, so every object closes at a servo angle 0.2 rad later and the widest opening grows from 88 to about 97 mm between pads. The grasp centre shifts about 4.5 mm toward the fixed jaw, which System 1's side-clearance parameter absorbs.",
+    "slot": "fixed_jaw (new)",
+    "needs": [
+     {
+      "item": "print:PLA",
+      "qty": 6.0,
+      "usd_each": null,
+      "lead_days": null
+     },
+     {
+      "item": "m3_screw",
+      "qty": 4.0,
+      "usd_each": null,
+      "lead_days": null
+     }
+    ],
+    "test": "Add a fixed-jaw offset parameter (0 to 12 mm) to the gripper model that translates the fixed jaw body and its pad outward along the closing axis. Run all groups at 9 mm with the current long_slide (46) and pads.",
+    "iteration": 8,
+    "cost": {
+     "usd": 0.0,
+     "usd_estimated": 0.0,
+     "lead_days": 0.0,
+     "fab_minutes": 30.0,
+     "lines": [
+      "print:PLA 6 g: 30 machine min",
+      "m3_screw x4: provided"
+     ],
+     "new_items": [],
+     "missing": [],
+     "fits_budget": true
+    }
+   },
+   {
+    "name": "sector_arc_extension",
+    "description": "A printed module-1 tooth arc at 50 mm pitch radius, screwed with four M3 screws over the current 46 mm sector, plus a printed 4 mm spacer that drops the carriage rack to the new centre distance. The finger travels 50 mm per servo radian over the same -0.17 to 1.75 rad, so the pads open to about 95 mm. They stay parallel and the tip does not rise, and the squeeze falls only from 35 N to 32 N.",
+    "slot": "jaw",
+    "needs": [
+     {
+      "item": "print:PLA",
+      "qty": 9.0,
+      "usd_each": null,
+      "lead_days": null
+     },
+     {
+      "item": "m3_screw",
+      "qty": 4.0,
+      "usd_each": null,
+      "lead_days": null
+     },
+     {
+      "item": "m2_screw",
+      "qty": 2.0,
+      "usd_each": null,
+      "lead_days": null
+     }
+    ],
+    "test": "In the simulator, build the long_slide with sector_radius_mm=50 but keep the current carriage, rods and pads (reach 9, width 20), and charge only the arc and spacer print. Rerun all 21 groups, checking tomato_soup_can and apple, which lost to a rack press at 49.5 when the whole slide was reprinted.",
+    "iteration": 9,
+    "cost": {
+     "usd": 0.0,
+     "usd_estimated": 0.0,
+     "lead_days": 0.0,
+     "fab_minutes": 45.0,
+     "lines": [
+      "print:PLA 9 g: 45 machine min",
+      "m3_screw x4: provided",
+      "m2_screw x2: provided"
+     ],
+     "new_items": [],
+     "missing": [],
+     "fits_budget": true
+    }
+   },
+   {
+    "name": "flush_reach_pads",
+    "description": "Printed PLA tongues that bolt to the back and side of each stock jaw face, with their contact surface coplanar with the stock face (0 mm stand-out), so they add no thickness to the opening. Each tongue extends 12 mm below the stock fingertip, is 20 mm wide, carries a 2 mm V-groove cut into it, and has a 0.5 mm TPU skin (mu 0.9) inset into a pocket so it does not stand proud. The fingertips open to about 95 mm, against 88 mm with the current pads, and still reach below the top of low objects.",
+    "slot": "pads",
+    "needs": [
+     {
+      "item": "m2_screw",
+      "qty": 4.0,
+      "usd_each": null,
+      "lead_days": null
+     },
+     {
+      "item": "print:PLA",
+      "qty": 2.0,
+      "usd_each": null,
+      "lead_days": null
+     },
+     {
+      "item": "print:TPU",
+      "qty": 0.5,
+      "usd_each": null,
+      "lead_days": null
+     }
+    ],
+    "test": "A pads variant in design/fingers.py with a stand-out parameter (pad thickness in front of the face, 0\u20134 mm) and the TPU skin inset into a pocket. Then re-run pudding_box, sugar_box and mustard_bottle at stand-out 0, plus banana, gelatin_box and tuna_fish_can to check that contact height is kept.",
+    "iteration": 12,
+    "cost": {
+     "usd": 0.0,
+     "usd_estimated": 0.0,
+     "lead_days": 0.0,
+     "fab_minutes": 14.0,
+     "lines": [
+      "m2_screw x4: provided",
+      "print:PLA 2 g: 10 machine min",
+      "print:TPU 0.5 g: 4 machine min"
+     ],
+     "new_items": [],
+     "missing": [],
+     "fits_budget": true
+    }
+   }
+  ],
+  "sim_s": 16946.8,
+  "attempts": 3438,
+  "proposals": {
+   "total": 36,
+   "tried": 30,
+   "refused": 2,
+   "ideas": 4,
+   "kept": 12,
+   "rejected_regression": 11,
+   "moves": {
+    "params": 24,
+    "swap": 4,
+    "idea": 4,
+    "tune": 4,
+    "merge": 0
+   },
+   "mean_prediction_precision": 0.032
+  },
+  "frontier": [],
+  "wall_s": 1384.9,
+  "llm": {
+   "calls": 14,
+   "tokens_in": 205675,
+   "tokens_out": 113302,
+   "usd_list_price": 3.668
+  }
+ },
+ "final_body": "arm_servos: servos_7v4; jaw: long_slide (sector_radius_mm=46); pads: pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=0, reach_mm=12, width_mm=20)",
+ "final_bom": [
+  {
+   "item": "print:PLA",
+   "qty": 49.4,
+   "slot": "jaw",
+   "note": "carriage, rack, gear sector, rod clamp"
+  },
+  {
+   "item": "steel_rod_3x150",
+   "qty": 2.0,
+   "slot": "jaw",
+   "note": ""
+  },
+  {
+   "item": "lm3uu_bearing",
+   "qty": 2.0,
+   "slot": "jaw",
+   "note": ""
+  },
+  {
+   "item": "m3_screw",
+   "qty": 6.0,
+   "slot": "jaw",
+   "note": ""
+  },
+  {
+   "item": "print:PLA",
+   "qty": 1.67,
+   "slot": "pads",
+   "note": ""
+  },
+  {
+   "item": "m2_screw",
+   "qty": 4.0,
+   "slot": "pads",
+   "note": ""
+  },
+  {
+   "item": "sts3215_7v4",
+   "qty": 6.0,
+   "slot": "arm_servos",
+   "note": ""
+  }
+ ],
+ "stock_bom": [
+  {
+   "item": "sts3215_7v4",
+   "qty": 6.0,
+   "slot": "arm_servos",
+   "note": ""
+  }
+ ],
+ "judge_key": "1fcfb65daab4",
+ "iterations": [
+  {
+   "iteration": 0,
+   "body": "arm_servos: servos_7v4; jaw: revolute; pads: none",
+   "held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "moving_jaw_on_top_face": 7,
+    "fixed_jaw_missed": 1,
+    "squeezed_down_out": 1
+   },
+   "failing": {
+    "reg_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.92 rad (fingertips 85 mm apart), moving fingertip +22 mm vs the fixed one; fixed jaw: no contact; moving jaw: 28 N on the stock jaw at +16 mm from the centre (top at +19), pushing 83 deg down; rose 1 mm, ended +0 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.88 rad (fingertips 82 mm apart), moving fingertip +20 mm vs the fixed one; fixed jaw: no contact; moving jaw: 20 N on the stock jaw at +17 mm from the centre (top at +19), pushing 84 deg down; rose 0 mm, ended +0 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.75 rad (fingertips 74 mm apart), moving fingertip +14 mm vs the fixed one; fixed jaw: no contact; moving jaw: 28 N on the stock jaw at +21 mm from the centre (top at +23), pushing 84 deg down; rose 0 mm, ended -0 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict stuck; closed to 0.77 rad (fingertips 75 mm apart), moving fingertip +14 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended +0 mm; 514 g"
+    },
+    "rva000_potted_meat_can": {
+     "mechanism": "squeezed_down_out",
+     "detail": "verdict wrong_behavior; closed to 0.60 rad (fingertips 63 mm apart), moving fingertip +8 mm vs the fixed one; fixed jaw: 27 N on the stock jaw at +23 mm from the centre (top at +42), pushing 2 deg up; moving jaw: 44 N on the stock jaw at +43 mm from the centre (top at +42), pushing 33 deg down; rose 30 mm, ended +30 mm; 370 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.71 rad (fingertips 71 mm apart), moving fingertip +12 mm vs the fixed one; fixed jaw: 3 N on the stock jaw at +12 mm from the centre (top at +29), pushing 12 deg down; moving jaw: 21 N on the stock jaw at +21 mm from the centre (top at +29), pushing 68 deg down; rose 1 mm, ended +1 mm; 431 g"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.78 rad (fingertips 76 mm apart), moving fingertip +15 mm vs the fixed one; fixed jaw: 10 N on the stock jaw at +6 mm from the centre (top at +29), pushing 9 deg down; moving jaw: 23 N on the stock jaw at +18 mm from the centre (top at +29), pushing 65 deg down; rose 1 mm, ended +1 mm; 431 g"
+    },
+    "reg_tuna_fish_can": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.91 rad (fingertips 84 mm apart), moving fingertip +22 mm vs the fixed one; fixed jaw: 6 N on the stock jaw at +5 mm from the centre (top at +17), pushing 2 deg up; moving jaw: 20 N on the stock jaw at +17 mm from the centre (top at +17), pushing 57 deg down; rose 0 mm, ended -0 mm; 171 g"
+    },
+    "rva000_tuna_fish_can": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.92 rad (fingertips 85 mm apart), moving fingertip +23 mm vs the fixed one; fixed jaw: 10 N on the stock jaw at +4 mm from the centre (top at +17), pushing 2 deg up; moving jaw: 27 N on the stock jaw at +17 mm from the centre (top at +17), pushing 55 deg down; rose 0 mm, ended -0 mm; 171 g"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "jaw -> long_slide (sector_radius_mm=50)",
+     "base": null,
+     "mechanism": "moving_jaw_on_top_face (pudding_box, sugar_box, mustard_bottle, tuna_fish_can) and fixed_jaw_missed (rva000_sugar_box): the hinged jaw's fingertip rises as it opens, by +14 to +23 mm at the 74-85 mm openings used, and its face tilts 44-64 deg. So on these low wide objects (34-58 mm tall, tops at +17 to +29 mm) the moving tip lands on the top face and pushes 55-84 deg down instead of squeezing the side. The same tilt causes squeezed_down_out on potted_meat_can: at 57 mm the moving face is 33 deg off, contacting at +43 mm when the top is at +42, and tan 33\u00b0 = 0.65 is more than the metal's friction of 0.35.",
+     "principle": "A finger can only hold a side if its fingertip reaches below the object's top at that opening, and only horizontal, opposed (antipodal) contacts hold without squeezing the object out. A slide keeps the finger from turning or rising at any opening.",
+     "hypothesis": "No params move can fix this. The stock revolute jaw's tip rise R(1-cos q) is fixed by its 81 mm radius, and the failing objects need 85-96 mm openings, where the brief gives tip +23 to +35 mm and face 53-64 deg. Pads with pad_angle 45 still leave the face at +14 deg and the tip at +14 mm at 85 mm. Parallelogram link 90 keeps the face parallel but its tip rises +33 mm at 85 mm, and link 50 cannot reach 85 mm at all. Prismatic tops out at 68 mm. long_slide at sector_radius 50 is the only catalogue part that reaches 103 mm with face 0 deg, tip +1 mm and 32 N at every width, which covers mustard's 96 mm plus side clearance. Holding force: 2\u00b70.5\u00b732 = 32 N against the sugar box's 5.0 N, 2\u00b70.4\u00b732 = 26 N against mustard's 4.2 N, and 2\u00b70.35\u00b732 = 22 N against potted meat's 3.6 N, all with large margin for the lift's acceleration. Arm load for the heaviest object (514 g) is 0.41 + 0.77 = 1.18 N\u00b7m plus about 60 g more at the wrist, still under the 1.62 N\u00b7m stall. Cost: $6.40 (lm3uu x2 at $2.40, steel_rod_3x150 x2 at $4.00), 3 days, 216 machine minutes; all within $40, 7 days and 600 minutes. M3 screws are on hand.",
+     "predicted_gains": [
+      "pudding_box",
+      "sugar_box",
+      "mustard_bottle",
+      "tuna_fish_can",
+      "potted_meat_can"
+     ],
+     "risks": [
+      "Round rollers (apple, golf_ball, tennis_ball, lemon, plum, strawberry, racquetball, tomato_soup_can): flat parallel faces don't centre a sphere along the depth axis. They should survive because the squeeze rises from 20 to 32 N, contacts now sit exactly at the equator with no up/down push, and the stock faces are flat too and already hold these objects. If any fails, a grooved pad (proposal 2's slot) is the remedy.",
+      "Small objects (dice 17 mm, large_marker 19 mm): the slide must close below 17 mm. Its servo range starts at -0.17 rad, as the stock jaw's does, so the fully closed position should be about the same; the parameter refit can lower sector_radius if needed, but anything below about 48 mm loses mustard's 96 mm.",
+      "Tomato_soup_can (349 g, friction 0.35): it is held at 20 N now, and 32 N with parallel faces only adds margin."
+     ],
+     "idea": null,
+     "result": "refused before trial: mechanism law (no interference): the wrist and the pinion share material, a region up to 1.6 x 0.2 x 0.5 mm (jaw at -0.17 rad, wrist rolled -2.74..-2.74 rad); parts may share material only at a bearing seat, within 10 mm of the hinge axis",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 6.4,
+      "lead_days": 3.0,
+      "fab_minutes": 270.0,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x150 x2: 0 provided, buy 2 at $2 ($4.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 54.0 g for jaw: 270 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    },
+    {
+     "k": 1,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "pads -> pads (groove_mm=2, lip_mm=0, pad_angle_deg=20, pad_tpu_mm=2, reach_mm=0, width_mm=12)",
+     "base": null,
+     "mechanism": "squeezed_down_out on rva000_potted_meat_can: the moving face is 33 deg off parallel at the 57-63 mm opening and pushes the 370 g metal can down with N sin(a). Bare PLA against metal at 0.35 cannot resist that, since tan 33\u00b0 = 0.65.",
+     "principle": "A tilted contact squeezes the object out unless friction exceeds the tilt. A TPU skin raises friction to 0.9, a pad tilted back by pad_angle makes the face parallel nearer the working opening, and a V-groove centres round objects.",
+     "hypothesis": "This is the cheapest fallback: $0, 0 days, 16 machine minutes, using on-hand M2 screws and about 3 g of print. With pad_angle 20, the moving face at about 57 mm should drop from about +33 deg to roughly +15 deg (tan 15\u00b0 \u2248 0.27), well within TPU's 0.9, so the can should stay held through the lift. It does not fix the wide low objects, because the tip still rises on the hinge. It changes a different slot from proposal 1, so if both are kept-eligible they can be combined: on the slide, the TPU and groove add friction and centre the rolling objects.",
+     "predicted_gains": [
+      "potted_meat_can"
+     ],
+     "risks": [
+      "Small objects (dice, large_marker, wood_block_cube, flat_screwdriver): a 20 deg pad tilts the moving face bottom-in by up to about -20 deg at 17-35 mm, pushing the object upward. TPU friction of 0.9 is more than tan 20\u00b0 = 0.36, so they should still hold. The refit can trade pad_angle down toward 10 if one slips.",
+      "Wide held objects (apple 75 mm, gelatin_box 73 mm, banana 70 mm): their face tilt falls from about 44 to about 25 deg, which helps, and the 2 mm groove and skin narrow the maximum opening by only a few mm (brief: 92-95 mm vs 99 mm). That leaves margin for the 75 mm apple."
+     ],
+     "idea": null,
+     "result": "KEPT: gained 1 tasks, lost none; costs $0.00, 5 machine min",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "potted_meat_can"
+      ],
+      "hit": [],
+      "missed": [
+       "potted_meat_can"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 5.0,
+      "lines": [
+       "m2_screw x4: provided (on hand)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 0.5 g for pads: 2 machine minutes",
+       "print:TPU 0.3 g for pads: 3 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "moving_jaw_on_top_face",
+      "slipped_under_load"
+     ]
+    }
+   ],
+   "accepted": "b001",
+   "notes": "The root cause of all five failing groups is the hinged jaw's geometry. At wide openings the moving fingertip rises (+14 to +35 mm) and its face tilts (44-64 deg), so on low wide objects it lands on the top face. At 57 mm the 33 deg tilt squeezes the potted meat can out. long_slide at sector_radius 50 is the only catalogue part that keeps tip rise under 2 mm and the face parallel out to 103 mm. Purchases for proposal 1: 2 lm3uu_bearing ($2.40) and 2 steel_rod_3x150 ($4.00), $6.40 total, 3 days lead, 216 machine minutes. That leaves $33.60, which is still not enough for 12 V servos ($68), and those aren't needed: the worst-case shoulder load is 1.18 of 1.62 N\u00b7m.",
+   "llm": {
+    "tag": "iter00",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 50.7,
+    "tokens_in": 11757,
+    "tokens_out": 4893,
+    "usd_list_price": 0.1742,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 69.3,
+   "stop": null
+  },
+  {
+   "iteration": 1,
+   "body": "arm_servos: servos_7v4; jaw: revolute; pads: pads (groove_mm=2, lip_mm=0, pad_angle_deg=20, pad_tpu_mm=2, reach_mm=0, width_mm=12)",
+   "held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "moving_jaw_on_top_face": 6,
+    "fixed_jaw_missed": 2,
+    "slipped_under_load": 1
+   },
+   "failing": {
+    "reg_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.92 rad (fingertips 76 mm apart), moving fingertip +19 mm vs the fixed one; fixed jaw: 7 N on the pad at -1 mm from the centre (top at +19), pushing 2 deg down; moving jaw: 19 N on the pad at +18 mm from the centre (top at +19), pushing 86 deg down; rose 0 mm, ended +0 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.96 rad (fingertips 78 mm apart), moving fingertip +22 mm vs the fixed one; fixed jaw: no contact; moving jaw: 20 N on the pad at +17 mm from the centre (top at +19), pushing 86 deg down; rose 0 mm, ended +0 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.57 rad (fingertips 52 mm apart), moving fingertip +5 mm vs the fixed one; fixed jaw: no contact; moving jaw: 38 N on the pad at +22 mm from the centre (top at +23), pushing 88 deg down; rose 0 mm, ended +0 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.82 rad (fingertips 69 mm apart), moving fingertip +14 mm vs the fixed one; fixed jaw: no contact; moving jaw: 35 N on the pad at +22 mm from the centre (top at +23), pushing 86 deg down; rose 0 mm, ended +0 mm; 514 g"
+    },
+    "rva000_potted_meat_can": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict wrong_behavior; closed to 1.00 rad (fingertips 81 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended +0 mm; 370 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.85 rad (fingertips 71 mm apart), moving fingertip +16 mm vs the fixed one; fixed jaw: no contact; moving jaw: 26 N on the pad at +24 mm from the centre (top at +29), pushing 74 deg down; rose 2 mm, ended +2 mm; 431 g"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.51 rad (fingertips 47 mm apart), moving fingertip +3 mm vs the fixed one; fixed jaw: no contact; moving jaw: 39 N on the stock jaw at +30 mm from the centre (top at +29), pushing 88 deg down; rose 2 mm, ended +1 mm; 431 g"
+    },
+    "reg_tuna_fish_can": {
+     "mechanism": "slipped_under_load",
+     "detail": "verdict wrong_behavior; closed to 0.44 rad (fingertips 41 mm apart), moving fingertip +2 mm vs the fixed one; fixed jaw: 22 N on the pad at +16 mm from the centre (top at +17), pushing 2 deg up; moving jaw: 23 N on the pad at +14 mm from the centre (top at +17), pushing 10 deg down; rose 16 mm, ended +13 mm; 171 g"
+    },
+    "rva000_tuna_fish_can": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict no_actuation; closed to 0.51 rad (fingertips 47 mm apart), moving fingertip +3 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended -0 mm; 171 g"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "jaw -> long_slide (sector_radius_mm=48.5); pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=2, reach_mm=0, width_mm=12)",
+     "base": null,
+     "mechanism": "moving_jaw_on_top_face on the wide, low boxes (pudding 90 mm/38 tall, sugar 92/45, tuna 85/34). The hinged jaw cannot open much wider than these objects: its maximum is 91 mm, and near that opening its tip has risen +28 mm or more (+19 to +22 mm in the failing runs). So the moving pad comes down onto the top face (contact at +17 to +22 mm with a top at +19 to +23, pushing 86-88 deg down), and the fixed jaw often never touches. reg_tuna also slipped, with its moving face pushing 10 deg down on metal (mu 0.35).",
+     "principle": "A face that turns with its joint is parallel to the fixed face at only one opening, and its tip rises by R(1-cos q). A finger that slides straight along the closing axis neither turns nor rises, so its contacts stay antipodal and below the object's top at every opening.",
+     "hypothesis": "Iteration 1's long_slide at sector_radius 50 was refused for interference with the wrist, not for its function: the overlap was only 1.6 x 0.2 x 0.5 mm, at jaw -0.17 rad. Cutting the pitch radius to 48.5 mm pulls the sector's rim in by 1.5 mm, about 7 times the 0.2 mm overlap, so it should clear. Opening: 30 mm gives 58 and 50 mm gives 93, so the opening rises about 1.75 mm per mm of radius and seems to stop near 93; 48.5 mm should still give about 92-93 mm. The tip stays at +2 mm and the squeeze is about 1.62/0.0485 = 33 N. With pad_angle set to 0 the slide face is parallel at every opening; it was -20 deg with the current pads. Pudding: 2*0.5*33 = 33 N of grip against 1.8 N of weight. Tuna: 2*0.35*33 = 23 N against 1.7 N, with the face now flat. Sugar: 92 mm against about 93 mm leaves almost no side clearance, so it is uncertain. Shoulder load: 0.41 + about 0.1 for the slide's mass + 0.77 for sugar = about 1.28 N*m, under the 1.62 stall. No params move fixes this. Pads at pad_angle 45 still give the hinge a +14 deg face and a +14 mm tip at 85 mm, and their 95 mm maximum leaves sugar nearly no clearance. Buy: 2 lm3uu ($2.40) and 2 steel_rod_3x150 ($4.00), $6.40 in all, 3 days, about 216 + 16 machine minutes.",
+     "predicted_gains": [
+      "pudding_box",
+      "tuna_fish_can",
+      "sugar_box"
+     ],
+     "risks": [
+      "It may still be refused for interference if the overlap is not at the sector's rim. If so, the next step is about 47 mm, at the cost of opening.",
+      "foam_brick, cup: the squeeze rises from 20 N to about 33 N. Both are light, with high friction or a rigid shell, so they should still hold, though crushing is possible.",
+      "Spheres (golf_ball, plum, strawberry, lemon, racquetball, tennis_ball, apple): flat parallel faces leave nothing but the 2 mm groove to centre them. The groove is kept, and parallel faces at the equator are the antipodal ideal, so they should hold better than on the hinge.",
+      "dice, large_marker, wood_block_cube: the slide's closed end at -0.17 rad has to come below 17 mm. A pitch radius of 48.5 mm gives about 8 mm of overtravel, so these should still be gripped."
+     ],
+     "idea": null,
+     "result": "rejected: lost banana, tomato_soup_can (banana: fixed_jaw_missed, verdict stuck; closed to 1.60 rad (fingertips 84 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no c; banana: fixed_jaw_missed, verdict stuck; closed to 1.60 rad (fingertips 84 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no c; tomato_soup_can: force_limit, verdict stuck; the rack pressed 0 N down on its top at t=2.26 s, +33 mm from the object's centre (top at +34); the force limit stopped the a); it would gain potted_meat_can, tuna_fish_can",
+     "gained": [
+      "potted_meat_can",
+      "tuna_fish_can"
+     ],
+     "lost": [
+      "banana",
+      "tomato_soup_can"
+     ],
+     "prediction": {
+      "predicted": [
+       "pudding_box",
+       "sugar_box",
+       "tuna_fish_can"
+      ],
+      "hit": [
+       "tuna_fish_can"
+      ],
+      "missed": [
+       "pudding_box",
+       "sugar_box"
+      ],
+      "unpredicted": [
+       "potted_meat_can"
+      ],
+      "precision": 0.333,
+      "lost": [
+       "banana",
+       "tomato_soup_can"
+      ]
+     },
+     "resources": {
+      "usd": 6.4,
+      "lead_days": 3.0,
+      "fab_minutes": 265.8,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x150 x2: 0 provided, buy 2 at $2 ($4.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 52.2 g for jaw: 261 machine minutes",
+       "print:PLA 0.5 g for pads: 2 machine minutes",
+       "print:TPU 0.3 g for pads: 2 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "force_limit",
+      "moving_jaw_on_top_face"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "pads (groove_mm=2, lip_mm=0, pad_angle_deg=45, pad_tpu_mm=2, reach_mm=0, width_mm=12)",
+     "base": null,
+     "mechanism": "The same moving_jaw_on_top_face mechanism, as a fallback if the slide is refused again. Tilting the pad back lowers the moving fingertip and flattens the face at wide openings.",
+     "principle": "The pad is parallel to the fixed face when the jaw has opened by pad_angle. From the brief: at 85 mm, pad_angle 20 gives face +42 deg and tip +28 mm, while pad_angle 45 gives face +14 deg and tip +14 mm. The maximum opening grows from 91 to 95 mm.",
+     "hypothesis": "pad_angle 45 gives about 95 mm, so pudding (90 + 2.75 mm clearance) and tuna (85) can be cleared with the moving tip about +14 to +20 mm, below their 34-38 mm tops. A face tilt of about 14-19 deg has tan 0.25-0.34, under mu 0.35-0.5, and 2*mu*20 N far exceeds their 1.7-1.8 N weight. It costs $0, with about 16 min of reprint.",
+     "predicted_gains": [
+      "pudding_box",
+      "tuna_fish_can"
+     ],
+     "risks": [
+      "dice (17 mm), large_marker (19), wood_block_cube (26), flat_screwdriver (34): at 35 mm the face is already -21 deg (bottom swung in) and the moving tip is 10 mm below the fixed one. At 17 mm the face is probably near -33 deg, and tan 33 = 0.65 > mu 0.4, which could squeeze the dice out. This is the main risk: it is why this is the fallback, and the trial will tell.",
+      "cup (57 mm, 13 g) and the small spheres: their faces swing toward bottom-in, but stay near parallel around 45-55 mm (-8 deg at 55 mm)."
+     ],
+     "idea": null,
+     "result": "rejected: lost banana, large_marker (banana: force_limit, verdict stuck; a contact exceeded the force limit at t=0.02 s (squeezing or pressing down); banana: force_limit, verdict stuck; a contact exceeded the force limit at t=0.02 s (squeezing or pressing down); large_marker: fixed_jaw_on_top_face, verdict wrong_behavior; closed to 0.17 rad (fingertips 12 mm apart), moving fingertip -10 mm vs the fixed one; fixed jaw: 19 N on the pad at)",
+     "gained": [],
+     "lost": [
+      "banana",
+      "large_marker"
+     ],
+     "prediction": {
+      "predicted": [
+       "pudding_box",
+       "tuna_fish_can"
+      ],
+      "hit": [],
+      "missed": [
+       "pudding_box",
+       "tuna_fish_can"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": [
+       "banana",
+       "large_marker"
+      ]
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 8.3,
+      "lines": [
+       "m2_screw x4: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 0.8 g for pads: 4 machine minutes",
+       "print:TPU 0.5 g for pads: 4 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_on_top_face",
+      "force_limit"
+     ]
+    },
+    {
+     "k": 2,
+     "move": "idea",
+     "declared_move": "idea",
+     "edit": "",
+     "base": null,
+     "mechanism": "mustard_bottle (96 mm across) is wider than any catalogue jaw can open without a large tip rise or face tilt: the slide gives about 93 mm, pads at 45 deg about 95, and the 96 mm parallelogram has a tip at +49 mm. So no catalogue part addresses its moving_jaw_on_top_face failure.",
+     "principle": "On a straight slide the opening range is fixed by travel = servo span (1.92 rad) x pitch radius. Moving the fixed face outward shifts the whole range wider without changing the radius, so the squeeze and the interference margin are unchanged.",
+     "hypothesis": "An 8 mm outward offset of the fixed face, with the slide at 48.5 mm, would shift the range from roughly 0-93 mm to 8-101 mm. That clears mustard (96 + clearance) and sugar (92) with room to spare, and the slide's overtravel would still close on the 17 mm dice.",
+     "predicted_gains": [
+      "mustard_bottle",
+      "sugar_box"
+     ],
+     "risks": [
+      "The fixed jaw's longer lever adds a little wrist torque. The closed end of the range moves to about 8 mm, so the dice keeps about 9 mm of margin."
+     ],
+     "idea": {
+      "name": "fixed_jaw_offset_block",
+      "description": "A printed PLA spacer and face that bolts onto the stock fixed jaw with M3 screws. It carries the fixed contact face 8 mm further outward, still vertical, with the same TPU-skinned grooved pad. Paired with the long_slide, it shifts the whole opening range outward by 8 mm.",
+      "slot": "fixed_jaw",
+      "needs": [
+       {
+        "item": "print:PLA",
+        "qty": 12.0,
+        "usd_each": null,
+        "lead_days": null
+       },
+       {
+        "item": "print:TPU",
+        "qty": 1.0,
+        "usd_each": null,
+        "lead_days": null
+       },
+       {
+        "item": "m3_screw",
+        "qty": 2.0,
+        "usd_each": null,
+        "lead_days": null
+       },
+       {
+        "item": "m2_screw",
+        "qty": 2.0,
+        "usd_each": null,
+        "lead_days": null
+       }
+      ],
+      "test": "Model the fixed jaw with its face offset +8 mm along the closing axis, on the long_slide body (sector_radius 48.5, pad_angle 0). Check that it does not interfere with the wrist at full roll, then run mustard_bottle, sugar_box and dice."
+     },
+     "result": "idea recorded, not tested: fixed_jaw_offset_block; it would need $0.00 from the manifest, 0 days, 68 machine min; within the budget left",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": null,
+     "still_failing": []
+    },
+    {
+     "k": "t0",
+     "move": "tune",
+     "declared_move": "tune",
+     "edit": "jaw (sector_radius_mm=48.5); pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=2, reach_mm=0, width_mm=8)",
+     "base": "b010",
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the loop fits b010's new jaw, pads before judging it (tuning trial 1 of 4)",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost banana, tomato_soup_can (banana: fixed_jaw_missed, verdict stuck; closed to 1.60 rad (fingertips 84 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no c; banana: fixed_jaw_missed, verdict stuck; closed to 1.60 rad (fingertips 84 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no c; tomato_soup_can: force_limit, verdict stuck; the rack pressed 0 N down on its top at t=2.26 s, +33 mm from the object's centre (top at +34); the force limit stopped the a); it would gain potted_meat_can, tuna_fish_can",
+     "gained": [
+      "potted_meat_can",
+      "tuna_fish_can"
+     ],
+     "lost": [
+      "banana",
+      "tomato_soup_can"
+     ],
+     "prediction": null,
+     "resources": {
+      "usd": 6.4,
+      "lead_days": 3.0,
+      "fab_minutes": 264.4,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x150 x2: 0 provided, buy 2 at $2 ($4.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 52.2 g for jaw: 261 machine minutes",
+       "print:PLA 0.3 g for pads: 2 machine minutes",
+       "print:TPU 0.2 g for pads: 2 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "force_limit",
+      "moving_jaw_on_top_face"
+     ]
+    },
+    {
+     "k": "t1",
+     "move": "tune",
+     "declared_move": "tune",
+     "edit": "jaw (sector_radius_mm=48.491); pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=2, reach_mm=0, width_mm=9.259)",
+     "base": "b010",
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the loop fits b010's new jaw, pads before judging it (tuning trial 2 of 4)",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost banana, tomato_soup_can (banana: fixed_jaw_missed, verdict stuck; closed to 1.60 rad (fingertips 84 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no c; banana: fixed_jaw_missed, verdict stuck; closed to 1.60 rad (fingertips 84 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no c; tomato_soup_can: force_limit, verdict stuck; the rack pressed 0 N down on its top at t=2.26 s, +33 mm from the object's centre (top at +34); the force limit stopped the a); it would gain potted_meat_can, tuna_fish_can",
+     "gained": [
+      "potted_meat_can",
+      "tuna_fish_can"
+     ],
+     "lost": [
+      "banana",
+      "tomato_soup_can"
+     ],
+     "prediction": null,
+     "resources": {
+      "usd": 6.4,
+      "lead_days": 3.0,
+      "fab_minutes": 264.8,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x150 x2: 0 provided, buy 2 at $2 ($4.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 52.2 g for jaw: 261 machine minutes",
+       "print:PLA 0.4 g for pads: 2 machine minutes",
+       "print:TPU 0.2 g for pads: 2 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "force_limit",
+      "moving_jaw_on_top_face"
+     ]
+    },
+    {
+     "k": "t2",
+     "move": "tune",
+     "declared_move": "tune",
+     "edit": "jaw (sector_radius_mm=48.5); pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=2, reach_mm=9.324, width_mm=8)",
+     "base": "b010",
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the loop fits b010's new jaw, pads before judging it (tuning trial 3 of 4)",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost tomato_soup_can (tomato_soup_can: force_limit, verdict stuck; the rack pressed 9 N down on its top at t=1.90 s, +33 mm from the object's centre (top at +34); the force limit stopped the a); it would gain tuna_fish_can",
+     "gained": [
+      "tuna_fish_can"
+     ],
+     "lost": [
+      "tomato_soup_can"
+     ],
+     "prediction": null,
+     "resources": {
+      "usd": 6.4,
+      "lead_days": 3.0,
+      "fab_minutes": 267.6,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x150 x2: 0 provided, buy 2 at $2 ($4.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 52.2 g for jaw: 261 machine minutes",
+       "print:PLA 0.6 g for pads: 3 machine minutes",
+       "print:TPU 0.4 g for pads: 3 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "force_limit",
+      "moving_jaw_on_top_face",
+      "slipped_under_load"
+     ]
+    },
+    {
+     "k": "t3",
+     "move": "tune",
+     "declared_move": "tune",
+     "edit": "jaw (sector_radius_mm=42.709); pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=2, reach_mm=0, width_mm=8)",
+     "base": "b010",
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the loop fits b010's new jaw, pads before judging it (tuning trial 4 of 4)",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "rejected: lost banana (banana: force_limit, verdict stuck; the rack pressed 2 N down on its top at t=3.02 s, +20 mm from the object's centre (top at +19); the force limit stopped the a); it would gain potted_meat_can",
+     "gained": [
+      "potted_meat_can"
+     ],
+     "lost": [
+      "banana"
+     ],
+     "prediction": null,
+     "resources": {
+      "usd": 6.4,
+      "lead_days": 3.0,
+      "fab_minutes": 232.9,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x150 x2: 0 provided, buy 2 at $2 ($4.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 45.9 g for jaw: 230 machine minutes",
+       "print:PLA 0.3 g for pads: 2 machine minutes",
+       "print:TPU 0.2 g for pads: 2 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "force_limit",
+      "moving_jaw_on_top_face"
+     ]
+    }
+   ],
+   "accepted": null,
+   "notes": "The common failure is that the hinged jaw cannot open wide enough with a low tip and a flat face. That leaves the moving pad pressing on the top face of the 85-96 mm boxes. Proposal 1 tries the long slide again: it is the right part, and was refused only for a 0.2 mm wrist interference at radius 50, so the radius is cut to 48.5 mm. It costs $6.40 and 3 days. Proposal 2 is a $0 pads-only fallback for the hinge, with a real risk to the dice and marker. The third is an untested idea for mustard (96 mm), which no catalogue part can open to with a low, flat finger. rva000_potted_meat_can (no contact at either jaw, 57 mm can) and rva000_tuna (no_actuation) look like placement or approach failures rather than jaw geometry, so I predict no gains for them.",
+   "llm": {
+    "tag": "iter01",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 110.0,
+    "tokens_in": 12344,
+    "tokens_out": 10578,
+    "usd_list_price": 0.2927,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 140.5,
+   "stop": null
+  },
+  {
+   "iteration": 2,
+   "body": "arm_servos: servos_7v4; jaw: revolute; pads: pads (groove_mm=2, lip_mm=0, pad_angle_deg=20, pad_tpu_mm=2, reach_mm=0, width_mm=12)",
+   "held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "moving_jaw_on_top_face": 6,
+    "fixed_jaw_missed": 2,
+    "slipped_under_load": 1
+   },
+   "failing": {
+    "reg_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.92 rad (fingertips 76 mm apart), moving fingertip +19 mm vs the fixed one; fixed jaw: 7 N on the pad at -1 mm from the centre (top at +19), pushing 2 deg down; moving jaw: 19 N on the pad at +18 mm from the centre (top at +19), pushing 86 deg down; rose 0 mm, ended +0 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.96 rad (fingertips 78 mm apart), moving fingertip +22 mm vs the fixed one; fixed jaw: no contact; moving jaw: 20 N on the pad at +17 mm from the centre (top at +19), pushing 86 deg down; rose 0 mm, ended +0 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.57 rad (fingertips 52 mm apart), moving fingertip +5 mm vs the fixed one; fixed jaw: no contact; moving jaw: 38 N on the pad at +22 mm from the centre (top at +23), pushing 88 deg down; rose 0 mm, ended +0 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.82 rad (fingertips 69 mm apart), moving fingertip +14 mm vs the fixed one; fixed jaw: no contact; moving jaw: 35 N on the pad at +22 mm from the centre (top at +23), pushing 86 deg down; rose 0 mm, ended +0 mm; 514 g"
+    },
+    "rva000_potted_meat_can": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict wrong_behavior; closed to 1.00 rad (fingertips 81 mm apart), moving fingertip +24 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended +0 mm; 370 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.85 rad (fingertips 71 mm apart), moving fingertip +16 mm vs the fixed one; fixed jaw: no contact; moving jaw: 26 N on the pad at +24 mm from the centre (top at +29), pushing 74 deg down; rose 2 mm, ended +2 mm; 431 g"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 0.51 rad (fingertips 47 mm apart), moving fingertip +3 mm vs the fixed one; fixed jaw: no contact; moving jaw: 39 N on the stock jaw at +30 mm from the centre (top at +29), pushing 88 deg down; rose 2 mm, ended +1 mm; 431 g"
+    },
+    "reg_tuna_fish_can": {
+     "mechanism": "slipped_under_load",
+     "detail": "verdict wrong_behavior; closed to 0.44 rad (fingertips 41 mm apart), moving fingertip +2 mm vs the fixed one; fixed jaw: 22 N on the pad at +16 mm from the centre (top at +17), pushing 2 deg up; moving jaw: 23 N on the pad at +14 mm from the centre (top at +17), pushing 10 deg down; rose 16 mm, ended +13 mm; 171 g"
+    },
+    "rva000_tuna_fish_can": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict no_actuation; closed to 0.51 rad (fingertips 47 mm apart), moving fingertip +3 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended -0 mm; 171 g"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "jaw -> long_slide (sector_radius_mm=43); pads -> pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=2, reach_mm=11, width_mm=12)",
+     "base": null,
+     "mechanism": "potted_meat_can: fixed_jaw_missed. It closed to 1.00 rad (fingertips 81 mm apart) with neither jaw touching, while the moving fingertip sat +24 mm above the fixed one. On the 81 mm-radius hinge the fingertip rises R(1-cos q), so the moving jaw sweeps on an arc and never meets the can squarely. The slide removes the rise. Iteration 2 broke two held groups by two separate mechanisms. Banana lost to the rack pressing on its top (2 N at +20 mm, top at +19): the rack sits too low above the fingertips. Tomato_soup_can lost to the rack pressing on its top at sector 48.5 but not at 42.7: the longer sector carries a longer rack, which overhangs the 68 mm can.",
+     "principle": "A finger that slides straight neither turns nor rises, so both faces stay antipodal at every opening. Pad reach moves the fingertips farther below the rack, which clears low objects like the banana. A smaller sector radius shortens the rack's travel and its overhang, which clears tall objects like the tomato can. Squeeze is servo torque over the sector radius: about 1.62/0.043 \u2248 38 N before losses, more than at 48.5 or 50 mm.",
+     "hypothesis": "The record already tested each half of this change on its own. Sector 48.5 with reach 9.3 kept banana and lost only tomato_soup_can. Sector 42.7 with reach 0 kept tomato_soup_can, apple (75 mm), gelatin_box (73 mm) and every other group, lost only banana, and gained potted_meat_can. This proposal combines the two fixes: sector 43 keeps the short rack that held the tomato can, and reach 11 (just above the 9.3 that cured banana) lifts the rack clear of the banana's 38 mm top. Pad angle goes to 0 because the slide keeps the face's orientation; at 20 deg the face would sit -20 deg off parallel at every opening. Sector 43 also pulls the sector rim about 7 mm inside the radius-50 part that touched the wrist by 0.2 mm, so it should pass the interference check. Cheaper moves won't work: revolute pad parameters have already failed (pad_angle 45 lost banana and large_marker), and no pad value removes the hinge's +24 mm tip rise at the can's opening. servos_12v is refused at $68. Purchases: lm3uu_bearing x2 ($2.40) and steel_rod_3x150 x2 ($4.00), $6.40 in total with 3 days lead. M3 and M2 screws are on hand. Machine time is about 216 min for the slide plus about 16 min for the pads, inside the 595 min available.",
+     "predicted_gains": [
+      "potted_meat_can"
+     ],
+     "risks": [
+      "banana: the rack-on-top contact returns if reach 11 is too little at sector 43. At 48.5, reach 9.3 cured it, and the 4 tuning trials can raise reach toward 15-20 mm.",
+      "tomato_soup_can: the rack pressed on its top at sector 48.5 and not at 42.7. Sector 43 is next to the value that held it.",
+      "apple (75 mm) and gelatin_box (73 mm): opening at sector 43 is about 80 mm, which is tight. Both held at 42.7, so they should survive.",
+      "dice and large_marker: longer pads reach lower toward the table. At 48.5 with reach 9.3 neither was lost, and System 1 retunes grasp depth."
+     ],
+     "idea": null,
+     "result": "KEPT: gained 1 tasks, lost none; costs $6.40, 241 machine min",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "potted_meat_can"
+      ],
+      "hit": [],
+      "missed": [
+       "potted_meat_can"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 6.4,
+      "lead_days": 3.0,
+      "fab_minutes": 241.1,
+      "lines": [
+       "lm3uu_bearing x2: 0 provided, buy 2 at $1.2 ($2.40, 3 days)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (on hand)",
+       "steel_rod_3x150 x2: 0 provided, buy 2 at $2 ($4.00, 2 days)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 46.2 g for jaw: 231 machine minutes",
+       "print:PLA 1.0 g for pads: 5 machine minutes",
+       "print:TPU 0.6 g for pads: 5 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "force_limit",
+      "moving_jaw_on_top_face",
+      "slipped_under_load"
+     ]
+    }
+   ],
+   "accepted": "b020",
+   "notes": "I expect this to gain potted_meat_can only. Pudding (90 mm), sugar (92 mm), mustard (96 mm) and tuna (85 mm) need openings of 87-99 mm with clearance. At sector 43 the slide opens to about 80 mm, and the full 50 mm sector, which would open to 93 mm, collides with the wrist. Holding all four with a flat face needs either the long slide at around 48-50 mm with a lifted, shortened rack, or the recorded fixed_jaw_offset_block idea (no cost, 68 machine min), which would shift the slide's range outward by 8 mm. Once this body is held, a later iteration could try a slightly larger sector with more reach. The arm has enough torque for every object: 0.41 + 0.15\u00d75.14 = 1.18 N\u00b7m against a 1.62 N\u00b7m stall for the 514 g sugar box. Grip has margin too: 2\u00d70.5\u00d7~38 N against 5 N of weight.",
+   "llm": {
+    "tag": "iter02",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 62.3,
+    "tokens_in": 14716,
+    "tokens_out": 5912,
+    "usd_list_price": 0.2186,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 68.0,
+   "stop": null
+  },
+  {
+   "iteration": 3,
+   "body": "arm_servos: servos_7v4; jaw: long_slide (sector_radius_mm=43); pads: pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=2, reach_mm=11, width_mm=12)",
+   "held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "force_limit": 4,
+    "moving_jaw_on_top_face": 3,
+    "slipped_under_load": 1,
+    "fixed_jaw_missed": 1
+   },
+   "failing": {
+    "reg_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 81 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 1 N on the pad at +17 mm from the centre (top at +19), pushing 85 deg down; rose 0 mm, ended +0 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "force_limit",
+     "detail": "verdict stuck; a pad pressed 6 N down on its top at t=1.92 s, +18 mm from the object's centre (top at +19); the force limit stopped the attempt"
+    },
+    "reg_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 81 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 3 N on the pad at +20 mm from the centre (top at +23), pushing 81 deg down; rose 0 mm, ended +0 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "force_limit",
+     "detail": "verdict stuck; a pad pressed 4 N down on its top at t=2.08 s, +21 mm from the object's centre (top at +23); the force limit stopped the attempt"
+    },
+    "rva000_potted_meat_can": {
+     "mechanism": "slipped_under_load",
+     "detail": "verdict wrong_behavior; closed to 1.18 rad (fingertips 57 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 38 N on the pad at +41 mm from the centre (top at +42), pushing 1 deg up; moving jaw: 38 N on the pad at +41 mm from the centre (top at +42), pushing 1 deg down; rose 25 mm, ended +25 mm; 370 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 81 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 11 N on the pad at +19 mm from the centre (top at +29), pushing 64 deg down; rose 0 mm, ended -0 mm; 431 g"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict no_actuation; closed to 1.74 rad (fingertips 81 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended -0 mm; 431 g"
+    },
+    "reg_tuna_fish_can": {
+     "mechanism": "force_limit",
+     "detail": "verdict stuck; a pad pressed 3 N down on its top at t=1.68 s, +17 mm from the object's centre (top at +17); the force limit stopped the attempt"
+    },
+    "rva000_tuna_fish_can": {
+     "mechanism": "force_limit",
+     "detail": "verdict stuck; a pad pressed 13 N down on its top at t=1.98 s, +17 mm from the object's centre (top at +17); the force limit stopped the attempt"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "jaw (sector_radius_mm=48.5); pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=18, width_mm=12)",
+     "base": null,
+     "mechanism": "moving_jaw_on_top_face / force_limit on pudding_box (90 mm), tuna_fish_can (85 mm) and sugar_box (92 mm). The brief caps the fingertips at 81 mm apart. That is 43 mm/rad \u00d7 1.92 rad of servo range, minus 10 mm of pad (5 mm per face), so the moving pad comes down on the top face. In iteration 2, sector 48.5 lost tomato_soup_can because the rack pressed on its top (contact +33, top +34). The larger sector puts the rack about 5.5 mm lower, and reach 9.3 did not clear it.",
+     "principle": "A finger can hold an object's side only if, at that object's opening, the fingertip reaches below the object's top and the gap is wide enough. On a slide, travel = sector radius \u00d7 servo range, and the face stays parallel at every opening (tip +1 mm). The pad's reach sets how far the contact sits below the rack.",
+     "hypothesis": "Sector 48.5 is known to clear the wrist (iteration 2 ran it), and it gives about 93 mm of travel. Cutting the TPU skin from 2 to 1 mm per face keeps friction at 0.9 and adds about 2 mm of opening, for about 93 mm between pads. That clears tuna (85) and pudding (90) with side clearance, and sugar (92) only barely. Squeeze is 1.62/0.0485 \u2248 33 N. For pudding (1.8 N) and tuna (1.7 N) the friction is 2\u00b70.35\u20130.5\u00b733 \u2265 23 N, and for sugar (5.0 N) it is 33 N. The arm holds sugar at 0.41 + 0.77 = 1.18 N\u00b7m, under the 1.62 N\u00b7m stall. Reach goes from 11 to 18 mm, about 1.5 mm more than the 11 mm that held tomato_soup_can at sector 43 plus the ~5.5 mm drop of the rack. That keeps tomato_soup_can and banana, which iteration 2 lost to the rack or to too little reach. A params move costs no money, only reprinting the sector (~215 min) and pads. A swap is not needed because the long_slide's own range covers these widths. Mustard (96) still needs the fixed_jaw_offset_block idea that is already recorded.",
+     "predicted_gains": [
+      "tuna_fish_can",
+      "pudding_box",
+      "potted_meat_can"
+     ],
+     "risks": [
+      "tomato_soup_can: the rack-on-top failure from iteration 2. Reach 18 puts the contact 7 mm further below the rack than the 11 mm that worked at sector 43.",
+      "banana: lost at reach 0 and held at reach 9.3 with sector 48.5, so 18 should hold it.",
+      "dice/large_marker/wood_block_cube: the longer pads mean fingertips sit lower. The slide does not rise, and System 1 retunes depth. Closing overtravel is -0.17 rad \u00d7 48.5 = -8 mm, so 17 mm is still reached.",
+      "heavier held objects (tomato_soup_can, 349 g): squeeze falls from 38 to 33 N. 2\u00b70.35\u00b733 = 23 N against 3.4 N of weight still holds."
+     ],
+     "idea": null,
+     "result": "rejected: lost tomato_soup_can (tomato_soup_can: force_limit, verdict stuck; the rack pressed 10 N down on its top at t=2.54 s, +33 mm from the object's centre (top at +34); the force limit stopped the )",
+     "gained": [],
+     "lost": [
+      "tomato_soup_can"
+     ],
+     "prediction": {
+      "predicted": [
+       "potted_meat_can",
+       "pudding_box",
+       "tuna_fish_can"
+      ],
+      "hit": [],
+      "missed": [
+       "potted_meat_can",
+       "pudding_box",
+       "tuna_fish_can"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": [
+       "tomato_soup_can"
+      ]
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 271.0,
+      "lines": [
+       "lm3uu_bearing x2: provided (reused)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (reused)",
+       "steel_rod_3x150 x2: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 52.2 g for jaw: 261 machine minutes",
+       "print:PLA 1.3 g for pads: 7 machine minutes",
+       "print:TPU 0.4 g for pads: 3 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "force_limit"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "jaw (sector_radius_mm=49.5); pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=20, width_mm=12)",
+     "base": null,
+     "mechanism": "moving_jaw_on_top_face on sugar_box (92 mm), pudding_box (90 mm) and tuna_fish_can (85 mm). The opening is too narrow (81 mm max).",
+     "principle": "Opening scales with sector radius (49.5 mm/rad \u00d7 1.92 rad \u2248 95 mm of travel). The wrist interference at 50 mm was only 0.2 mm deep, so a 0.5 mm smaller pitch radius should clear it. Extra reach keeps the rack, which sits lower on the larger sector, above object tops.",
+     "hypothesis": "Between pads this gives about 95 mm with 1 mm TPU, the margin sugar (92) needs and the first proposal lacks. The rim pulls in 0.5 mm, 2.5 times the recorded 0.2 mm overlap, so the no-interference check should pass. Squeeze is 1.62/0.0495 \u2248 33 N, enough for the 514 g sugar box (2\u00b70.5\u00b733 = 33 N against 5 N). Reach goes to 20 mm to cover the rack being about 6.5 mm lower than at sector 43.",
+     "predicted_gains": [
+      "sugar_box",
+      "pudding_box",
+      "tuna_fish_can"
+     ],
+     "risks": [
+      "Could be refused for wrist interference if the pinch scales worse than linearly. The cost is a refusal, not a lost group.",
+      "tomato_soup_can and banana: the same rack-height concern as the first proposal, covered by reach 20.",
+      "small objects: the longer pads, covered by System 1 depth tuning. Overtravel -8.4 mm still closes on the 17 mm dice."
+     ],
+     "idea": null,
+     "result": "rejected: lost apple, tomato_soup_can (tomato_soup_can: force_limit, verdict stuck; the rack pressed 6 N down on its top at t=2.56 s, +33 mm from the object's centre (top at +34); the force limit stopped the a; apple: force_limit, verdict stuck; the rack pressed 3 N on its side at t=3.54 s, +29 mm from the object's centre (top at +36); the force limit stopped the attem)",
+     "gained": [],
+     "lost": [
+      "apple",
+      "tomato_soup_can"
+     ],
+     "prediction": {
+      "predicted": [
+       "pudding_box",
+       "sugar_box",
+       "tuna_fish_can"
+      ],
+      "hit": [],
+      "missed": [
+       "pudding_box",
+       "sugar_box",
+       "tuna_fish_can"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": [
+       "apple",
+       "tomato_soup_can"
+      ]
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 277.7,
+      "lines": [
+       "lm3uu_bearing x2: provided (reused)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (reused)",
+       "steel_rod_3x150 x2: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 53.4 g for jaw: 267 machine minutes",
+       "print:PLA 1.4 g for pads: 7 machine minutes",
+       "print:TPU 0.5 g for pads: 4 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "force_limit"
+     ]
+    },
+    {
+     "k": 2,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "jaw (sector_radius_mm=46); pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=15, width_mm=12)",
+     "base": null,
+     "mechanism": "force_limit / moving_jaw_on_top_face on tuna_fish_can (85 mm). The 81 mm maximum opening is 4 mm short before side clearance.",
+     "principle": "A smaller step in sector radius moves the rack less (about 3 mm lower than at 43), so reach 15 keeps the 11 mm contact-to-rack margin that held tomato_soup_can and banana. This is the conservative fallback.",
+     "hypothesis": "46 \u00d7 1.92 \u2248 88 mm of travel, and with 1 mm TPU about 88\u201389 mm between pads. That clears tuna (85) with clearance, and squeeze rises to 35 N. It moves held geometry less than the other two proposals, so it is the most likely to be kept if they lose tomato_soup_can or banana. It also costs only machine time (sector reprint ~215 min).",
+     "predicted_gains": [
+      "tuna_fish_can",
+      "potted_meat_can"
+     ],
+     "risks": [
+      "tomato_soup_can: the rack drops about 3 mm and reach goes up 4 mm, so the net margin is not worse than now.",
+      "banana: the same as for tomato_soup_can, the net reach margin is kept.",
+      "Friction stays 0.9 with the thinner TPU skin. If thin skin were modelled as softer, small objects like the dice could shift, but TPU depth does not change face angle."
+     ],
+     "idea": null,
+     "result": "KEPT: gained tuna_fish_can, lost none; costs $0.00, 256 machine min",
+     "gained": [
+      "tuna_fish_can"
+     ],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "potted_meat_can",
+       "tuna_fish_can"
+      ],
+      "hit": [
+       "tuna_fish_can"
+      ],
+      "missed": [
+       "potted_meat_can"
+      ],
+      "unpredicted": [],
+      "precision": 0.5,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 255.9,
+      "lines": [
+       "lm3uu_bearing x2: provided (reused)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (reused)",
+       "steel_rod_3x150 x2: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 49.4 g for jaw: 247 machine minutes",
+       "print:PLA 1.2 g for pads: 6 machine minutes",
+       "print:TPU 0.4 g for pads: 3 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "force_limit",
+      "moving_jaw_on_top_face"
+     ]
+    }
+   ],
+   "accepted": "b032",
+   "notes": "Diagnosis: four of the five failing groups (tuna 85, pudding 90, sugar 92, mustard 96) are wider than the current 81 mm between pads. That opening is the 43 mm sector's 82.6 mm of travel minus 10 mm of pad, plus the slide's offset. Each proposal widens the opening by reprinting the sector, and lengthens the pads to make up for the rack sitting lower on a larger sector, which is how tomato_soup_can was lost in iteration 2. All three use parts on hand: $0 and 0 days, about 220 machine min each, so only one can be printed out of the 354 min left. Mustard (96 mm) stays out of reach even at sector 49.5. It needs the fixed_jaw_offset_block idea already recorded ($0, 68 min), so I have not proposed it again. Nothing needs buying.",
+   "llm": {
+    "tag": "iter03",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 69.5,
+    "tokens_in": 14576,
+    "tokens_out": 6872,
+    "usd_list_price": 0.2367,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 81.1,
+   "stop": null
+  },
+  {
+   "iteration": 4,
+   "body": "arm_servos: servos_7v4; jaw: long_slide (sector_radius_mm=46); pads: pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=15, width_mm=12)",
+   "held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "tuna_fish_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "moving_jaw_on_top_face": 3,
+    "force_limit": 3,
+    "fixed_jaw_missed": 2
+   },
+   "failing": {
+    "reg_pudding_box": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended -0 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 0 N on the pad at +17 mm from the centre (top at +19), pushing 85 deg down; rose 0 mm, ended +0 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict stuck; closed to 1.74 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended -0 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 2 N on the pad at +20 mm from the centre (top at +23), pushing 80 deg down; rose 0 mm, ended +0 mm; 514 g"
+    },
+    "reg_potted_meat_can": {
+     "mechanism": "force_limit",
+     "detail": "verdict stuck; a pad pressed 15 N down on its top at t=0.70 s, +42 mm from the object's centre (top at +42); the force limit stopped the attempt"
+    },
+    "rva000_potted_meat_can": {
+     "mechanism": "force_limit",
+     "detail": "verdict stuck; a contact exceeded the force limit at t=0.02 s (squeezing or pressing down)"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 2 N on the pad at +14 mm from the centre (top at +29), pushing 60 deg down; rose 0 mm, ended -0 mm; 431 g"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "force_limit",
+     "detail": "verdict stuck; a pad pressed 2 N down on its top at t=2.30 s, +17 mm from the object's centre (top at +29); the force limit stopped the attempt"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=7, width_mm=12)",
+     "base": null,
+     "mechanism": "potted_meat_can: force_limit. The pad comes down on the can's top (reg: 15 N at +42 mm, top at +42; rva: force limit at t=0.02 s). This is a tall object (84 mm), and the pads hang 15 mm past the stock fingertips.",
+     "principle": "A finger can only hold an object's side if it reaches below the object's top with clearance above the table; otherwise it presses on the top face. On a tall object, a long pad extension puts the pad tip into the can's top during approach or at the start pose, and any wrist tilt moves the tip sideways by reach x sin(tilt).",
+     "hypothesis": "The record isolates reach as the variable. With reach 0, potted_meat_can was gained at both sector 42.7 and sector 48.5 (iteration 2). With reach 11 (sector 43) and reach 15 (sector 46, now) it fails, both times with the pad on the top. Reach exists only to lift the rack clear of short objects. At sector 42.7 with reach 0, banana failed by just 1 mm (rack at +20, top at +19). The rack hangs about 3.3 mm lower at sector 46, so banana needs reach of about 4.5 mm or more. Reach 7 leaves about 2.5 mm of margin on banana and pulls the pad tip 8 mm back from the can's top. Cheaper moves are exhausted: this is the cheapest move, a pads reprint (about 3 g, roughly 18 machine minutes, $0). A jaw parameter change would reprint 43 g of PLA (about 215 min against 98 left), and the 12 V servos are refused on budget. Neither addresses this mechanism anyway, since squeeze (2*0.35*35 = 24.5 N against 3.6 N of weight) and shoulder torque (0.41 + 0.55 = 0.96 against 1.62 N*m) both have margin.",
+     "predicted_gains": [
+      "potted_meat_can"
+     ],
+     "risks": [
+      "banana: the rack lands on its 38 mm top if reach is too short. The estimated threshold is about 4.5 mm at sector 46, so 7 should survive.",
+      "tomato_soup_can: its rack contact at sector 48.5 happened whatever the reach (0, 9.3, 18), so it is driven by sector size, not reach. At sector 46 it should hold, but no sector-46 trial has used a reach below 15.",
+      "tuna_fish_can and gelatin_box: both were held or gained with reach 0 at sector 48.5, so a shorter reach should keep them."
+     ],
+     "idea": null,
+     "result": "KEPT: gained 1 tasks, lost none; costs $0.00, 6 machine min",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "potted_meat_can"
+      ],
+      "hit": [],
+      "missed": [
+       "potted_meat_can"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 6.1,
+      "lines": [
+       "lm3uu_bearing x2: provided (reused)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (reused)",
+       "steel_rod_3x150 x2: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 0.8 g for pads: 4 machine minutes",
+       "print:TPU 0.3 g for pads: 2 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "force_limit",
+      "moving_jaw_on_top_face",
+      "slipped_under_load"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=5, width_mm=12)",
+     "base": null,
+     "mechanism": "potted_meat_can: force_limit, with the pad pressing on the top of the 84 mm tall can because the pad extension is too long",
+     "principle": "The fingertip must clear the object's top on the way down. A shorter pad extension raises the tip with respect to the wrist, while the rack must still clear short objects.",
+     "hypothesis": "This brackets reach 7 from below. It is closer to the reach-0 condition under which potted_meat_can was known to pass, in case the threshold for the can lies under 7. It accepts a thinner margin on banana's rack clearance (about 0.5 mm over the estimated 4.5 mm threshold). The cost is the same pads reprint: $0, about 18 min.",
+     "predicted_gains": [
+      "potted_meat_can"
+     ],
+     "risks": [
+      "banana: the rack-to-top clearance becomes marginal. Reach 0 at sector 42.7 missed by 1 mm, and sector 46 sits about 3.3 mm lower.",
+      "tomato_soup_can: the same untested sector-46, short-reach combination as in the first proposal."
+     ],
+     "idea": null,
+     "result": "rejected: lost banana (banana: force_limit, verdict stuck; the carriage pressed 13 N down on its top at t=3.90 s, +11 mm from the object's centre (top at +19); the force limit stopped ; banana: fixed_jaw_missed, verdict no_actuation; closed to 1.65 rad (fingertips 84 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving ja)",
+     "gained": [],
+     "lost": [
+      "banana"
+     ],
+     "prediction": {
+      "predicted": [
+       "potted_meat_can"
+      ],
+      "hit": [],
+      "missed": [
+       "potted_meat_can"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": [
+       "banana"
+      ]
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 5.4,
+      "lines": [
+       "lm3uu_bearing x2: provided (reused)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (reused)",
+       "steel_rod_3x150 x2: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 0.7 g for pads: 4 machine minutes",
+       "print:TPU 0.2 g for pads: 2 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "force_limit"
+     ]
+    },
+    {
+     "k": 2,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=9, width_mm=12)",
+     "base": null,
+     "mechanism": "potted_meat_can: force_limit, with the pad pressing on the top of the 84 mm tall can because the pad extension is too long",
+     "principle": "The fingertip must clear the object's top on the way down, while the rack keeps clear of short objects. This choice favours rack clearance.",
+     "hypothesis": "This brackets from above. Reach 9 is 6 mm shorter than now and 2 mm under the reach 11 that failed. It tests whether the can's threshold sits just below 11, while keeping the most margin on banana and tomato. The cost is the same pads reprint: $0, about 18 min.",
+     "predicted_gains": [
+      "potted_meat_can"
+     ],
+     "risks": [
+      "Low risk to held groups because it is closest to the current reach 15. If potted_meat_can's threshold is below 9, it simply gains nothing."
+     ],
+     "idea": null,
+     "result": "not kept (another proposal gained more): gained 1 tasks, lost none; costs $0.00, 7 machine min",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "potted_meat_can"
+      ],
+      "hit": [],
+      "missed": [
+       "potted_meat_can"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 6.8,
+      "lines": [
+       "lm3uu_bearing x2: provided (reused)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (reused)",
+       "steel_rod_3x150 x2: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 0.9 g for pads: 4 machine minutes",
+       "print:TPU 0.3 g for pads: 2 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "force_limit",
+      "moving_jaw_on_top_face",
+      "slipped_under_load"
+     ]
+    }
+   ],
+   "accepted": "b040",
+   "notes": "I sent three proposals, all aimed at the potted meat can. None of them can fix the pudding box, sugar box or mustard bottle.\n\n**Why the three wide objects stay blocked.** The pudding box (90 mm), sugar box (92 mm) and mustard bottle (96 mm) are wider than the current 88 mm maximum opening. That is why one jaw misses and the other lands on the top face. Nothing in the catalogue can widen the opening right now:\n- **A larger gear sector on the slide:** reprinting it takes about 43 g of PLA, roughly 215 machine minutes, and only 98 are left. The record also shows sectors of 48.5 and 49.5 lost the tomato soup can because the longer rack pressed on its top, and 49.5 also lost the apple. Sector 50 was refused because it collides with the wrist. Even about 95 mm would not fit the 96 mm mustard bottle.\n- **Prismatic jaw:** refused because it needs 123 machine minutes.\n- **Parallelogram jaw:** the moving fingertip rises 44 mm at an 85 mm opening.\n- **Stock hinged jaw:** this was already abandoned because tilted faces lost the banana and the large marker.\n- **Removing the pads:** this would give 96 mm but takes away the extension, groove and rubber skin that hold the banana, tomato soup can and the round objects.\n\nThe right fix is still the recorded idea, a fixed-jaw offset block. It would shift the opening range outward without lengthening the rack, but it has no builder in the simulator, so I did not re-propose it.\n\n**What the proposals change.** Each one shortens how far the pads extend (now 15 mm) and changes nothing else; the three values are 7, 5 and 9 mm. The trial record ties the potted meat can's failure to that extension: it passed with 0 mm and failed with 11 and 15 mm, each time with a pad landing on the can's top. Each proposal costs $0 and about 18 machine minutes for a pads reprint. The bracket is there because two thresholds are uncertain:\n- **Banana:** the slide's rack needs some extension below it to clear the banana's top. I estimate about 4.5 mm or more at sector 46.\n- **Potted meat can:** the extension it tolerates is unknown, somewhere between 0 and 11 mm.\n\nIf I had money for the wide objects, I would spend it on time rather than parts. More machine minutes would allow a jaw reprint, and the $68 12 V servos are not what limits the opening. The sugar box loads the shoulder to about 0.41 + 0.77 = 1.18 N*m, under its 1.62 N*m stall.",
+   "llm": {
+    "tag": "iter04",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 115.4,
+    "tokens_in": 15340,
+    "tokens_out": 11063,
+    "usd_list_price": 0.3268,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 130.9,
+   "stop": null
+  },
+  {
+   "iteration": 5,
+   "body": "arm_servos: servos_7v4; jaw: long_slide (sector_radius_mm=46); pads: pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=7, width_mm=12)",
+   "held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "tuna_fish_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "moving_jaw_on_top_face": 2,
+    "fixed_jaw_missed": 2,
+    "force_limit": 2,
+    "slipped_under_load": 1
+   },
+   "failing": {
+    "reg_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 0 N on the pad at +17 mm from the centre (top at +19), pushing 85 deg down; rose 0 mm, ended -0 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict no_actuation; closed to 1.74 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended -0 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict stuck; closed to 1.74 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended -0 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 3 N on the pad at +20 mm from the centre (top at +23), pushing 80 deg down; rose 0 mm, ended +0 mm; 514 g"
+    },
+    "rva000_potted_meat_can": {
+     "mechanism": "slipped_under_load",
+     "detail": "verdict wrong_behavior; closed to 1.06 rad (fingertips 57 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 35 N on the pad at +41 mm from the centre (top at +42), pushing 1 deg up; moving jaw: 35 N on the pad at +41 mm from the centre (top at +42), pushing 1 deg down; rose 25 mm, ended +25 mm; 370 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "force_limit",
+     "detail": "verdict stuck; a pad pressed 5 N down on its top at t=1.96 s, +15 mm from the object's centre (top at +29); the force limit stopped the attempt"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "force_limit",
+     "detail": "verdict stuck; a pad pressed 2 N down on its top at t=2.34 s, +17 mm from the object's centre (top at +29); the force limit stopped the attempt"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=7, width_mm=18)",
+     "base": null,
+     "mechanism": "slipped_under_load on rva000_potted_meat_can: both pads grip at +41 mm on a can whose top is at +42 (a thin strip at the top edge), each at 35 N, rose 25 mm and failed to hold. Sliding is ruled out: 2*0.35*35 = 24.5 N of friction against 3.6 N of weight, so the can is swinging about the line between the two contacts, not sliding down.",
+     "principle": "A thin-strip contact resists sliding but gives little resistance to turning. The torque it can resist grows with the length of the contact along the object's depth. Widening the pad across the jaw lengthens that contact without changing the opening, the face angle, the reach or the squeeze.",
+     "hypothesis": "Pad width is the only pads parameter not yet varied. Reach has been tried at 0, 5, 7, 9, 11 and 15, and it is pinned between the banana (needs more than 5) and the can's grasp depth. Thickening the TPU skin would close the opening below the 85 mm tuna can. A groove of 0 would endanger the eight round objects. Going from 12 to 18 mm gives 1.5 times the contact length on the can's 102 mm depth, so about 1.5 times the resistance to turning, enough to hold it through the 30 mm lift. It costs $0 and about 25 machine minutes, within the 92 left. The slide is untouched: reprinting it would take about 215 minutes, which rules out any change to the jaw this round.",
+     "predicted_gains": [
+      "potted_meat_can"
+     ],
+     "risks": [
+      "dice / wood_block_cube / large_marker (17-26 mm deep): the pad now overhangs the object; the extra width lies beside it, so the contact is unchanged.",
+      "banana / tomato_soup_can: reach, thickness and opening are unchanged, so the rack and carriage heights are as they are now; the width was varied 8-9.3 mm in iteration 2 with no effect on either.",
+      "wrist clearance: a wider pad could brush the wrist at full wrist roll; 6 mm more is small next to the jaw body."
+     ],
+     "idea": null,
+     "result": "KEPT: gained 1 tasks, lost none; costs $0.00, 9 machine min",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "potted_meat_can"
+      ],
+      "hit": [],
+      "missed": [
+       "potted_meat_can"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 8.9,
+      "lines": [
+       "lm3uu_bearing x2: provided (reused)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (reused)",
+       "steel_rod_3x150 x2: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.2 g for pads: 6 machine minutes",
+       "print:TPU 0.4 g for pads: 3 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "force_limit",
+      "moving_jaw_on_top_face",
+      "slipped_under_load"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=7, width_mm=24)",
+     "base": null,
+     "mechanism": "slipped_under_load on rva000_potted_meat_can (same as the first proposal: the can swings on a top-edge strip, the squeeze is ample).",
+     "principle": "Resistance to turning grows with the contact length along the object's depth; the widest pad gives the most.",
+     "hypothesis": "This brackets the first proposal at the top of the range. If 18 mm is not enough to stop the off-centre can from swinging, 24 mm (2 times today) is the strongest pads-only move left. It adds about 2 g at the wrist, which is negligible against the 1.62 N*m stall. It costs $0 and about 30 machine minutes.",
+     "predicted_gains": [
+      "potted_meat_can"
+     ],
+     "risks": [
+      "wrist clearance at full wrist roll is more likely with a 24 mm pad than an 18 mm one.",
+      "small objects (dice 18 deep, wood_block_cube 26 deep): a pad wider than the object could catch a neighbouring surface during the descent. The contact is still vertical and opposed, so the grip itself is unchanged.",
+      "banana, tomato_soup_can: the geometry is unchanged in the closing plane, as in the first proposal."
+     ],
+     "idea": null,
+     "result": "rejected: lost banana (banana: force_limit, verdict stuck; a pad pressed 48 N on its side at t=3.94 s, -1 mm from the object's centre (top at +19); the force limit stopped the attempt; banana: force_limit, verdict stuck; a pad pressed 67 N on its side at t=3.78 s, -0 mm from the object's centre (top at +19); the force limit stopped the attempt)",
+     "gained": [],
+     "lost": [
+      "banana"
+     ],
+     "prediction": {
+      "predicted": [
+       "potted_meat_can"
+      ],
+      "hit": [],
+      "missed": [
+       "potted_meat_can"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": [
+       "banana"
+      ]
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 11.7,
+      "lines": [
+       "lm3uu_bearing x2: provided (reused)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (reused)",
+       "steel_rod_3x150 x2: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.5 g for pads: 8 machine minutes",
+       "print:TPU 0.5 g for pads: 4 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "force_limit"
+     ]
+    }
+   ],
+   "accepted": "b050",
+   "notes": "The pudding box (90 mm), sugar box (92 mm) and mustard bottle (96 mm) are wider than the jaw opens (88 mm today). None of the catalogue fixes fits the resources left. A bigger gear sector means a jaw reprint of about 215 machine minutes against 92 left; the short-rod slide (123 minutes) and the 12 V servos ($68 against $33.60) were refused. Removing the pads opens 96 mm but loses the banana, and bare PLA pads reach only 90 mm. The fixed-jaw offset block idea from iteration 2 is still the best route to these groups once there is more machine time; with the slide at 48.5 mm and the offset it would give about 8-101 mm. I suggest spending the remaining machine time on the potted meat can now and saving the jaw reprint for when there is the time to print it.",
+   "llm": {
+    "tag": "iter05",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 107.8,
+    "tokens_in": 15855,
+    "tokens_out": 9596,
+    "usd_list_price": 0.3015,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 117.6,
+   "stop": null
+  },
+  {
+   "iteration": 6,
+   "body": "arm_servos: servos_7v4; jaw: long_slide (sector_radius_mm=46); pads: pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=7, width_mm=18)",
+   "held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "tuna_fish_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "fixed_jaw_missed": 3,
+    "force_limit": 2,
+    "moving_jaw_on_top_face": 1,
+    "slipped_under_load": 1
+   },
+   "failing": {
+    "reg_pudding_box": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended +0 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict no_actuation; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended +0 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict no_actuation; closed to 1.74 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended -0 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict no_actuation; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 4 N on the pad at +20 mm from the centre (top at +23), pushing 80 deg down; rose 0 mm, ended +0 mm; 514 g"
+    },
+    "rva000_potted_meat_can": {
+     "mechanism": "slipped_under_load",
+     "detail": "verdict wrong_behavior; closed to 1.06 rad (fingertips 57 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 35 N on the pad at +41 mm from the centre (top at +42), pushing 1 deg up; moving jaw: 35 N on the pad at +41 mm from the centre (top at +42), pushing 1 deg down; rose 25 mm, ended +25 mm; 370 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "force_limit",
+     "detail": "verdict stuck; a pad pressed 3 N down on its top at t=1.96 s, +15 mm from the object's centre (top at +29); the force limit stopped the attempt"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "force_limit",
+     "detail": "verdict stuck; a pad pressed 2 N down on its top at t=2.34 s, +17 mm from the object's centre (top at +29); the force limit stopped the attempt"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=7, width_mm=21)",
+     "base": null,
+     "mechanism": "slipped_under_load on rva000_potted_meat_can. Both pads touch the can at +41 mm with its top at +42 (2.65 mm grasp depth). Faces are tilted only 1 deg, so they are antipodal, and the squeeze is 35 N. The can rose 25 of 30 mm and stopped there.",
+     "principle": "Squeeze is not the limit: 2\u00b70.35\u00b735 N = 24.5 N against 3.6 N of weight, a 6.7x margin. Friction can hold the weight. What fails is a can 84 mm tall gripped along a 1\u20133 mm band at its rim, which pivots about the line between the pads under the lift's acceleration and the off-centre placement. Only the size of the contact patch resists that pivot, and torsional friction grows with it. Widening the pads from 12 to 18 mm in iteration 6 gained one task, which fits this reading. Width 24 lost banana by force limit.",
+     "hypothesis": "Width 21 sits between 18 (kept, gained one task) and 24 (lost banana: a 48\u201367 N side press at the banana's centre). It should add about 17% more resistance to pivoting on the can, and it keeps 3 mm of the 6 mm step that broke the banana's curved side. Cheaper moves are used up: reach has been tried at 0/5/7/9/11/15 and is pinned by banana (it needs more than 5) and the can. Changing the groove or TPU would put the eight rolling objects or the opening at risk. Cost: $0, about 10\u201311 machine minutes of the 83 left.",
+     "predicted_gains": [
+      "potted_meat_can"
+     ],
+     "risks": [
+      "banana: width 24 caused a force-limit side press. Width 21 is closer to the 18 that holds, but the threshold is unknown.",
+      "Small objects (dice 17 mm, large_marker 19 mm, wood cube 26 mm): a wider pad changes nothing across the jaw axis, so they should hold.",
+      "Round objects: the groove and the 2 mm depth are unchanged, so centring is the same."
+     ],
+     "idea": null,
+     "result": "not kept (another proposal gained more): gained 1 tasks, lost none; costs $0.00, 10 machine min",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "potted_meat_can"
+      ],
+      "hit": [],
+      "missed": [
+       "potted_meat_can"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 10.3,
+      "lines": [
+       "lm3uu_bearing x2: provided (reused)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (reused)",
+       "steel_rod_3x150 x2: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.4 g for pads: 7 machine minutes",
+       "print:TPU 0.4 g for pads: 4 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "moving_jaw_on_top_face",
+      "slipped_under_load"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=7, width_mm=20)",
+     "base": null,
+     "mechanism": "slipped_under_load on rva000_potted_meat_can: a grip on the top rim pivots under the lift (contact at +41, top at +42, 35 N, faces 1 deg).",
+     "principle": "Torsional friction resisting the pivot grows with patch width. The width that breaks banana lies somewhere between 18 and 24 mm.",
+     "hypothesis": "This is the conservative bracket for the first proposal. Width 20 adds 2 mm, a third of the step that lost banana, so banana is the most likely to survive. It may still be enough to stop the rim pivot on the off-centre placement. If 21 loses banana and 20 keeps it, the record pins the threshold. Cost: $0, about 10 machine minutes.",
+     "predicted_gains": [
+      "potted_meat_can"
+     ],
+     "risks": [
+      "banana: same mechanism as width 24 but with a smaller step. Expected to hold, because 18 holds."
+     ],
+     "idea": null,
+     "result": "KEPT: gained 1 tasks, lost none; costs $0.00, 10 machine min",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "potted_meat_can"
+      ],
+      "hit": [],
+      "missed": [
+       "potted_meat_can"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 9.8,
+      "lines": [
+       "lm3uu_bearing x2: provided (reused)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (reused)",
+       "steel_rod_3x150 x2: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.3 g for pads: 6 machine minutes",
+       "print:TPU 0.4 g for pads: 3 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "force_limit",
+      "moving_jaw_on_top_face",
+      "slipped_under_load"
+     ]
+    }
+   ],
+   "accepted": "b061",
+   "notes": "I'm only proposing a fix for the potted meat can this round. Nothing within the remaining budget can open the jaw wide enough for the pudding box, sugar box or mustard bottle.\n\n**The wide boxes and bottle.** Their mechanism (fixed_jaw_missed, moving_jaw_on_top_face, force_limit) has one root cause: the brief gives a widest opening of 88 mm, and these objects are 90, 92 and 96 mm across. Here is why each fix is out of reach:\n- **Larger sector (`sector_radius_mm`):** this means reprinting the long slide (43 g of PLA, about 215 machine minutes; iteration 4 cost 256). Only 83 minutes are left.\n- **Prismatic jaw:** refused, 123 minutes.\n- **12 V servos:** refused, $68 against $33.60 left, and they don't change the opening anyway.\n- **Parallelogram, link 90:** opens to 98 mm, but the fingertip rises +44 mm at 85 mm. That would lose tuna_fish_can, which is 34 mm tall.\n- **Stock revolute jaw:** opens to 100 mm, but the face tilts +54 deg at 85 mm, which would push objects out.\n- **Removing the pads:** gives 96 mm, but drops the reach and grooves. Reach 0 has lost banana twice, and the eight rolling objects rely on the groove.\n- **No TPU skin:** adds only about 2 mm (to roughly 90 mm). That gives the 90 mm pudding box no side clearance, so I don't expect it to gain anything.\n\nThe fixed_jaw_offset_block idea from iteration 2 (68 minutes, $0) still fits the budget. Building and testing it is the real route to these three objects, so I haven't re-proposed it.\n\n**The potted meat can.** The two proposals bracket pad width at 21 and 20 mm. I expect them to help the potted meat can, which slips by pivoting at its rim, not from lack of squeeze. Banana is the risk to watch, because width 24 lost it. If neither width works, the can's real limit is grasp depth: the rack sitting above the fingers against the 7 mm reach. Pads can't fix that on this jaw.",
+   "llm": {
+    "tag": "iter06",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 123.5,
+    "tokens_in": 15774,
+    "tokens_out": 11390,
+    "usd_list_price": 0.3367,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 136.0,
+   "stop": null
+  },
+  {
+   "iteration": 7,
+   "body": "arm_servos: servos_7v4; jaw: long_slide (sector_radius_mm=46); pads: pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=7, width_mm=20)",
+   "held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "tuna_fish_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "moving_jaw_on_top_face": 3,
+    "fixed_jaw_missed": 2,
+    "slipped_under_load": 1,
+    "force_limit": 1
+   },
+   "failing": {
+    "reg_pudding_box": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict no_actuation; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended +0 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 0 N on the pad at +17 mm from the centre (top at +19), pushing 85 deg down; rose 0 mm, ended +0 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict no_actuation; closed to 1.74 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended -0 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict no_actuation; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 5 N on the pad at +20 mm from the centre (top at +23), pushing 80 deg down; rose 0 mm, ended +0 mm; 514 g"
+    },
+    "rva000_potted_meat_can": {
+     "mechanism": "slipped_under_load",
+     "detail": "verdict wrong_behavior; closed to 1.06 rad (fingertips 57 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 35 N on the pad at +41 mm from the centre (top at +42), pushing 1 deg up; moving jaw: 35 N on the pad at +41 mm from the centre (top at +42), pushing 1 deg down; rose 25 mm, ended +25 mm; 370 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "force_limit",
+     "detail": "verdict stuck; a pad pressed 3 N down on its top at t=1.96 s, +15 mm from the object's centre (top at +29); the force limit stopped the attempt"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 2 N on the pad at +17 mm from the centre (top at +29), pushing 58 deg down; rose 0 mm, ended -0 mm; 431 g"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=7, width_mm=22)",
+     "base": null,
+     "mechanism": "slipped_under_load on rva000_potted_meat_can: 35 N per side at only 1 mm below the 370 g can's top. The off-centre placement turns the can about the line between the two contacts, and it slips at 25 mm of the 30 mm lift.",
+     "principle": "Gravity's torque about the contact line is m g times the centre-of-mass offset. The friction torque that resists it grows with how far the contact patch spreads across the jaw. Widening the pads widens the patch.",
+     "hypothesis": "Width is the only pad setting that has gained this kind of task: 18 and then 20 mm each gained one. 21 mm gained the same one task as 20, so the rva000 off-centre case needs a little more. 22 mm is the widest step that stays clear of the 24 mm that lost the banana. The reprint takes about 11 machine minutes and $0, so it fits the 73 minutes left. A sector change can't be printed in the time left, and changing extension or groove has already failed or puts round objects at risk.",
+     "predicted_gains": [
+      "potted_meat_can"
+     ],
+     "risks": [
+      "banana: 24 mm lost it when the pad hit its curved side at 48-67 N. 22 mm is 1 mm past the 21 mm that kept it, so it should survive, but this is the main risk.",
+      "Round objects held at the equator (golf_ball, lemon, plum, strawberry): a wider pad meets a curved surface farther from the contact point. They survived 21 mm, so 22 mm should be safe.",
+      "Opening and squeeze are unchanged (88 mm, 35 N), so tuna_fish_can and the wide objects are not affected."
+     ],
+     "idea": null,
+     "result": "rejected: lost banana (banana: force_limit, verdict stuck; a pad pressed 59 N on its side at t=3.78 s, -0 mm from the object's centre (top at +19); the force limit stopped the attempt)",
+     "gained": [],
+     "lost": [
+      "banana"
+     ],
+     "prediction": {
+      "predicted": [
+       "potted_meat_can"
+      ],
+      "hit": [],
+      "missed": [
+       "potted_meat_can"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": [
+       "banana"
+      ]
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 10.7,
+      "lines": [
+       "lm3uu_bearing x2: provided (reused)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (reused)",
+       "steel_rod_3x150 x2: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.4 g for pads: 7 machine minutes",
+       "print:TPU 0.5 g for pads: 4 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "force_limit"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=8, width_mm=20)",
+     "base": null,
+     "mechanism": "slipped_under_load on rva000_potted_meat_can: the contacts sit at +41 mm against a top at +42, so only the bottom 1 mm of each pad touches the can.",
+     "principle": "The friction torque that resists the can turning also grows with the patch height. A pad that reaches a little lower lets the grasp go deeper before the rack or carriage reaches the can's top.",
+     "hypothesis": "Reach 7 and 9 both held everything at width 12. Reach 11 and 15 put the pad on the can's top, and 5 lost the banana. Reach 8 on the current 20 mm pads makes the contact strip taller without changing its width. This runs alongside proposal 1 so the trial can tell height and width apart. About 10 machine minutes, $0.",
+     "predicted_gains": [
+      "potted_meat_can"
+     ],
+     "risks": [
+      "tomato_soup_can / banana: both depend on rack clearance, and reach between 7 and 9 kept them at width 12. 8 lies inside that range.",
+      "potted_meat_can (reg placement, held): 11 mm put the pad on the top, but 8 is closer to the 7 that passes."
+     ],
+     "idea": null,
+     "result": "KEPT: gained 1 tasks, lost none; costs $0.00, 10 machine min",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "potted_meat_can"
+      ],
+      "hit": [],
+      "missed": [
+       "potted_meat_can"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 10.4,
+      "lines": [
+       "lm3uu_bearing x2: provided (reused)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (reused)",
+       "steel_rod_3x150 x2: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.4 g for pads: 7 machine minutes",
+       "print:TPU 0.4 g for pads: 4 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "force_limit",
+      "moving_jaw_on_top_face",
+      "slipped_under_load"
+     ]
+    }
+   ],
+   "accepted": "b071",
+   "notes": "What still blocks the wide boxes: pudding (90 mm), sugar (92) and mustard (96) can't be gripped while the jaw opens to only 88 mm. No pad setting adds more than about 2 mm, by thinning the rubber skin to near zero, which gives roughly 90 mm with no clearance. Bare stock faces reach 96 mm but would lose the banana and the eight round objects. Opening wider needs a new gear sector (about 256 machine minutes against 73 left, and sectors of 48.5 and 49.5 lost the tomato soup can) or the four-bar jaw (82 minutes). The fixed_jaw_offset_block idea (68 min, $0) is the only affordable option, and it needs a builder before it can be tested. If machine time comes back, one route worth testing is the 50 mm sector with the rack raised clear of the tomato can's top, but that is beyond this run's resources. On the two proposals: if both pass, prefer width 22 unless the banana's contact forces come close to the force limit.",
+   "llm": {
+    "tag": "iter07",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 115.1,
+    "tokens_in": 15392,
+    "tokens_out": 10798,
+    "usd_list_price": 0.3218,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 126.5,
+   "stop": null
+  },
+  {
+   "iteration": 8,
+   "body": "arm_servos: servos_7v4; jaw: long_slide (sector_radius_mm=46); pads: pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=8, width_mm=20)",
+   "held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "tuna_fish_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "moving_jaw_on_top_face": 4,
+    "fixed_jaw_missed": 1,
+    "slipped_under_load": 1,
+    "force_limit": 1
+   },
+   "failing": {
+    "reg_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 0 N on the pad at +17 mm from the centre (top at +19), pushing 84 deg down; rose 0 mm, ended +0 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 0 N on the pad at +17 mm from the centre (top at +19), pushing 85 deg down; rose 0 mm, ended +0 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict no_actuation; closed to 1.74 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended -0 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict no_actuation; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 5 N on the pad at +20 mm from the centre (top at +23), pushing 80 deg down; rose 0 mm, ended +0 mm; 514 g"
+    },
+    "rva000_potted_meat_can": {
+     "mechanism": "slipped_under_load",
+     "detail": "verdict wrong_behavior; closed to 1.06 rad (fingertips 57 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 35 N on the pad at +41 mm from the centre (top at +42), pushing 1 deg up; moving jaw: 35 N on the pad at +41 mm from the centre (top at +42), pushing 1 deg down; rose 25 mm, ended +25 mm; 370 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "force_limit",
+     "detail": "verdict stuck; a pad pressed 3 N down on its top at t=1.94 s, +15 mm from the object's centre (top at +29); the force limit stopped the attempt"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 2 N on the pad at +17 mm from the centre (top at +29), pushing 58 deg down; rose 0 mm, ended -0 mm; 431 g"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=9, width_mm=20)",
+     "base": null,
+     "mechanism": "slipped_under_load on rva000_potted_meat_can: 35 N per face but the contact sits at +41 mm with the top at +42, so the grip is a 1 mm strip at the rim of an off-centre can. The can twists about the closing axis and rises only 25 of 30 mm. With an assumed effective friction of 0.35, 2\u00b70.35\u00b735 \u2248 25 N against 3.6 N of weight, so squeeze is not the limit; the twist is.",
+     "principle": "Resistance to twisting about the closing axis grows with how far the contact patch extends up the object. A taller pad strip below the wrist gives a longer lever against the off-centre gravity torque.",
+     "hypothesis": "Reach went 7 to 8 at width 20 and gained a task, so contact height is the lever that works. Reach 9 held every group at width 12 (iteration 5, gained 1, lost none). Reach 11 and 15 put the pad on the can's top, and reach 5 lost the banana. 9 is the next 1 mm step and stays inside the known-safe band. Width stays at 20 because 22 and 24 lost the banana. Cost: pads reprint, about 10 machine min, $0. The wide-box failures (pudding 90, sugar 92, mustard 96 mm against an 88 mm opening) cannot be fixed with what is left: a sector reprint is about 215 min against 63 left, and the other jaws and the 12 V servos are refused.",
+     "predicted_gains": [
+      "potted_meat_can"
+     ],
+     "risks": [
+      "banana: reach changes the carriage clearance over its 38 mm top. Reach 9 held it at width 12, and more reach only raises the carriage, so it should survive.",
+      "tomato_soup_can: the earlier rack-on-top losses came from larger sectors (48.5 and 49.5), not from reach. Reach 9 held it at sector 46.",
+      "potted_meat_can (reg): reach 11 put the pad on its top, so 9 keeps a 2 mm margin."
+     ],
+     "idea": null,
+     "result": "KEPT: gained 1 tasks, lost none; costs $0.00, 11 machine min",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "potted_meat_can"
+      ],
+      "hit": [],
+      "missed": [
+       "potted_meat_can"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 11.0,
+      "lines": [
+       "lm3uu_bearing x2: provided (reused)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (reused)",
+       "steel_rod_3x150 x2: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.4 g for pads: 7 machine minutes",
+       "print:TPU 0.5 g for pads: 4 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "force_limit",
+      "moving_jaw_on_top_face",
+      "slipped_under_load"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "pads (groove_mm=4, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=8, width_mm=20)",
+     "base": null,
+     "mechanism": "slipped_under_load on rva000_potted_meat_can: the off-centre upright can twists about the closing axis because the 2 mm V-groove on a 20 mm pad touches the 57 mm cylinder on two lines only about 5.6 mm either side of centre (my estimate), with a 1 mm tall contact strip.",
+     "principle": "A concave or grooved contact centres a round object and, for a cylinder, spreads the contact into two lines. Their spacing is the lever that resists twisting about the closing axis. A deeper V (4 mm on a 10 mm half-width, faces at about 22 deg) moves the contact lines on a 28.5 mm radius out to the pad edges at about 10 mm, nearly doubling that lever.",
+     "hypothesis": "Widening the pads (12, 18, 20) is the only pads move that gained this kind of task, because it spreads the contacts. Width 22 and 24 lost the banana by enlarging the pad outline. A deeper groove spreads the cylinder contacts as much as a much wider pad would, but only removes material, so the outline does not grow. Contact normals tilt sideways, not vertically, so nothing is squeezed out. Cost: pads reprint, about 10 machine min, $0.",
+     "predicted_gains": [
+      "potted_meat_can"
+     ],
+     "risks": [
+      "banana: its curved side meets a deeper groove. The pad outline does not grow (unlike widths 22 and 24, which lost it), so I expect it to hold, but this is the main risk.",
+      "dice, large_marker: round or small objects sink up to about 2.6 mm deeper per side, so they need about 0.1 rad more servo closure. Dice at 0.20 rad becomes about 0.24, well inside the -0.17 rad limit.",
+      "golf_ball, plum, lemon, strawberry, racquetball, tennis_ball, apple: a deeper groove centres balls better (the principle), so they should be safe.",
+      "tuna_fish_can, gelatin_box, foam_brick: flat faces now rest on the groove edges. The normals stay horizontal and the 35 N squeeze is unchanged."
+     ],
+     "idea": null,
+     "result": "not kept (another proposal gained more): gained 1 tasks, lost none; costs $0.00, 11 machine min",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "potted_meat_can"
+      ],
+      "hit": [],
+      "missed": [
+       "potted_meat_can"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 11.0,
+      "lines": [
+       "lm3uu_bearing x2: provided (reused)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (reused)",
+       "steel_rod_3x150 x2: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.4 g for pads: 7 machine minutes",
+       "print:TPU 0.5 g for pads: 4 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "force_limit",
+      "moving_jaw_on_top_face",
+      "slipped_under_load"
+     ]
+    },
+    {
+     "k": 2,
+     "move": "idea",
+     "declared_move": "idea",
+     "edit": "",
+     "base": null,
+     "mechanism": "moving_jaw_on_top_face / fixed_jaw_missed on pudding_box (90 mm), sugar_box (92 mm) and mustard_bottle (96 mm): the servo reaches its 1.75 rad limit with the fingertips only 88 mm apart, so the moving pad lands on the top face (at +17 to +20 mm, pushing 80 to 85 deg down).",
+     "principle": "A finger can only hold an object's side if the opening exceeds the object's width with clearance. The opening is the slide's travel plus the fixed jaw's position.",
+     "hypothesis": "No catalogue move is affordable. A long_slide sector of 50 (95 mm) needs about 215 machine minutes against 63 left. The parallelogram (82 min) and prismatic (123 min) are refused for time, and servos_12v for cost. Pads 'none' (96 mm) is reach 0, which put the carriage on 38 mm-tall objects like the banana and the pudding box. A 9 mm spacer under the fixed jaw moves its face out and raises the maximum opening to about 97 mm. Squeeze stays at 35 N (1.62 N\u00b7m over 46 mm). At -0.17 rad the gap is about 9 mm, still under the 17 mm dice. The sugar box's 514 g needs 0.41 + 0.77 = 1.18 N\u00b7m at the shoulder, under the 1.62 N\u00b7m stall, and friction gives 2\u00b70.5\u00b735 = 35 N against 5 N. This is a leaner version of the iteration-2 fixed_jaw_offset_block (68 min), so it fits the remaining machine time.",
+     "predicted_gains": [
+      "pudding_box",
+      "sugar_box"
+     ],
+     "risks": [
+      "dice, large_marker: the minimum gap rises to about 9 mm, still under 17 mm.",
+      "banana, tomato_soup_can: the grasp centre shifts 4.5 mm, which System 1's side parameter must re-centre."
+     ],
+     "idea": {
+      "name": "fixed_jaw_spacer_shim",
+      "description": "A 9 mm printed PLA spacer plate (about 20 x 30 mm, 40% infill) bolted between the gripper body and the fixed jaw with the jaw's existing screw pattern. It moves the fixed jaw's face 9 mm outward along the closing axis. The slide's travel is unchanged, so every object closes at a servo angle 0.2 rad later and the widest opening grows from 88 to about 97 mm between pads. The grasp centre shifts about 4.5 mm toward the fixed jaw, which System 1's side-clearance parameter absorbs.",
+      "slot": "fixed_jaw (new)",
+      "needs": [
+       {
+        "item": "print:PLA",
+        "qty": 6.0,
+        "usd_each": null,
+        "lead_days": null
+       },
+       {
+        "item": "m3_screw",
+        "qty": 4.0,
+        "usd_each": null,
+        "lead_days": null
+       }
+      ],
+      "test": "Add a fixed-jaw offset parameter (0 to 12 mm) to the gripper model that translates the fixed jaw body and its pad outward along the closing axis. Run all groups at 9 mm with the current long_slide (46) and pads."
+     },
+     "result": "idea recorded, not tested: fixed_jaw_spacer_shim; it would need $0.00 from the manifest, 0 days, 30 machine min; within the budget left",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": null,
+     "still_failing": []
+    }
+   ],
+   "accepted": "b080",
+   "notes": "The 63 machine minutes left rule out any sector reprint (about 215 min), the parallelogram jaw and the prismatic jaw, and $33.60 rules out the 12 V servos. So the opening stays at 88 mm and the 90, 92 and 96 mm boxes cannot be reached by catalogue moves this iteration. Proposals 1 and 2 both change the pads, so they will be tried separately. If both gain, groove 4 with reach 9 is the natural next trial. Mustard (96 mm) would need about 98 mm of opening, which even the spacer idea only just reaches.",
+   "llm": {
+    "tag": "iter08",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 133.6,
+    "tokens_in": 15356,
+    "tokens_out": 12921,
+    "usd_list_price": 0.364,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 147.4,
+   "stop": null
+  },
+  {
+   "iteration": 9,
+   "body": "arm_servos: servos_7v4; jaw: long_slide (sector_radius_mm=46); pads: pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=9, width_mm=20)",
+   "held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "tuna_fish_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "fixed_jaw_missed": 3,
+    "moving_jaw_on_top_face": 2,
+    "slipped_under_load": 1,
+    "force_limit": 1
+   },
+   "failing": {
+    "reg_pudding_box": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended +0 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended +0 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict no_actuation; closed to 1.74 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended -0 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict no_actuation; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 5 N on the pad at +20 mm from the centre (top at +23), pushing 80 deg down; rose 0 mm, ended +0 mm; 514 g"
+    },
+    "rva000_potted_meat_can": {
+     "mechanism": "slipped_under_load",
+     "detail": "verdict wrong_behavior; closed to 1.06 rad (fingertips 57 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 35 N on the pad at +41 mm from the centre (top at +42), pushing 1 deg up; moving jaw: 35 N on the pad at +41 mm from the centre (top at +42), pushing 1 deg down; rose 25 mm, ended +25 mm; 370 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "force_limit",
+     "detail": "verdict stuck; a pad pressed 3 N down on its top at t=1.94 s, +15 mm from the object's centre (top at +29); the force limit stopped the attempt"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 2 N on the pad at +17 mm from the centre (top at +29), pushing 58 deg down; rose 0 mm, ended -0 mm; 431 g"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "pads (groove_mm=4, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=9, width_mm=20)",
+     "base": null,
+     "mechanism": "slipped_under_load on rva000_potted_meat_can. The jaws closed to 1.06 rad (57 mm). Both pads pushed 35 N within 1 deg of horizontal, so the hold is antipodal, but both contacts sat at +41 mm with the top at +42. The can rose 25 mm and slid out. Friction should not be the limit: 2 x 0.35 x 35 = 24.5 N against 3.6 N of weight. What fails is the off-centre can turning about a thin strip of contact at the pads' bottom edge.",
+     "principle": "A pad's friction resists the object twisting in proportion to how far the contact reaches from its centre. The record shows two pad moves gaining on this kind of task: a wider footprint (width 12 to 18 to 20) and a lower pad (reach 7 to 8 to 9). Width cannot grow: 22 and 24 lost the banana. A deeper V-groove makes each flat-face contact into two strips at the pad's outer edges. That gives a longer lever against twisting without changing the pad outline that hurt the banana.",
+     "hypothesis": "Groove 4 is so far the only pads move that gained a task without widening the pad: at reach 8 and width 20 it gained one and lost none (iteration 9). Reach 9 then beat it, and the trial did not combine the two. This proposal combines them: reach 9 for contact height, groove 4 for the twist lever. Cheaper moves are used up. The jaw cannot be changed: a new sector needs about 215 machine minutes against the 52 left. Width is capped by the banana, and a thicker TPU skin would shrink the 88 mm opening below what tuna (85 mm) needs. The reprint is about 2 g PLA and 1 g TPU, roughly 11 min and $0.",
+     "predicted_gains": [
+      "potted_meat_can"
+     ],
+     "risks": [
+      "dice, wood_block_cube and gelatin_box: a deeper groove leaves less flat face, but each is wider than the groove can swallow. Groove 4 held every group at reach 8 (iteration 9).",
+      "banana: the outline and width are unchanged, so the side-press failure seen at width 22 and 24 should not return.",
+      "tomato_soup_can and tuna_fish_can: the opening and reach are the same as the held body."
+     ],
+     "idea": null,
+     "result": "not kept (another proposal gained more): gained 1 tasks, lost none; costs $0.00, 12 machine min",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "potted_meat_can"
+      ],
+      "hit": [],
+      "missed": [
+       "potted_meat_can"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 11.6,
+      "lines": [
+       "lm3uu_bearing x2: provided (reused)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (reused)",
+       "steel_rod_3x150 x2: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.5 g for pads: 8 machine minutes",
+       "print:TPU 0.5 g for pads: 4 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "force_limit",
+      "moving_jaw_on_top_face",
+      "slipped_under_load"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=10, width_mm=20)",
+     "base": null,
+     "mechanism": "slipped_under_load on rva000_potted_meat_can. The contact strip is only about 1 mm tall (contact at +41 mm, top at +42), so the can twists out after rising 25 mm.",
+     "principle": "Taller pads put more contact on the can's side and resist the twist of an off-centre can. Reach has been the steady lever in the record: reach 7 to 8 gained a task, and 8 to 9 gained another, at width 20.",
+     "hypothesis": "This takes the next 1 mm step, reach 10, which brackets below the reach 11 that put the pad on the can's top at width 12 and sector 43. If the twist lever is the limit, 10 adds contact. If the pad-on-top threshold lies between 9 and 11, this trial pins it. Its only purpose is to tell reach apart from groove alongside proposal 1. It costs $0 and about 11 machine min.",
+     "predicted_gains": [
+      "potted_meat_can"
+     ],
+     "risks": [
+      "tomato_soup_can (68 mm, lying): reach 18 put the rack on its top. 10 is far below that, and longer pads move the rack up, away from the top.",
+      "reg_potted_meat_can is not a held group, but reach 11 once put the pad on its top; 10 stays under that.",
+      "Short objects (dice 17 mm tall, wood cube 26 mm): the pads' lowest point moves down 1 mm, and System 1 sets the grasp depth to suit."
+     ],
+     "idea": null,
+     "result": "KEPT: gained 1 tasks, lost none; costs $0.00, 12 machine min",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "potted_meat_can"
+      ],
+      "hit": [],
+      "missed": [
+       "potted_meat_can"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 11.5,
+      "lines": [
+       "lm3uu_bearing x2: provided (reused)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (reused)",
+       "steel_rod_3x150 x2: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.5 g for pads: 8 machine minutes",
+       "print:TPU 0.5 g for pads: 4 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "force_limit",
+      "moving_jaw_on_top_face",
+      "slipped_under_load"
+     ]
+    },
+    {
+     "k": 2,
+     "move": "idea",
+     "declared_move": "idea",
+     "edit": "",
+     "base": null,
+     "mechanism": "fixed_jaw_missed and moving_jaw_on_top_face on pudding_box (90 mm), sugar_box (92 mm) and mustard_bottle (96 mm). The servo hits its 1.75 rad limit with the fingertips 88 mm apart. Neither jaw touches the box's side, and the moving pad lands on the top face (sugar: 5 N at 80 deg down).",
+     "principle": "On a slide, opening equals sector radius times servo travel: 46 mm x 1.92 rad is about 88 mm. A 50 mm sector gives 95 mm (from the brief) while keeping the faces parallel, at 1.62/0.050 = 32 N of squeeze. That holds the 514 g sugar box: 2 x 0.5 x 32 = 32 N against 5 N. The arm needs 0.41 + 0.77 = 1.18 N*m, under the 1.62 N*m stall.",
+     "hypothesis": "The catalogue offers a larger sector only as a whole reprint of the long slide: 43 g PLA, about 215 machine min, against the 52 left. Pads 'none' (96 mm) means reach 0, which put the carriage on 38 mm-tall objects and loses the banana. The 12 V servos would not widen the jaw and cost $68. A bolt-on tooth arc at 50 mm pitch radius, screwed onto the current sector hub, plus a 4 mm spacer under the rack to keep module-1 mesh, would give the opening for about 9 g of PLA. The idea differs from the recorded fixed-jaw shims: it adds travel instead of moving a face, so the pad geometry the held groups depend on stays as it is.",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": {
+      "name": "sector_arc_extension",
+      "description": "A printed module-1 tooth arc at 50 mm pitch radius, screwed with four M3 screws over the current 46 mm sector, plus a printed 4 mm spacer that drops the carriage rack to the new centre distance. The finger travels 50 mm per servo radian over the same -0.17 to 1.75 rad, so the pads open to about 95 mm. They stay parallel and the tip does not rise, and the squeeze falls only from 35 N to 32 N.",
+      "slot": "jaw",
+      "needs": [
+       {
+        "item": "print:PLA",
+        "qty": 9.0,
+        "usd_each": null,
+        "lead_days": null
+       },
+       {
+        "item": "m3_screw",
+        "qty": 4.0,
+        "usd_each": null,
+        "lead_days": null
+       },
+       {
+        "item": "m2_screw",
+        "qty": 2.0,
+        "usd_each": null,
+        "lead_days": null
+       }
+      ],
+      "test": "In the simulator, build the long_slide with sector_radius_mm=50 but keep the current carriage, rods and pads (reach 9, width 20), and charge only the arc and spacer print. Rerun all 21 groups, checking tomato_soup_can and apple, which lost to a rack press at 49.5 when the whole slide was reprinted."
+     },
+     "result": "idea recorded, not tested: sector_arc_extension; it would need $0.00 from the manifest, 0 days, 45 machine min; within the budget left",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": null,
+     "still_failing": []
+    }
+   ],
+   "accepted": "b091",
+   "notes": "Wide boxes are out of reach this run: their fix (a larger sector) does not fit in the 52 machine minutes, and the 12 V servos do not fit in the $33.60, so I recorded that as an idea. The two pads trials together use about 22 machine minutes, leaving about 30 for later iterations.",
+   "llm": {
+    "tag": "iter09",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 87.9,
+    "tokens_in": 15254,
+    "tokens_out": 7878,
+    "usd_list_price": 0.2624,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 99.6,
+   "stop": null
+  },
+  {
+   "iteration": 10,
+   "body": "arm_servos: servos_7v4; jaw: long_slide (sector_radius_mm=46); pads: pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=10, width_mm=20)",
+   "held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "tuna_fish_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "fixed_jaw_missed": 3,
+    "moving_jaw_on_top_face": 2,
+    "slipped_under_load": 1,
+    "force_limit": 1
+   },
+   "failing": {
+    "reg_pudding_box": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended +0 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended +0 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict no_actuation; closed to 1.74 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended -0 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict no_actuation; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 5 N on the pad at +20 mm from the centre (top at +23), pushing 80 deg down; rose 0 mm, ended +0 mm; 514 g"
+    },
+    "rva000_potted_meat_can": {
+     "mechanism": "slipped_under_load",
+     "detail": "verdict wrong_behavior; closed to 1.06 rad (fingertips 57 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 35 N on the pad at +41 mm from the centre (top at +42), pushing 1 deg up; moving jaw: 35 N on the pad at +41 mm from the centre (top at +42), pushing 1 deg down; rose 25 mm, ended +25 mm; 370 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "force_limit",
+     "detail": "verdict stuck; a pad pressed 3 N down on its top at t=1.94 s, +15 mm from the object's centre (top at +29); the force limit stopped the attempt"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 2 N on the pad at +17 mm from the centre (top at +29), pushing 58 deg down; rose 0 mm, ended -0 mm; 431 g"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "pads (groove_mm=4, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=10, width_mm=20)",
+     "base": null,
+     "mechanism": "slipped_under_load (rva000_potted_meat_can): both pads take 35 N, but the contacts sit at +41 mm on a can whose top is at +42 mm. The pads hold only a 1 mm sliver at the rim of the upright cylinder, and the 370 g can slides or pivots. It rose 25 mm, not the 30 mm needed.",
+     "principle": "Friction holds weight when 2 mu N exceeds m g with margin. A V-groove running up the pad meets a vertical cylinder on two lines instead of one. The wedge also raises the normal force by about 1/sin(half-angle) and resists the can pivoting about a single contact line. The groove only removes material, so the pad outline that the banana is sensitive to stays the same.",
+     "hypothesis": "Groove 4 is the only non-reach pads change that has gained a task without losing one: at reach 8 and at reach 9 (iterations 9 and 10). Reach 10 at groove 2 was kept instead, so groove 4 has never been tried on top of reach 10. Combining the two keeps the contact height that reach 10 bought and adds the groove's grip on the cylinder. Cheaper moves are spent. Width above 20 lost the banana three times. More TPU would shrink the 88 mm opening below what the 85 mm tuna can needs. The jaw parameters need a 215 to 256 minute reprint against the 40 minutes left. The cost is a pads reprint (PLA 2 g, TPU 1 g): $0 and about 12 machine minutes.",
+     "predicted_gains": [
+      "potted_meat_can"
+     ],
+     "risks": [
+      "banana: groove 4 left it intact at reach 8 and 9 because the pad outline does not change. It should survive.",
+      "golf_ball, tennis_ball, apple, lemon, plum, racquetball, strawberry, tomato_soup_can (round objects): a deeper V-groove centres a round object better, and groove 4 lost none of them before.",
+      "dice, large_marker: very small or narrow objects could sit in the groove with less face contact. The 17 to 19 mm widths still span both groove flanks, and groove 4 held them before."
+     ],
+     "idea": null,
+     "result": "not kept (another proposal gained more): gained 1 tasks, lost none; costs $0.00, 12 machine min",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "potted_meat_can"
+      ],
+      "hit": [],
+      "missed": [
+       "potted_meat_can"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 12.2,
+      "lines": [
+       "lm3uu_bearing x2: provided (reused)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (reused)",
+       "steel_rod_3x150 x2: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.6 g for pads: 8 machine minutes",
+       "print:TPU 0.5 g for pads: 4 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "force_limit",
+      "moving_jaw_on_top_face",
+      "slipped_under_load"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=11, width_mm=20)",
+     "base": null,
+     "mechanism": "slipped_under_load (rva000_potted_meat_can): the contact sits at the can's rim (+41 of +42 mm), so it holds only on a sliver of the side.",
+     "principle": "A finger holds a side only as far as it reaches below the object's top. A longer pad puts the contact patch lower on the can, away from the rim, and gives a taller contact strip that resists pivoting.",
+     "hypothesis": "Each 1 mm step of reach at width 20 has gained a task with no losses: 7 to 8 (iteration 8), 8 to 9 (iteration 9) and 9 to 10 (iteration 10). Reach 11 and 15 failed only on an older body (width 12, sector 43). Reach 11 is the next step on the trend, and this trial tests whether the old pad-on-top threshold still applies at width 20 and sector 46. Its only purpose is to separate height from groove against proposal 1. It costs $0 and about 12 machine minutes.",
+     "predicted_gains": [
+      "potted_meat_can"
+     ],
+     "risks": [
+      "potted_meat_can (the reg placement that passes now): reach 11 put the pad on the can's top on the older body. If that recurs, the trial is not kept, and the record pins the threshold between 10 and 11.",
+      "banana, gelatin_box, tomato_soup_can: a longer pad sits lower. Reach is pinned from below by the banana (5 lost it), and longer reach adds rack clearance, so the low objects are not at risk from this direction."
+     ],
+     "idea": null,
+     "result": "KEPT: gained 1 tasks, lost none; costs $0.00, 12 machine min",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "potted_meat_can"
+      ],
+      "hit": [],
+      "missed": [
+       "potted_meat_can"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 12.1,
+      "lines": [
+       "lm3uu_bearing x2: provided (reused)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (reused)",
+       "steel_rod_3x150 x2: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.6 g for pads: 8 machine minutes",
+       "print:TPU 0.5 g for pads: 4 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "force_limit",
+      "moving_jaw_on_top_face",
+      "slipped_under_load"
+     ]
+    }
+   ],
+   "accepted": "b101",
+   "notes": "Wide boxes (pudding 90 mm, sugar 92, mustard 96): the mechanism is the jaw's opening, not grip. The jaw opens 88 mm at most: 46 mm/rad \u00d7 1.92 rad, less 4 mm of pad per face. pad_tpu 0 gives about 90 mm, which leaves the pudding box no clearance, and a pad face tilted by pad_angle squeezes the object out. Pads 'none' (96 mm) is reach 0, which put the carriage on the banana. Sector 50 opens only 95 mm and needs a ~215 min reprint, against 40 left. The parallelogram (82 min) and prismatic (123 min) are refused for machine time, servos_12v for cost, and the revolute tilts its face up to +52 deg. No affordable catalogue move or new idea fixes these three groups this run, so the remaining time goes to the potted meat can. To open the wide boxes in a later run, buy time for a sector of 50 or more, plus a thinner pad base.",
+   "llm": {
+    "tag": "iter10",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 66.2,
+    "tokens_in": 14980,
+    "tokens_out": 6209,
+    "usd_list_price": 0.2267,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 77.6,
+   "stop": null
+  },
+  {
+   "iteration": 11,
+   "body": "arm_servos: servos_7v4; jaw: long_slide (sector_radius_mm=46); pads: pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=11, width_mm=20)",
+   "held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "tuna_fish_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "fixed_jaw_missed": 3,
+    "moving_jaw_on_top_face": 2,
+    "slipped_under_load": 1,
+    "force_limit": 1
+   },
+   "failing": {
+    "reg_pudding_box": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict no_actuation; closed to 1.74 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended +0 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended +0 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict no_actuation; closed to 1.74 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended -0 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict no_actuation; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 5 N on the pad at +20 mm from the centre (top at +23), pushing 80 deg down; rose 0 mm, ended +0 mm; 514 g"
+    },
+    "rva000_potted_meat_can": {
+     "mechanism": "slipped_under_load",
+     "detail": "verdict wrong_behavior; closed to 1.06 rad (fingertips 57 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: 35 N on the pad at +41 mm from the centre (top at +42), pushing 1 deg up; moving jaw: 35 N on the pad at +41 mm from the centre (top at +42), pushing 1 deg down; rose 25 mm, ended +25 mm; 370 g"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "force_limit",
+     "detail": "verdict stuck; a pad pressed 3 N down on its top at t=1.92 s, +15 mm from the object's centre (top at +29); the force limit stopped the attempt"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 2 N on the pad at +17 mm from the centre (top at +29), pushing 58 deg down; rose 0 mm, ended -0 mm; 431 g"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=12, width_mm=20)",
+     "base": null,
+     "mechanism": "slipped_under_load on rva000_potted_meat_can. Both pads touch the can at +41 mm from its centre, with the top at +42 mm. The 35 N squeeze sits on a 1 mm strip at the rim. The off-centre 370 g can (friction 0.35) pivots and slides about that strip: it rose only 25 of the 30 mm.",
+     "principle": "Friction 2\u00b7\u03bc\u00b7N = 2\u00b70.35\u00b735 \u2248 24 N is far more than the 3.6 N weight, so the squeeze is not what limits this grasp. What limits it is how much contact can resist a twist. A taller strip of contact below the rim resists the can pivoting about the contact line. Pad reach moves the contact strip down the object's side without changing the squeeze or the opening.",
+     "hypothesis": "At width 20, every 1 mm step of reach has gained a task with no losses: 7\u21928, 8\u21929, 9\u219210 and 10\u219211 (iterations 8\u201311). The remaining failure is the same kind of contact-height failure. Reach 12 is the next step. It reuses the pads part: $0, about 12\u201313 machine min of the 28 left. Cheaper moves are used up. Width above 20 loses the banana (iterations 6 and 8). Groove 4 changes round contacts, not the flat side of the can. TPU thickness does not raise friction above 0.9.",
+     "predicted_gains": [
+      "potted_meat_can"
+     ],
+     "risks": [
+      "dice / large_marker / wood_block_cube (17\u201326 mm tall): the pads reach 1 mm further down, so a fixed grasp depth brings them 1 mm closer to the table. System 1 re-tunes the grasp depth, and reach 11 already holds them.",
+      "gelatin_box (30 tall) and tuna_fish_can (34 tall): the same 1 mm of table clearance. These objects are wide but low, and the depth can be re-tuned.",
+      "banana: it failed only when reach was shorter (5) or the pad wider (22, 24), so longer reach moves away from those failures."
+     ],
+     "idea": null,
+     "result": "KEPT: gained 1 tasks, lost none; costs $0.00, 13 machine min",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "potted_meat_can"
+      ],
+      "hit": [],
+      "missed": [
+       "potted_meat_can"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 12.7,
+      "lines": [
+       "lm3uu_bearing x2: provided (reused)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (reused)",
+       "steel_rod_3x150 x2: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.7 g for pads: 8 machine minutes",
+       "print:TPU 0.5 g for pads: 4 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "force_limit",
+      "moving_jaw_on_top_face"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=13, width_mm=20)",
+     "base": null,
+     "mechanism": "slipped_under_load on rva000_potted_meat_can: the contact is a 1 mm rim strip (+41 of +42 mm), and the off-centre 370 g can pivots out about it.",
+     "principle": "Moving the contact further below the rim lengthens the strip that resists the can's twisting, while the squeeze and the opening stay the same.",
+     "hypothesis": "This brackets proposal 1 from above. If one more millimetre is not enough contact height on the off-centre placement, two may be. If reach 13 loses a low object where 12 does not, the trial finds the ceiling. It is the same reprint, about 13 machine min.",
+     "predicted_gains": [
+      "potted_meat_can"
+     ],
+     "risks": [
+      "dice, large_marker, wood_block_cube, gelatin_box and tuna_fish_can: the pads come 2 mm closer to the table at a fixed depth. System 1 must raise the grasp depth, and the shortest object (dice, 17 mm) has the least margin."
+     ],
+     "idea": null,
+     "result": "rejected: gained nothing; still failing: fixed_jaw_missed, force_limit, moving_jaw_on_top_face, squeezed_up_out",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "potted_meat_can"
+      ],
+      "hit": [],
+      "missed": [
+       "potted_meat_can"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 13.3,
+      "lines": [
+       "lm3uu_bearing x2: provided (reused)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (reused)",
+       "steel_rod_3x150 x2: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.8 g for pads: 9 machine minutes",
+       "print:TPU 0.6 g for pads: 5 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "force_limit",
+      "moving_jaw_on_top_face",
+      "squeezed_up_out"
+     ]
+    }
+   ],
+   "accepted": "b110",
+   "notes": "The wide boxes cannot be fixed with what is left. The pudding box (90 mm), sugar box (92 mm) and mustard bottle (96 mm) are all wider than the 88 mm the fingertips can open, so they fail as fixed_jaw_missed or moving_jaw_on_top_face. A 50 mm sector would open to about 95 mm, but reprinting the slide takes about 215 min and 28 are left. The parallelogram (82 min) and prismatic (123 min) jaws are also refused for time. The 12 V servos cost $68 and $33.60 is left, and they would not open the jaw anyway. Removing the TPU skin (tpu 0) would gain only about 2 mm (90 mm), with no clearance for the pudding box, and it would halve pad friction on every held object. Removing the pads opens the jaw to 96 mm but means reach 0, which lost the banana before. The shim and sector-extension ideas already recorded cover this mechanism, so I have not proposed another idea. Buying: nothing.",
+   "llm": {
+    "tag": "iter11",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 52.8,
+    "tokens_in": 14977,
+    "tokens_out": 5044,
+    "usd_list_price": 0.2034,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 61.9,
+   "stop": null
+  },
+  {
+   "iteration": 12,
+   "body": "arm_servos: servos_7v4; jaw: long_slide (sector_radius_mm=46); pads: pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=12, width_mm=20)",
+   "held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "tuna_fish_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "fixed_jaw_missed": 3,
+    "moving_jaw_on_top_face": 2,
+    "force_limit": 2
+   },
+   "failing": {
+    "reg_pudding_box": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict no_actuation; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended +0 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended +0 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict no_actuation; closed to 1.74 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended -0 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict no_actuation; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 5 N on the pad at +20 mm from the centre (top at +23), pushing 80 deg down; rose 0 mm, ended +0 mm; 514 g"
+    },
+    "rva000_potted_meat_can": {
+     "mechanism": "force_limit",
+     "detail": "verdict stuck; a contact exceeded the force limit at t=0.02 s (squeezing or pressing down)"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "force_limit",
+     "detail": "verdict stuck; a pad pressed 3 N down on its top at t=1.92 s, +15 mm from the object's centre (top at +29); the force limit stopped the attempt"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 2 N on the pad at +17 mm from the centre (top at +29), pushing 58 deg down; rose 0 mm, ended -0 mm; 431 g"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "",
+     "base": null,
+     "mechanism": "fixed_jaw_missed / moving_jaw_on_top_face on the pudding box (90 mm), sugar box (92 mm) and mustard bottle (96 mm). The jaw closes all the way to 1.75 rad with the fingertips 88 mm apart, so the object never fits between the faces and the moving pad lands on the top face.",
+     "principle": "A finger can only hold an object's side if the fingertips open wider than the object at that point. The opening is set by the slide's travel (46 mm/rad over 1.92 rad, about 88 mm of carriage travel) and by how far the pads stand out from the stock faces. Bare faces open to 96 mm and the pads open to 88 mm, so the pads take 4 mm per face, and 1 mm of that per face is the TPU skin.",
+     "hypothesis": "Every other way to widen the jaw is refused: sector 50 needs a long_slide reprint of about 215 machine minutes, parallelogram and prismatic need 82 and 123 minutes, and 12 V servos cost $68 and would not widen the jaw anyway. That leaves the TPU skin as the only pad thickness I can change inside 16 machine minutes. At pad_tpu_mm=0 each face loses 1 mm, so the fingertips open to about 90 mm, which just matches the pudding box. Reach 12, width 20 and groove 2 are unchanged, so the contact height that iterations 8\u201312 bought is kept. The reprint is PLA only (about 2 g, 10 min), with no TPU to print. Even at 90 mm the pudding box has almost no clearance, so this is a long-shot test of where the opening limit really is. Sugar (92 mm) and mustard (96 mm) stay out of reach.",
+     "predicted_gains": [
+      "pudding_box"
+     ],
+     "risks": [
+      "tomato_soup_can (349 g, metal mu 0.35) and tuna_fish_can (171 g): pad friction drops from 0.9 to 0.45. If the simulator combines friction by max, 2*0.45*35 N = 31.5 N is still about 9x the soup can's 3.4 N weight. If it combines by min, the metal's 0.35 already governs and nothing changes.",
+      "banana and the round rollers (apple, tennis_ball, golf_ball, racquetball): less friction against twisting off-centre. The groove still centres the round objects, and squeeze stays at 35 N.",
+      "dice and large_marker: the faces sit 1 mm further back each, so small objects need about 0.04 rad more close. That is well inside the servo's -0.17 rad lower limit."
+     ],
+     "idea": null,
+     "result": "refused before trial: the edit leaves the body unchanged",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "lm3uu_bearing x2: provided (reused)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (reused)",
+       "steel_rod_3x150 x2: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    },
+    {
+     "k": 1,
+     "move": "idea",
+     "declared_move": "idea",
+     "edit": "",
+     "base": null,
+     "mechanism": "fixed_jaw_missed / moving_jaw_on_top_face on the 90\u201396 mm boxes and bottle. The pads take 8 mm of opening (96 mm bare vs 88 mm padded), and the catalogue's pads have no setting for how far they stand out from the stock face.",
+     "principle": "The opening is the carriage travel plus the gap between the stock faces, minus the pad thickness in front of each face. A pad whose contact surface is flush with the stock face adds reach below the fingertip without costing any opening.",
+     "hypothesis": "Bare faces (pads=none) open to 96 mm but lose the 12 mm of reach that the low objects need: reach 0 put the carriage on 38 mm-tall objects and lost the banana. This part takes the opening of the bare face and the reach of the current pad. It is a printed tongue screwed to the back and side of each stock jaw, flush with the face plane, and it extends 12 mm below the fingertip. It has a 0.5 mm TPU skin and a 2 mm V-groove cut into the tongue, so the groove costs no thickness. Expected opening is about 95 mm, which clears the pudding box (90) and sugar box (92). The mustard bottle (96) is still marginal. Squeeze is unchanged at 35 N, because the sector radius is still 46 mm.",
+     "predicted_gains": [
+      "pudding_box",
+      "sugar_box"
+     ],
+     "risks": [
+      "banana and the low objects, if the flush tongue gives less contact strip than the current pad. It keeps reach 12 and width 20.",
+      "Mass at the wrist about the same as now (about 3 g)."
+     ],
+     "idea": {
+      "name": "flush_reach_pads",
+      "description": "Printed PLA tongues that bolt to the back and side of each stock jaw face, with their contact surface coplanar with the stock face (0 mm stand-out), so they add no thickness to the opening. Each tongue extends 12 mm below the stock fingertip, is 20 mm wide, carries a 2 mm V-groove cut into it, and has a 0.5 mm TPU skin (mu 0.9) inset into a pocket so it does not stand proud. The fingertips open to about 95 mm, against 88 mm with the current pads, and still reach below the top of low objects.",
+      "slot": "pads",
+      "needs": [
+       {
+        "item": "m2_screw",
+        "qty": 4.0,
+        "usd_each": null,
+        "lead_days": null
+       },
+       {
+        "item": "print:PLA",
+        "qty": 2.0,
+        "usd_each": null,
+        "lead_days": null
+       },
+       {
+        "item": "print:TPU",
+        "qty": 0.5,
+        "usd_each": null,
+        "lead_days": null
+       }
+      ],
+      "test": "A pads variant in design/fingers.py with a stand-out parameter (pad thickness in front of the face, 0\u20134 mm) and the TPU skin inset into a pocket. Then re-run pudding_box, sugar_box and mustard_bottle at stand-out 0, plus banana, gelatin_box and tuna_fish_can to check that contact height is kept."
+     },
+     "result": "idea recorded, not tested: flush_reach_pads; it would need $0.00 from the manifest, 0 days, 14 machine min; within the budget left",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": null,
+     "still_failing": []
+    }
+   ],
+   "accepted": null,
+   "notes": "I don't expect this round to recover the three wide-box groups. The fix that works, a wider jaw, doesn't fit the budget: sector 50 needs about 215 machine minutes and we have 16 left.\n\nThe pudding box, sugar box and mustard bottle are 90, 92 and 96 mm across, and the jaw opens to 88 mm at most. That limit comes from the slide's travel (46 mm per servo radian over 1.92 rad) plus the 4 mm the pads take on each face. No pads setting can open the jaw past about 90 mm.\n\n- **Proposal 1** removes the TPU skin (a PLA-only reprint, about 10 minutes), which should open the jaw to about 90 mm. It's a long shot: even then the pudding box has almost no clearance, and the sugar box and mustard bottle stay out of reach.\n- **Proposal 2** is a new idea, recorded and costed but not tested: pads that sit flush with the jaw face, so they add reach without costing any opening. Expected opening is about 95 mm. It uses only parts on the bench, costs $0 and about 14 machine minutes. It is different from the three earlier ideas, which offset the fixed jaw or extended the gear sector.\n\nThe potted meat can hits the force limit at t = 0.02 s, which is too early to be a squeeze. More likely the pads, which now reach 12 mm below the stock fingertips, touch the top of the 84 mm can at the start pose. Shortening reach would put at risk the groups that each 1 mm of reach gained, so I've left it alone this round.\n\nIf one more round were affordable, I would buy nothing and spend the machine time reprinting the long slide with sector 50. That opens the jaw to 95 mm at 32 N of squeeze, enough for the pudding and sugar boxes.",
+   "llm": {
+    "tag": "iter12",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 64.0,
+    "tokens_in": 14762,
+    "tokens_out": 5999,
+    "usd_list_price": 0.2207,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 64.1,
+   "stop": null
+  },
+  {
+   "iteration": 13,
+   "body": "arm_servos: servos_7v4; jaw: long_slide (sector_radius_mm=46); pads: pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=1, reach_mm=12, width_mm=20)",
+   "held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "tuna_fish_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "fixed_jaw_missed": 3,
+    "moving_jaw_on_top_face": 2,
+    "force_limit": 2
+   },
+   "failing": {
+    "reg_pudding_box": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict no_actuation; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended +0 mm; 187 g"
+    },
+    "rva000_pudding_box": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended +0 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict no_actuation; closed to 1.74 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended -0 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict no_actuation; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 5 N on the pad at +20 mm from the centre (top at +23), pushing 80 deg down; rose 0 mm, ended +0 mm; 514 g"
+    },
+    "rva000_potted_meat_can": {
+     "mechanism": "force_limit",
+     "detail": "verdict stuck; a contact exceeded the force limit at t=0.02 s (squeezing or pressing down)"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "force_limit",
+     "detail": "verdict stuck; a pad pressed 3 N down on its top at t=1.92 s, +15 mm from the object's centre (top at +29); the force limit stopped the attempt"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 88 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 2 N on the pad at +17 mm from the centre (top at +29), pushing 58 deg down; rose 0 mm, ended -0 mm; 431 g"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=0, reach_mm=12, width_mm=20)",
+     "base": null,
+     "mechanism": "fixed_jaw_missed / moving_jaw_on_top_face on the wide boxes: the pudding box (90 mm), sugar box (92 mm) and mustard bottle (96 mm) are wider than the jaw opens. The brief gives a maximum fingertip gap of 88 mm at 1.75 rad, the end of the servo range. The jaw closes on air, or the moving pad comes down on the top face (sugar: 5 N at +20 mm, pushing 80 deg down; mustard: 2 N at +17 mm, pushing 58 deg down).",
+     "principle": "A finger can only hold an object's side if it opens wider than the object. On a slide, the opening is the sector travel minus the thickness of both pad faces. The brief gives 4 mm per face at pad_tpu_mm=1. Bare faces open to 96 mm, so the pads cost about 8 mm of opening. Removing the 1 mm TPU skin should give back about 2 mm, for an opening of about 90\u201391 mm.",
+     "hypothesis": "Every other way to widen the jaw is refused. A sector of 50 mm needs a long_slide reprint of about 215 min, against the 16 left. The parallelogram needs 82 min and the prismatic 123 min. The 12 V servos cost $68 against $33.60 and would not widen the jaw anyway. pads=none opens to 96 mm, but reach 0 has already put the carriage on 38 mm-tall objects and lost the banana, and the pudding box is also 38 mm tall. The TPU skin is the only part of the face thickness that a pads reprint can change. A reprint with pad_tpu_mm=0 is PLA only: about 10 min, $0, no TPU print time. This keeps reach 12, width 20 and groove 2, which won every held group. It should open the jaw to about 90\u201391 mm, enough for the 90 mm pudding box with System 1's side clearance near zero (best rva000 run: side=2.8e-05). It will not reach the sugar box (92 mm) or the mustard bottle (96 mm). The cost is friction: 0.45 (bare PLA) instead of 0.9. Even for the 349 g soup can on metal, 2*0.45*35 N = 31.5 N against 3.4 N of weight, so friction still holds about 9x the weight.",
+     "predicted_gains": [
+      "pudding_box"
+     ],
+     "risks": [
+      "tomato_soup_can and tuna_fish_can (metal, 0.35, 349 g and 171 g): the pads' friction drops from 0.9 to 0.45. The plain friction margin is still about 9x, but the soup can lies on its side and rolls, so twist resistance falls too.",
+      "golf_ball, tennis_ball, racquetball, apple, lemon, plum, strawberry: round objects that relied partly on high-friction contacts. The 2 mm groove still centres them.",
+      "banana: was sensitive to the pad outline. The outline does not change here, only the 1 mm skin, so it should survive."
+     ],
+     "idea": null,
+     "result": "KEPT: gained 2 tasks, lost none; costs $0.00, 8 machine min",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "pudding_box"
+      ],
+      "hit": [],
+      "missed": [
+       "pudding_box"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 8.3,
+      "lines": [
+       "lm3uu_bearing x2: provided (reused)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (reused)",
+       "steel_rod_3x150 x2: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.7 g for pads: 8 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "force_limit",
+      "moving_jaw_on_top_face"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "pads (groove_mm=4, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=0, reach_mm=12, width_mm=20)",
+     "base": null,
+     "mechanism": "fixed_jaw_missed on the pudding box (90 mm wide against an 88 mm maximum opening). This is the same opening limit as proposal 1. It adds a hedge against losing the round held objects once friction drops to bare PLA.",
+     "principle": "Thinner faces open the jaw wider (opening = travel minus both face thicknesses). A concave or grooved contact centres a round object even when friction alone cannot trap it. A deeper V-groove makes up geometrically for the friction lost with the TPU skin.",
+     "hypothesis": "Groove 4 has gained a task and lost none three times: at reach 8, 9 and 10 (iterations 9\u201311). It lost each time only because a reach step gained more, so it is a known-safe shape change. Pairing it with pad_tpu_mm=0 recovers the opening (about 90\u201391 mm) and deepens the centring of spheres and rolling cylinders at the lower 0.45 friction. The reprint is PLA only, about 10 min, inside the 16 left. It is tried on its own beside proposal 1, so the trial can tell whether the friction loss needs the groove's help.",
+     "predicted_gains": [
+      "pudding_box"
+     ],
+     "risks": [
+      "tomato_soup_can, tuna_fish_can: lower friction on metal. Groove 4 has held them before, at TPU 1.",
+      "banana and flat_screwdriver: a deeper groove changes the contact on long narrow objects. Groove 4 held both at reach 8\u201310.",
+      "dice and large_marker (17 and 19 mm): small objects may sit in a 4 mm groove differently. Groove 4 held them before."
+     ],
+     "idea": null,
+     "result": "not kept (another proposal gained more): gained 2 tasks, lost none; costs $0.00, 9 machine min",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "pudding_box"
+      ],
+      "hit": [],
+      "missed": [
+       "pudding_box"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 8.8,
+      "lines": [
+       "lm3uu_bearing x2: provided (reused)",
+       "m2_screw x4: provided (reused)",
+       "m3_screw x6: provided (reused)",
+       "steel_rod_3x150 x2: provided (reused)",
+       "sts3215_7v4 x6: provided (reused)",
+       "print:PLA 1.8 g for pads: 9 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "fixed_jaw_missed",
+      "force_limit",
+      "moving_jaw_on_top_face"
+     ]
+    }
+   ],
+   "accepted": "b130",
+   "notes": "Sugar box (92 mm) and mustard bottle (96 mm) need a wider jaw than any affordable change gives. The only fixes are a 50 mm sector, which means a 215-min long_slide reprint, or the recorded ideas (sector_arc_extension, flush_reach_pads), and all are beyond the 16 machine minutes left. One potted-meat-can placement fails on force_limit at t=0.02 s, right at the start of the attempt. That points to a placement collision, not something the body can fix cheaply, so I left it alone. If one of these proposals is kept, I would buy nothing: both reuse the pads part and print in PLA only.",
+   "llm": {
+    "tag": "iter13",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 44.5,
+    "tokens_in": 14592,
+    "tokens_out": 4149,
+    "usd_list_price": 0.1823,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 55.1,
+   "stop": null
+  },
+  {
+   "iteration": 14,
+   "body": "arm_servos: servos_7v4; jaw: long_slide (sector_radius_mm=46); pads: pads (groove_mm=2, lip_mm=0, pad_angle_deg=0, pad_tpu_mm=0, reach_mm=12, width_mm=20)",
+   "held": [
+    "apple",
+    "banana",
+    "cup",
+    "dice",
+    "flat_screwdriver",
+    "foam_brick",
+    "gelatin_box",
+    "golf_ball",
+    "large_marker",
+    "lemon",
+    "plum",
+    "racquetball",
+    "strawberry",
+    "tennis_ball",
+    "tomato_soup_can",
+    "tuna_fish_can",
+    "wood_block_cube"
+   ],
+   "failing_mechanisms": {
+    "moving_jaw_on_top_face": 3,
+    "force_limit": 2,
+    "fixed_jaw_missed": 1
+   },
+   "failing": {
+    "rva000_pudding_box": {
+     "mechanism": "fixed_jaw_missed",
+     "detail": "verdict no_actuation; closed to 1.75 rad (fingertips 90 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: no contact; rose 0 mm, ended +0 mm; 187 g"
+    },
+    "reg_sugar_box": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 90 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 0 N on the pad at +19 mm from the centre (top at +23), pushing 80 deg down; rose 0 mm, ended +0 mm; 514 g"
+    },
+    "rva000_sugar_box": {
+     "mechanism": "force_limit",
+     "detail": "verdict stuck; a contact exceeded the force limit at t=0.02 s (squeezing or pressing down)"
+    },
+    "rva000_potted_meat_can": {
+     "mechanism": "force_limit",
+     "detail": "verdict stuck; a contact exceeded the force limit at t=0.02 s (squeezing or pressing down)"
+    },
+    "reg_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 90 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 5 N on the pad at +14 mm from the centre (top at +29), pushing 60 deg down; rose 0 mm, ended -0 mm; 431 g"
+    },
+    "rva000_mustard_bottle": {
+     "mechanism": "moving_jaw_on_top_face",
+     "detail": "verdict stuck; closed to 1.75 rad (fingertips 90 mm apart), moving fingertip +1 mm vs the fixed one; fixed jaw: no contact; moving jaw: 1 N on the pad at +16 mm from the centre (top at +29), pushing 60 deg down; rose 0 mm, ended -0 mm; 431 g"
+    }
+   },
+   "proposals": [],
+   "accepted": null,
+   "notes": "",
+   "llm": {},
+   "seconds": null,
+   "stop": "iterations"
+  }
+ ],
+ "llm_calls": [
+  {
+   "tag": "iter00",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 50.7,
+   "tokens_in": 11757,
+   "tokens_out": 4893,
+   "usd_list_price": 0.1742,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter01",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 110.0,
+   "tokens_in": 12344,
+   "tokens_out": 10578,
+   "usd_list_price": 0.2927,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter02",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 62.3,
+   "tokens_in": 14716,
+   "tokens_out": 5912,
+   "usd_list_price": 0.2186,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter03",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 69.5,
+   "tokens_in": 14576,
+   "tokens_out": 6872,
+   "usd_list_price": 0.2367,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter04",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 115.4,
+   "tokens_in": 15340,
+   "tokens_out": 11063,
+   "usd_list_price": 0.3268,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter05",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 107.8,
+   "tokens_in": 15855,
+   "tokens_out": 9596,
+   "usd_list_price": 0.3015,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter06",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 123.5,
+   "tokens_in": 15774,
+   "tokens_out": 11390,
+   "usd_list_price": 0.3367,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter07",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 115.1,
+   "tokens_in": 15392,
+   "tokens_out": 10798,
+   "usd_list_price": 0.3218,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter08",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 133.6,
+   "tokens_in": 15356,
+   "tokens_out": 12921,
+   "usd_list_price": 0.364,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter09",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 87.9,
+   "tokens_in": 15254,
+   "tokens_out": 7878,
+   "usd_list_price": 0.2624,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter10",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 66.2,
+   "tokens_in": 14980,
+   "tokens_out": 6209,
+   "usd_list_price": 0.2267,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter11",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 52.8,
+   "tokens_in": 14977,
+   "tokens_out": 5044,
+   "usd_list_price": 0.2034,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter12",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 64.0,
+   "tokens_in": 14762,
+   "tokens_out": 5999,
+   "usd_list_price": 0.2207,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter13",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 44.5,
+   "tokens_in": 14592,
+   "tokens_out": 4149,
+   "usd_list_price": 0.1823,
+   "billing": "plan",
+   "error": ""
+  }
+ ]
+}

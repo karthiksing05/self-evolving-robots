@@ -1,0 +1,30 @@
+{
+ "run": "gripper_s2depth_s0",
+ "world": "gripper",
+ "films": [
+  {
+   "frame": 3,
+   "id": "b032",
+   "group": "tuna_fish_can",
+   "task": "reg_tuna_fish_can",
+   "file": "03_b032_tuna_fish_can.mp4",
+   "poster": "03_b032_tuna_fish_can.jpg",
+   "seconds": 6.6,
+   "sound": false,
+   "clipping_mm": 0.14,
+   "change": "What changed: jaw: sector radius mm 43 → 46; pads: reach mm 11 → 15, pad tpu mm 2 → 1",
+   "before": {
+    "ok": false,
+    "verdict": "force limit (stuck (force limit))",
+    "headline": "The tuna fish can is not held (force limit)",
+    "recorded": "force_limit"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the tuna fish can for the full second",
+    "recorded": true
+   }
+  }
+ ]
+}

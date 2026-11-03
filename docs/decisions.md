@@ -1804,6 +1804,23 @@ Three fixes failed on the way, each for a reason:
   - `test_world_gripper::test_solve_reads_the_failure` now reads the stock's failure on the pudding box instead.
 
 
+**The campaign** (three seeds, 14 iterations; `results/evolve/gripper_s2depth_s{0,1,2}.json`).
+
+| seed | train groups by iteration | final train | test groups (stock) | kept body |
+|---|---|---|---|---|
+| s0 | 16 → 17 at 4 | 17/21 | 17 (15) | long slide, 46 mm sector; 15 → 12 mm reach, 2 mm grooved pads, 20 mm wide |
+| s1 | 16 → 17 at 1 | 17/21 | 17 (16) | revolute; 10° pads, 2 mm TPU, 12 mm wide |
+| s2 | 16 → 20 by 8 | **20/21** | 18 (15) | revolute; 42° pads, 10 mm wide, no reach |
+
+- **The prediction missed:** 19/21 or better in one seed, not two.
+- **The long slide.** System 2 tried it again within two iterations in s0, as predicted, and kept it at iteration 3. It never tried it bare. It kept pads and then nudged their reach and width one task at a time for ten iterations, without a new group.
+  - The slide's sector stops the fingertips 90 mm apart, so the pudding box and sugar box, at about 90 mm, slip through unsqueezed (`fixed_jaw_missed`) or meet a pad on their top.
+  - The bare slide held 20 of the 21 groups on one placement each in the replays above, but never in a campaign. A search that adds pads first never finds it.
+- **s2's 20/21** is a hinged jaw with 42° pads 10 mm wide. The angled pads lean into a box's side instead of meeting its top edge.
+- **The mustard bottle is lost on every seed** with `moving_jaw_on_top_face`: the hinged jaw's arc, or the slide's carriage, comes down on the bottle's shoulder. No kept body grips below it.
+- **Stock:** the first iteration holds 16 groups. That is one fewer than the replay's 17, because the campaign needs both placements of each group.
+- **Films:** `results/evolve/films/gripper_s2depth_s*` holds 6 before→after films of the changes the seeds kept. `results/evolve/gallery/gripper_s2depth_s*` holds 60 films of the stock beside each final body, one per group, replayed under each run's seed. A replay that disagreed with its run's record was not filmed (s2's stock gelatin box).
+
 ## D-066 The pad's printed shoe is simulated (world: physics)
 
 **Why.** A pad was simulated as its land boxes alone. The pad as built (`design/pad_cad.py`) is a PLA shoe that slides over the stock jaw's tapered tip, with the land in front, a TPU skin and two M2 cap screws behind:

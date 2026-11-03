@@ -1,0 +1,102 @@
+{
+ "run": "gripper_s2depth_s2",
+ "world": "gripper",
+ "films": [
+  {
+   "frame": 1,
+   "id": "b001",
+   "group": "gelatin_box",
+   "task": "rva000_gelatin_box",
+   "file": "01_b001_gelatin_box.mp4",
+   "poster": "01_b001_gelatin_box.jpg",
+   "seconds": 7.0,
+   "sound": false,
+   "clipping_mm": 0.13,
+   "change": "What changed: pads none → pads (reach mm 0, pad angle deg 30, groove mm 0)",
+   "before": {
+    "ok": false,
+    "verdict": "squeezed down out (wrong behavior (slip))",
+    "headline": "The gelatin box is squeezed out downward as the fingers close",
+    "recorded": "squeezed_down_out"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the gelatin box for the full second",
+    "recorded": true
+   }
+  },
+  {
+   "frame": 2,
+   "id": "b021",
+   "group": "tuna_fish_can",
+   "task": "reg_tuna_fish_can",
+   "file": "02_b021_tuna_fish_can.mp4",
+   "poster": "02_b021_tuna_fish_can.jpg",
+   "seconds": 6.6,
+   "sound": false,
+   "clipping_mm": 0.06,
+   "change": "What changed: pads: pad angle deg 30 → 38, width mm 12 → 10",
+   "before": {
+    "ok": false,
+    "verdict": "force limit (stuck (force limit))",
+    "headline": "The tuna fish can is not held (force limit)",
+    "recorded": "force_limit"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the tuna fish can for the full second",
+    "recorded": true
+   }
+  },
+  {
+   "frame": 3,
+   "id": "b040",
+   "group": "sugar_box",
+   "task": "reg_sugar_box",
+   "file": "03_b040_sugar_box.mp4",
+   "poster": "03_b040_sugar_box.jpg",
+   "seconds": 9.7,
+   "sound": false,
+   "clipping_mm": 0.13,
+   "change": "What changed: pads: pad angle deg 38 → 42",
+   "before": {
+    "ok": false,
+    "verdict": "moving jaw on top face (stuck (load limit))",
+    "headline": "The sugar box is not held (moving jaw on top face)",
+    "recorded": "moving_jaw_on_top_face"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the sugar box for the full second",
+    "recorded": true
+   }
+  },
+  {
+   "frame": 4,
+   "id": "b071",
+   "group": "pudding_box",
+   "task": "reg_pudding_box",
+   "file": "04_b071_pudding_box.mp4",
+   "poster": "04_b071_pudding_box.jpg",
+   "seconds": 6.6,
+   "sound": false,
+   "clipping_mm": 0.15,
+   "change": "What changed: pads: pad tpu mm 2 → 0",
+   "before": {
+    "ok": false,
+    "verdict": "moving jaw on top face (stuck (slip))",
+    "headline": "The pudding box is not held (moving jaw on top face)",
+    "recorded": "moving_jaw_on_top_face"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the pudding box for the full second",
+    "recorded": true
+   }
+  }
+ ]
+}
