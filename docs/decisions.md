@@ -2349,3 +2349,22 @@ The long slide reached 20 of 21 groups (D-066) on exactly this idealisation.
   - the overhung load of a large gear on the servo's spline: Feetech publishes no radial rating for the STS3215;
   - tooth bending (D-059);
   - belt or bushing friction.
+
+**Campaign** (System 2, three seeds, 14 iterations, 4 workers, `gripper_s2rods_s{0,1,2}`; results in `results/evolve/`):
+
+| Seed | Train groups | Test tasks (final vs stock) | Final pads |
+|---|---|---|---|
+| 0 | 19/21 (38/42 tasks) | 18 vs 15 | angle 31°, TPU 2 mm, reach 17 mm, width 12 mm |
+| 1 | 17/21 (34/42) | 17 vs 16 | angle 30°, TPU 1.5 mm, reach 0, width 12 mm |
+| 2 | 18/21 (38/42) | 16 vs 15 | angle 32.7°, TPU 1.5 mm, reach 8 mm, width 9.05 mm |
+
+- **Every seed kept the stock revolute jaw and changed only the pads.** The best, 19/21, is one group below the long slide's 20/21 under the idealised slide (D-066), now reached with a mechanism that passes every law.
+- **Proposals:** 144 in all. 9 kept, 77 rejected, 38 refused before trial and 17 recorded as ideas.
+  - The slides' refusals were interference, for example the pinion against the rolled wrist or one pad shoe against the other.
+  - The slides that were trialled lost most held groups: each squeeze dents a bushing or skips the rack.
+- **System 2 named the fix this entry predicted, without being told it.** Seeds 0, 1 and 2 each proposed a braced or bridged long slide (about $10.60, 300 machine min). Seed 2 added a rack-preload roller.
+- **It converged on one further mechanism, over and over:** a moving pad that stays parallel to the fixed one as the jaw turns. On the three seeds it appeared as:
+  - a flexure-mounted or pivoting self-aligning pad (4 times);
+  - a link-driven or tie-rod levelled pad (3);
+  - a convex rocker pad (3).
+- **None of these ideas could be tried:** an idea is recorded, not built, because the catalogue has no part for it. This is the case for the design-creativity work: ideas built from real links, joints and guides rather than catalogue entries.
