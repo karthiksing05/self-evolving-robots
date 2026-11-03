@@ -231,16 +231,15 @@ def wrist_torque(tool: BuiltTool | None, tip_load_n: float = NOMINAL_TIP_LOAD_N)
 def finger_estimate(design: Design) -> tuple[float, float, float, float]:
     """(print_minutes, grams_pla, grams_tpu, added_mass_g) for the two finger pads (design/fingers.py).
 
-    Volume is the sum of the pad boxes the simulator collides with; the TPU skin is its share of it.
+    The volumes are both pads' printed shoes, lands included, and their TPU skins (D-067).
     """
-    from sea.design.fingers import has_pads, pad_geoms, thickness
+    from sea.design.fingers import has_pads
+    from sea.sim.build_model import shoe_volumes
 
     f = design.fingers
     if not has_pads(f):  # the stock pads; a jaw joint change is priced by the world that offers it (D-042)
         return 0.0, 0.0, 0.0, 0.0
-    vol = sum(8 * g.half[0] * g.half[1] * g.half[2] for g in pad_geoms(f)) * 1e6  # cm^3, both pads
-    tpu = vol * (f.pad_tpu_mm * 1e-3) / thickness(f)
-    pla = vol - tpu
+    pla, tpu = shoe_volumes(f)
     m_pla, g_pla = print_estimate(pla, "pla")
     m_tpu, g_tpu = print_estimate(tpu, "tpu") if tpu > 0 else (0.0, 0.0)
     mass = (pla * DENSITY_G_CM3["pla"] + tpu * DENSITY_G_CM3["tpu"]) * INFILL_FACTOR
@@ -250,11 +249,11 @@ def finger_estimate(design: Design) -> tuple[float, float, float, float]:
 def finger_print(old: Design, new: Design) -> tuple[float, float, float]:
     """(volume_cm3, grams_pla, grams_tpu) to print when ``new`` changes ``old``'s fingers: both pads,
     whole, since a changed pad is a new part.  Zero when the fingers are unchanged or go back to stock."""
-    from sea.design.fingers import pad_geoms
+    from sea.sim.build_model import shoe_volumes
 
     if new.fingers == old.fingers:
         return 0.0, 0.0, 0.0
-    vol = sum(8 * g.half[0] * g.half[1] * g.half[2] for g in pad_geoms(new.fingers)) * 1e6
+    vol = sum(shoe_volumes(new.fingers))
     _, pla, tpu, _ = finger_estimate(new)
     return vol, pla, tpu
 

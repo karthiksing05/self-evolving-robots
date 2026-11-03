@@ -169,6 +169,8 @@ class Shoe:
     pieces: tuple[np.ndarray, ...]  # convex vertex sets, the jaw body's frame (m)
     screws: tuple[tuple[np.ndarray, np.ndarray], ...]  # head centre and axis, the body's frame (m)
     grams: float  # shoe, skin and both screws
+    pla_cm3: float  # the shoe as printed, lands included
+    tpu_cm3: float  # the skin
 
 
 def _piece(pa: list[tuple[float, float]], ya: float, pb: list[tuple[float, float]], yb: float, xmax: float) -> np.ndarray:
@@ -211,7 +213,7 @@ def build(spec: FingerSpec, fr: PadFrame, host: trimesh.Trimesh) -> Shoe:
     grams = shoe_cm3 * DENSITY["pla"] + skin_cm3 * DENSITY["tpu"] + screw_cm3 * DENSITY["steel"]
     to_body = lambda p: (fr.rot @ np.asarray(p).T).T / 1000 + fr.origin / 1000  # noqa: E731
     screws = tuple((to_body(c + n * hh / 2), fr.rot @ n) for c, n in screw_poses(sec, fr.length))
-    return Shoe(tuple(to_body(p) for p in pieces), screws, grams)
+    return Shoe(tuple(to_body(p) for p in pieces), screws, grams, shoe_cm3, skin_cm3)
 
 
 Host = tuple[str, bytes, bytes]  # a jaw body, its finger's vertices in the body's frame (m) and faces, as bytes

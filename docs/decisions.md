@@ -1834,3 +1834,28 @@ The pictures drew the shoe, but the physics and the mechanism laws never saw it:
 - Every test passed, including the golden grasps.
 - Model builds take 0.03–0.06 s, with the shoes cached per finger spec.
 - What the shoe changes is what the films show and what the laws check: the shoe and screws, no longer boxes alone.
+
+## D-067 The pads are priced as the shoe they are printed as (judge: build)
+
+**Why.** `design/build.finger_estimate` priced a pad's print from its land boxes. That is about 0.3 cm³ a pad at 30° with 0.5 mm TPU. The part printed is the shoe of D-066, about 1.1 cm³ of PLA, with the skin as its TPU. The bill of materials, the print minutes and the added mass System 2 reads all under-counted the pads.
+
+**Change.**
+- `finger_estimate` and `finger_print` read the PLA and TPU volumes of both shoes (`sim/build_model.shoe_volumes`, cached per finger spec), not the boxes.
+- The screws were already on the bill (four M2).
+
+**Prediction.**
+- PLA grams for a pair of pads rise about 3× (for example 0.7 g to about 2.4 g at 30°).
+- Print minutes rise by a few minutes.
+- No grasp outcome changes; this is a price.
+- Tests that pin pad grams or minutes move, and are re-derived here.
+
+**Measured.**
+
+| pads (both) | PLA before → after | TPU | print minutes |
+|---|---|---|---|
+| 30°, 0.5 mm TPU | 0.55 → 1.29 g | 0.09 g | 13.7 → 15.6 |
+| reach 20 mm, 0.5 mm TPU | 1.34 → 3.71 g | 0.22 g | 16.0 → 22.2 |
+| reach 30, groove 3, lip 4, 1.5 mm TPU | 2.17 → 3.47 g | 1.06 → 0.87 g | 20.4 → 23.3 |
+
+- PLA rose 1.6–2.8×, a little under the predicted 3×. The boxes over-counted deep grooves and long lips, which the shoe's land carries in less material.
+- Every test passed unchanged: none pinned pad grams.

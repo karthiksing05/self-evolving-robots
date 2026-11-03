@@ -141,6 +141,20 @@ def _shoes(spec: mujoco.MjSpec, fingers) -> dict[str, float]:
     return mu
 
 
+@lru_cache(maxsize=256)
+def shoe_volumes(fingers) -> tuple[float, float]:
+    """(PLA, TPU) cm^3 of both pads' shoes as printed (D-067); zero for the stock fingers."""
+    from sea.design.fingers import has_pads
+    from sea.sim import shoe
+
+    if not has_pads(fingers):
+        return 0.0, 0.0
+    spec = mujoco.MjSpec.from_file(str(STOCK_MJCF))
+    _jaw_joint(spec, fingers)
+    built = shoe.shoes(fingers, _finger_hosts(spec))
+    return sum(s.pla_cm3 for _, s in built), sum(s.tpu_cm3 for _, s in built)
+
+
 def _z_to(n: np.ndarray) -> np.ndarray:
     """The quaternion (wxyz) that turns +z onto ``n``."""
     n = n / np.linalg.norm(n)
