@@ -74,6 +74,15 @@ def test_edges_are_driven_in_mujoco_and_climbed_as_a_vehicle_climbs_them():
     assert not slow.ok and slow.why.startswith("stuck")  # at a low duty the drive cannot lift it over the edge
 
 
+def test_a_ramp_is_climbed_on_its_surface_at_its_slope():
+    """The ramp's euler angle went in as radians where MuJoCo reads degrees: a 22 degree ramp lay 0.38
+    degrees off flat, 19 cm up, and robots drove under it (seen in a film)."""
+    tracks = _spec(_body(*GOLD))
+    ep = _drive(tracks, "ramp", {"k": "ramp", "s": "gravel", "deg": 22.0}, 0.6, 0.7, trace=True)
+    x, z = ep.qpos[-1][0], ep.qpos[-1][2]
+    assert ep.ok and x > 0.3 and abs(z - x * np.tan(np.radians(22.0)) - 0.05) < 0.02  # riding on the face
+
+
 def test_width_ground_pressure_trench_and_energy():
     assert W.solve(_body(Edit(slot="chassis", params={"width": 12.0})), TASK["bedroom"]).success
     out = W.solve(_body(Edit(slot="chassis", params={"width": 16.0})), TASK["bedroom"])

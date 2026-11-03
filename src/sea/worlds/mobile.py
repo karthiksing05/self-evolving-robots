@@ -244,12 +244,16 @@ def _robot(s: Spec, surf: str) -> MM.Robot:
 
 
 def _drive(s: Spec, kind: str, f: dict[str, Any], mu: float, duty: float, y0: float = 0.0,
-           standing: bool = False) -> MM.Episode:
-    """One MuJoCo episode at an obstacle, its arguments quantised so that search shares physics (D-063)."""
+           standing: bool = False, trace: bool = False) -> MM.Episode:
+    """One MuJoCo episode at an obstacle, its arguments quantised so that search shares physics (D-063).  With
+    ``trace`` (a film), the same episode run afresh with its trajectory kept."""
     q = {"h": 0.1, "w": 0.1, "depth": 0.1, "deg": 0.25, "off": 0.25}  # cm, or degrees
     items = tuple(sorted((k, round(f[k] / q[k]) * q[k]) for k in q if k in f))
-    return MM.cached(_robot(s, f["s"]), kind, items, round(mu / 0.03) * 0.03, round(duty / 0.05) * 0.05,
-                     round(y0 / 0.25) * 0.25 / 100, standing)
+    args = (_robot(s, f["s"]), kind, items, round(mu / 0.03) * 0.03, round(duty / 0.05) * 0.05,
+            round(y0 / 0.25) * 0.25 / 100)
+    if trace:
+        return MM.episode(*args[:2], dict(items), *args[3:], trace=True, standing=standing)
+    return MM.cached(*args, standing)
 
 
 @functools.cache

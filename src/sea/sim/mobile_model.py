@@ -175,6 +175,8 @@ def terrain_xml(kind: str, f: dict[str, float], mu: float) -> tuple[str, float]:
     rounded by NOSE, as a real one is."""
     g = f'friction="{mu:.4f} 0.005 0.0001" priority="1" class="ground"'
     floor = '<geom name="floor" type="plane" size="3 1 0.1" rgba="0.55 0.53 0.5 1" {g}/>'
+    if kind == "floor":  # flat ground: a film's still of a feature MuJoCo does not drive
+        return floor.format(g=g), 0.0
     if kind == "step":
         h = f["h"] / 100
         return floor.format(g=g) + _block("obstacle", 0.0, 2.0, 0.0, h, g, +1), 0.0
@@ -186,7 +188,7 @@ def terrain_xml(kind: str, f: dict[str, float], mu: float) -> tuple[str, float]:
         th = math.radians(f["deg"])
         ln = 1.0
         return floor.format(g=g) + (
-            f'<geom name="obstacle" type="box" size="{ln / 2:.5f} 0.6 0.01" euler="0 {-th:.6f} 0" '
+            f'<geom name="obstacle" type="box" size="{ln / 2:.5f} 0.6 0.01" euler="0 {-f['deg']:.4f} 0" '
             f'pos="{ln / 2 * math.cos(th) + 0.01 * math.sin(th):.5f} 0 {ln / 2 * math.sin(th) - 0.01 * math.cos(th):.5f}" '
             f'rgba="0.7 0.68 0.64 1" {g}/>'), 0.5 * math.cos(th)
     if kind == "gap":  # two jambs, the opening centred ``off`` off the robot's line
