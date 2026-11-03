@@ -84,7 +84,8 @@ both ends of every control's range. It writes `results/design_language/audit.md`
 
 - `src/sea/design/language.py`: the numbers, `Assembly` and `Member`, and the laws.
 - `src/sea/design/pad_cad.py`: the printed pads over the simulated boxes. `worlds/cad.gripper` calls `dress`.
-- `src/sea/worlds/rig_cad.py`: the talking robot as a bench instrument. `worlds/cad.phonology` calls it.
+- `src/sea/worlds/rig_cad.py`: the talking robot as a bench instrument. `worlds/cad.phonology` calls it. Every
+  linkage's geometry comes from `worlds/linkages.py`, the judge-tier drives that `phonology.check` holds to law (D-071).
 - `src/sea/design/callouts.py`: labelled pictures, with numbered callouts and a legend of what each part does.
 - `tests/test_design_language.py`: the lands, the frames, the audits, the refusals and the posture.
 - `scripts/design_language.py`: before-and-after renders and the audit, in `results/design_language/`.

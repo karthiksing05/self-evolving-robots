@@ -19,7 +19,8 @@ tip is a narrower pad on its own linkage.  The lips are a short tube in front of
 lips only open with the jaw from a cast rest gap; a rounding ring sets the opening (down to pressed shut)
 and a protrusion that lengthens the lip tube.  A motorized larynx lengthens the pharynx.  Each control's
 range comes from its part (rail travel, cam stroke, linkage), and a control exists for System 1 only if
-a part provides it.  Every attempt adds servo noise (1% of each range), so confirmation on fresh seeds
+a part provides it.  Each control is driven by a servo through a real linkage (``worlds/linkages.py``): a body whose
+linkage cannot reach, turn, push or draw through its ranges is refused before any trial (D-071).  Every attempt adds servo noise (1% of each range), so confirmation on fresh seeds
 means robustness.  System 1 keeps a map of 600 sampled postures per body (babbling), runs ``local_search``
 from the nearest three distinct ones, and the same map grounds the brief and the diagnosis.
 
@@ -49,6 +50,7 @@ import numpy as np
 
 from sea.evolve.core import Body, BomLine, Outcome, Param, Part, PartType, Task
 from sea.evolve.search import local_search
+from sea.worlds import linkages
 
 # ---------------------------------------------------------------- acoustics
 C = 35000.0  # speed of sound, cm/s
@@ -117,6 +119,7 @@ class Rig:
     fixed: dict[str, float] = field(default_factory=dict)  # non-servo settings (a jaw-lips rest gap...)
     lips: str = "jaw_lips"
     servos: int = 0
+    opposed: bool = False  # the tip blade presses from the palate, the body pad from the floor (a tip tongue)
 
     def lip_range(self) -> tuple[float, float, float, float]:
         """Smallest and largest lip opening (cm2), shortest and longest lip tube (cm)."""
@@ -143,6 +146,7 @@ def rig(body: Body) -> Rig:
         if to.type == "tip_tongue":
             r.controls |= {"tip_place": (0.3, 5.0), "tip_height": (0.0, BORE + 0.1)}
             r.servos += 2
+            r.opposed = True
     r.lips = li.type
     if li.type == "round_lips":
         r.controls |= {"lip_radius": (-0.2, RING), "protrusion": (0.0, li.params["max_protrusion"])}
@@ -174,6 +178,29 @@ def tract(r: Rig, ctl: dict[str, np.ndarray]) -> tuple[np.ndarray, np.ndarray, n
     lens = np.concatenate([np.repeat((length / NT)[:, None], NT, 1), np.repeat((lip_l / 2)[:, None], 2, 1)], 1)
     dist = np.concatenate([d, -np.stack([lip_l / 4, 3 * lip_l / 4], 1)], 1)
     return areas, lens, dist
+
+
+CLASH = 0.025  # cm: the blade and the pad may press 0.5 mm into each other (twice this: both are drawn as gaps)
+
+
+def clash(r: Rig, ctl: dict[str, np.ndarray]) -> tuple[np.ndarray, np.ndarray]:
+    """How far (cm) the tip blade and the body pad of a tip tongue press past each other, and where (cm behind the
+    teeth).  They press from opposite walls, the blade from the palate and the pad from the floor, so where both narrow
+    one section the gaps they leave must sum to the bore; the concentric tract model would let each pass through the
+    other.  Zero for every other tongue (the hydrostat's body and tip are one cast)."""
+    n = next(iter(ctl.values())).shape[0]
+    if not r.opposed:
+        return np.zeros(n), np.zeros(n)
+    length = r.length + ctl.get("larynx", np.zeros(n))
+    d = (1.0 - (np.arange(NT) + 0.5) / NT)[None, :] * length[:, None]
+    rads = []
+    for place, height, k in (("tongue_place", "tongue_height", K_BODY), ("tip_place", "tip_height", K_TIP)):
+        r0 = np.maximum(0.0, BORE - ctl[height])[:, None]
+        rads.append(np.minimum(BORE, r0 + k * (BORE - r0) * (d - ctl[place][:, None]) ** 2))
+    over = BORE - rads[0] - rads[1]
+    i = np.argmax(over, 1)
+    rows = np.arange(n)
+    return np.maximum(over[rows, i], 0.0), d[rows, i]
 
 
 def acoustics(r: Rig, ctl: dict[str, np.ndarray]) -> tuple[np.ndarray, np.ndarray]:
@@ -230,7 +257,8 @@ CATALOGUE = [
     _pt("long_cast", "tract", "a large cast-silicone vocal tract (adult-male size), bore 2.4 cm",
         "a longer fixed tube from the glottis to the teeth",
         length=Param(lo=15.5, hi=17.5, unit="cm", doc="glottis to teeth, set by the mold")),
-    _pt("larynx_tube", "tract", "the small cast with a silicone bellows at the glottal end, on a servo-driven slide",
+    _pt("larynx_tube", "tract", "the small cast with a silicone bellows at the glottal end; the reed housing rides a "
+        "slide whose rack a pinion on a servo drives",
         "a tube whose pharynx lengthens during an utterance as the larynx is lowered",
         length=Param(lo=12.5, hi=14.5, unit="cm", doc="glottis to teeth with the larynx raised"),
         travel=Param(lo=1.0, hi=3.0, unit="cm", doc="how far the slide lowers the larynx")),
@@ -242,7 +270,8 @@ CATALOGUE = [
                      "(past 1.2 it squeezes the tube shut)")),
     _pt("long_rail_tongue", "tongue", "the cam pad on a carriage riding a 10 cm rail",
         "one constriction over a longer stretch of the tube (2 servos)",
-        rail_start=Param(lo=2.5, hi=4.0, unit="cm", doc="front end of the rail; the pad reaches 10 cm back from it"),
+        rail_start=Param(lo=2.5, hi=4.0, unit="cm", doc="front end of the rail; the pad reaches 10 cm back from it, "
+                         "and the rail must end 0.5 cm in front of the glottis"),
         stroke=Param(lo=0.6, hi=1.3, unit="cm", doc="cam lift into the 1.2 cm bore radius")),
     _pt("tip_tongue", "tongue", "the cam pad on its 7 cm rail plus a narrow tip blade on a two-servo linkage under "
         "the palate", "two constrictions at once: the body pad, and a short tip that slides 0.3-5 cm behind the "
@@ -257,7 +286,8 @@ CATALOGUE = [
     _pt("spread_lips", "lips", "jaw lips with a second servo pulling the mouth corners apart",
         "a lip opening from the rest gap to rest + 5.4 cm2, lip tube 0.6 cm (2 servos)",
         rest_area=Param(lo=2.5, hi=3.5, unit="cm2", doc="lip opening with the jaw shut")),
-    _pt("round_lips", "lips", "a silicone lip ring closed by a drawstring servo and pushed forward by a second servo",
+    _pt("round_lips", "lips", "a silicone lip ring closed by a drawstring wound on a servo's spool and pushed forward "
+        "by a second servo's pushrod",
         "a lip opening of 0-6.6 cm2 and a lip tube 1 cm long plus the protrusion (2 servos)",
         max_protrusion=Param(lo=0.6, hi=1.6, unit="cm", doc="how far the ring can be pushed forward of the teeth")),
 ]
@@ -276,7 +306,7 @@ MANIFEST: dict[str, Any] = {
         "rail_100mm": {"on_hand": 0, "usd": 9, "lead_days": 4, "doc": "miniature linear rail and carriage"},
         "rail_150mm": {"on_hand": 0, "usd": 12, "lead_days": 4, "doc": "miniature linear rail and carriage"},
         "pushrod_kit": {"on_hand": 0, "usd": 4, "lead_days": 2, "doc": "steel pushrods and ball links"},
-        "slide_40mm": {"on_hand": 0, "usd": 15, "lead_days": 5, "doc": "40 mm lead-screw slide"},
+        "slide_40mm": {"on_hand": 0, "usd": 15, "lead_days": 5, "doc": "40 mm linear slide with a rack and pinion"},
         "valve_manifold_3ch": {"on_hand": 0, "doc": "proportional pneumatic valves; not stocked, no supplier"},
     },
 }
@@ -313,6 +343,7 @@ class Babble:
     x: np.ndarray  # (n, k) postures
     f: np.ndarray  # (n, 3) formants
     clo: np.ndarray  # (n, 3) closure: smallest area, its place, the airway elsewhere
+    clash: np.ndarray  # (n,) how far the tip blade and the body pad press past each other, cm
 
 
 def _fmt(f: Sequence[float] | np.ndarray) -> str:
@@ -374,10 +405,10 @@ class PhonologyWorld:
         errs += [f"slot {s!r} is empty" for s in missing]
         if errs:
             return errs
-        n = rig(body).servos
-        if n > CHANNELS:
-            errs.append(f"the body needs {n} servos and the servo controller drives {CHANNELS} channels")
-        return errs
+        r = rig(body)
+        if r.servos > CHANNELS:
+            errs.append(f"the body needs {r.servos} servos and the servo controller drives {CHANNELS} channels")
+        return errs + linkages.faults(r, body.parts)
 
     def manifest(self) -> dict[str, Any]:
         return copy.deepcopy(MANIFEST)
@@ -393,23 +424,27 @@ class PhonologyWorld:
             lo = np.array([r.controls[k][0] for k in keys])
             hi = np.array([r.controls[k][1] for k in keys])
             x = lo + u * (hi - lo)
-            f, clo = acoustics(r, {k: x[:, j] for j, k in enumerate(keys)})
-            self._babble[key] = Babble(keys, x, f, clo)
+            ctl = {k: x[:, j] for j, k in enumerate(keys)}
+            f, clo = acoustics(r, ctl)
+            self._babble[key] = Babble(keys, x, f, clo, clash(r, ctl)[0])
         return self._babble[key]
 
     @staticmethod
-    def _errors(task: Task, f: np.ndarray, clo: np.ndarray) -> np.ndarray:
+    def _errors(task: Task, f: np.ndarray, clo: np.ndarray, over: np.ndarray) -> np.ndarray:
         if task.data["kind"] == "vowel":
             formant = np.abs(_vowel_error(f, task.data["target"])).max(1)
-            return np.maximum(formant, A_VOWEL / np.maximum(clo[:, 0], 1e-6))  # a vowel keeps its airway open
-        return _stop_error(clo, task.data["place"])
+            e = np.maximum(formant, A_VOWEL / np.maximum(clo[:, 0], 1e-6))  # a vowel keeps its airway open
+        else:
+            e = _stop_error(clo, task.data["place"])
+        return np.where(over > CLASH, np.maximum(e, 1.0 + over / CLASH), e)  # a posture the parts cannot take
 
     def solve(self, body: Body, task: Task, seed: int = 0) -> Outcome:
         """System 1: ``local_search`` from the nearest postures in the body's map, up to ``starts`` of them."""
         r, bab = rig(body), self.babble(body)
         span = np.array([hi - lo for lo, hi in (r.controls[k] for k in bab.keys)])
         picks: list[int] = []
-        for i in np.argsort(self._errors(task, bab.f, bab.clo)):  # nearest first, each start 15% of the range apart
+        # nearest first, each start 15% of the range apart
+        for i in np.argsort(self._errors(task, bab.f, bab.clo, bab.clash)):
             if all(np.abs((bab.x[i] - bab.x[j]) / span).max() > 0.15 for j in picks):
                 picks.append(int(i))
             if len(picks) == self.starts:
@@ -421,8 +456,13 @@ class PhonologyWorld:
             x = {k: np.array([np.clip(ctl[k] + rng.normal(0.0, NOISE * (hi - lo)), lo, hi)])
                  for k, (lo, hi) in r.controls.items()}
             f, clo = acoustics(r, x)
-            e = float(self._errors(task, f, clo)[0])
-            return Outcome(task=task.id, success=e <= 1.0, score=1.0 / (1.0 + e), detail=self._said(task, f[0], clo[0]),
+            over, at = clash(r, x)
+            e = float(self._errors(task, f, clo, over)[0])
+            said = self._said(task, f[0], clo[0])
+            if over[0] > CLASH:
+                said += (f"; the tip blade presses {20 * over[0]:.1f} mm into the tongue pad {at[0]:.1f} cm behind the "
+                         "teeth: no posture the parts can take")
+            return Outcome(task=task.id, success=e <= 1.0, score=1.0 / (1.0 + e), detail=said,
                            sim_s=time.perf_counter() - t0)
 
         out, attempts, sim_s = None, 0, 0.0
@@ -458,7 +498,8 @@ class PhonologyWorld:
         r, bab = rig(body), self.babble(body)
         best = {k: np.array([out.controls[k]]) for k in r.controls}
         fb, cb = acoustics(r, best)
-        f, clo = np.vstack([bab.f, fb]), np.vstack([bab.clo, cb])
+        keep = np.concatenate([bab.clash, clash(r, best)[0]]) <= CLASH  # only postures the parts can take
+        f, clo = np.vstack([bab.f, fb])[keep], np.vstack([bab.clo, cb])[keep]
         noisy = "passed once" in out.detail
         if task.data["kind"] == "stop":
             return self._diagnose_stop(r, task, clo, noisy)

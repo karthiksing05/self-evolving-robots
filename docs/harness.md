@@ -155,7 +155,7 @@ These are known gaps. Each one makes a verdict less trustworthy in a specific wa
 | Long four-bar links outreach the finger | Above about 78 mm the coupler's pins hang below the stock fingertip and meet the table first; the finger's mount is not yet a part parameter | decisions.md D-057 |
 | The rig's mounts are drawn, not simulated | The pad shoe and its screws are simulated since D-066; the mounts that hold the rig's parts are still in the pictures only | [design-language.md](design-language.md) |
 | Some simulated pad and rig geometry cannot be built | Grooves deeper than 1.6 mm, a tilted moving pad partly inside the jaw, the lip box t/2 too long, overlapping tip and body tongue ranges: each scores a body no one could build | [design-language.md](design-language.md) |
-| Mobile and talking-robot bodies are not mechanisms yet | The mobile world is analytic with drawn tracks; the talking robot's articulators are free positions | plan P4, P5 |
+| The tongue pad and tip blade press from opposite walls; the acoustics are concentric | The talking robot's drives are laws since D-071 (reach, travel, transmission, dead centre, draw, a sled clear of the glottis). Where the blade and pad press one section, the tract model takes the narrower radius, while the drawn membranes meet and seal | decisions.md D-071 |
 
 Fixing physics gaps changes the *world* tier, so it moves the golden verdicts. Follow the
 procedure in [iteration.md](iteration.md) §4.2.

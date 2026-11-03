@@ -837,7 +837,7 @@ def phonology(body: Body, task: Task, controls: dict[str, float], seed: int = 0,
     ctl = {k: float(np.clip(controls.get(k, (lo + hi) / 2), lo, hi)) for k, (lo, hi) in r.controls.items()}
     arr = {k: np.array([v]) for k, v in ctl.items()}
     f, clo = P.acoustics(r, arr)
-    ok = float(P.PhonologyWorld._errors(task, f, clo)[0]) <= 1.0
+    ok = float(P.PhonologyWorld._errors(task, f, clo, P.clash(r, arr)[0])[0]) <= 1.0
     said = P.PhonologyWorld._said(task, f[0], clo[0])
     w, h = size
     model = C.phonology(body, ctl)

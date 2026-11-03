@@ -1957,3 +1957,67 @@ These test different things: pitch and tipping across several nosings, a round o
 - Mecanum wheels climb higher than the 0.6 edge factor allowed, and still below plain wheels of the same radius. As predicted.
 - Driving straight at a 3 cm step, the X pattern's side forces cancel: 0.0 cm of drift across it.
 - No held route moved, and every mobile, film and CAD test passed. The mecanum wheels still gain nothing over the stock (they lose the gravel ramp, where loose ground clogs their rollers).
+
+## D-071 The talking robot's drives obey the laws of the linkages that move them (judge: world_phonology)
+
+**Why.** The phonology world gives System 1 position controls (`phonology.rig`): a tongue place, a cam lift, a lip radius. The bench rig's CAD (`worlds/rig_cad.py`, tooling) draws a servo and a linkage behind each control, but nothing checked that the linkage can make the motion. A probe of the CAD's linkages at the ends of every control range, for bodies at the catalogue's corners, found two parts that cannot be built as described:
+- **Drawstring (every `round_lips`):** a 12 mm horn turning 100° takes up 18 mm of cord. Closing the ring from 1.45 cm radius to shut takes up 91 mm, its change in circumference.
+- **Larynx slide (every `larynx_tube`):** a 180° servo turns the slide's 8 mm lead screw half a turn, 4 mm. The part promises 10–30 mm.
+
+Two more faults:
+- **A pad that leaves the tract:** a 10 cm rail starting 2.5–4.0 cm behind the teeth carries the pad to 12.5–14.0 cm, while a 12.5 cm cast ends at 12.5.
+- **A crank short of the rail:** the rail crank's servo was rounded onto the base plate's grid the wrong way, 2 mm short of the rail's back end.
+
+The plan's P5 asks for exactly this: articulators driven through linkages, with reachable ranges and checks.
+
+**Change.**
+- **`worlds/linkages.py`** (new, in the `world_phonology` component) is the mechanism between each servo and its control. It holds:
+  - the rail's offset slider-crank;
+  - the tongue cam's eccentric and roller follower;
+  - the tip blade's two-servo five-bar;
+  - the jaw link;
+  - the protrusion pushrod;
+  - the drawstring's spool;
+  - the larynx's pinion and rack.
+
+  `rig_cad` draws from it, so the drawn linkage is the checked one.
+- **Pre-trial laws.** `PhonologyWorld.check` refuses a body whose drives break a law at any of 21 postures per control (a 21 × 21 grid for a coupled pair: tip place × height, lip radius × protrusion). The laws:
+  - **reach:** every rod spans the gap from its arm to its pin;
+  - **travel:** every arm turns at most the MG90S's 180°;
+  - **transmission:** where a rod drives a slide, its angle to the slide's normal is at least 30°; the five-bar's two rods meet the crosshead at 30° or more;
+  - **no dead centre:** a horn and its rod stay at least 10° from lying in line;
+  - **draw:** the spool winds the cord the ring needs, and the pinion moves its rack the slide's whole travel, within the servo's turn;
+  - **clear of the glottis:** the tongue's sled reaches 2.5 cm behind its pad. It must stop short of the reed housing's stand, or of the larynx slide's carriage 3 mm further forward. The rail crank and its rod must pass clear of the stand.
+- **A posture law, inside every attempt.** The tip blade presses from the palate and the body pad from the floor. Where both narrow one section, the gaps they leave must sum to the bore. The concentric tract model let each pass through the other, so `phonology.clash` measures the crossing. A posture crossing by more than 0.5 mm fails its attempt, whatever it sounds like, and its detail says so. System 1's map scores those postures as failures, and the diagnosis leaves them out.
+- **New drives for two parts.** Each part's controls, ranges and acoustics are unchanged:
+  - **`round_lips`:** both ends of the drawstring wind onto a 16 mm spool on the servo. The cord runs in a sheath fixed to the ring clip, so protrusion draws none. Closing the ring takes 163° of turn.
+  - **`larynx_tube`:** a pinion (module 0.5, 40 teeth, 10 mm pitch radius) on the servo drives a rack on the slide's carriage. 30 mm takes 172°.
+- **Harness geometry the CAD audit found wrong:**
+  - **Rail crank:** the servo moves onto the grid on the side that reaches the rail's back end. The crank is 2 mm longer than half the travel, so the stroke between its dead centres leaves a grid step to place the servo in. The rod is 12 mm longer, so it meets the sled at 39.9° or more (30.1° before).
+  - **Reed housing's stand:** it becomes a bracket on the +y side. The rail crank's arm swings under the cast's centreline, and the old full-width stand stood in its path.
+  - **Pharynx clamp:** its ring opens underneath, so the follower's guide passes under the cast's back end at full stroke.
+
+**Prediction** (written before `check` called the laws).
+- The stock passes.
+- So does every final body of the frozen c1 phonology campaign (three System 2 seeds, all `short_cast` + `tip_tongue` + `round_lips`). So do 29 of its 30 random-search finals; the 30th (random s12, a long rail on a 12.94 cm larynx tube) is refused.
+- Of the 468 bodies at the catalogue's corners, the 48 with a long rail on a 12.5 cm tract are refused, and no others.
+- The tightest drives are the jaw link (30.4° at full opening) and the second tip servo, whose horn comes within 18° of a dead centre.
+- **Three-seed re-run:** 13/13 train groups on each seed, as in c1. The acoustics, the controls and the stock are unchanged. The only difference a run can see is the refusal of long rails on short casts, which costs a proposal, not a sound.
+
+**Revised before any campaign.** A CAD audit of law-passing corner bodies at their control ends found two more faults:
+- the sled and the rail's rod running into the glottis's hardware;
+- the blade and pad pressing through each other.
+
+The sled and crank law and the clash law above were added, the stand and clamp redrawn, and the prediction revised:
+- The stock and the c1 System 2 finals still pass, and still hold the same tasks under System 1: the stock 18 of 39 train and test tasks, the c1 final all 39, before and after.
+- Of the 30 random finals, 3 are refused, all for the sled:
+  - s12 and s13, long rails on larynx tubes;
+  - s16, a cam tongue reaching 10.94 cm on a 12.65 cm larynx tube.
+- At the catalogue's corners, 156 of 468 bodies are refused, every one for the sled:
+  - every long rail on a cast shorter than 15 cm, and one starting 4 cm back on a cast shorter than 16.5 cm;
+  - a 7 cm rail starting 4 cm back on a 12.5 cm cast;
+  - the same on any larynx tube shorter than 13.8 cm.
+
+  No other law refuses a corner, so the drives are built for their parts' ranges.
+- The clash law turns 14–21 % of a tip tongue's 600 sampled postures into failures. That is how many of the postures System 1 could reach before were ones the parts cannot take.
+- **The three-seed re-run:** 13/13 train groups on each seed. The c1 final holds every sound without a clashing posture. A run that proposes a long rail on a short cast loses that proposal.

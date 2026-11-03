@@ -5,9 +5,12 @@ move it:
 - a crank on the rail servo slides the tongue's sled along its rail (``tongue_place``);
 - an eccentric cam on the sled's servo lifts the follower rod that bulges the tongue pad (``tongue_height``);
 - two servos on a bridge over the tract carry the tip blade through a five-bar linkage (``tip_place``, ``tip_height``);
-- a lead-screw slide lowers the reed housing and stretches a bellows (``larynx``);
-- a servo pulls the jaw down its guide (``jaw``), or pushes the lip ring forward and draws its string
+- a pinion on the larynx servo drives the rack of a slide that lowers the reed housing and stretches a bellows
+  (``larynx``);
+- a servo pulls the jaw down its guide (``jaw``), or pushes the lip ring forward and winds its drawstring on a spool
   (``protrusion``, ``lip_radius``).
+
+Every linkage's geometry comes from ``linkages`` (the world's judge tier), which holds it to physical law (D-071).
 
 The acoustics are the world's: this module reads only ``P.rig``, the bore and the articulators' profile constants.
 
@@ -31,17 +34,16 @@ from sea.design import language as LG
 from sea.design.cad import CadModel, CadPart, View
 from sea.design.language import tessellate as to_mesh
 from sea.evolve.core import Body
+from sea.worlds import linkages as K
 from sea.worlds import phonology as P
+from sea.worlds.linkages import FOOT_DOWN, FOOT_STAND, RAIL_MM, X_STEM, ZP
 
 V = cq.Vector
 R = 10 * P.BORE  # bore radius
 RO = R + 4.0  # the cast's outer radius: a 4 mm silicone wall
-ZP = -66.0  # top of the base plate
 UP = (0.0, 0.0, 1.0)
 NEAR = cq.Solid.makeBox(4000, 2000, 4000, V(-2000, -2000, -2000))  # y < 0: removed in section
-RAIL_MM = {"cam_tongue": (70.0, 100.0), "tip_tongue": (70.0, 100.0), "long_rail_tongue": (100.0, 150.0)}  # travel, rail
 LINER_MM = 1.2  # a TPU membrane's thickness; a cast one is silicone's wall
-X_STEM = -10.0  # the tip stem's front limit: its crosshead and pushrod eyes clear the cast's flange
 
 # MG90S, in its own frame: the shaft on +z at x = y = 0, the case running toward +x
 CASE = (-6.1, 16.7, 6.1, 22.7)  # x from, x to, half width, height
@@ -49,8 +51,6 @@ TABS = (15.9, 18.4, 4.75)  # tab underside, top, overhang past each end
 DOME = (5.9, 26.7)  # gear dome radius, and its top: where a placement puts ``at``
 SPLINE = (2.4, 29.9)
 HORN = (3.5, 30.7, 1.6)  # hub radius, top, arm thickness
-FOOT_DOWN = 9.6  # a lying servo's shaft above the foot of its mount
-FOOT_STAND = 29.7  # a standing servo's dome top above the foot of its mount
 ARM_Y = 3.2  # a servo whose shaft points -y has its horn arm centred on y = 0 when its dome top is here
 
 
@@ -184,27 +184,6 @@ def _liner(x0: float, x1: float, depth: float, from_top: bool = False) -> cq.Sha
     return out.mirror("XY") if from_top else out
 
 
-def _inverse(f, target: float, lo: float, hi: float) -> float:
-    """``x`` in [lo, hi] with f(x) = target, for f monotonic there (bisection; the nearer end if out of range)."""
-    up = f(hi) > f(lo)
-    for _ in range(60):
-        mid = (lo + hi) / 2
-        lo, hi = (mid, hi) if (f(mid) < target) == up else (lo, mid)
-    return (lo + hi) / 2
-
-
-def _reach(s: np.ndarray, p: np.ndarray, a: float, b: float, elbow: float) -> np.ndarray:
-    """The tip (2-D) of a horn of length ``a`` turning about ``s`` whose link of length ``b`` reaches ``p``;
-    ``elbow`` (+1 or -1) picks the side of the line from s to p."""
-    d = p - s
-    n = float(np.linalg.norm(d))
-    n = min(max(n, abs(b - a) + 1e-6), a + b - 1e-6)
-    along = (a * a - b * b + n * n) / (2 * n)
-    h = math.sqrt(max(a * a - along * along, 0.0))
-    u = d / np.linalg.norm(d)
-    return s + u * along + elbow * h * np.array([-u[1], u[0]])
-
-
 # ---------------------------------------------------------------- the assembly
 class _Rig:
     def __init__(self, body: Body, ctl: dict[str, float] | None):
@@ -297,7 +276,9 @@ class _Rig:
         """The reed housing with its front face at the glottis ``g``, standing on ``floor``: its air chamber, the
         reed over the glottal slit, and the air fitting and hose behind."""
         body = _cyl(RO + 5, 18, (g - 9, 0, 0), (1, 0, 0))
-        stand = _box((g - 17, -RO, floor), (g - 1, RO, -RO), 1.0).cut(_cyl(RO + 5, 20, (g - 9, 0, 0), (1, 0, 0)))
+        y0, y1 = K.STAND_Y  # a bracket on one side: the rail crank and its rod pass under the housing on the other
+        stand = _box((g - K.STAND_X[0], y0, floor), (g - K.STAND_X[1], y1, -8.0), 1.0).cut(
+            _cyl(RO + 5, 20, (g - 9, 0, 0), (1, 0, 0)))
         housing = body.fuse(stand).clean()
         housing = housing.cut(_cyl(R - 2, 11, (g - 8.5, 0, 0), (1, 0, 0)))  # air chamber
         housing = housing.cut(_box((g - 3.1, -6, -1.5), (g + 0.1, 6, 1.5)))  # glottal slit
@@ -327,16 +308,16 @@ class _Rig:
         self.housing = k
 
     def larynx(self, back: float) -> None:
-        """A clamp holds the cast's back end; a bellows joins it to the reed housing, which rides a lead-screw slide
-        the larynx servo turns: lowering the larynx lengthens the pharynx by the ``larynx`` control."""
+        """A clamp holds the cast's back end; a bellows joins it to the reed housing, which rides a slide whose rack
+        the larynx servo's pinion drives: lowering the larynx lengthens the pharynx by the ``larynx`` control."""
         ext = 10 * self.c.get("larynx", 0.0)
         # a ring on an arm from a post beside the bench: the space under the cast is the tongue sled's travel
         yp = 38.0
         clamp = _cyl(RO + 4, 6, (back + 3, 0, 0), (1, 0, 0)).fuse(
             _box((back, RO + 2, -4), (back + 6, yp + 6, 4), 1.0), _box((back, yp, ZP + 3), (back + 6, yp + 6, 4), 1.0),
             _box((back - 4, yp - 1, ZP), (back + 10, yp + 9, ZP + 4), 1.0))
-        clamp = clamp.cut(_cyl(RO, 8, (back + 3, 0, 0), (1, 0, 0))).cut(  # flat underneath, over the follower's guide
-            _box((back - 1, -RO - 10, -RO - 12), (back + 7, RO + 10, -RO - 2)))
+        clamp = clamp.cut(_cyl(RO, 8, (back + 3, 0, 0), (1, 0, 0))).cut(  # open underneath: the follower's guide
+            _box((back - 1, -RO - 10, -RO - 12), (back + 7, RO + 10, -RO + 2)))  # passes below the cast
         kc = self.part("pharynx clamp", "tract", clamp, role="holds the cast's back end from a post beside the "
                        "tongue's travel", up=(1, 0, 0), section=True)
         self.join(kc, self.cast)
@@ -354,24 +335,35 @@ class _Rig:
         g = back - length
         rest = back - 6.0
         travel = 10 * self.r.controls["larynx"][1]
-        zs = ZP + FOOT_DOWN - 2.0  # the slide's top: its screw lies on it, on the servo's axis
+        zs = ZP + 6.0  # the slide's top
         lo, hi = rest - travel - 30, rest - 1
         ks = self.part("larynx slide", "tract", _box((lo, -10, ZP), (hi, 10, zs), 1.0), "metal",
-                       "40 mm lead-screw slide, on the base")
+                       "40 mm linear slide, on the base")
         self.join(ks, self.base)
+        # the carriage carries the reed housing; a rack runs back from it along the slide's top
         kca = self.part("slide carriage", "tract", _box((g - 20, -12, zs), (g + 2, 12, zs + 6), 1.0), "metal",
-                        "carries the reed housing")
-        self.join(kca, ks)
-        kscr = self.part("lead screw", "tract", _rod((lo - 1.5, 0, zs + 2), (g - 20, 0, zs + 2), 2.0), "metal",
-                         "turned by the larynx servo: drives the carriage")
-        self.join(kscr, kca, "joint")
-        self.join(kscr, ks)
-        sv = self.servo("larynx servo", "tract", "turns the lead screw: lowers the larynx", (lo - 6.5, 0, zs + 2),
-                        (1, 0, 0), (0, 1, 0), self.base)
-        kcp = self.part("shaft coupler", "tract", _cyl(4.0, 6.0, (lo - 3.5, 0, zs + 2), (1, 0, 0)), "metal",
-                        "joins the servo's spline to the lead screw")
-        self.join(kcp, sv["servo"], "joint")
-        self.join(kcp, kscr, "joint")
+                        "carries the reed housing and the rack")
+        self.join(kca, ks, "guide")
+        rack = _box((g - 20 - travel - 16, -2.5, zs + 0.5), (g - 20, 2.5, zs + 6), 0.3)
+        k_rk = self.part("rack", "tract", rack, role=f"module {K.PINION[0]:g}, screwed to the carriage's back")
+        self.join(k_rk, kca)
+        self.join(k_rk, ks, "guide")
+        # the pinion stands over the rack behind the carriage: the rack moves under it over the whole travel
+        x_p, z_sh = rest - travel - 30.0, zs + 6 + K.PINION_R
+        riser = _box((x_p - 23, 12, ZP), (x_p + 12, 34, z_sh - FOOT_DOWN), 1.0)
+        k_rs = self.part("servo riser", "tract", riser, role="holds the larynx servo over the rack")
+        self.join(k_rs, self.base)
+        y_dome = 1.5 + (SPLINE[1] - DOME[1]) - 0.5  # the spline reaches into the pinion
+        sv = self.servo("larynx servo", "tract", "turns the pinion: lowers the larynx", (x_p, y_dome, z_sh), (0, -1, 0),
+                        (-1, 0, 0), k_rs)
+        turn = K.pinion_angle(10 * self.c.get("larynx", 0.0))
+        pinion = _cyl(K.PINION_R, 3.0, (x_p, 0, z_sh), (0, 1, 0)).cut(
+            _box((x_p - 0.6, -2, z_sh + K.PINION_R - 1.2), (x_p + 0.6, 2, z_sh + K.PINION_R + 1)))
+        pinion = pinion.rotate(V(x_p, 0, z_sh), V(x_p, 1, z_sh), -math.degrees(turn))
+        k_pn = self.part("pinion", "tract", pinion, role=f"{K.PINION[1]} teeth, module {K.PINION[0]:g}, on the servo's "
+                         "spline: drives the rack", up=(0, 1, 0))
+        self.join(k_pn, sv["servo"], "joint")
+        self.join(k_pn, k_rk, "joint")
         self.glottis(g, zs + 6, kca, kb)
 
     # -------------------------------------------------- the tongue
@@ -393,7 +385,7 @@ class _Rig:
         k_car = self.part("carriage", "tongue", car, "metal", "rides the rail, carries the sled")
         self.join(k_car, k_rail)
         top = ZP + 11.0
-        e, rc = stroke / 2, 9.0
+        e, rc = stroke / 2, K.CAM_R
         sled = _box((xp - 25, -10, ZP + 8), (xp + 14, 36, top), 1.0).cut(  # a window the cam turns through
             _box((xp - min(e + rc + 1.0, 16.0), -3.0, ZP + 7), (xp + e + rc + 1.0, 3.0, top + 1)))
         k_sled = self.part("sled", "tongue", sled, role="carries the cam servo and the follower's guide along the rail")
@@ -406,7 +398,7 @@ class _Rig:
         def rise(phi: float) -> float:
             return -e * math.cos(phi) + math.sqrt(rc * rc - (e * math.sin(phi)) ** 2)
 
-        phi = _inverse(lambda f: rise(f) - rise(0.0), min(lift, 2 * e), 0.0, math.pi)
+        phi = K.cam_angle(to.params["stroke"], min(lift, 2 * e))
         d = np.array([math.sin(phi), 0.0, -math.cos(phi)])
         sv = self.servo("cam servo", "tongue", "turns the cam: how far the tongue rises", (xp, 6.0, zs), (0, -1, 0),
                         (-1, 0, 0), k_sled, horn=(d, max(e, 4.0)))
@@ -415,7 +407,7 @@ class _Rig:
                           role="eccentric, screwed to the horn: lifts the follower", up=(0, -1, 0))
         self.join(k_cam, sv["horn"], "joint")
         z_roll, z_end = zs + rise(phi) + 3.0, -R + lift
-        follower = _cyl(3.0, 4.0, (xp, 0, z_roll), (0, 1, 0)).fuse(_rod((xp, 0, z_roll), (xp, 0, z_end), 1.5))
+        follower = _cyl(K.ROLLER, 4.0, (xp, 0, z_roll), (0, 1, 0)).fuse(_rod((xp, 0, z_roll), (xp, 0, z_end), 1.5))
         k_fol = self.part("follower rod", "tongue", follower, "metal", "rides the cam on its roller and pushes up "
                           "through the cast's floor slot into the tongue pad")
         self.join(k_fol, k_cam)
@@ -436,24 +428,15 @@ class _Rig:
                           "follower lifts it", section=True)
         self.join(k_pad, k_fol, "joint")
         self.join(k_pad, self.cast)
-        self.crank(xp - 18.75, -start - travel - 18.75, travel, zk, k_guide)
+        self.crank(K.sled_pin(c["tongue_place"]), K.rail_crank(to.params["rail_start"], to.type), zk, k_guide)
         if to.type == "tip_tongue":
             self.tip()
 
-    def crank(self, x_pin: float, x_far: float, travel: float, zk: float, on: str) -> None:
+    def crank(self, x_pin: float, ck: K.Crank, zk: float, on: str) -> None:
         """The rail servo stands in front of the rail; a crank on its horn and a connecting rod slide the sled
-        (an offset slider-crank: the crank turns half a turn for the rail's whole travel)."""
-        a, y_pin, y_c = travel / 2, -8.75, -36.0
-        b = (y_pin - y_c) + a + 12.0
-
-        def x_of(th: float) -> float:
-            return a * math.cos(th) + math.sqrt(b * b - (y_pin - y_c - a * math.sin(th)) ** 2)
-
-        ths = np.linspace(0.6 * math.pi, 2.4 * math.pi, 721)
-        xs = np.array([x_of(t) for t in ths])
-        i0, i1 = sorted((int(np.argmin(xs)), int(np.argmax(xs))))
-        x_c = round((x_far - xs.min() + 1.0) / LG.GRID) * LG.GRID
-        th = _inverse(x_of, x_pin - x_c, ths[i0], ths[i1])
+        (an offset slider-crank, ``linkages.rail_crank``)."""
+        a, y_pin, y_c, x_c = ck.a, ck.y_pin, ck.y_c, ck.x_c
+        th = ck.angle(x_pin)
         u = np.array([math.cos(th), math.sin(th), 0.0])
         sv = self.servo("rail servo", "tongue", "swings the crank: where the tongue sits along the tract",
                         (x_c, y_c, ZP + FOOT_STAND), UP, (-1, 0, 0), self.base, horn=(u, 12.0), lying=False)
@@ -471,20 +454,18 @@ class _Rig:
         where it presses (x) and how deep (z).  The blade hangs under the palate on a stem through the cast's roof."""
         c = self.c
         xt, lift = -10 * c["tip_place"], 10 * c["tip_height"]
-        zb = 44.0
+        zb = K.TIP_BRIDGE
         bridge = _box((-92, 10, zb - 4), (-4, 34, zb), 1.0).fuse(_box((-92, 28, zb - 14), (-4, 34, zb - 3), 1.0)).clean()
         k_br = self.part("palate bridge", "tongue", bridge, role="over the tract, cantilevered from the face plate: "
                          "carries the tip servos", up=(0, 1, 0))
         self.join(k_br, self.face)
-        zs, pz = zb + FOOT_DOWN, 33.0 - lift  # the servos' axes; the crosshead
-        xt = min(xt, X_STEM)  # the stem stays behind the cast's flange; the blade reaches forward of it
-        p = np.array([xt, pz])
+        p = K.tip_pin(c["tip_place"], c["tip_height"])  # the stem stays behind the cast's flange; the blade reaches
+        xt, pz = float(p[0]), float(p[1])  # forward of it
         ends = []
-        for sx, a, b, elbow, y_end in ((-27.0, 12.0, 30.0, 1.0, 0.0), (-63.0, 24.0, 46.0, -1.0, -3.4)):
-            s = np.array([sx, zs])
-            h = _reach(s, p, a, b, elbow)
+        for d, y_end in zip(K.TIP_DYADS, (0.0, -3.4), strict=True):
+            (sx, zs), h = d.s, d.tip(p)
             sv = self.servo("tip servo", "tongue", "one of a pair: together they place the tip blade", (sx, ARM_Y, zs),
-                            (0, -1, 0), (-1, 0, 0), k_br, horn=(np.array([h[0] - sx, 0.0, h[1] - zs]), a))
+                            (0, -1, 0), (-1, 0, 0), k_br, horn=(np.array([h[0] - sx, 0.0, h[1] - zs]), d.a))
             ends.append((sv["tip"], sv["horn"], y_end))
         cross = _rod((xt, -5.4, pz), (xt, 1.6, pz), 1.0).fuse(_rod((xt, 0, pz), (xt, 0, R - lift), 1.5))
         k_stem = self.part("tip stem", "tongue", cross, "metal", "crosshead and stem: carry the blade through the "
@@ -534,7 +515,7 @@ class _Rig:
         rest = 2 * math.sqrt(rest_area / math.pi) * 10
 
         def drop_of(jaw: float) -> float:
-            return 2 * math.sqrt((rest_area + P.JAW[li.type][0] * jaw) / math.pi) * 10 - rest
+            return K.jaw_drop(rest_area, P.JAW[li.type][0], jaw)
 
         drop = drop_of(self.c.get("jaw", 0.0))
         lip = _cyl(RO, tube, (tube / 2, 0, 0), (1, 0, 0))
@@ -555,12 +536,10 @@ class _Rig:
                         up=(1, 0, 0))
         self.join(k_g, self.face)
         self.join(k_jaw, k_g, "guide")
-        s = np.array([round((tube + 34) / LG.GRID) * LG.GRID, ZP + FOOT_DOWN])
-        pin_rest = np.array([tube + 5, -RO - 2.5])
-        a = 12.0
-        b = float(np.linalg.norm(pin_rest - s))
+        dy, pin_rest = K.jaw_dyad(tube, rest_area, P.JAW[li.type][0])
+        s, a = np.asarray(dy.s), dy.a
         pin = pin_rest - np.array([0.0, drop])
-        h = _reach(s, pin, a, b, -1.0)
+        h = dy.tip(pin)
         sv = self.servo("jaw servo", "lips", "pulls the jaw open through the jaw link", (s[0], ARM_Y, s[1]), (0, -1, 0),
                         (1, 0, 0), self.base, horn=(np.array([h[0] - s[0], 0, h[1] - s[1]]), a))
         self.link("jaw link", "lips", sv["tip"], (pin[0], 0.0, pin[1]), (sv["horn"], k_jaw), (0, 1, 0),
@@ -606,26 +585,34 @@ class _Rig:
         self.join(k_clip, k_sl, "joint")
         zs = ZP + FOOT_DOWN
         # protrusion: a pushrod of fixed length from the horn to the clip
-        s = np.array([50.0, zs])
-        prot_hi = 10 * self.r.controls["protrusion"][1]
-        pin_mid = np.array([10.0 + prot_hi / 2, -(10 * P.RING / 2 + 2) - 2.5 - 3.0])
-        a, b = 14.0, float(np.linalg.norm(pin_mid - s))
-        pin = np.array([reach, zc - 3.0])
-        h = _reach(s, pin, a, b, -1.0)
+        dy = K.protrusion_dyad(self.r.controls["protrusion"][1], P.RING / 2)
+        s, a = np.asarray(dy.s), dy.a
+        pin = K.ring_clip(c["lip_radius"], c["protrusion"])
+        h = dy.tip(pin)
         sv = self.servo("protrusion servo", "lips", "pushes the lip ring forward", (s[0], ARM_Y, s[1]), (0, -1, 0),
                         (1, 0, 0), self.base, horn=(np.array([h[0] - s[0], 0, h[1] - s[1]]), a))
         self.link("pushrod", "lips", sv["tip"], (pin[0], 0.0, pin[1]), (sv["horn"], k_clip), (0, 1, 0),
                   "steel, with ball links: a horn drives it")
-        # the drawstring: the horn's angle sets how far the string is drawn
+        # the drawstring: both ends wind onto a spool on the servo, in a sheath from the servo to the ring clip
         lo, hi = self.r.controls["lip_radius"]
-        ang = math.radians(150 - 100 * (c["lip_radius"] - lo) / (hi - lo))
-        s2 = np.array([90.0, zs])
-        sv2 = self.servo("drawstring servo", "lips", "draws the ring's string: rounds and closes the lips",
-                         (s2[0], ARM_Y + 4.0, s2[1]), (0, -1, 0), (1, 0, 0), self.base,
-                         horn=(np.array([math.cos(ang), 0.0, math.sin(ang)]), 12.0))
-        k = self.part("drawstring", "lips", _rod(sv2["tip"], (reach + 1.5, 4.0, zc - 6.0), 0.5), "rubber",
-                      "braided cord around the lip ring, drawn by its servo")
-        self.join(k, sv2["horn"], "joint")
+        turn = K.spool_angle(c["lip_radius"], lo, hi)
+        s2 = np.array([90.0, zs + K.SPOOL_R - FOOT_DOWN + 4.0])  # on a riser, so the spool clears the base plate
+        riser = _box((s2[0] - 12, ARM_Y + 8, ZP), (s2[0] + 24, ARM_Y + 34, s2[1] - FOOT_DOWN), 1.0)
+        k_r = self.part("servo riser", "lips", riser, role="lifts the drawstring servo so its spool clears the plate")
+        self.join(k_r, self.base)
+        sv2 = self.servo("drawstring servo", "lips", "winds the ring's drawstring: rounds and closes the lips",
+                         (s2[0], ARM_Y + 4.0, s2[1]), (0, -1, 0), (1, 0, 0), k_r)
+        y_sp = ARM_Y + 4.0 - (HORN[1] - DOME[1]) + 1.5
+        spool = _cyl(K.SPOOL_R, 3.0, (s2[0], y_sp, s2[1]), (0, 1, 0)).cut(
+            _box((s2[0] - 0.6, y_sp - 0.5, s2[1] + K.SPOOL_R - 3), (s2[0] + 0.6, y_sp + 0.5, s2[1] + K.SPOOL_R + 1)))
+        spool = spool.rotate(V(s2[0], y_sp, s2[1]), V(s2[0], y_sp + 1, s2[1]), -math.degrees(turn))  # the cord's slot
+        k_sp = self.part("spool", "lips", spool, role=f"{2 * K.SPOOL_R:g} mm, on the servo's spline: both ends of the "
+                         "drawstring wind onto it", up=(0, -1, 0))
+        self.join(k_sp, sv2["servo"], "joint")
+        top = np.array([s2[0], y_sp, s2[1] + K.SPOOL_R + 1.0])
+        k = self.part("drawstring sheath", "lips", _rod(top, (reach + 1.5, 4.0, zc - 6.0), 1.2), "rubber",
+                      "the cord runs in it from the spool to the ring: pushing the ring forward draws no cord")
+        self.join(k, k_sp, "joint")
         self.join(k, k_clip, "joint")
 
     # -------------------------------------------------- the whole
