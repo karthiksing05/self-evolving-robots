@@ -80,6 +80,13 @@ def test_diagnose_names_the_mechanism():
     lifted = descent + [_row(1 + 0.1 * k, -0.17, 0.015 + 0.002 * k, side, side) for k in range(30)]
     assert diagnose(lifted, "load_limit", f, 0.03, 514)[0] == "arm_stall"
 
+    # a force limit that trips between two samples is named from the step that pressed hardest (D-068)
+    quiet = descent + [_row(1 + 0.1 * k, -0.17, 0.015, [], []) for k in range(30)]
+    assert "exceeded the force limit" in diagnose(quiet, "force_limit", f, 0.03, 97)[1]
+    peak = _row(2.07, -0.17, 0.015, [], [(12.0, 13.0, -0.95, "jaw_moving_pad1")])
+    mech, detail = diagnose(quiet, "force_limit", f, 0.03, 97, peak)
+    assert mech == "force_limit" and detail.startswith("a pad pressed 12 N down on its top at t=2.07 s")
+
 
 def test_solve_reads_the_failure():
     tasks = {t.id: t for t in W.tasks()}

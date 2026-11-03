@@ -71,13 +71,15 @@ def to_design(body: Body) -> Design:
 
 
 # ---------------------------------------------------------------- mechanism diagnosis
-def _replay(sim, attempt) -> list[dict[str, Any]]:
-    """Run ``attempt()`` on ``sim`` with its step instrumented: jaw-object contacts every 10 sim steps."""
+def _replay(sim, attempt) -> tuple[list[dict[str, Any]], dict[str, Any] | None]:
+    """Run ``attempt()`` on ``sim`` with its step instrumented: jaw-object contacts every 10 sim steps, and the step
+    where they pressed hardest (D-068: a force limit can trip between two samples)."""
     m, d = sim.model, sim.data
     obody = next(h.body_id for h in sim.controls.values())
     ogeoms = {g for g in range(m.ngeom) if m.geom_bodyid[g] == obody}
     gact = m.actuator("gripper").id
     rows: list[dict[str, Any]] = []
+    peak: list[Any] = [0.0, None]
     n = [0]
     orig = sim.step
     fr = np.zeros(6)
@@ -85,8 +87,6 @@ def _replay(sim, attempt) -> list[dict[str, Any]]:
     def step(k: int = 1) -> None:
         orig(k)
         n[0] += 1
-        if n[0] % 10:
-            return
         com = d.xipos[obody].copy()
         cons: dict[str, list[tuple[float, float, float, str]]] = {"jaw_fixed": [], "jaw_moving": [], "arm": []}
         for i in range(d.ncon):
@@ -104,15 +104,22 @@ def _replay(sim, attempt) -> list[dict[str, Any]]:
             mujoco.mj_contactForce(m, d, i, fr)
             name = mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_GEOM, other) or ""
             cons[kind].append((float(fr[0]), float(c.pos[2] - com[2]) * 1000, float(c.frame[2] * sign), name))
-        rows.append({"t": n[0] * 0.002, "ctrl": float(d.ctrl[gact]), "q": float(sim.arm_q()[-1]),
-                     "z": float(com[2]), "xy": com[:2].copy(), "cons": cons})
+        total = sum(c[0] for v in cons.values() for c in v)
+        if n[0] % 10 and total <= peak[0]:
+            return
+        row = {"t": n[0] * 0.002, "ctrl": float(d.ctrl[gact]), "q": float(sim.arm_q()[-1]), "z": float(com[2]),
+               "xy": com[:2].copy(), "cons": cons}
+        if total > peak[0]:
+            peak[:] = [total, row]
+        if not n[0] % 10:
+            rows.append(row)
 
     sim.step = step
     try:
         attempt()
     finally:
         sim.step = orig
-    return rows
+    return rows, peak[1]
 
 
 def _jaw_summary(cs: list[tuple[float, float, float, str]]) -> tuple[float, float, float, str]:
@@ -138,9 +145,11 @@ def _part(geom: str) -> str:
     return _label(geom, "")
 
 
-def diagnose(rows: list[dict[str, Any]], note: str, fing: FingerSpec, height_m: float, mass_g: float) -> tuple[str, str]:
+def diagnose(rows: list[dict[str, Any]], note: str, fing: FingerSpec, height_m: float, mass_g: float,
+             peak: dict[str, Any] | None = None) -> tuple[str, str]:
     """(mechanism, detail) for one failed pick, from the replayed contacts.  A stalled arm joint is labelled by
-    what the jaws were doing: pressing on the object's top stalls the arm without any payload."""
+    what the jaws were doing: pressing on the object's top stalls the arm without any payload.  ``peak``: the step
+    where the robot pressed hardest on the object, which names what tripped a force limit."""
     if not rows:
         return "no_trace", note
     z0, xy0 = rows[0]["z"], rows[0]["xy"]
@@ -148,7 +157,7 @@ def diagnose(rows: list[dict[str, Any]], note: str, fing: FingerSpec, height_m: 
     if start:
         return "start_collision", "the robot touches the object at the start of the episode"
     if note == "force_limit":
-        r = max(rows, key=lambda r: sum(c[0] for k in r["cons"] for c in r["cons"][k]))
+        r = peak or max(rows, key=lambda r: sum(c[0] for k in r["cons"] for c in r["cons"][k]))
         cs = [c for k in r["cons"] for c in r["cons"][k]]
         if not cs:
             return "force_limit", f"a contact exceeded the force limit at t={r['t']:.2f} s (squeezing or pressing down)"
@@ -453,9 +462,10 @@ class GripperWorld:
         if prog is not None:
             runner = PanelRunner(panel, cfg, 0)
             box: dict[str, Any] = {}
-            rows = _replay(runner.sim, lambda: box.setdefault("t", runner.attempt(panel.controls[0], prog, run.params)))
+            rows, peak = _replay(runner.sim, lambda: box.setdefault("t", runner.attempt(panel.controls[0], prog, run.params)))
             note = box["t"].note if "t" in box else ""
-            mech, detail = diagnose(rows, note, built.design.fingers, task.data["height_mm"] / 1000, task.data["mass_g"])
+            mech, detail = diagnose(rows, note, built.design.fingers, task.data["height_mm"] / 1000, task.data["mass_g"],
+                                    peak)
         return Outcome(task=task.id, success=False, score=score, mechanism=mech, detail=f"verdict {verdict}; {detail}",
                        controls=_flat(run.params), attempts=n, sim_s=round(sim_s, 2))
 

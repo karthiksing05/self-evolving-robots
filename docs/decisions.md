@@ -1859,3 +1859,25 @@ The pictures drew the shoe, but the physics and the mechanism laws never saw it:
 
 - PLA rose 1.6–2.8×, a little under the predicted 3×. The boxes over-counted deep grooves and long lips, which the shoe's land carries in less material.
 - Every test passed unchanged: none pinned pad grams.
+
+## D-068 A force limit is named from the step that pressed hardest (judge: world_gripper)
+
+**Why.** In the D-065 campaign, seed 0's final body failed two placements with "a contact exceeded the force limit at t=0.02 s". That reads as a start-of-episode collision, and it was not one: a replay with every contact logged showed the moving pad pressing 17 N on the sugar box's top edge at 2.06 s.
+- The diagnosis replay samples contacts every 10 simulation steps (20 ms), but a force limit can trip between two samples.
+- With no sample showing a contact, the fallback took the first row: t = 0.02 s, no part.
+- System 2 was told something false about when and what pressed.
+
+**Change.**
+- The replay still keeps a row every 10 steps.
+- It now also keeps the step where the robot pressed hardest on the object.
+- The force-limit diagnosis reads that step.
+- Verdicts are untouched: only the text System 2 reads changes.
+
+**Prediction.** No verdict or held count moves. Every force-limit diagnosis now names a part and a time inside the attempt, except a limit tripped by contact with the table alone.
+
+**Measured.**
+- Seed 0's final body (D-065 campaign):
+  - `rva000_sugar_box`: "a pad pressed 12 N down on its top at t=2.07 s".
+  - `rva000_potted_meat_can`: "a pad pressed 25 N down on its top at t=0.89 s".
+  - Both were "t=0.02 s" before.
+- `test_world_gripper` gains the case.
