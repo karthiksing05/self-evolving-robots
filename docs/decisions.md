@@ -1749,3 +1749,43 @@ Three fixes failed on the way, each for a reason:
 
   That is a real trade-off, and it is left to System 2.
 - **The force-limit diagnosis now names the part.** It used to read "a contact exceeded the force limit". It now says, for example, "the carriage pressed 20 N on its side … +42 mm from the object's centre (top at +42)", so a redesign can move the part that pressed.
+- **Campaign under this key** (`results/evolve/gripper_s2long_s{0,1,2}.json`, 14 iterations, 31–44 min a seed): **the prediction missed.**
+  - Every seed ended at 17/21 train, the same as before, on the revolute jaw with retuned TPU pads (30°, 14° and 23°). Test: 17 of 21 for each seed, against stock 14, 16 and 14.
+  - Every seed did pick the long slide in iteration 0 or 1, as predicted: 10, 12 and 15 long-slide trials, of which 4, 2 and 8 were refused by the wrist-interference law at 48–50 mm.
+  - The best long-slide trial in each seed gained 3–4 of the 4 wide groups (gelatin, pudding, sugar and tuna; the mustard bottle never). Each lost as many: the apple, banana, tomato soup can and potted meat can. The no-regression rule rejected every one.
+  - **Why it lost them** (the diagnosis now names the part): with nothing above the fingertips but 25 mm of finger, the rack presses on the tops of tall or round objects as the jaw closes. That happened in 56 force-limit outcomes across the seeds, plus 5 by the carriage. Pads long enough to reach below it (reach 22–30 mm) then land on the tops of small objects instead.
+  - **What System 2 asked for next, unprompted**:
+    - A **drop finger**: a rigid finger hanging 60–95 mm below the rack and rods, with a matching extension on the fixed jaw (seeds 0 and 1).
+    - An **outboard rack**: so nothing spans the gap between the fingers (seeds 0 and 1).
+    - A **self-aligning pivot pad**: on the moving jaw (all three seeds; this is decision 2's pad shoe).
+
+    These are recorded as untested ideas in each record, and they become D-065 and D-066.
+
+## D-065 The pick comes down from above its lowest part, and keeps the slide's rack off the object (skill: primitives, tools)
+
+**Why.** Replaying D-064's rejected long-slide trials showed two faults in System 1's pick (`control/motor.py::grasp`). Neither is a fault of the body.
+- **The approach point was a fixed 40 mm above the grip.** The arm runs in a straight line from its start to that point, then descends.
+  - With short pads, the jaws' lowest part ends that line just above the object's top. The stock reaches 23.5 mm below its tool point, and 17 + 6.5 + 10 is under 40.
+  - With 28 mm pads it ends 23 mm below the top. So the line dragged the fixed pad sideways into the object's shoulder.
+  - For example, the tennis ball: the fixed pad came down 21 mm from the ball's axis on a 33 mm radius, at 13 N, and hit the force limit. The same happened on the stock hinged jaw with the same pads.
+  - Every long-reach pad System 2 tried in any gripper campaign (reach 20–30 mm) lost the round objects this way. The diagnosis honestly said "a pad pressed down on its top", but that was the pick's fault, not the pad's.
+- **The grip depth ignored the parts above the fingers.**
+  - The pick puts the tool point 17 mm below the object's top. Grip depth is not a control System 1 searches.
+  - The slide's rack spans the gap between the fingers 22.5 mm above the tool point (a 46 mm sector). So on a tall object it came down to within 5 mm of the top, and the object rising in the squeeze closed that. A pick that knows its jaw keeps what spans the gap clear.
+
+**Change.**
+- The approach point is `max(40 mm, depth + below + PICK_CLEAR)` above the grip, so the lowest jaw part passes `PICK_CLEAR` (10 mm) over the object's top.
+- The grip depth is at most the height of the lowest part spanning the gap above the tool point, less `PICK_CLEAR`: `fingers.gap_ceiling`.
+  - On a slide this is the rack's underside, read from the slide's own layout in `sim/jaws.py`.
+  - The hinged and parallelogram jaws have nothing over the gap.
+- The carriage beside the finger is not counted: an object deeper than about 69 mm meets it, but the task gives System 1 no object depth. The force-limit diagnosis names it when it presses, so a body can answer with pads.
+
+**Prediction** (written before the change was made in the tree; the patch was tried on replays first, below).
+- Stock gold, the phase A/B sets and every test that uses the stock or short pads: unchanged, because neither rule binds there.
+- Long-reach pads on any jaw stop landing on the round objects.
+- The campaign (three seeds): System 2 tries the long slide again within two iterations, now with pads of reach 15–30 mm. It keeps the apple, banana, soup can and tennis ball, and gains the tuna can and the pudding box. Pads close the opening to about 91 mm, so the sugar box and mustard bottle stay out unless it goes bare. I expect 19/21 train in at least two seeds.
+
+**Measured on replays, with the change patched in before it was made.**
+- Long slide at 46 mm with 28 mm, 2 mm TPU pads, System 1's default first attempt:
+  - Approach fix alone: tennis ball and cup are now held. The soup can and apple still fail, with the rack pressing 27 N and 8 N on their tops.
+  - The stock hinged jaw with the same pads now holds the tennis ball as well.

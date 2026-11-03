@@ -1,0 +1,132 @@
+{
+ "run": "gripper_s2long_s1",
+ "world": "gripper",
+ "frames": [
+  {
+   "iteration": 0,
+   "id": "stock",
+   "held": 15,
+   "groups": 21,
+   "changes": [],
+   "body": {
+    "id": "stock",
+    "parent": null,
+    "parts": {
+     "jaw": {
+      "type": "revolute",
+      "params": {}
+     },
+     "pads": {
+      "type": "none",
+      "params": {}
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "file": "00_stock.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 1,
+   "id": "b001",
+   "held": 16,
+   "groups": 21,
+   "changes": [
+    "pads: none \u2192 pads (groove_mm 0, lip_mm 0, pad_angle_deg 0, pad_tpu_mm 1.5, reach_mm 5, width_mm 12)"
+   ],
+   "body": {
+    "id": "b001",
+    "parent": "stock",
+    "parts": {
+     "jaw": {
+      "type": "revolute",
+      "params": {}
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 5.0,
+       "pad_angle_deg": 0.0,
+       "groove_mm": 0.0,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 1.5,
+       "width_mm": 12.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "swap",
+   "gained": [
+    "potted_meat_can"
+   ],
+   "lost": [],
+   "cost": "$0.00, 6 machine min",
+   "why": [
+    "Pads with a TPU skin double the face friction. A small reach of 5 mm lets the contact sit lower on the can without adding much tilt: with reach 15 the tilt at 35 mm goes from 14 to 20 deg, so 5 mm should add only about 2 deg. pad_angle stays 0 so the dice and marker keep their near-parallel faces. No groove and no lip, which could catch on the tops of the boxes. Costs $0, 16 machine minutes, all on hand."
+   ],
+   "file": "01_b001.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  },
+  {
+   "iteration": 11,
+   "id": "b100",
+   "held": 17,
+   "groups": 21,
+   "changes": [
+    "pads: pad_angle_deg 0 \u2192 14"
+   ],
+   "body": {
+    "id": "b100",
+    "parent": "b001",
+    "parts": {
+     "jaw": {
+      "type": "revolute",
+      "params": {}
+     },
+     "pads": {
+      "type": "pads",
+      "params": {
+       "reach_mm": 5.0,
+       "pad_angle_deg": 14.0,
+       "groove_mm": 0.0,
+       "lip_mm": 0.0,
+       "pad_tpu_mm": 1.5,
+       "width_mm": 12.0
+      }
+     },
+     "arm_servos": {
+      "type": "servos_7v4",
+      "params": {}
+     }
+    }
+   },
+   "move": "params",
+   "gained": [
+    "gelatin_box"
+   ],
+   "lost": [],
+   "cost": "$0.00, 6 machine min",
+   "why": [
+    "Pad angles of 0 (all 16 held) and 28/36/45 (lost banana and potted_meat_can) have both been tried, but the 10-20 deg range has not. At 14 deg, gelatin's face should drop from about 47 deg to about 33 deg, inside TPU's roughly 42 deg friction cone, and its tip should drop by about 3 mm against a 15 mm half-height. Potted meat (57 mm) would sit at about +18 deg instead of the +4 deg where it was lost, so whatever broke at 28 deg should be weaker here. The cheaper moves are all used: this is the only pad value range left untried. My confidence is low, because 28 deg did not gain gelatin either."
+   ],
+   "file": "02_b100.png",
+   "views": [
+    "side",
+    "three-quarter"
+   ]
+  }
+ ]
+}

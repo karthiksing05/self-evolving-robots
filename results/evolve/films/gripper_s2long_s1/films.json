@@ -1,0 +1,54 @@
+{
+ "run": "gripper_s2long_s1",
+ "world": "gripper",
+ "films": [
+  {
+   "frame": 1,
+   "id": "b001",
+   "group": "potted_meat_can",
+   "task": "rva000_potted_meat_can",
+   "file": "01_b001_potted_meat_can.mp4",
+   "poster": "01_b001_potted_meat_can.jpg",
+   "seconds": 7.7,
+   "sound": false,
+   "clipping_mm": 0.13,
+   "change": "What changed: pads none → pads (reach mm 5, pad angle deg 0, groove mm 0)",
+   "before": {
+    "ok": false,
+    "verdict": "slipped under load (wrong behavior)",
+    "headline": "The potted meat can slides out of the fingers as the arm lifts",
+    "recorded": "slipped_under_load"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the potted meat can for the full second",
+    "recorded": true
+   }
+  },
+  {
+   "frame": 2,
+   "id": "b100",
+   "group": "gelatin_box",
+   "task": "reg_gelatin_box",
+   "file": "02_b100_gelatin_box.mp4",
+   "poster": "02_b100_gelatin_box.jpg",
+   "seconds": 6.6,
+   "sound": false,
+   "clipping_mm": 0.16,
+   "change": "What changed: pads: pad angle deg 0 → 14",
+   "before": {
+    "ok": false,
+    "verdict": "squeezed down out (stuck (slip))",
+    "headline": "The gelatin box is squeezed out downward as the fingers close",
+    "recorded": "squeezed_down_out"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the gelatin box for the full second",
+    "recorded": true
+   }
+  }
+ ]
+}

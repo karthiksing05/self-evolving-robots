@@ -1,0 +1,347 @@
+{
+ "run": "gripper_s2long_s1",
+ "world": "gripper",
+ "body": "b100",
+ "films": [
+  {
+   "group": "gelatin_box",
+   "task": "reg_gelatin_box",
+   "file": "gelatin_box.mp4",
+   "poster": "gelatin_box.jpg",
+   "clipping_mm": 0.17,
+   "stock": {
+    "ok": false,
+    "verdict": "stuck (slip)",
+    "headline": ""
+   },
+   "final": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the gelatin box for the full second"
+   }
+  },
+  {
+   "group": "pudding_box",
+   "task": "reg_pudding_box",
+   "file": "pudding_box.mp4",
+   "poster": "pudding_box.jpg",
+   "clipping_mm": 0.08,
+   "stock": {
+    "ok": false,
+    "verdict": "stuck (slip)",
+    "headline": ""
+   },
+   "final": {
+    "ok": false,
+    "verdict": "stuck (slip)",
+    "headline": ""
+   }
+  },
+  {
+   "group": "sugar_box",
+   "task": "reg_sugar_box",
+   "file": "sugar_box.mp4",
+   "poster": "sugar_box.jpg",
+   "clipping_mm": 0.04,
+   "stock": {
+    "ok": false,
+    "verdict": "stuck (slip)",
+    "headline": ""
+   },
+   "final": {
+    "ok": false,
+    "verdict": "stuck (slip)",
+    "headline": ""
+   }
+  },
+  {
+   "group": "mustard_bottle",
+   "task": "reg_mustard_bottle",
+   "file": "mustard_bottle.mp4",
+   "poster": "mustard_bottle.jpg",
+   "clipping_mm": 0.06,
+   "stock": {
+    "ok": false,
+    "verdict": "stuck (slip)",
+    "headline": ""
+   },
+   "final": {
+    "ok": false,
+    "verdict": "stuck (slip)",
+    "headline": ""
+   }
+  },
+  {
+   "group": "foam_brick",
+   "task": "reg_foam_brick",
+   "file": "foam_brick.mp4",
+   "poster": "foam_brick.jpg",
+   "clipping_mm": 0.14,
+   "stock": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the foam brick for the full second"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the foam brick for the full second"
+   }
+  },
+  {
+   "group": "wood_block_cube",
+   "task": "reg_wood_block_cube",
+   "file": "wood_block_cube.mp4",
+   "poster": "wood_block_cube.jpg",
+   "clipping_mm": 0.62,
+   "stock": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the wood block cube for the full second"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the wood block cube for the full second"
+   }
+  },
+  {
+   "group": "strawberry",
+   "task": "reg_strawberry",
+   "file": "strawberry.mp4",
+   "poster": "strawberry.jpg",
+   "clipping_mm": 0.43,
+   "stock": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the strawberry for the full second"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the strawberry for the full second"
+   }
+  },
+  {
+   "group": "banana",
+   "task": "reg_banana",
+   "file": "banana.mp4",
+   "poster": "banana.jpg",
+   "clipping_mm": 0.14,
+   "stock": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the banana for the full second"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the banana for the full second"
+   }
+  },
+  {
+   "group": "tomato_soup_can",
+   "task": "reg_tomato_soup_can",
+   "file": "tomato_soup_can.mp4",
+   "poster": "tomato_soup_can.jpg",
+   "clipping_mm": 0.21,
+   "stock": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the tomato soup can for the full second"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the tomato soup can for the full second"
+   }
+  },
+  {
+   "group": "tuna_fish_can",
+   "task": "reg_tuna_fish_can",
+   "file": "tuna_fish_can.mp4",
+   "poster": "tuna_fish_can.jpg",
+   "clipping_mm": 0.0,
+   "stock": {
+    "ok": false,
+    "verdict": "stuck (slip)",
+    "headline": ""
+   },
+   "final": {
+    "ok": false,
+    "verdict": "stuck (force limit)",
+    "headline": ""
+   }
+  },
+  {
+   "group": "tennis_ball",
+   "task": "reg_tennis_ball",
+   "file": "tennis_ball.mp4",
+   "poster": "tennis_ball.jpg",
+   "clipping_mm": 0.31,
+   "stock": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the tennis ball for the full second"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the tennis ball for the full second"
+   }
+  },
+  {
+   "group": "racquetball",
+   "task": "reg_racquetball",
+   "file": "racquetball.mp4",
+   "poster": "racquetball.jpg",
+   "clipping_mm": 0.26,
+   "stock": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the racquetball for the full second"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the racquetball for the full second"
+   }
+  },
+  {
+   "group": "golf_ball",
+   "task": "reg_golf_ball",
+   "file": "golf_ball.mp4",
+   "poster": "golf_ball.jpg",
+   "clipping_mm": 0.21,
+   "stock": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the golf ball for the full second"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the golf ball for the full second"
+   }
+  },
+  {
+   "group": "lemon",
+   "task": "reg_lemon",
+   "file": "lemon.mp4",
+   "poster": "lemon.jpg",
+   "clipping_mm": 0.32,
+   "stock": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the lemon for the full second"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the lemon for the full second"
+   }
+  },
+  {
+   "group": "plum",
+   "task": "reg_plum",
+   "file": "plum.mp4",
+   "poster": "plum.jpg",
+   "clipping_mm": 0.38,
+   "stock": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the plum for the full second"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the plum for the full second"
+   }
+  },
+  {
+   "group": "apple",
+   "task": "reg_apple",
+   "file": "apple.mp4",
+   "poster": "apple.jpg",
+   "clipping_mm": 0.17,
+   "stock": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the apple for the full second"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the apple for the full second"
+   }
+  },
+  {
+   "group": "large_marker",
+   "task": "reg_large_marker",
+   "file": "large_marker.mp4",
+   "poster": "large_marker.jpg",
+   "clipping_mm": 0.47,
+   "stock": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the large marker for the full second"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the large marker for the full second"
+   }
+  },
+  {
+   "group": "flat_screwdriver",
+   "task": "reg_flat_screwdriver",
+   "file": "flat_screwdriver.mp4",
+   "poster": "flat_screwdriver.jpg",
+   "clipping_mm": 0.13,
+   "stock": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the flat screwdriver for the full second"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the flat screwdriver for the full second"
+   }
+  },
+  {
+   "group": "cup",
+   "task": "reg_cup",
+   "file": "cup.mp4",
+   "poster": "cup.jpg",
+   "clipping_mm": 0.42,
+   "stock": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the cup for the full second"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the cup for the full second"
+   }
+  },
+  {
+   "group": "dice",
+   "task": "reg_dice",
+   "file": "dice.mp4",
+   "poster": "dice.jpg",
+   "clipping_mm": 0.57,
+   "stock": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the dice for the full second"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the dice for the full second"
+   }
+  }
+ ]
+}

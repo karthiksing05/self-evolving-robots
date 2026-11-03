@@ -1,0 +1,30 @@
+{
+ "run": "gripper_s2long_s2",
+ "world": "gripper",
+ "films": [
+  {
+   "frame": 1,
+   "id": "b11t1",
+   "group": "gelatin_box",
+   "task": "reg_gelatin_box",
+   "file": "01_b11t1_gelatin_box.mp4",
+   "poster": "01_b11t1_gelatin_box.jpg",
+   "seconds": 6.6,
+   "sound": false,
+   "clipping_mm": 0.12,
+   "change": "What changed: pads none → pads (reach mm 4.7, pad angle deg 22.981, groove mm 0)",
+   "before": {
+    "ok": false,
+    "verdict": "squeezed down out (stuck (slip))",
+    "headline": "The gelatin box is squeezed out downward as the fingers close",
+    "recorded": "squeezed_down_out"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "held for the full second",
+    "headline": "Holds the gelatin box for the full second",
+    "recorded": true
+   }
+  }
+ ]
+}
