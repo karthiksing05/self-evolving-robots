@@ -15,7 +15,7 @@ must be static, its pistons retracted.  The match is simulated in MuJoCo (``sea.
 
 A body is eight parts: the ``frame``, its ``drive``, and a mechanism for each task (``mermaid``, ``cannon``,
 ``flag``, ``heart``, ``treasure``), with a ``release`` for the stored-energy parts.  A task is achieved when it
-scores at least half its maximum; the ``match`` group asks for all six in one 40 s run.  System 1 places the
+scores at least half its maximum; the ``match`` group asks for half of all the points in one 40 s run (D-074).  System 1 places the
 robot in the dock, chooses where it parks and how fast it drives, and times each mechanism (``local_search``);
 for the match it starts from what it found for each task.
 """
@@ -39,6 +39,7 @@ KIT = {"motors": 2, "pistons": 2, "mousetraps": 2, "bands": 5}  # the brief: two
 BUDGET = 120.0
 PRINT_USD = 0.05  # per gram
 THRESH = {k: v / 2 for k, v in MM.MAX_POINTS.items()}
+MATCH_POINTS = round(sum(MM.MAX_POINTS.values()) / 2)  # D-074: the match is judged on points
 TASKS = ("activate", "treasure", "flag", "cannon", "mermaids", "heart")
 # assumed prices (USD) for what the brief makes teams buy; kit parts cost nothing
 PRICE = {"plywood_in2": 0.0156, "wheel_pair": 6.0, "ball_caster": 3.0, "hinge": 1.0, "m3_screw": 0.05,
@@ -274,7 +275,8 @@ WHAT = {"activate": "activate and fully leave the dock (1 + 10 points)",
                     "4 in mark)",
         "heart": "the heart out of the chest: 39 on the robot, 61 back behind the start line (the chest itself: "
                  "11 on the robot, 32 back)",
-        "match": "achieve all six tasks (each at least half its points) in one 40 s match"}
+        "match": f"score at least {MATCH_POINTS:g} of the {sum(MM.MAX_POINTS.values())} points the six tasks offer, in "
+                 "one 40 s match, breaking no rule"}
 HORIZON = {"activate": 8.0, "mermaids": 12.0, "flag": 30.0, "heart": 30.0, "cannon": 40.0, "treasure": 40.0,
            "match": 40.0}
 
@@ -378,14 +380,14 @@ def _attempt(body: Body, rb: MM.Robot, v: MM.Variant, task: str, ctl: dict[str, 
     t0 = time.perf_counter()
     r = MM.Match(rb, v, ctl, seed=seed, horizon=HORIZON[task]).run()
     if task == "match":
-        held = [k for k in TASKS if r.points[k] >= THRESH[k]]
-        ok = len(held) == len(TASKS) and not r.laws
-        score = sum(0.8 * min(1.0, r.points[k] / THRESH[k]) + 0.2 * r.progress.get(k, 0.0) for k in TASKS) / len(TASKS) \
-            * (0.5 if r.laws else 1.0)
-        detail = f"{sum(r.points.values()):.0f} points; achieved: {', '.join(held) or 'none'}; " + "; ".join(
-            f"{k}: {r.notes[k]}" for k in TASKS if k not in held)
-        mech = "" if ok else ("rule_broken" if r.laws else "tasks_missed_in_one_match:" + ",".join(
-            k for k in TASKS if k not in held))
+        total, top = sum(r.points[k] for k in TASKS), sum(MM.MAX_POINTS.values())
+        ok = total >= MATCH_POINTS and not r.laws
+        score = (0.8 * total / top + 0.2 * sum(r.progress.get(k, 0.0) for k in TASKS) / len(TASKS)) * \
+            (0.5 if r.laws else 1.0) + (0.2 if ok else 0.0)
+        detail = f"{total:.0f} of {top} points (needs {MATCH_POINTS}): " + "; ".join(
+            f"{k} {r.points[k]:.0f}: {r.notes[k]}" for k in TASKS)
+        mech = "" if ok else ("rule_broken" if r.laws else "points_short; scored nothing at:" + ",".join(
+            k for k in TASKS if r.points[k] <= 0))
     else:
         pts = r.points[task]
         ok = pts >= THRESH[task] and not r.laws

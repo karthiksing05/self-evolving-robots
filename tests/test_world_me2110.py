@@ -154,3 +154,12 @@ def test_the_loop_runs_on_the_world(tmp_path):
     s = run(RunConfig(world="me2110", arm="s1", iterations=1), tmp_path / "s1", world=ME2110World(), log=lambda m: None)
     assert s["final_held_train"] == ["activate"] and len(s["curve"]) == 1
     assert s["train_groups"] == 7
+
+
+def test_the_match_is_judged_on_points():
+    from sea.worlds.me2110 import MATCH_POINTS
+
+    assert MATCH_POINTS == 174
+    match = [t for t in TRAIN if t.group == "match"][0]
+    out = W.solve(W.stock(), match)
+    assert not out.success and "of 347 points (needs 174)" in out.detail and out.mechanism.startswith("points_short")

@@ -2233,3 +2233,17 @@ Each task was checked for one body that achieves it, so that no group measures a
 
 **Open before any campaign.**
 - **The match may be impossible as the kit stands.** The cannon, the flag boom and the heart each need a piston, and the kit has two. The brief says only "a set of pneumatic and electrical actuators"; two pistons is this world's assumption. The other flag, the band mast, has not yet fixed the flag on any of 64 bodies and controls tried: at full extension it is rigid, and the pole's corners knock the flag. Either the kit count or a flag mechanism that needs no piston decides whether the match group is valid.
+
+## D-074 The ME 2110 match is judged on points, not on all six tasks (judge: world_me2110)
+
+**Why.** The brief gives two pistons. The cannon, the flag boom and the heart hook each need one, and the band mast, the one flag that needs none, has not yet fixed a flag (D-073). So "all six tasks in one match" may be impossible, and a group no body can achieve measures nothing. A competition is won on points anyway. The six task groups stay as they are; only the match changes:
+- it is achieved when one 40 s run scores at least half the points the six tasks offer (174 of 347) and breaks no rule;
+- its score is the run's points over 347 (plus progress shaping, as before), so a higher-scoring match is always better;
+- each run's points are in its detail; failing, the mechanism names the tasks that scored nothing.
+
+**Prediction** (before the change):
+- the stock still fails the match: it scores 11 + 5 = 16 points;
+- the six task groups' verdicts do not move (the change touches only the match);
+- in a campaign, System 2's best match will come from a body that gives up one piston task, most likely the heart (61 points but a return trip), for the cannon and the flag; the treasure's 175 decides who passes, so a body without a working peel chute does not reach 174.
+
+**Measured** (System 1 on the stock, before any campaign). The stock fails the match on every variant: 11 points on train (it parks back at x = -6.6 in, short of the merfolk) and 16 on both tests (11 + 5 for a merfolk moved). The prediction said 16; System 1's 10-sample search on train settled on a parking spot that misses the merfolk. The six task groups are untouched.
