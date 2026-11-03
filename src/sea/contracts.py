@@ -141,10 +141,12 @@ class FingerSpec(_Model):
     # The moving jaw's joint (D-042).  revolute: the stock hinge.  parallelogram: two links of length
     # link_mm keep the finger's orientation while it swings.  prismatic: a rack and pinion slides the
     # finger drive_mm_per_rad per servo radian; sector: its gear is a sector on 150 mm rods (the long slide, D-064).
-    jaw: Literal["revolute", "parallelogram", "prismatic"] = "revolute"
+    # built: a mechanism System 2 composed, ``mechanism`` its graph as JSON (sea.mech, D-079).
+    jaw: Literal["revolute", "parallelogram", "prismatic", "built"] = "revolute"
     link_mm: float = 0.0
     drive_mm_per_rad: float = 0.0
     sector: bool = False
+    mechanism: str = ""
 
 
 class ArmSpec(_Model):

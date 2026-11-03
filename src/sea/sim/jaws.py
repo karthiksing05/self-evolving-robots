@@ -192,6 +192,7 @@ def _frame():
     return m
 
 
+@lru_cache(maxsize=512)
 def frame_face_y(x: tuple[float, float], z: tuple[float, float], y_from: float) -> float | None:
     """Where a bracket coming from ``y_from`` toward +y first meets the frame over its footprint (x, z): the
     nearest the frame's material comes, so the bracket ends on the frame's face and nowhere enters it.  None if

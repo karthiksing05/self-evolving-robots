@@ -49,7 +49,16 @@ ruler. This document is the discipline for running it.
    - Claims need 5 seeds and 95% bootstrap intervals.
    - Single-seed numbers are for debugging only.
    - A change shows its effect on paired draws (same panels, same randomization).
-8. **Every change is reversible and recorded.**
+8. **A law that binds must expose what it binds on (D-079).**
+   - When a law starts refusing or failing designs, the parts System 2 can change must
+     include the physical variable the law measures: where a bushing sits, how long a
+     link is, where a pad is mounted.
+   - Otherwise the law silently outlaws a whole family of mechanisms that nobody built or
+     trialled. Under D-076, the bushing law bound on a slide's single bushing, and the
+     braced slide that would answer it could not be written.
+   - Never rule out an idea before it has been built and trialled; a refusal must name a
+     change that would lift it.
+9. **Every change is reversible and recorded.**
    - One commit per change, plus an entry in [decisions.md](decisions.md) using the template
      in §6.
    - Re-recorded fixtures (golden verdicts, reach grid, IK points) get committed in the same

@@ -25,8 +25,10 @@ their kinematic limits, what they can and cannot reach.  Reason from those numbe
 3. Climb the ladder only as far as you must.  A `params` move (new values for the current parts) is \
 cheapest.  A `swap` replaces a part with another type from the catalogue: a redesign of that part, worth \
 its cost when the brief or the history shows that no value in the current part's range fixes the \
-mechanism.  An `idea` is a part the catalogue lacks; it is recorded with its bill of materials, costed \
-against the bench, and not tested, so propose one only when no catalogue part can address the mechanism.
+mechanism.  An `idea` is a part the catalogue lacks.  Where the world lists mechanisms, an idea with a \
+`mechanism` (a change to one of its modules) is built, checked against the same laws, and trialled like a \
+swap, priced by its own parts; an idea without one is recorded with its bill of materials and not tested.  \
+Propose an idea when no catalogue part can address the mechanism.
 4. The robot's history comes first.  A change is kept only if every task group already held still \
 passes.  Say which held groups your change puts at risk and why they will survive.
 5. Resources are real.  Every part has a bill of materials.  Items on hand are free, items with a price \
@@ -97,6 +99,8 @@ def build(world: World, body: Body, tasks: Sequence[Task], outcomes: dict[str, O
            f"# Brief: computed facts about the current body\n{world.brief(body, tasks)}",
            "# Physics principles of this world\n" + "\n".join(f"- {p}" for p in world.principles()),
            f"# Catalogue: every part type, by slot\n{_catalogue_text(world, body, manifest, spent)}",
+           *([f"# Mechanisms: modules an idea's mechanism may change (D-079)\n{world.modules_text()}"]
+             if hasattr(world, "modules_text") else []),
            f"# Resources\n{manifest_text(manifest, spent)}",
            f"# Held task groups (each must keep passing)\n{held_txt}",
            f"# Failing tasks ({len(fail_groups)} groups)\n" + "\n".join(_outcome_line(by_id[t.id], outcomes[t.id])
@@ -124,7 +128,7 @@ def build(world: World, body: Body, tasks: Sequence[Task], outcomes: dict[str, O
             "\nTo build on one, set `base` to its id: your edits apply to that body, and the result must still keep "
             "every held group.")
     if ideas:
-        sec.append("# Ideas recorded so far (untested: no builder in the simulator)\n" +
+        sec.append("# Ideas recorded so far without a mechanism (untested)\n" +
                    "\n".join(f"- {i['name']} (iteration {i['iteration'] + 1}): {idea_text(i['cost'])}" for i in ideas[-6:]))
     close = (f"Propose 1 to {max_proposals} body changes for the failing groups.  Each proposal is tried on "
              "its own and kept only if it gains a group and loses none; proposals that are each kept-eligible and "

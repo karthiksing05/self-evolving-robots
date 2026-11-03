@@ -21,6 +21,7 @@ and what happened on the lift.  That is the ``mechanism`` System 2 reads.
 
 from __future__ import annotations
 
+import json
 import math
 from collections.abc import Sequence
 from functools import lru_cache
@@ -34,6 +35,7 @@ import yaml
 from sea.contracts import ARM_JOINTS, ArmSpec, Design, FingerSpec, HardLimits, PanelSpec, SensorSuite
 from sea.design import fingers as F
 from sea.evolve.core import Body, BomLine, Outcome, Param, Part, PartType, Task
+from sea.sim import jaws as J
 
 ROOT = Path(__file__).resolve().parents[3]
 LIFT_JOINTS = ("shoulder_lift", "elbow_flex", "wrist_flex")
@@ -57,6 +59,8 @@ def _limits() -> HardLimits:
 def to_design(body: Body) -> Design:
     jaw, pads, servos = body.parts["jaw"], body.parts["pads"], body.parts["arm_servos"]
     kw: dict[str, Any] = {"jaw": jaw.type}
+    if jaw.type == "built":  # a mechanism System 2 composed (D-079)
+        kw["mechanism"] = jaw.mechanism
     if jaw.type == "parallelogram":
         kw["link_mm"] = jaw.params["link_mm"]
     if jaw.type == "prismatic":  # a module-1 pinion: pitch radius teeth/2 mm (sim/jaws.py builds it, D-058)
@@ -296,6 +300,8 @@ class GripperWorld:
 
         out = []
         jaw = body.parts["jaw"]
+        if jaw.type == "built":
+            out += _built_bom(jaw.mechanism)
         if jaw.type == "parallelogram":
             out += [BomLine(item="print:PLA", qty=8 + 0.12 * jaw.params["link_mm"], slot="jaw", note="links, coupler"),
                     BomLine(item="m3_screw", qty=4, slot="jaw"), BomLine(item="mr63_bearing", qty=4, slot="jaw")]
@@ -346,11 +352,57 @@ class GripperWorld:
         from sea.design.build import build
         from sea.mechanism.gripper import laws
 
+        if body.parts["jaw"].type == "built":
+            errs = _built_errors(body.parts["jaw"].mechanism)
+            if errs:
+                return errs
         try:
             built = build(to_design(body), _limits())
         except (ValueError, ZeroDivisionError) as exc:
             return [f"cannot build: {exc}"]
         return list(built.errors) + laws(body)
+
+    # mechanisms System 2 composes (D-079)
+    def build_idea(self, body: Body, idea: Any, new_id: str) -> Body:
+        """``body`` with the jaw ``idea.mechanism`` describes: a catalogue module's graph, changed by its patch.
+        Raises ``ValueError`` naming what does not apply."""
+        from sea.mech.patch import Op, apply_patch
+
+        mech = idea.mechanism
+        if idea.slot not in ("", "jaw"):
+            raise ValueError(f"a mechanism here is a jaw: slot {idea.slot!r} takes catalogue parts")
+        if mech.module not in MODULES:
+            raise ValueError(f"no module {mech.module!r}; the modules are {sorted(MODULES)}")
+        g = _module(mech.module, mech.params)
+        g = apply_patch(g, [Op.model_validate(o) for o in mech.patch]).model_copy(update={"name": idea.name})
+        return Body(id=new_id, parent=body.id, parts={**body.parts, "jaw": Part(type="built",
+                                                                                mechanism=g.model_dump_json())})
+
+    def modules_text(self) -> str:
+        """The modules a mechanism may start from: each catalogue jaw's graph at its parameters' midpoints."""
+        from sea.mech import graph as G
+        from sea.mech.patch import __doc__ as patch_doc
+
+        kinds = []
+        for cls in (G.Box, G.Cylinder, G.Link, G.Web, G.Gear, G.RackTeeth, G.Blade, G.Bracket, G.Bought, G.Body,
+                    G.Joint, G.Inertial, G.Loop, G.Mesh, G.Guide):
+            fields = ", ".join(f"{n}" + ("" if f.is_required() else f"={f.default!r}")
+                               for n, f in cls.model_fields.items() if n != "kind")
+            name = cls.model_fields["kind"].default if "kind" in cls.model_fields and cls not in (G.Loop, G.Mesh, G.Guide) \
+                else cls.__name__.lower()
+            kinds.append(f"- {name}: {' '.join((cls.__doc__ or '').split())} ({fields})")
+        out = ["A mechanism is a graph (lengths in metres; a part's coordinates in its body's frame).  Bodies: "
+               "'gripper' (the fixed jaw: x closes the jaws, z up; stock) and 'moving_jaw_so101_v1' (the servo's "
+               "horn body: its own hinge joint 'gripper' is the servo; x toward the fixed jaw at q = 0, z along the "
+               f"hinge; origin on the hinge at gripper {[round(float(v), 4) for v in J.HINGE]}).  New bodies hang from "
+               "either with their own joints; loops and meshes tie them to the servo.  The body carrying the blade is "
+               "the finger: pads mount on it.  Guides hold one bushing per rod, at the carriage's middle.",
+               "Part kinds, then a body's, joint's and constraint's fields:", *kinds, (patch_doc or "").strip(), "Modules (a patch applies to the module's graph):"]
+        for name, (_, params) in MODULES.items():
+            mid = {k: (lo + hi) / 2 for k, (lo, hi) in params.items()}
+            ranges = ", ".join(f"{k} {lo:g}..{hi:g}" for k, (lo, hi) in params.items()) or "no parameters"
+            out += [f"## {name} ({ranges}); at {mid or 'its only setting'}:", _compact(_module(name, mid))]
+        return "\n".join(out)
 
     # facts and physics
     def brief(self, body: Body, tasks: Sequence[Task]) -> str:
@@ -362,7 +414,7 @@ class GripperWorld:
             if q is None:
                 rows.append(f"  {w} mm: beyond the widest opening")
                 continue
-            tilt = math.degrees(q) - f.pad_angle_deg if f.jaw == "revolute" else -f.pad_angle_deg
+            tilt = F.finger_tilt_deg(f, q) - f.pad_angle_deg if f.jaw in ("revolute", "built") else -f.pad_angle_deg
             rise = F.fingertips(f, q)[1] * 1000
             face = (f"{abs(tilt):.0f} deg off parallel, bottom swung {'out' if tilt > 0 else 'in'}" if abs(tilt) > 0.5
                     else "parallel to the fixed face")
@@ -410,7 +462,7 @@ class GripperWorld:
                 if q is None:
                     cells.append(f"{w} mm out of reach")
                     continue
-                tilt = math.degrees(q) - f.pad_angle_deg if f.jaw == "revolute" else -f.pad_angle_deg
+                tilt = F.finger_tilt_deg(f, q) - f.pad_angle_deg if f.jaw in ("revolute", "built") else -f.pad_angle_deg
                 cells.append(f"{w} mm: face {tilt:+.0f} deg, tip {F.fingertips(f, q)[1] * 1000:+.0f} mm, "
                              f"{F.squeeze_n(f, q, GRIP_TORQUE_NM):.0f} N" + _rods(f, q, hi))
             label = ", ".join(f"{k}={x:g}" for k, x in v.items() if k in pt.params and (pt.slot != "pads" or k ==
@@ -471,6 +523,115 @@ class GripperWorld:
                                     peak)
         return Outcome(task=task.id, success=False, score=score, mechanism=mech, detail=f"verdict {verdict}; {detail}",
                        controls=_flat(run.params), attempts=n, sim_s=round(sim_s, 2))
+
+
+MODULES: dict[str, tuple[str, dict[str, tuple[float, float]]]] = {
+    "revolute": ("revolute", {}), "parallelogram": ("parallelogram", {"link_mm": (50.0, 90.0)}),
+    "prismatic": ("prismatic", {"pinion_teeth": (17.0, 60.0)}),
+    "long_slide": ("long_slide", {"sector_radius_mm": (30.0, 50.0)})}
+
+
+@lru_cache(maxsize=1)
+def _site():
+    from sea.control.frames import STOCK_MJCF
+    from sea.mech.seed.gripper import Site
+
+    return Site.of(mujoco.MjSpec.from_file(str(STOCK_MJCF)))
+
+
+def _module(name: str, params: dict[str, float]):
+    """A catalogue jaw's graph, as the catalogue builds it from these parameters."""
+    from sea.mech.seed import gripper as S
+
+    ranges = MODULES[name][1]
+    bad = sorted(set(params) - set(ranges))
+    if bad:
+        raise ValueError(f"module {name} has no parameter {bad[0]!r}; it has {sorted(ranges)}")
+    p = {k: float(params.get(k, (lo + hi) / 2)) for k, (lo, hi) in ranges.items()}
+    for k, v in p.items():
+        if not ranges[k][0] - 1e-9 <= v <= ranges[k][1] + 1e-9:
+            raise ValueError(f"{name}.{k}={v:g} is outside {ranges[k][0]:g}..{ranges[k][1]:g}")
+    if name == "parallelogram":
+        return S.parallelogram(p["link_mm"], _site())
+    if name == "prismatic":
+        return S.slide(round(p["pinion_teeth"]) / 2 * J.MM, False, _site())
+    if name == "long_slide":
+        return S.slide(round(2 * p["sector_radius_mm"]) / 2 * J.MM, True, _site())
+    return S.revolute()
+
+
+def _compact(g) -> str:
+    """A graph as JSON with lengths to 0.1 mm."""
+    def r(x):
+        if isinstance(x, float):
+            return round(x, 4)
+        if isinstance(x, (list, tuple)):
+            return [r(v) for v in x]
+        if isinstance(x, dict):
+            return {k: r(v) for k, v in x.items() if v not in (None, (), [], "")}
+        return x
+    return json.dumps(r(g.model_dump()), separators=(",", ":"))
+
+
+def _built_errors(mechanism: str) -> list[str]:
+    """What stops a built mechanism before the laws: it must compile, and its loops must close over the servo's
+    range (a loop that cannot close jams there)."""
+    import mujoco as mj
+
+    from sea.control.frames import STOCK_MJCF
+    from sea.mech import build
+    from sea.mech.graph import Blade, Graph
+    from sea.mech.kinematics import CLOSE_TOL, closes, finger_body
+
+    g = Graph.model_validate_json(mechanism)
+    try:
+        spec = mj.MjSpec.from_file(str(STOCK_MJCF))
+        build.compile(spec, g)
+        spec.compile()
+    except Exception as exc:  # MuJoCo names the element
+        return [f"the mechanism does not compile: {str(exc)[:300]}"]
+    if not any(isinstance(p, Blade) for b in g.bodies for p in b.parts):
+        return ["the mechanism carries no finger: put the blade on the body that should hold the object"]
+    worst, at = closes(g)
+    if worst > CLOSE_TOL:
+        return [f"the mechanism's loops do not close: {worst * 1000:.2f} mm (or mrad) apart at servo {at:.2f} rad; "
+                f"the linkage jams before the servo's range ends ({finger_body(g)[0]} carries the finger)"]
+    return []
+
+
+def _built_bom(mechanism: str) -> list[BomLine]:
+    """A built mechanism's bill of materials, from its parts: printed PLA by volume, rods by length, bought parts,
+    two MR63 bearings per pinned joint or loop, two M3 screws per clamp or bracket piece."""
+    from sea.mech.build import part_kg
+    from sea.mech.graph import Blade, Bought, Cylinder, Graph, RackTeeth
+
+    g = Graph.model_validate_json(mechanism)
+    pla, rods, bought, pieces, pins = 0.0, [], {}, set(), 0
+    for b in g.bodies:
+        pins += sum(j.type == "hinge" for j in b.joints) if not b.stock else 0
+        for p in b.parts:
+            if isinstance(p, (Blade, RackTeeth)):
+                continue
+            if isinstance(p, Bought):
+                item = {"lm3uu": "lm3uu_bearing"}.get(p.item, p.item)
+                bought[item] = bought.get(item, 0) + 1
+            elif isinstance(p, Cylinder) and p.role == "rod":
+                rods.append(2 * p.half_length)
+            elif getattr(p, "material", "pla") == "pla":
+                pla += part_kg(p) * 1000
+            if getattr(p, "role", "") in ("clamp", "bracket"):
+                pieces.add(getattr(p, "piece", "") or p.name)
+    pins += len(g.loops)
+    out = [BomLine(item="print:PLA", qty=round(pla, 1), slot="jaw", note=f"{g.name}: printed parts")]
+    for length in rods:
+        mm = 100 if length <= 0.1001 else 150 if length <= 0.1501 else round(length * 1000)
+        out.append(BomLine(item=f"steel_rod_3x{mm}", qty=1, slot="jaw"))
+    out += [BomLine(item=k, qty=n, slot="jaw") for k, n in sorted(bought.items())]
+    if pins:
+        out.append(BomLine(item="mr63_bearing", qty=2 * pins, slot="jaw"))
+    if pieces:
+        out.append(BomLine(item="m3_screw", qty=2 * len(pieces), slot="jaw"))
+    return out
 
 
 def _rods(f, q: float, q_hi: float) -> str:

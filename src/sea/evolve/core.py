@@ -58,6 +58,7 @@ class PartType(_Model):
 class Part(_Model):
     type: str
     params: dict[str, float] = {}
+    mechanism: str = ""  # a mechanism System 2 composed, as its graph's JSON (sea.mech, D-079); "" for the catalogue's
 
 
 class Body(_Model):
@@ -67,13 +68,16 @@ class Body(_Model):
 
     def key(self) -> str:
         """Content hash: two bodies with the same parts are the same body, whatever their ids."""
-        blob = json.dumps({s: p.model_dump() for s, p in sorted(self.parts.items())}, sort_keys=True)
+        blob = json.dumps({s: p.model_dump(exclude=set() if p.mechanism else {"mechanism"})
+                           for s, p in sorted(self.parts.items())}, sort_keys=True)
         return hashlib.sha256(blob.encode()).hexdigest()[:12]
 
     def describe(self) -> str:
         out = []
         for slot, p in sorted(self.parts.items()):
             ps = ", ".join(f"{k}={v:g}" for k, v in sorted(p.params.items()))
+            if p.mechanism:  # a built mechanism: its graph's name
+                ps = json.loads(p.mechanism).get("name", "")
             out.append(f"{slot}: {p.type}" + (f" ({ps})" if ps else ""))
         return "; ".join(out)
 
@@ -121,12 +125,23 @@ class Need(_Model):
     lead_days: float | None = Field(default=None, description="for an item the manifest does not list: your estimate")
 
 
+class Mechanism(_Model):
+    """A mechanism the catalogue lacks, written as a change to one of the world's modules (D-079)."""
+
+    module: str = Field(description="the module it starts from, by name, as the mechanisms section lists them")
+    params: dict[str, float] = Field(default_factory=dict, description="the module's parameters, within its ranges")
+    patch: list[dict[str, Any]] = Field(default_factory=list, description="operations on the module's graph, each "
+                                        "{op: add|set|remove, path, value}, addressed by names as the section says")
+
+
 class Idea(_Model):
     name: str
     description: str = Field(description="the part and how it works physically")
     slot: str = Field(default="", description="the slot it would fill, or a new slot")
     needs: list[Need] = Field(default_factory=list, description="its bill of materials, item by item")
     test: str = Field(default="", description="what would have to be built in the simulator to try it")
+    mechanism: Mechanism | None = Field(default=None, description="the mechanism as a change to a module: given, it "
+                                        "is built and trialled like a swap; omitted, the idea is only recorded")
 
 
 Move = Literal["params", "swap", "idea"]

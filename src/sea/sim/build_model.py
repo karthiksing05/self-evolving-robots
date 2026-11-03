@@ -31,6 +31,7 @@ import numpy as np
 from sea.contracts import ARM_JOINTS, ContactType, ControlSpec, Design, PanelSpec
 from sea.control.frames import MJCF_TOOL_SITE, R_SITE_URDF, STOCK_MJCF, mat_to_quat_wxyz, quat_wxyz_to_mat
 from sea.design.fingers import pad_geoms
+from sea.mech.kinematics import follow
 from sea.sim.controls import (
     HINGE_ARMATURE,
     SLIDE_ARMATURE,
@@ -249,7 +250,7 @@ class Sim:
     panel_body: int = -1
     objects: dict[str, int] = field(default_factory=dict)  # scene object name -> body id
     object_geoms: dict[str, int] = field(default_factory=dict)  # scene object name -> geom id
-    linked: list[tuple[int, float]] = field(default_factory=list)  # (qpos address, units per servo radian)
+    linked: list[tuple[int, Any]] = field(default_factory=list)  # (qpos address, units per servo radian or a table)
     rods: RodSprings | None = None  # a slide's rods, bending under the carriage (D-076)
     mech: Any = None  # the jaw's mechanism graph (sea.mech.graph.Graph, D-078)
     _limit_type: int = int(mujoco.mjtConstraint.mjCNSTR_LIMIT_JOINT)
@@ -286,7 +287,7 @@ class Sim:
     def set_arm_q(self, q: np.ndarray) -> None:
         self.data.qpos[self.arm_qadr] = q
         for adr, ratio in self.linked:  # the jaw mechanism's other joints, where the servo angle puts them
-            self.data.qpos[adr] = q[-1] * ratio
+            self.data.qpos[adr] = follow(ratio, q[-1])
         self.data.qvel[self.arm_dadr] = 0.0
         self.data.ctrl[:] = q
         mujoco.mj_forward(self.model, self.data)
@@ -523,7 +524,7 @@ def _stops(model: mujoco.MjModel, linked: list[tuple[str, float]]) -> list[tuple
     for q in np.linspace(lo - STOP_OVER, hi + STOP_OVER, STOP_SAMPLES):
         data.qpos[model.jnt_qposadr[jid]] = q
         for adr, ratio in others:
-            data.qpos[adr] = q * ratio
+            data.qpos[adr] = follow(ratio, q)
         mujoco.mj_kinematics(model, data)
         centres = np.linalg.norm(data.geom_xpos[fixed][:, None] - data.geom_xpos[moving][None, :], axis=-1)
         for i, j in zip(*np.nonzero(centres < reach), strict=True):  # bounding spheres first, then the hulls
@@ -545,6 +546,14 @@ def _jaw_joint(spec: mujoco.MjSpec, f):
     return g
 
 
+def _jaw_linked(g) -> list:
+    """The jaw mechanism's joints that move with the servo: the graph's ratios, and for the rest of its own joints
+    a table solved from its loops and meshes (``mech.kinematics.closure``)."""
+    from sea.mech.kinematics import closure_tables
+
+    return [*g.linked, *closure_tables(g)]
+
+
 def build_model(design: Design, panel: PanelSpec | None = None, tools: list | None = None,
                 faults: dict[str, Faults] | None = None, dr: DomainRandomization | None = None,
                 mjcf_path: Path = STOCK_MJCF, objects: Sequence[SceneObject] = (),
@@ -564,7 +573,7 @@ def build_model(design: Design, panel: PanelSpec | None = None, tools: list | No
         tau = STALL_TORQUE[float(volts)]
         act.forcerange = [-tau, tau]
     jaw_mech = _jaw_joint(spec, design.fingers)
-    linked = list(jaw_mech.linked)
+    linked = _jaw_linked(jaw_mech)
     _horn(spec, design.fingers)
     # Stock jaw geoms get the names the verifier maps (Appendix B).  The jaw meshes collide through
     # their CoACD parts instead of one convex hull (D-013); other arm meshes keep their hulls.

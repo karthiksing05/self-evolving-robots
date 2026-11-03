@@ -219,7 +219,9 @@ def slide(r_pitch: float, sector: bool, site: Site) -> Graph:
 
 
 def jaw_graph(fingers, site: Site) -> Graph:
-    """The graph of a ``FingerSpec``'s jaw."""
+    """The graph of a ``FingerSpec``'s jaw: a built mechanism's own, or the catalogue's."""
+    if fingers.jaw == "built":
+        return Graph.model_validate_json(fingers.mechanism)
     if fingers.jaw == "prismatic":
         return slide(fingers.drive_mm_per_rad * MM, fingers.sector, site)
     if fingers.jaw == "parallelogram":

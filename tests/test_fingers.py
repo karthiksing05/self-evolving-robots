@@ -35,7 +35,7 @@ PADS = FingerSpec(reach_mm=10, pad_angle_deg=30, pad_tpu_mm=2)
 # ---------------------------------------------------------------- geometry
 def test_all_zero_is_the_stock_jaws():
     assert F.is_stock(FingerSpec()) and F.pad_geoms(FingerSpec()) == [] and F.thickness(FingerSpec()) == 0
-    assert set(F.RANGES) | {"jaw", "link_mm", "drive_mm_per_rad", "sector"} == set(FingerSpec.model_fields)
+    assert set(F.RANGES) | {"jaw", "link_mm", "drive_mm_per_rad", "sector", "mechanism"} == set(FingerSpec.model_fields)
     assert not F.is_stock(FingerSpec(pad_tpu_mm=1)) and F.thickness(FingerSpec(pad_tpu_mm=1)) == pytest.approx(0.004)
 
 

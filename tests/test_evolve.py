@@ -365,3 +365,38 @@ def test_plan_claude_waits_out_an_outage_without_spending_an_attempt():
     run, _ = cli(*[down] * 9)
     with pytest.raises(RuntimeError, match="unreachable"):
         PlanClaude(run=run, sleep=lambda s: None, outage_s=100.0).propose("sys", "prompt")
+
+
+class Builds(Reach):
+    """The toy world with modules: a stick built from the 'rod' module at any length the catalogue lacks."""
+
+    def build_idea(self, body: Body, idea: Idea, new_id: str) -> Body:
+        if idea.mechanism.module != "rod":
+            raise ValueError(f"no module {idea.mechanism.module!r}")
+        return Body(id=new_id, parent=body.id, parts={**body.parts, "stick": Part(
+            type="built", params={"length": idea.mechanism.params["length"]}, mechanism=json.dumps({"name": idea.name}))})
+
+    def modules_text(self) -> str:
+        return "- rod(length): a printed rod"
+
+
+def test_an_idea_with_a_mechanism_is_built_and_trialled(tmp_path):
+    """An idea that carries a mechanism is built by the world and trialled whole; one without stays recorded;
+    one the world cannot build is refused with its reason (D-079)."""
+    from sea.evolve.core import Mechanism
+
+    batches = [ProposalBatch(proposals=[
+        _p("idea", idea=Idea(name="long rod", description="a 0.5 m rod", slot="stick",
+                             mechanism=Mechanism(module="rod", params={"length": 0.5}))),
+        _p("idea", idea=Idea(name="kite", description="fly it", slot="stick")),
+        _p("idea", idea=Idea(name="whip", description="d", slot="stick", mechanism=Mechanism(module="whip"))),
+    ])]
+    s = run(RunConfig(world="toy", iterations=1), tmp_path, proposer=Scripted(batches), world=Builds(),
+            log=lambda m: None)
+    trials = json.loads((tmp_path / "iterations.jsonl").read_text().splitlines()[0])["trials"]
+    assert trials[0]["move"] == "idea" and trials[0]["tried"] and trials[0]["result"].startswith("KEPT")
+    assert trials[0]["edit"] == "stick: built 'long rod' (rod + 0 changes)"
+    assert trials[1]["result"].startswith("idea recorded, not tested: kite") and not trials[1]["tried"]
+    assert "refused before trial: no module 'whip'" in trials[2]["result"]
+    assert s["final_body"]["parts"]["stick"]["type"] == "built" and [i["name"] for i in s["ideas"]] == ["kite"]
+    assert "# Mechanisms" in build(Builds(), Builds().stock(), [], {}, [], [], [], Spent(), {}, 1, 1, 3)

@@ -88,8 +88,46 @@ def thickness(spec: FingerSpec) -> float:
 
 
 def q_range(spec: FingerSpec) -> tuple[float, float]:
-    """Servo angles the skills use: closed to the widest opening at which the gap still means a width."""
+    """Servo angles the skills use: closed to the widest opening at which the gap still means a width.  A built
+    mechanism's: the servo's whole range, over which its finger's motion is measured."""
+    if spec.jaw == "built":
+        qs = _motion(spec)[0]
+        return float(qs[0]), float(qs[-1])
     return Q_RANGES[spec.jaw]
+
+
+def _motion(spec: FingerSpec):
+    """A built mechanism's finger through the servo's range, measured on its compiled model (``mech.kinematics``)."""
+    from sea.mech.kinematics import finger_motion
+
+    return finger_motion(spec.mechanism)
+
+
+def _at(spec: FingerSpec, q: float) -> tuple[np.ndarray, np.ndarray]:
+    """A built finger's motion from q = 0 to ``q``: rotation and translation (gripper frame), interpolated."""
+    qs, rots, trans, _, _ = _motion(spec)
+    r = np.stack([np.interp(q, qs, rots[:, i, j]) for i in range(3) for j in range(3)]).reshape(3, 3)
+    return r, np.array([np.interp(q, qs, trans[:, i]) for i in range(3)])
+
+
+def finger_shift(spec: FingerSpec) -> np.ndarray:
+    """Where the jaw's frame at q = 0 sits in the moving finger's body frame: pads and shoes placed in the jaw's
+    frame move by this onto the finger's body (the coupler hangs a link below the jaw)."""
+    if spec.jaw == "parallelogram":
+        return -link_vec(spec)
+    if spec.jaw == "built":
+        return np.asarray(_motion(spec)[4], float)
+    return np.zeros(3)
+
+
+def finger_tilt_deg(spec: FingerSpec, q: float) -> float:
+    """How far the moving finger has turned about the hinge's axis at ``q`` from where it is closed."""
+    if spec.jaw == "revolute":
+        return math.degrees(q)
+    if spec.jaw == "built":
+        m = R0.T @ _at(spec, q)[0] @ R0
+        return math.degrees(math.atan2(m[1, 0], m[0, 0]))
+    return 0.0
 
 
 def link_vec(spec: FingerSpec) -> np.ndarray:
@@ -100,6 +138,8 @@ def link_vec(spec: FingerSpec) -> np.ndarray:
 def moving_body(spec: FingerSpec) -> str:
     """The body the moving finger's geoms sit on: the jaw itself, the parallelogram's coupler or the slide's
     carriage (whose frame is the jaw's at q = 0)."""
+    if spec.jaw == "built":
+        return _motion(spec)[3]
     return {"parallelogram": "jaw_coupler", "prismatic": "jaw_carriage"}.get(spec.jaw, "moving_jaw_so101_v1")
 
 
@@ -110,6 +150,8 @@ def _rz(a: float) -> np.ndarray:
 
 def finger_rot(q: float, spec: FingerSpec | None = None) -> np.ndarray:
     """Orientation of the moving finger in the gripper frame: it turns with ``q`` only on the hinge."""
+    if spec is not None and spec.jaw == "built":
+        return _at(spec, q)[0] @ R0
     return R0 @ _rz(q) if spec is None or spec.jaw == "revolute" else R0
 
 
@@ -120,6 +162,9 @@ def moving_to_gripper(q: float, p_local: np.ndarray, spec: FingerSpec | None = N
     if spec.jaw == "parallelogram":
         v = link_vec(spec)
         return HINGE + R0 @ (p_local + _rz(q) @ v - v)
+    if spec.jaw == "built":
+        r, t = _at(spec, q)
+        return r @ (HINGE + R0 @ p_local) + t
     return HINGE + R0 @ p_local + np.array([spec.drive_mm_per_rad * MM * q, 0.0, 0.0])
 
 
@@ -199,7 +244,7 @@ def pad_geoms(spec: FingerSpec) -> list[PadGeom]:
     corner = np.array([MOVING_FACE_X, MOVING_TIP_Y, MOVING_MID_Z])
     lm = moving_reach(spec)
     base_m = corner + _rz(-th) @ np.array([0.0, -lm, 0.0])
-    shift = -link_vec(spec) if spec.jaw == "parallelogram" else np.zeros(3)  # the coupler's frame
+    shift = finger_shift(spec)  # the finger body's frame
     for k, (c, half, rot) in enumerate(_face_boxes(spec, lm)):
         out.append(PadGeom(moving_body(spec), "jaw_moving", f"jaw_moving_pad{k}", tuple(half),
                            tuple(base_m + rm @ c + shift), _quat(rm @ rot), mu))
@@ -265,7 +310,7 @@ def below_tool(spec: FingerSpec, q: float) -> float:
         if g.body == "gripper":
             z = c[:, 2]
         else:
-            shift = link_vec(spec) if spec.jaw == "parallelogram" else np.zeros(3)  # back to the jaw's frame
+            shift = -finger_shift(spec)  # back to the jaw's frame
             z = np.array([moving_to_gripper(q, p + shift, spec)[2] for p in c])
         low = max(low, TOOL_Z - float(z.min()))
     return low
@@ -277,6 +322,10 @@ def squeeze_n(spec: FingerSpec, q: float, torque_nm: float) -> float:
     if spec.jaw == "prismatic":
         return torque_nm / max(spec.drive_mm_per_rad * MM, 1e-6)
     tip = np.array([MOVING_FACE_X, MOVING_TIP_Y, MOVING_MID_Z])
+    if spec.jaw == "built":  # virtual work: the torque over how far the fingertip closes per servo radian
+        dq = 1e-3
+        dx = (moving_to_gripper(q + dq, tip, spec)[0] - moving_to_gripper(q - dq, tip, spec)[0]) / (2 * dq)
+        return torque_nm / max(abs(float(dx)), 1e-3)
     if spec.jaw == "parallelogram":
         return torque_nm / max(spec.link_mm * MM * math.cos(q), 1e-3)
     p = moving_to_gripper(q, tip, spec) - HINGE

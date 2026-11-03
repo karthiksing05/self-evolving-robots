@@ -56,7 +56,7 @@ def frames(spec: FingerSpec) -> list[PadFrame]:
     rm = tilt @ np.column_stack([[-1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, -1.0]])
     lm = F.moving_reach(spec)
     corner = np.array([F.MOVING_FACE_X, F.MOVING_TIP_Y, F.MOVING_MID_Z])
-    shift = -F.link_vec(spec) if spec.jaw == "parallelogram" else np.zeros(3)
+    shift = F.finger_shift(spec)
     moving = PadFrame("jaw_moving", F.moving_body(spec), rm, 1000 * (corner + tilt @ np.array([0.0, -lm, 0.0]) + shift),
                       1000 * lm)
     return [fixed, moving]

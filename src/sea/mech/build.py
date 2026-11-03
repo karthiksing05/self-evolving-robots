@@ -46,6 +46,43 @@ def _quat_z(a: float) -> list[float]:
     return [math.cos(a / 2), 0.0, 0.0, math.sin(a / 2)]
 
 
+def bracket_box(p: Bracket) -> tuple[np.ndarray, np.ndarray]:
+    """A bracket's corners: from ``y_from`` to the frame's face over its footprint, seated into it."""
+    from sea.sim import jaws
+
+    face = jaws.frame_face_y(tuple(p.x), tuple(p.z), p.y_from)
+    return (np.array([p.x[0], p.y_from, p.z[0]]),
+            np.array([p.x[1], p.fallback_y if face is None else face + jaws.FIT, p.z[1]]))
+
+
+def part_kg(p) -> float:
+    """A part's mass: its volume times its material's density, or a bought part's own."""
+    from sea.sim import jaws
+
+    if isinstance(p, Box):
+        return DENSITY[p.material] * 8 * float(np.prod(p.half)) if p.massive and p.material != "stock" else 0.0
+    if isinstance(p, Cylinder):
+        return (DENSITY[p.material] * math.pi * p.radius**2 * 2 * p.half_length
+                if p.massive and p.material != "stock" else 0.0)
+    if isinstance(p, Link):
+        hz = (p.z[1] - p.z[0]) / 2
+        vol = 2 * p.half_width * p.length * 2 * hz + 2 * math.pi * p.boss_r**2 * 2 * hz / 2  # half of each round end
+        return DENSITY["pla"] * vol
+    if isinstance(p, Web):
+        return DENSITY["pla"] * float(np.linalg.norm(np.subtract(p.b, p.a))) * 4 * p.half[0] * p.half[1]
+    if isinstance(p, Gear):
+        share = 1.0 if p.arc is None else (p.arc[1] - p.arc[0]) / (2 * math.pi)
+        return DENSITY["pla"] * math.pi * share * p.r_pitch**2 * p.width
+    if isinstance(p, Blade):
+        return jaws.blade_mass()
+    if isinstance(p, Bracket):
+        lo, hi = bracket_box(p)
+        return DENSITY["pla"] * float(np.prod(hi - lo))
+    if isinstance(p, Bought):
+        return p.kg
+    return 0.0  # a rack's teeth: drawn
+
+
 def _add_part(spec: mujoco.MjSpec, body, p, pose: tuple[np.ndarray, np.ndarray]) -> float:
     """Add one part's solids to ``body``; returns the mass it brings (kg)."""
     from sea.sim import jaws
@@ -53,37 +90,34 @@ def _add_part(spec: mujoco.MjSpec, body, p, pose: tuple[np.ndarray, np.ndarray])
     if isinstance(p, Box):
         body.add_geom(name=p.name, type=_GEOM.mjGEOM_BOX, size=list(p.half), pos=list(p.pos), quat=list(p.quat),
                       rgba=_rgba(p.material), group=2, mass=0.0)
-        return DENSITY[p.material] * 8 * float(np.prod(p.half)) if p.massive else 0.0
+        return part_kg(p)
     if isinstance(p, Cylinder):
         body.add_geom(name=p.name, type=_GEOM.mjGEOM_CYLINDER, size=[p.radius, p.half_length], pos=list(p.pos),
                       quat=list(p.quat), rgba=_rgba(p.material), group=2, mass=0.0)
-        return DENSITY[p.material] * math.pi * p.radius**2 * 2 * p.half_length if p.massive else 0.0
+        return part_kg(p)
     if isinstance(p, Link):
         zc, hz = (p.z[0] + p.z[1]) / 2, (p.z[1] - p.z[0]) / 2
         body.add_geom(name=f"{p.name}_web", type=_GEOM.mjGEOM_BOX, size=[p.half_width, p.length / 2, hz],
                       pos=[0.0, -p.length / 2, zc], rgba=PRINTED, group=2, mass=0.0)
-        vol = 2 * p.half_width * p.length * 2 * hz
         for k, y in enumerate((0.0, -p.length)):
             body.add_geom(name=f"{p.name}_boss{k}", type=_GEOM.mjGEOM_CYLINDER, size=[p.boss_r, hz], pos=[0.0, y, zc],
                           rgba=PRINTED, group=2, mass=0.0)
-            vol += math.pi * p.boss_r**2 * 2 * hz / 2  # half of each round end lies outside the web
         out = p.z[1] + p.pin_head[1] if p.outward > 0 else p.z[0] - p.pin_head[1]
         body.add_geom(name=f"{p.name}_pin", type=_GEOM.mjGEOM_CYLINDER, size=list(p.pin_head),
                       pos=[0.0, -p.length, out], rgba=STEEL, group=2, mass=0.0)
-        return DENSITY["pla"] * vol
+        return part_kg(p)
     if isinstance(p, Web):
         a, b = np.asarray(p.a), np.asarray(p.b)
         length = float(np.linalg.norm(b - a))
         body.add_geom(name=p.name, type=_GEOM.mjGEOM_BOX, size=[length / 2, *p.half], pos=[*((a + b) / 2), p.z],
                       quat=_quat_z(math.atan2(*(b - a)[::-1])), rgba=PRINTED, group=2, mass=0.0)
-        return DENSITY["pla"] * length * 4 * p.half[0] * p.half[1]
+        return part_kg(p)
     if isinstance(p, Gear):
         gv, gf = jaws.gear(p.r_pitch, p.width, p.arc)
         spec.add_mesh(name=p.name, uservert=gv.ravel().tolist(), userface=gf.ravel().tolist())
         body.add_geom(name=f"{p.name}_gear", type=_GEOM.mjGEOM_MESH, meshname=p.name, pos=[0.0, 0.0, p.z],
                       rgba=PRINTED, group=2, mass=0.0)
-        share = 1.0 if p.arc is None else (p.arc[1] - p.arc[0]) / (2 * math.pi)
-        return DENSITY["pla"] * math.pi * share * p.r_pitch**2 * p.width
+        return part_kg(p)
     if isinstance(p, RackTeeth):
         tv, tf = jaws.rack_teeth(*p.x, p.x_mesh, p.z_pitch, p.width, p.module)
         pos, rot = pose  # the body in the gripper frame
@@ -102,16 +136,14 @@ def _add_part(spec: mujoco.MjSpec, body, p, pose: tuple[np.ndarray, np.ndarray])
             spec.add_mesh(name=f"jaw_blade_cvx{k}", uservert=(part + p.offset).ravel().tolist())
             body.add_geom(name=f"jaw_moving_{k}", type=_GEOM.mjGEOM_MESH, meshname=f"jaw_blade_cvx{k}", condim=4,
                           group=3, mass=0.0)
-        return jaws.blade_mass()
+        return part_kg(p)
     if isinstance(p, Bracket):
-        face = jaws.frame_face_y(p.x, p.z, p.y_from)
-        lo = np.array([p.x[0], p.y_from, p.z[0]])
-        hi = np.array([p.x[1], p.fallback_y if face is None else face + jaws.FIT, p.z[1]])
+        lo, hi = bracket_box(p)
         body.add_geom(name=p.name, type=_GEOM.mjGEOM_BOX, size=((hi - lo) / 2).tolist(), pos=((lo + hi) / 2).tolist(),
                       rgba=PRINTED, group=2, mass=0.0)
-        return DENSITY["pla"] * float(np.prod(hi - lo))
+        return part_kg(p)
     if isinstance(p, Bought):
-        return p.kg
+        return part_kg(p)
     raise TypeError(p)
 
 

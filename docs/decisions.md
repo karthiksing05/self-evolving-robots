@@ -2442,3 +2442,51 @@ Nothing System 2 wrote could enter any of these.
   - **The catalogue jaws' bill of materials stays the hand estimate** (`worlds/gripper.py`: PLA grams by formula, screws and bearings the graph does not yet hold). Taking it from the graph's volumes would change prices, and so the keep rule, so it needs its own measured decision. Mechanisms System 2 builds (C1) take theirs from the graph from the start.
   - **The catalogue's kinematic facts stay `design/fingers.py`'s**, for the same reason. A built idea's facts come from the simulator.
 - **Full suite:** 710 passed, 2 skipped, 1 xfailed (the 683 before, plus the 27 equivalence tests).
+
+## D-079 System 2's ideas can be mechanisms: built from a module and a patch, closed, priced and judged (policy: prompt, schema; world: physics; judge: built jaws only)
+
+**Why.** Under D-076, the mechanisms System 2 asked for were recorded and never tried: a braced slide three times, and a pad that stays parallel ten times. An idea was free text. The catalogue was the only thing that could be built, and the laws bound on variables that no catalogue part exposed (the slide's single bushing).
+
+D-078 made every jaw a graph. This is the second step (C1): an idea can now carry a graph, and that graph is trialled exactly like a catalogue swap.
+
+**Change.**
+- **`Idea.mechanism`** (`evolve/core.py`) names a module, its parameters and a patch. A patch is a list of `add`/`set`/`remove` operations addressed by names, never by position (`mech/patch.py`), for example `bodies/jaw_follower/parts/jaw_follower_horn/length` or `loops/jaw_follower/point`.
+  - A jaw built this way is `Part(type="built", mechanism=<graph JSON>)`.
+  - Its key and description carry the graph.
+- **Closure kinematics** (`mech/kinematics.py`). A general linkage does not move its joints in proportion to the servo, so the graph's free joints are solved at 61 servo angles across the range. The solver is least squares on the simulator's own equality residuals, stepping out from the closed jaw. The results are kept as tables that the model's `linked` joints follow.
+  - A loop that cannot close somewhere in the range is reported, with the servo angle where it jams.
+- **The finger's motion is measured from the compiled model** (`kinematics.finger_motion`) for built jaws: position, tilt and squeeze per newton-metre. The grasp skills read it in place of `design/fingers.py`'s per-type formulas. Catalogue jaws keep those formulas (D-078 deferral).
+- **The world** (`worlds/gripper.py`):
+  - `build_idea` builds the module, applies the patch, and refuses with the reason when a name or range does not apply;
+  - `check` refuses a built jaw that does not compile, carries no finger or does not close, and only then runs the same laws as every jaw;
+  - the bill of materials comes from the graph: PLA by volume, rods by length, bought parts by item, two MR63 bearings per pinned joint or loop, two M3 screws per clamp or bracket piece.
+- **The loop** (`evolve/loop.py`) builds an idea that carries a mechanism with `world.build_idea`, scores it whole (move `idea`), and keeps it on the same rule as a swap. An idea without a mechanism is recorded as before. One the world cannot build is refused before the trial, with the reason.
+- **The prompt** gains a "Mechanisms" section: the part kinds and fields, the patch grammar, and every module's graph at its parameters' midpoints. Rule 3 says that an idea with a mechanism is built and trialled.
+- **`iteration.md` principle 8:** a law that binds must expose the variable it binds on, and no idea is ruled out before it is built and trialled.
+
+**Prediction.**
+- *Mechanics (measured while building, so a check rather than a forecast):* a catalogue jaw rebuilt through `build_idea` with no patch moves its finger as the catalogue's formula says; a patched four-bar closes and tilts its finger; a loop that cannot close is refused before the laws.
+- *Campaign (forecast, not yet run):*
+  - on at least 2 of 3 seeds, System 2 writes a mechanism that builds and reaches a trial;
+  - at least one of those is refused by a law that names a variable the patch can change;
+  - no claim on groups held.
+- *Catalogue jaws:* the D-078 golden models and laws are unchanged; the full suite stays green.
+
+**Measured (tests).**
+- **Closure solver.** With the parallelogram's ratios removed, the solver recovers ±1 to 1e-6 and closes to 1e-8. The finger of a built parallelogram, and of a built prismatic jaw, matches the catalogue formula to the table's interpolation (under 10 µm, tilt under 0.01°) (`tests/mech/test_kinematics.py`).
+- **A patched four-bar** (follower links shortened from 70 to 60 mm, pivot moved to match):
+  - it closes to 7e-11 and its finger tilts +2.5°, +7.6° and +15.9° at a servo of 0.5, 1.0 and 1.5 rad, where the parallelogram's stays at 0;
+  - its bill of materials is 34 g of PLA, 6 MR63 bearings and 2 M3 screws;
+  - the laws refuse it for real reasons: the moved follower shares material with the wrist and the driver links, and its loop comes within 10° of toggle (`tests/mech/test_built_jaw.py`).
+- **A loop pin placed 40 mm off** is refused with the one closure error, before the laws.
+- **The loop on the toy world:**
+  - an idea with a mechanism is built, trialled and kept;
+  - one without a mechanism is recorded;
+  - one naming a module that does not exist is refused with its name (`tests/test_evolve.py`).
+- **Not yet built, next:**
+  - C1b: a guide with several bushings per rod (the braced slide);
+  - C1c: a pad mounted on any body (the levelled pad).
+  
+  Until they exist, the two ideas System 2 asked for most still cannot be written; the campaign waits for them.
+- **Catalogue jaws unchanged:** their briefs are kept byte-for-byte (a parallelogram's face still reads "-0 deg"), and the D-078 golden models and laws pass.
+- **Full suite:** 726 passed, 2 skipped, 1 xfailed (710 before, plus 16 new tests).

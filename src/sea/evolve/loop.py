@@ -365,7 +365,9 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
             for k, prop in enumerate(batch.proposals[: cfg.max_proposals]):
                 entry: dict[str, Any] = {"k": k, "proposal": prop.model_dump(), "iteration": it, "move": prop.move,
                                          "hypothesis": prop.hypothesis, "edit": _edit_text(prop.edits)}
-                if prop.move == "idea" or prop.idea is not None and not prop.edits:
+                builds = (prop.idea is not None and prop.idea.mechanism is not None and hasattr(world, "build_idea")
+                          and not prop.edits)
+                if (prop.move == "idea" or prop.idea is not None and not prop.edits) and not builds:
                     idea = prop.idea.model_dump() if prop.idea else {"name": "?", "needs": []}
                     cost = cost_idea(prop.idea.needs if prop.idea else [], manifest, spent)
                     ideas.append({**idea, "iteration": it, "cost": cost})
@@ -378,16 +380,22 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                     if prop.base is not None and prop.base not in frontier:
                         raise ValueError(f"no promising body {prop.base!r} in the record; ids: {sorted(frontier)}")
                     base = body if prop.base is None else frontier[prop.base]["body"]
-                    cand = apply(base, prop.edits, catalogue, new_id=f"b{it:02d}{k}")
+                    if builds:  # a mechanism the catalogue lacks, built from the world's modules (D-079)
+                        cand = world.build_idea(base, prop.idea, new_id=f"b{it:02d}{k}")
+                        mech = prop.idea.mechanism
+                        entry["edit"] = (f"{prop.idea.slot}: built {prop.idea.name!r} ({mech.module} + "
+                                         f"{len(mech.patch)} changes)")
+                    else:
+                        cand = apply(base, prop.edits, catalogue, new_id=f"b{it:02d}{k}")
                 except ValueError as exc:
                     entry.update(result=f"refused before trial: {exc}", tried=False)
                     trials.append(entry)
                     history.append(entry)
                     continue
                 change = _diff(body, cand)  # against the current body, also when the proposal builds on another
-                entry["move"] = edit_rung(body, change)
+                entry["move"] = "idea" if builds else edit_rung(body, change)
                 entry["slots"] = sorted({e.slot for e in change})
-                score = trial(cand, entry, full_always=entry["move"] == "swap")  # a redesign is always scored whole
+                score = trial(cand, entry, full_always=entry["move"] in ("swap", "idea"))  # a redesign is scored whole
                 if entry.get("tried"):
                     entry["prediction"] = _score_prediction(prop.gains, entry["gained"], entry["lost"])
                     if entry["move"] == "swap":
