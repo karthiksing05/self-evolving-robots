@@ -27,10 +27,9 @@ from pathlib import Path
 
 from render_bodies import frames
 
-from sea.mechanism.gripper import HAND, SAMPLES
+from sea.mechanism.gripper import SAMPLES
 from sea.mechanism.gripper import geometry as gripper_geometry
 
-ROBOT = {"base", "shoulder", "upper_arm", "lower_arm", "wrist", *HAND}
 # Datasheet ratings per H-bridge channel (A, continuous): Toshiba TB6612FNG 1.2 A (3.2 A peak); ST L298 2 A.
 CHANNEL_A = {"driver_tb6612": 1.2, "driver_l298n": 2.0}
 CELL_V = {"nimh_pack": 1.2, "liion_pack": 3.7}  # nominal volts per cell: NiMH AA, 18650 Li-ion
@@ -38,9 +37,11 @@ CELL_V = {"nimh_pack": 1.2, "liion_pack": 3.7}  # nominal volts per cell: NiMH A
 
 # ---------------------------------------------------------------- gripper replays
 def _labeller(model):
+    arm = model.body("base").id  # the robot is every body on the arm, its jaw mechanism's included
+
     def label(b: int) -> str:
         name = model.body(b).name
-        return "robot" if name in ROBOT else ("object" if name.startswith(("ctl_", "obj_")) else "table")
+        return "robot" if model.body_rootid[b] == arm else ("object" if name.startswith(("ctl_", "obj_")) else "table")
     return label
 
 

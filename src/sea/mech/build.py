@@ -115,6 +115,32 @@ def _add_part(spec: mujoco.MjSpec, body, p, pose: tuple[np.ndarray, np.ndarray])
     raise TypeError(p)
 
 
+def solid_names(p) -> tuple[str, ...]:
+    """The simulator's names for a part's solids."""
+    if isinstance(p, Link):
+        return (f"{p.name}_web", f"{p.name}_boss0", f"{p.name}_boss1", f"{p.name}_pin")
+    if isinstance(p, Gear):
+        return (f"{p.name}_gear",)
+    if isinstance(p, Blade):
+        from sea.sim import jaws
+
+        return ("jaw_blade_drawn", *(f"jaw_moving_{k}" for k in range(len(jaws.blade_parts()))))
+    if isinstance(p, Bought):
+        return ()
+    return (p.name,)
+
+
+def solids(g: Graph) -> dict[str, tuple[str, str, str]]:
+    """Every solid the mechanism adds: name -> (body, role, piece).  A part with no piece is a piece of its own."""
+    out = {}
+    for b in g.bodies:
+        for p in b.parts:
+            role = getattr(p, "role", "finger" if isinstance(p, Blade) else "structure")
+            for n in solid_names(p):
+                out[n] = (b.name, role, getattr(p, "piece", "") or getattr(p, "name", n))
+    return out
+
+
 def _inertial(sb, b: Body, mass: float) -> None:
     i = b.inertial
     sb.mass, sb.explicitinertial = mass, True

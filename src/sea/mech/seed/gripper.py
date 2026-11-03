@@ -97,9 +97,10 @@ def parallelogram(link_mm: float, site: Site) -> Graph:
     lo, hi = J.HINGE[1] - (J.HORN_SIDE[0] - 0.3 * MM), J.HINGE[1] - (J.REAR_SIDE[1] + 0.3 * MM)
     grip = Body(name="gripper", stock=True, parts=(
         Cylinder(name="jaw_bracket_hub", pos=(float(f_g[0]), (lo + hi) / 2, float(f_g[2])), radius=5.0 * MM,
-                 half_length=(hi - lo) / 2, quat=(math.sqrt(0.5), math.sqrt(0.5), 0.0, 0.0), role="bracket"),
+                 half_length=(hi - lo) / 2, quat=(math.sqrt(0.5), math.sqrt(0.5), 0.0, 0.0), role="bracket",
+                 piece="jaw_bracket"),
         Box(name="jaw_bracket", pos=(30.4 * MM + 2.8 * MM, float(J.HINGE[1] - J.MID_Z), float(f_g[2] - 6.0 * MM)),
-            half=(2.8 * MM, 15.0 * MM, 9.0 * MM), role="bracket")))
+            half=(2.8 * MM, 15.0 * MM, 9.0 * MM), role="bracket", piece="jaw_bracket")))
     return Graph(name=f"parallelogram({link_mm:g})", bodies=(jaw, coupler, follower, grip),
                  remove_stock_mesh=(J.JAW_MESH,), loops=(Loop(a="jaw_follower", b="jaw_coupler", point=(0.0, -L, 0.0)),),
                  excludes=(("gripper", "jaw_coupler"), ("jaw_follower", J.JAW_MESH), ("jaw_follower", "jaw_coupler")),
@@ -113,9 +114,10 @@ def _jaw_box(name: str, lo, hi) -> Box:
     return Box(name=name, pos=tuple(((lo + hi) / 2).tolist()), half=tuple(((hi - lo) / 2).tolist()))
 
 
-def _grip_box(name: str, lo, hi, role: str = "structure") -> Box:
+def _grip_box(name: str, lo, hi, role: str = "structure", piece: str = "") -> Box:
     lo, hi = np.asarray(lo, float), np.asarray(hi, float)
-    return Box(name=name, pos=tuple(((lo + hi) / 2).tolist()), half=tuple(((hi - lo) / 2).tolist()), role=role)
+    return Box(name=name, pos=tuple(((lo + hi) / 2).tolist()), half=tuple(((hi - lo) / 2).tolist()), role=role,
+               piece=piece)
 
 
 def slide(r_pitch: float, sector: bool, site: Site) -> Graph:
@@ -190,20 +192,20 @@ def slide(r_pitch: float, sector: bool, site: Site) -> Graph:
         # and under the sector's sweep to the finger
         clamp_hi = J.CLAMP_X[1]
         fixed.append(_grip_box("jaw_clamp", [J.CLAMP_X[0], rod_y - 5 * MM, rods[0] - 5 * MM],
-                               [J.CLAMP_X[1], rod_y + 5 * MM, rods[1] + 5 * MM], "clamp"))
+                               [J.CLAMP_X[1], rod_y + 5 * MM, rods[1] + 5 * MM], "clamp", "jaw_clamp"))
         fixed.append(Bracket(name="jaw_clamp_bracket", x=J.CLAMP_X, z=(z_pitch + m + 1 * MM, z_pitch + m + 8 * MM),
-                             y_from=rod_y + 5 * MM, fallback_y=rod_y + 6 * MM))
+                             y_from=rod_y + 5 * MM, fallback_y=rod_y + 6 * MM, piece="jaw_clamp"))
     else:
         back = front - J.ROD_LEN
         clamp_hi = back + 8 * MM
         clamp_top = -31 * MM  # the bracket's top meets the frame's horn side (y = -28 mm, down to z = -37 mm)
         fixed.append(_grip_box("jaw_clamp", [back, J.CARRIAGE_Y[0], rods[1] - 5 * MM], [back + 8 * MM, J.ROD_Y + 5 * MM, clamp_top],
-                               "clamp"))
+                               "clamp", "jaw_clamp"))
         # the bracket crosses the gear plane behind the pinion to reach the frame (x >= -19.5 mm there): a pinion
         # too large leaves it no room, and the clamp hangs from nothing
         reach = min(max(back + 8 * MM, -11.0 * MM), J.HINGE[0] - r_pitch - 2 * m - 1 * MM)
         fixed.append(Bracket(name="jaw_clamp_bracket", x=(back, max(reach, back + 1 * MM)), z=(clamp_top, clamp_top + 6 * MM),
-                             y_from=J.CARRIAGE_Y[0], fallback_y=J.CARRIAGE_Y[0] + 1 * MM))
+                             y_from=J.CARRIAGE_Y[0], fallback_y=J.CARRIAGE_Y[0] + 1 * MM, piece="jaw_clamp"))
     grip = Body(name="gripper", stock=True, parts=tuple(fixed))
 
     c0 = J._to_jaw(np.array([sum(J.CARRIAGE_X) / 2, rod_y, sum(rods) / 2]))

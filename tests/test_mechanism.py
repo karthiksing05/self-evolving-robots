@@ -204,9 +204,14 @@ def test_a_four_bar_near_toggle_breaks_the_transmission_law(monkeypatch):
     world = GripperWorld()
     body = _jaw(world, "parallelogram", link_mm=70.0)
     assert G.laws(body) == []
-    monkeypatch.setattr(jaws, "transmission_deg", lambda q: 20.0)
-    assert G.laws(body) == ["mechanism law (transmission): the four-bar's links come within 20 deg of toggle; they "
-                            "must stay 30 deg away"]
+    # the follower's fixed pin moved onto the closing axis: opened wide, the links line up with the line through
+    # their fixed pins (D-078: the angle is measured where the loop's links meet, in the simulator)
+    monkeypatch.setattr(jaws, "FOLLOWER_DIR", np.array([1.0, 0.0, 0.0]))
+    monkeypatch.setattr(G, "_CACHE", {})
+    worst = min(jaws.transmission_deg(q) for q in np.linspace(*G.geometry(body)["jaw_range_servo_rad"], 50))
+    assert worst < 15.0
+    assert (f"mechanism law (transmission): the loop closing the follower links on the four-bar's coupler comes "
+            f"within {worst:.0f} deg of toggle; its links must stay 30 deg away") in G.laws(body)
 
 
 @pytest.mark.parametrize("fingers", [{"pad_tpu_mm": 2.0, "pad_angle_deg": 32.0, "width_mm": 12.0},

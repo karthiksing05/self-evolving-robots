@@ -251,6 +251,7 @@ class Sim:
     object_geoms: dict[str, int] = field(default_factory=dict)  # scene object name -> geom id
     linked: list[tuple[int, float]] = field(default_factory=list)  # (qpos address, units per servo radian)
     rods: RodSprings | None = None  # a slide's rods, bending under the carriage (D-076)
+    mech: Any = None  # the jaw's mechanism graph (sea.mech.graph.Graph, D-078)
     _limit_type: int = int(mujoco.mjtConstraint.mjCNSTR_LIMIT_JOINT)
 
     # ---------------------------------------------------------------- tools
@@ -748,6 +749,7 @@ def build_model(design: Design, panel: PanelSpec | None = None, tools: list | No
         sim.tool_template[slot] = spec_t.template if spec_t is not None else "?"
         if spec_t is not None:
             sim.tool_specs[slot] = spec_t
+    sim.mech = jaw_mech
     if "jaw_rods" in {model.numeric(i).name for i in range(model.nnumeric)}:
         sim.rods = RodSprings(model)
     sim.mount(None)

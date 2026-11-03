@@ -7,7 +7,10 @@ that build on the real meshes, through the jaw's range and the wrist's roll rang
   jaw angle (a pin's or a bushing's clearance);
 - **no interference:** no two parts share material, except at a bearing seat: the servo's spline and rear
   pin, inside ``SEAT_MM`` of the hinge axis, where the hinge body meets the servo;
-- **transmission:** a four-bar's links stay at least ``MIN_TRANSMISSION_DEG`` from toggle.
+- **transmission:** every closed loop's links stay at least ``MIN_TRANSMISSION_DEG`` from toggle.
+
+What each part is comes from the jaw's mechanism graph (``sea.mech``, D-078): which bodies it adds, each fixed
+part's role (a rod, a clamp, a bracket) and the printed piece it belongs to, and the loops it closes.
 
 Each violation names the law, the parts and the numbers, for System 2's "refused before trial" channel.
 Tooth bending is not a law: no measured allowable stress exists for printed PLA teeth (D-059).
@@ -21,7 +24,7 @@ from typing import Any
 
 import numpy as np
 
-HAND = ("gripper", "moving_jaw_so101_v1", "jaw_coupler", "jaw_follower", "jaw_carriage")
+STOCK_HAND = ("gripper", "moving_jaw_so101_v1")  # the SO-101's: the mechanism's graph adds the rest
 # What the jaw mechanism must clear beyond the gripper (D-058): the wrist, which carries the gripper, so the
 # simulator never collides the two.  The lower arm is no parent of the jaw's bodies: the simulator's contacts
 # stop a jaw that meets it, in the poses the arm takes (D-076)
@@ -52,7 +55,7 @@ def _near(a, pa: np.ndarray, b, pb: np.ndarray) -> bool:
     return float(np.linalg.norm(ca - cb)) <= a.mesh.bounding_sphere.primitive.radius + b.mesh.bounding_sphere.primitive.radius
 
 
-def _hand(model):
+def _hand(model, hand: tuple[str, ...]):
     import mujoco
     import trimesh
 
@@ -61,7 +64,7 @@ def _hand(model):
     out = []
     for i in range(model.ngeom):
         body = model.body(model.geom_bodyid[i]).name
-        if model.geom_group[i] != 2 or body not in HAND + OBSTACLES:
+        if model.geom_group[i] != 2 or body not in hand + OBSTACLES:
             continue
         if model.geom_type[i] == mujoco.mjtGeom.mjGEOM_MESH:
             k = model.geom_dataid[i]
@@ -101,19 +104,22 @@ def _geometry(body) -> dict[str, Any]:
 
     from sea.contracts import ARM_JOINTS
     from sea.control.executor import HOME_Q
+    from sea.mech.build import solids as mech_solids
     from sea.mechanism.geometry import clearance, extent, from_axis, grounded, overlap
     from sea.sim.build_model import build_model
     from sea.worlds.gripper import to_design
 
     sim = build_model(to_design(body))
     m, d = sim.model, sim.data
-    solids = _hand(m)
+    hand = STOCK_HAND + sim.mech.new_bodies()
+    parts = mech_solids(sim.mech)  # name -> (body, role, piece)
+    solids = _hand(m, hand)
     jid = m.joint("gripper").id
     lo, hi = m.jnt_range[jid]
     bodies = {s.body for s in solids}
     clashes: dict[str, dict] = {}
     names = {m.body(i).name for i in range(m.nbody)}
-    support: dict[str, dict[float, float]] = {b: {} for b in HAND[1:] if b in names}
+    support: dict[str, dict[float, float]] = {b: {} for b in hand[1:] if b in names}
 
     def pose(b: str) -> np.ndarray:  # in the gripper's frame, mm
         rot, at = d.xmat[m.body("gripper").id].reshape(3, 3), d.xpos[m.body("gripper").id]
@@ -131,7 +137,7 @@ def _geometry(body) -> dict[str, Any]:
         seen["wrist"].append((f"wrist rolled {r:+.2f} rad", pose("wrist")))
 
     def added(s) -> bool:  # a part the jaw mechanism brings, or one that moves: what an obstacle must clear
-        return s.body != "gripper" or s.name.startswith("jaw_")
+        return s.body != "gripper" or s.name in parts or s.name.startswith(PAD)
 
     tracks = []  # (a, b, obstacle body, obstacle pose label, obstacle pose): each checked through the jaw's range
     for i, a in enumerate(solids):
@@ -234,35 +240,60 @@ def _geometry(body) -> dict[str, Any]:
     fastened = {}
     for i, a in enumerate(fixed):
         for b in fixed[i + 1:]:
-            if _assembly(a.name) == _assembly(b.name) or {a.name, b.name} <= STOCK_PARTS:
+            if _piece(a.name, parts) == _piece(b.name, parts) or {a.name, b.name} <= STOCK_PARTS:
                 continue
             pts = overlap(a, eye, b, eye)
             if len(pts):
                 fastened[f"{a.name} / {b.name}"] = extent(pts)
     poses0 = {"gripper": eye}
     loose = grounded(fixed, poses0, FRAME, touch=CARRY_MM)
+    # each closed loop's transmission angle over the jaw's range: at the loop's pin, between the two links that
+    # meet there (both pinned at their bodies' origins)
+    loops = {}
+    for lp in sim.mech.loops:
+        worst = 90.0
+        for q in np.linspace(lo, hi, LOOP_SAMPLES):
+            qa = HOME_Q.copy()
+            qa[-1] = q
+            sim.set_arm_q(qa)
+            ia, ib = m.body(lp.a).id, m.body(lp.b).id
+            c = d.xpos[ia] + d.xmat[ia].reshape(3, 3) @ np.asarray(lp.point)
+            u, v = d.xpos[ib] - c, d.xpos[ia] - c
+            mu = math.degrees(math.acos(np.clip(u @ v / (np.linalg.norm(u) * np.linalg.norm(v)), -1.0, 1.0)))
+            worst = min(worst, mu, 180.0 - mu)
+        loops[f"{lp.a} / {lp.b}"] = round(worst, 1)
     mass = {b: round(1000 * float(m.body_mass[m.body(b).id]), 1) for b in [*support, "gripper"]}
+    roles = {n: r for n, (_, r, _) in parts.items()}
     return {"jaw_range_servo_rad": [round(float(lo), 3), round(float(hi), 3)], "samples": [round(q, 3) for q in samples],
-            "clashes": clashes, "carried": carried, "fastened": fastened, "loose": loose, "sim_mass_g": mass}
+            "clashes": clashes, "carried": carried, "fastened": fastened, "loose": loose, "loops_deg": loops,
+            "roles": roles, "pieces": {n: p for n, (_, _, p) in parts.items()}, "sim_mass_g": mass}
 
 
-def _assembly(name: str) -> str:
-    """The piece a fixed part belongs to: a pad and its shoes and screws are one, a clamp and its bracket one."""
-    for prefix, piece in (("jaw_fixed_pad", "pad"), ("jaw_clamp", "clamp"), ("jaw_bracket", "bracket")):
-        if name.startswith(prefix):
-            return piece
-    return name
+PAD = "jaw_fixed_pad"  # the fixed pad, its shoe and its screws: one piece (D-066); pads are not in the graph yet
+LOOP_SAMPLES = 50
 
 
-def _allowed_mm(a: str, b: str) -> float:
+def _piece(name: str, pieces: dict) -> str:
+    """The printed piece a fixed part belongs to: the graph's, or the pad's."""
+    if name.startswith(PAD):
+        return PAD
+    got = pieces.get(name)
+    return got[2] if isinstance(got, tuple) else (got or name)
+
+
+def _allowed_mm(a: str, b: str, geo: dict[str, Any]) -> float:
     """How thick a region two fixed parts may share: a rod in its clamp's bore, any; a pad seated on the finger it
     wraps, ``PAD_SEAT_MM``; a printed part screwed to another, ``FIT_MM``; otherwise faces in contact."""
-    pa, pb = {_assembly(a), _assembly(b)}, {a, b}
-    if "clamp" in pa and any(n.startswith("jaw_rod") for n in pb):
+    roles, pieces = geo["roles"], geo["pieces"]
+    piece_roles = {}
+    for n, p in pieces.items():
+        piece_roles.setdefault(p, set()).add(roles[n])
+    held = lambda n: piece_roles.get(_piece(n, pieces), set())  # noqa: E731  the roles in a part's piece
+    if any(roles.get(x) == "rod" and "clamp" in held(y) for x, y in ((a, b), (b, a))):
         return math.inf
-    if "pad" in pa and FRAME in pb:
+    if PAD in (_piece(a, pieces), _piece(b, pieces)) and FRAME in (a, b):
         return PAD_SEAT_MM
-    if pa & {"clamp", "bracket"} and pb & STOCK_PARTS:
+    if (held(a) | held(b)) & {"clamp", "bracket"} and {a, b} & STOCK_PARTS:
         return FIT_MM
     return TOUCH_MM
 
@@ -303,9 +334,6 @@ def _seat(c: dict[str, Any], a: str, b: str) -> bool:
 
 def laws(body) -> list[str]:
     """The mechanism laws this body's jaw breaks, each with its parts and numbers (empty: none)."""
-    from sea.sim import jaws
-    from sea.worlds.gripper import to_design
-
     geo = geometry(body)
     qs = geo["samples"]
     out = []
@@ -336,7 +364,7 @@ def laws(body) -> list[str]:
                    f"that should carry it (jaw at {q:.2f} rad); a {c['joint']} bears on its parts within {CARRY_MM:g} mm")
     for pair, region in geo["fastened"].items():  # the gripper's fixed parts, on one another
         a, b = pair.split(" / ")
-        allowed = _allowed_mm(a, b)
+        allowed = _allowed_mm(a, b, geo)
         if min(region) > allowed:
             out.append(f"mechanism law (no interference): {_label(a, 'gripper')} and {_label(b, 'gripper')} share "
                        f"material, a region up to {' x '.join(f'{x:.1f}' for x in region)} mm, both fixed to the "
@@ -344,10 +372,9 @@ def laws(body) -> list[str]:
     for part in dict.fromkeys(_label(p, "gripper") for p in geo["loose"]):
         out.append(f"mechanism law (mounted): {part} touches nothing that reaches the gripper "
                    f"frame (within {CARRY_MM:g} mm); a fixed part must be fastened to the frame or to a part that is")
-    f = to_design(body).fingers
-    if f.jaw == "parallelogram":
-        worst = min(jaws.transmission_deg(q) for q in np.linspace(*geo["jaw_range_servo_rad"], 50))
+    for pair, worst in geo["loops_deg"].items():
         if worst < MIN_TRANSMISSION_DEG:
-            out.append(f"mechanism law (transmission): the four-bar's links come within {worst:.0f} deg of toggle; "
-                       f"they must stay {MIN_TRANSMISSION_DEG:g} deg away")
+            a, b = pair.split(" / ")
+            out.append(f"mechanism law (transmission): the loop closing {_label(a, a)} on {_label(b, b)} comes within "
+                       f"{worst:.0f} deg of toggle; its links must stay {MIN_TRANSMISSION_DEG:g} deg away")
     return out

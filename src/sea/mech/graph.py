@@ -40,6 +40,7 @@ class Box(_M):
     quat: Quat = (1.0, 0.0, 0.0, 0.0)
     material: Material = "pla"
     role: Role = "structure"
+    piece: str = ""  # parts with the same piece are one printed part (a clamp and its bracket)
     massive: bool = True  # counts toward the body's mass
 
 
@@ -54,6 +55,7 @@ class Cylinder(_M):
     quat: Quat = (1.0, 0.0, 0.0, 0.0)
     material: Material = "pla"
     role: Role = "structure"
+    piece: str = ""
     massive: bool = True
 
 
@@ -127,6 +129,7 @@ class Bracket(_M):
     y_from: float
     fallback_y: float
     role: Role = "bracket"
+    piece: str = ""
 
 
 class Bought(_M):
@@ -175,7 +178,9 @@ class Body(_M):
 
 
 class Loop(_M):
-    """Closes a loop: ``point`` (in ``b``'s frame) of body ``b`` is pinned to the same point of body ``a``."""
+    """Closes a loop: ``point`` of body ``a`` (in ``a``'s frame) is pinned to body ``b``.  With each body's own
+    joint at its origin, the loop's pins are ``a``'s and ``b``'s origins and ``point``: the transmission angle is
+    the angle at ``point`` between them."""
 
     kind: Literal["loop"] = "loop"
     a: str
