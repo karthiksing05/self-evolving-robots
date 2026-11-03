@@ -220,7 +220,7 @@ def _spec(body: Body) -> Spec:
         height = max(ride + TUB_H + sh, 2 * r)
         kw = {"area": 4 * side * 0.5 * r * (0.5 if mec else 1.0), "base": ln - 2.0}
         if mec:
-            kw.update(edge=0.6, loose=0.55)  # rollers spin free at an edge
+            kw.update(loose=0.55)  # rollers clog in loose ground; at an edge they are in the model (D-070)
     ratio, volts = _ratio(dr), _cells(bt) * VOLTS[bt.type][0]
     k = volts / WINDING[dr.type]  # a DC motor's stall torque and no-load speed both scale with its supply
     return Spec(loco=lo.type, m=grams / 1000, width=w + 2 * side, height=height, length=ln, belly=belly, r=r, n=n,
@@ -232,7 +232,7 @@ def _spec(body: Body) -> Spec:
 # ---------------------------------------------------------------- terrain mechanics
 def _mu(s: Spec, surf: str) -> float:
     mu = SURF[surf][0]
-    return mu * s.loose if surf in LOOSE else mu * (0.7 if s.loco == "mecanum4" else 1.0)
+    return mu * s.loose if surf in LOOSE else mu  # a mecanum wheel's rollers are in the model (D-070)
 
 
 def _crr(s: Spec, surf: str) -> float:

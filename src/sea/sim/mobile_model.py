@@ -14,8 +14,8 @@ The robot is built from the world's numbers (``sea.worlds.mobile._spec``) with t
 - **Rolling resistance:** the world's C_rr as Coulomb friction at each wheel joint, C_rr N r.
 
 Contacts are stiff (a 4 ms time constant on a 1 ms step) with elliptic friction cones, the terrain's
-friction taking priority over the robot's.  Mecanum rollers are not modelled one by one: their wheels
-take the world's reduced friction.  Sand stays analytic (a Winkler soil): MuJoCo's soft contact is not sinkage.
+friction taking priority over the robot's.  A mecanum wheel is a driven hub carrying ``ROLLERS`` free rollers on
+45 degree axes (D-070), so it passes force only across each roller's axis.  Sand stays analytic (a Winkler soil): MuJoCo's soft contact is not sinkage.
 
 An episode starts the robot just short of the obstacle, at the steady speed its motors reach on the flat
 at that duty, and runs until it is past, stuck for 0.8 s, tipped over, or out of time.
@@ -36,6 +36,7 @@ SOLREF, SOLIMP = "0.004 1", "0.95 0.99 0.001"
 ROLLER_GAP = 0.012  # m between track rollers: under half the lowest edge they meet
 SIDE = {"tracks": 0.030, "rocker_bogie6": 0.035, "mecanum4": 0.030, "wheels4": 0.025}
 SPROCKET, IDLER = 0.018, 0.015  # m, as the CAD draws them
+ROLLERS, ROLLER_AT, ROLLER_R = 10, 0.82, 0.18  # a mecanum wheel's rollers: count, centre and radius over the wheel's
 
 
 @dataclass(frozen=True)
@@ -75,6 +76,32 @@ def _cyl_y(name: str, pos: tuple[float, float, float], r: float, half: float, rg
             f'zaxis="0 1 0" mass="{mass:.5f}" rgba="{rgba}" class="robot"/>')
 
 
+def roller_axes(r: float, lean: float) -> list[tuple[np.ndarray, np.ndarray]]:
+    """A mecanum wheel's rollers in the hub's frame (axle along y): each centre and its axis, 45 degrees across the
+    rim toward ``lean`` (+1 or -1) along the axle."""
+    out = []
+    for k in range(ROLLERS):
+        a = 2 * math.pi * k / ROLLERS
+        rim = np.array([-math.sin(a), 0.0, math.cos(a)])  # the rim's direction at the roller
+        out.append((ROLLER_AT * r * np.array([math.cos(a), 0.0, math.sin(a)]),
+                    (rim + lean * np.array([0.0, 1.0, 0.0])) / math.sqrt(2)))
+    return out
+
+
+def _mecanum(nm: str, r: float, side: float, lean: float, kg: float) -> str:
+    """A mecanum wheel's hub and its free rollers, each a capsule on a hinge along its own axis (D-070)."""
+    hub = (f'<geom name="{nm}" type="cylinder" size="{0.62 * r:.5f} {side / 2:.5f}" zaxis="0 1 0" mass="{0.6 * kg:.5f}" '
+           f'rgba="0.55 0.56 0.6 1" class="robot"/>')
+    half = 0.45 * side  # half a roller's length, as the CAD draws it
+    rollers = "".join(
+        f'<body name="{nm}_r{k}" pos="{c[0]:.5f} {c[1]:.5f} {c[2]:.5f}">'
+        f'<joint name="{nm}_r{k}" type="hinge" axis="{a[0]:.5f} {a[1]:.5f} {a[2]:.5f}" damping="1e-6" armature="1e-8"/>'
+        f'<geom type="capsule" size="{ROLLER_R * r:.5f}" fromto="{-half * a[0]:.5f} {-half * a[1]:.5f} {-half * a[2]:.5f} '
+        f'{half * a[0]:.5f} {half * a[1]:.5f} {half * a[2]:.5f}" mass="{0.4 * kg / ROLLERS:.6f}" rgba="0.12 0.12 0.13 1" '
+        f'class="robot"/></body>' for k, (c, a) in enumerate(roller_axes(r, lean)))
+    return hub + rollers
+
+
 def _robot_xml(rb: Robot) -> tuple[str, str, str, list[str]]:
     """(the robot's body tree, its equalities, its actuators, the driven joints)."""
     side = SIDE[rb.loco]
@@ -94,8 +121,12 @@ def _robot_xml(rb: Robot) -> tuple[str, str, str, list[str]]:
         for i, x in enumerate((rb.length / 2 - 0.01, -rb.length / 2 + 0.01)):
             for j, y in enumerate(ys):
                 nm = f"w{i}{j}"
+                if rb.loco == "mecanum4":  # the X pattern: front-left and rear-right lean one way, the others the other
+                    wheel = _mecanum(nm, rb.r, side, 1.0 if i == j else -1.0, rb.wheel_kg)
+                else:
+                    wheel = _cyl_y(nm, (0, 0, 0), rb.r, side / 2, wheel_rgba, rb.wheel_kg)
                 bodies.append(f'<body name="{nm}" pos="{x:.5f} {y:.5f} {rb.r - zc:.5f}">{joint(nm, n_load, rb.r)}'
-                              + _cyl_y(nm, (0, 0, 0), rb.r, side / 2, wheel_rgba, rb.wheel_kg) + "</body>")
+                              + wheel + "</body>")
                 driven.append(nm)
         tub_kg = rb.m - 4 * rb.wheel_kg
     elif rb.loco == "rocker_bogie6":
@@ -260,10 +291,11 @@ def episode(rb: Robot, kind: str, f: dict[str, float], mu: float, duty: float, y
                                                              / (len(driven) * rb.torque)))
     d.qvel[0] = v_ss
     jid = [m.joint(n).id for n in driven]
-    radii = [m.geom(n).size[0] for n in driven]
+    radii = [rb.r if rb.loco == "mecanum4" else m.geom(n).size[0] for n in driven]  # a mecanum hub rolls on rollers
     for j in range(1, m.njnt):  # every wheel and roller already turning at the robot's speed
-        if m.jnt_type[j] == mujoco.mjtJoint.mjJNT_HINGE and m.joint(j).name[0] in "wt":
-            d.qvel[m.jnt_dofadr[j]] = v_ss / m.geom(m.joint(j).name).size[0]
+        nm = m.joint(j).name
+        if m.jnt_type[j] == mujoco.mjtJoint.mjJNT_HINGE and nm[0] in "wt" and "_r" not in nm:  # not a mecanum roller
+            d.qvel[m.jnt_dofadr[j]] = v_ss / (rb.r if rb.loco == "mecanum4" else m.geom(nm).size[0])
     for k in range(m.nu):
         d.ctrl[k] = duty
     mujoco.mj_forward(m, d)

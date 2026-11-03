@@ -1928,3 +1928,32 @@ These test different things: pitch and tipping across several nosings, a round o
   - the stock also holds the study, and fails the patio and greenhouse on its belly;
   - the gold test records the conflict;
   - a new test drives the cord, threshold, hose and stairs.
+
+## D-070 Mecanum wheels roll on their rollers (judge: world_mobile)
+
+**Why.** In the MuJoCo episodes (D-063) a mecanum wheel was a plain cylinder. Its rollers were two factors: friction × 0.7 everywhere, and × 0.6 more at an edge ("rollers spin free at an edge"). The CAD drew ten rollers on 45° axes that the physics never saw (invariant 11).
+
+**Change.**
+- Each mecanum wheel is a driven hub carrying ten rollers on free hinges, as the CAD draws them:
+  - centres at 0.82 r, capsules of radius 0.18 r reaching the wheel's radius;
+  - axes at 45° across the rim, in the X pattern: front-left and rear-right one way, the other two the other way, so driving straight their side forces cancel through the chassis.
+- A roller passes force only across its own axis, so the traction factor and the edge factor are deleted. Loose ground (rollers clog) and rolling resistance keep their factors: neither is a contact MuJoCo models.
+- The CAD reads the roller layout from `sim/mobile_model.py`.
+
+**Prediction.**
+- On flat ground the push a mecanum body reaches is within 15 % of before: cos 45° is 0.71, the factor was 0.7.
+- At edges it climbs a little higher than the 0.6 factor allowed, but still below plain wheels of the same radius: a roller meets an edge on a 0.18 r capsule, not the tyre's full radius.
+- No held route moves for the stock, the gold body or the D-063 finals (none uses mecanum).
+- The distractor test still holds: mecanum wheels gain nothing over the stock's routes.
+
+**Measured** (the highest edge climbed at full duty, MuJoCo bisection; and the train routes held).
+
+| body | wood edge, before → after | concrete edge | routes held |
+|---|---|---|---|
+| stock wheels, 3 cm | 3.14 (unchanged) | 3.61 | 6 |
+| mecanum, 3 cm | 2.34 → 3.05 cm | 2.53 → 3.42 | 5 → 5 |
+| mecanum, 4 cm | 3.31 → 4.00 | 3.44 → 3.81 | 5 → 5 |
+
+- Mecanum wheels climb higher than the 0.6 edge factor allowed, and still below plain wheels of the same radius. As predicted.
+- Driving straight at a 3 cm step, the X pattern's side forces cancel: 0.0 cm of drift across it.
+- No held route moved, and every mobile, film and CAD test passed. The mecanum wheels still gain nothing over the stock (they lose the gravel ramp, where loose ground clogs their rollers).

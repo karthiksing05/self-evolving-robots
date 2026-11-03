@@ -116,12 +116,17 @@ def mobile(body: Body) -> CadModel:
 
     def wheel(x: float, z: float, r: float, mecanum: bool = False) -> None:
         for y in (w / 2 + side / 2, -w / 2 - side / 2):
-            if mecanum:
+            if mecanum:  # the rollers the simulator rolls on (sim/mobile_model.py, D-070), front-left and rear-right
+                from sea.sim.mobile_model import (  # leaning one way, the other two the other
+                    ROLLER_R,
+                    roller_axes,
+                )
+
                 parts.append(solid("hub", "locomotion", cyl(0.62 * r, side, (x, y, z), (0, 1, 0))))
-                for th in np.linspace(0, 2 * math.pi, 10, endpoint=False):
-                    c = (x + 0.82 * r * math.cos(th), y, z + 0.82 * r * math.sin(th))
-                    ax = (-math.sin(th) * 0.707, 0.707, math.cos(th) * 0.707)
-                    parts.append(solid("roller", "locomotion", cyl(0.17 * r, 0.9 * side, c, ax), "rubber"))
+                lean = 1.0 if (x > 0) == (y > 0) else -1.0
+                for c, ax in roller_axes(r, lean):
+                    parts.append(solid("roller", "locomotion", cyl(ROLLER_R * r, 0.9 * side, tuple(np.array([x, y, z]) + c),
+                                                                    tuple(ax)), "rubber"))
             else:
                 tyre = cyl(r, side, (x, y, z), (0, 1, 0)).cut(cyl(0.62 * r, side * 1.1, (x, y, z), (0, 1, 0)))
                 parts.append(solid("tyre", "locomotion", tyre, "rubber"))
