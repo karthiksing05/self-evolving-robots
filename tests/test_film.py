@@ -89,10 +89,12 @@ def test_silent_films_play_together_and_sounding_ones_in_turn():
     still = [np.zeros((40, 60, 3), np.uint8)]
     b, a = F.Clip(still * 10, False, "no"), F.Clip(still * 4, True, "yes")
     frames, audio = F.pair(b, a, "t", ("before", "after"), hold_s=0.4)
-    assert audio is None and len(frames) == 10 + 10 and frames[0].shape == (40 + 34, 126, 3)
+    side = F.LABEL + 40 + F.FOOT  # each picture between its name and its outcome
+    assert audio is None and len(frames) == 10 + 10 and frames[0].shape == (32 + side, 126, 3)
     b.audio, a.audio = np.zeros(10 * F.SR // F.FPS, np.float32), np.zeros(4 * F.SR // F.FPS, np.float32)
     frames, audio = F.pair(b, a, "t", ("before", "after"), hold_s=0.4)
     assert len(frames) == 10 + 10 + 4 + 10 and abs(len(audio) / F.SR - len(frames) / F.FPS) < 0.05
+    assert frames[0].shape == (32 + 2 * side + 6, 60, 3)  # in turn, stacked
 
 
 def test_gripper_film_replays_the_recorded_failure():

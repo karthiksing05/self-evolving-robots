@@ -6,7 +6,8 @@ Writes to ``--out``:
 - ``before_pads_<k>.png``, ``after_pads_<k>.png``: the jaws with the simulated pad boxes, and with the pads as built,
   for a flat TPU pad and a 40 degree grooved one; ``tips_<k>.png``: each fingertip close up, before above after;
 - ``after_rig_stock.png``, ``after_rig_rich.png``: the talking robot, one camera for both bodies (the rich body adds
-  the tip tongue, round lips and the larynx tube), and ``labelled_rig_<k>.png`` with a callout on every component;
+  the tip tongue, round lips and the larynx tube), ``labelled_rig_<k>.png`` with a callout on every component, and
+  ``grouped_rig_<k>.png`` with its parts coloured by what they do and one label per group (a first look);
 - ``audit.json``, ``audit.md``: per assembly, the parts nothing carries to the base, the parts that share space with
   no declared joint, declared joints that do not touch, and each part's form (sharp edge, overhang, thinnest wall);
   the same laws on each rig at both ends of every control's range; and the pad parameter sets the proposal-tier
@@ -106,12 +107,44 @@ def stack(rows: list[tuple[str, bytes]]) -> bytes:
     return buf.getvalue()
 
 
+FLOW = "Air from the pump → the reed buzzes → the silicone tube shapes the buzz into a sound; servos squeeze the tube."
+# the rig's parts by what they do: (name, what it does, colour, the part names that open the group)
+RIG_GROUPS = [
+    ("Frame", "base plate and face plate: everything is screwed to them", (0.78, 0.76, 0.72), ("base plate", "face plate")),
+    ("Voice source", "air from the pump buzzes a brass reed: the raw sound, like vocal folds",
+     (0.30, 0.55, 0.85), ("reed housing",)),
+    ("Vocal tract", "a silicone tube, 24 mm bore; squeezing it changes the sound", (0.93, 0.55, 0.40), ("cast tract",)),
+    ("Tongue position", "a servo and crank slide the tongue along a rail: where it squeezes the tube",
+     (0.55, 0.40, 0.75), ("rail", "rail servo")),
+    ("Tongue height", "a servo turns a cam that pushes a soft pad up into the tube: how hard it squeezes",
+     (0.85, 0.35, 0.55), ("sled",)),
+    ("Lips", "servos open and close the lips (the stock jaw pulls the lower lip down)", (0.25, 0.65, 0.45),
+     ("upper lip", "lip sleeve")),
+    ("Larynx", "a servo and lead screw slide the reed end: a longer tube, lower resonances", (0.60, 0.58, 0.22),
+     ("larynx bellows",)),
+    ("Tongue tip", "two servos push a thin blade up just behind the teeth: the seal for /t/", (0.95, 0.70, 0.20),
+     ("palate bridge",)),
+]
+
+
+def rig_groups(names: list[str]) -> list:
+    """RIG_GROUPS with each group's part indices: a part joins the group whose opening name came last before it
+    (the assembly lists each mechanism's parts together; a servo's mount, horn and screws follow it)."""
+    opens = {n: k for k, (_, _, _, first) in enumerate(RIG_GROUPS) for n in first}
+    members: list[list[int]] = [[] for _ in RIG_GROUPS]
+    k = 0
+    for i, n in enumerate(names):
+        k = opens.get(n, k)
+        members[k].append(i)
+    return [(name, does, colour, members[j]) for j, (name, does, colour, _) in enumerate(RIG_GROUPS) if members[j]]
+
+
 def main(argv: list[str] | None = None) -> int:
     from sea.contracts import FingerSpec
     from sea.design import language as LG
     from sea.design import pad_cad
     from sea.design.cad import render
-    from sea.design.callouts import labelled
+    from sea.design.callouts import grouped, labelled
     from sea.worlds import cad, rig_cad
 
     ap = argparse.ArgumentParser()
@@ -150,6 +183,8 @@ def main(argv: list[str] | None = None) -> int:
             legend.setdefault(m.part.name, m.role)
         model = asms[k].model(rig_cad.VIEWS, (460, 320))
         (out / f"labelled_rig_{k}.png").write_bytes(labelled(model, legend, titles[k]))
+        (out / f"grouped_rig_{k}.png").write_bytes(grouped(model, rig_groups([m.part.name for m in asms[k].members]),
+                                                           titles[k], FLOW))
     for k, asm in asms.items():
         report["rig"][k] = LG.audit(asm)
         print(f"rig {k}: drawn and audited", flush=True)

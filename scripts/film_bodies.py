@@ -30,11 +30,35 @@ def _human(s: str) -> str:
     return s.replace("_", " ")
 
 
+def _num(v) -> str:
+    return f"{v:g}" if isinstance(v, (int, float)) else str(v)
+
+
+def changes(prev, new) -> tuple[str, frozenset[str]]:
+    """What a kept change did to the body, in a line ("What changed: pads none -> pads (pad angle deg 7, ...)"),
+    and the slots it touched."""
+    said, slots = [], set()
+    for slot in sorted(set(prev.parts) | set(new.parts)):
+        a, b = prev.parts.get(slot), new.parts.get(slot)
+        if a == b:
+            continue
+        slots.add(slot)
+        if a is None or b is None or a.type != b.type:
+            shown = ", ".join(f"{_human(k)} {_num(v)}" for k, v in list((b.params if b else {}).items())[:3])
+            said.append(f"{_human(slot)} {_human(a.type) if a else 'none'} → {_human(b.type) if b else 'none'}"
+                        + (f" ({shown})" if shown else ""))
+        else:
+            moved = [f"{_human(k)} {_num(a.params.get(k, '-'))} → {_num(v)}" for k, v in b.params.items()
+                     if a.params.get(k) != v]
+            said.append(f"{_human(slot)}: " + ", ".join(moved[:3]))
+    return "What changed: " + "; ".join(said), frozenset(slots)
+
+
 def main(argv: list[str] | None = None) -> int:
     from sea.evolve.core import Body
     from sea.evolve.loop import make_world
     from sea.harness import fingerprint
-    from sea.worlds.film import CLIP_MM, FILM, READS, encode, pair
+    from sea.worlds.film import CLIP_MM, FILM, READS, encode, grip_headline, pair
 
     ap = argparse.ArgumentParser()
     ap.add_argument("runs", nargs="+", type=Path)
@@ -76,9 +100,11 @@ def main(argv: list[str] | None = None) -> int:
                         seen.add(hit[1]["mechanism"])
             for g, tid, before in chosen[: args.per_change]:
                 after = trial.get("outcomes", {}).get(tid, {})
-                prev_body = Body.model_validate(fs[k - 1]["body"])
-                b = FILM[world_name](prev_body, tasks[tid], before.get("controls", {}), seed)
-                a = FILM[world_name](Body.model_validate(f["body"]), tasks[tid], after.get("controls", {}), seed)
+                prev_body, new_body = Body.model_validate(fs[k - 1]["body"]), Body.model_validate(f["body"])
+                change, slots = changes(prev_body, new_body)
+                kw = {"changed": slots} if world_name.startswith("gripper") else {}
+                b = FILM[world_name](prev_body, tasks[tid], before.get("controls", {}), seed, **kw)
+                a = FILM[world_name](new_body, tasks[tid], after.get("controls", {}), seed, **kw)
                 if b.ok or a.ok != bool(after.get("success")):
                     print(f"{run.name} {f['id']} {tid}: the replay ({b.verdict} / {a.verdict}) disagrees with the "
                           f"record; not filmed", file=sys.stderr)
@@ -88,17 +114,22 @@ def main(argv: list[str] | None = None) -> int:
                     print(f"{run.name} {f['id']} {tid}: a drawn part goes {deep:.1f} mm into what it touches "
                           f"(limit {CLIP_MM} mm); not filmed", file=sys.stderr)
                     continue
-                if not b.ok and before.get("mechanism"):
-                    b.verdict = f"{_human(before['mechanism'])} ({b.verdict})" if world_name.startswith("gripper") else b.verdict
+                if not b.ok and before.get("mechanism") and world_name.startswith("gripper"):
+                    b.verdict = f"{_human(before['mechanism'])} ({b.verdict})"
+                    b.headline = grip_headline(tasks[tid], before["mechanism"])
                 title = tasks[tid].facts if len(tasks[tid].facts) <= 110 else tasks[tid].facts[:107] + "…"
-                film, audio = pair(b, a, title, (f"before · {fs[k - 1]['id']}", f"after · {f['id']} (this change)"))
+                film, audio = pair(b, a, title, (f"before · {fs[k - 1]['id']}", f"after · {f['id']} (this change)"),
+                                   change=change)
                 name = f"{k:02d}_{f['id']}_{g}.mp4"
                 encode(film, d / name, audio)
                 out.append({"frame": k, "id": f["id"], "group": g, "task": tid, "file": name,
                             "poster": name.replace(".mp4", ".jpg"), "seconds": round(len(film) / 25, 1),
                             "sound": audio is not None, "clipping_mm": round(deep, 2),
-                            "before": {"ok": b.ok, "verdict": b.verdict, "recorded": before.get("mechanism", "")},
-                            "after": {"ok": a.ok, "verdict": a.verdict, "recorded": after.get("success")}})
+                            "change": change,
+                            "before": {"ok": b.ok, "verdict": b.verdict, "headline": b.headline,
+                                       "recorded": before.get("mechanism", "")},
+                            "after": {"ok": a.ok, "verdict": a.verdict, "headline": a.headline,
+                                      "recorded": after.get("success")}})
                 print(f"{run.name} {name}: before {'pass' if b.ok else 'fail'}, after {'pass' if a.ok else 'fail'}")
         if out:
             d.mkdir(parents=True, exist_ok=True)

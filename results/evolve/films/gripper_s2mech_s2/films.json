@@ -12,14 +12,17 @@
    "seconds": 6.6,
    "sound": false,
    "clipping_mm": 0.12,
+   "change": "What changed: pads none → pads (reach mm 0.992, pad angle deg 30, groove mm 0.596)",
    "before": {
     "ok": false,
     "verdict": "squeezed down out (stuck (slip))",
+    "headline": "The gelatin box is squeezed out downward as the fingers close",
     "recorded": "squeezed_down_out"
    },
    "after": {
     "ok": true,
     "verdict": "held for the full second",
+    "headline": "Holds the gelatin box for the full second",
     "recorded": true
    }
   }

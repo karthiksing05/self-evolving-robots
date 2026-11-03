@@ -12,14 +12,17 @@
    "seconds": 5.6,
    "sound": true,
    "clipping_mm": 0.0,
+   "change": "What changed: lips jaw lips → round lips (max protrusion 1.6); tongue cam tongue → tip tongue (rail start 3.25, stroke 1.3)",
    "before": {
     "ok": false,
     "verdict": "F 691/1067 Hz vs target 570/840 (F1 +21%, F2 +27%)",
+    "headline": "Not /ɔ/ yet: a resonance falls outside its target",
     "recorded": "f2_floor_too_high"
    },
    "after": {
     "ok": true,
     "verdict": "F 525/889 Hz vs target 570/840",
+    "headline": "Sounds like /ɔ/: both resonances inside their targets",
     "recorded": true
    }
   },
@@ -33,14 +36,17 @@
    "seconds": 5.6,
    "sound": true,
    "clipping_mm": 0.0,
+   "change": "What changed: lips jaw lips → round lips (max protrusion 1.6); tongue cam tongue → tip tongue (rail start 3.25, stroke 1.3)",
    "before": {
     "ok": false,
     "verdict": "F 679/1494/2769 Hz vs target 490/1350/1690 (F1 +38%, F2 +11%, F3 +64%)",
+    "headline": "Not /ɝ/ yet: a resonance falls outside its target",
     "recorded": "f3_floor_too_high"
    },
    "after": {
     "ok": true,
     "verdict": "F 484/1324/1815 Hz vs target 490/1350/1690",
+    "headline": "Sounds like /ɝ/: both resonances inside their targets",
     "recorded": true
    }
   },
@@ -51,17 +57,20 @@
    "task": "k_train0",
    "file": "01_b00m_k.mp4",
    "poster": "01_b00m_k.jpg",
-   "seconds": 4.9,
+   "seconds": 7.3,
    "sound": true,
    "clipping_mm": 0.0,
+   "change": "What changed: lips jaw lips → round lips (max protrusion 1.6); tongue cam tongue → tip tongue (rail start 3.25, stroke 1.3)",
    "before": {
     "ok": false,
     "verdict": "narrowest 0.20 cm2 at 3.7 cm behind the teeth, airway elsewhere 1.23 cm2",
+    "headline": "Never seals the tube, so no /k/: the voice runs straight through",
     "recorded": "no_closure_at_velar"
    },
    "after": {
     "ok": true,
     "verdict": "narrowest 0.00 cm2 at 8.2 cm behind the teeth, airway elsewhere 0.72 cm2",
+    "headline": "Seals the tube in the right place: a clean /k/",
     "recorded": true
    }
   }

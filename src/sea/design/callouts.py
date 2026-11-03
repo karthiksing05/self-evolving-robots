@@ -204,3 +204,73 @@ def labelled(model: CadModel, legend: Mapping[str, str], title: str = "", view: 
     buf = io.BytesIO()
     canvas.save(buf, format="PNG", optimize=True)
     return buf.getvalue()
+
+
+def grouped(model: CadModel, groups: list[tuple[str, str, tuple[float, float, float], list[int]]], title: str = "",
+            flow: str = "", view: int = 0, size: tuple[int, int] = (1100, 640)) -> bytes:
+    """One view of ``model`` with its parts coloured by what they do and one label per group, for a first look at
+    a body.  ``groups`` are (name, what it does, colour, the indices of its parts); parts in no group keep their
+    material.  Servos keep their own colour, so they still read as servos.  Each label sits in the side margin
+    nearer its group, beside a swatch of its colour, with a leader to the group's most visible pixel; labels on a
+    side are ordered by height, so leaders do not cross.  ``flow`` is a line under the title: how the parts work
+    together."""
+    from dataclasses import replace
+
+    from PIL import Image, ImageDraw
+
+    from sea.design.cad import MATERIALS
+
+    w, h = size
+    v = model.views[view]
+    parts = list(model.parts)
+    for k, (_, _, colour, members) in enumerate(groups):
+        MATERIALS.setdefault(f"group{k}", colour)
+        for i in members:
+            if parts[i].material != "servo":
+                parts[i] = replace(parts[i], material=f"group{k}")
+    pic = Image.open(io.BytesIO(render([CadModel(parts, [v], (w, h))])[0])).convert("RGB")
+    who = ids(model, v, w, h)
+    tips = {}
+    for k, (_, _, _, members) in enumerate(groups):
+        a = _anchor(np.isin(who, members))
+        if a is not None:
+            tips[k] = a
+    margin, head = 300, 22 + (34 if title else 0) + (26 if flow else 0)
+    canvas = Image.new("RGB", (w + 2 * margin, h + head + 16), (250, 249, 246))
+    canvas.paste(pic, (margin, head))
+    d = ImageDraw.Draw(canvas)
+    font, bold = _font(15), _font(17, True)
+    if title:
+        d.text((20, 14), title, fill=(25, 25, 28), font=_font(22, True))
+    if flow:
+        d.text((20, 14 + (34 if title else 0)), flow, fill=(70, 74, 82), font=_font(16))
+    for side in ("left", "right"):
+        mine = sorted((k for k, (x, _) in tips.items() if (x < w / 2) == (side == "left")), key=lambda k: tips[k][1])
+        if not mine:
+            continue
+        slot = (h - 40) / len(mine)
+        for j, k in enumerate(mine):
+            name, does, colour, _ = groups[k]
+            y = head + 20 + slot * j + slot / 2 - 30
+            x = 18 if side == "left" else margin + w + 18
+            rgb = tuple(int(255 * c) for c in colour)
+            d.rectangle([x, y + 2, x + 16, y + 18], fill=rgb, outline=(60, 60, 60))
+            d.text((x + 24, y), name, fill=(25, 25, 28), font=bold)
+            lines = _wrap(d, does, font, margin - 50)
+            for i, line in enumerate(lines[:4]):
+                d.text((x + 24, y + 24 + 19 * i), line, fill=(60, 62, 68), font=font)
+            tx, ty = tips[k]
+            sx = (margin - 10) if side == "left" else (margin + w + 10)
+            d.line([(sx, y + 10), (margin + tx, head + ty)], fill=rgb, width=3)
+            d.ellipse([margin + tx - 6, head + ty - 6, margin + tx + 6, head + ty + 6], fill=rgb, outline=(30, 30, 30))
+    buf = io.BytesIO()
+    canvas.save(buf, format="PNG", optimize=True)
+    return buf.getvalue()
+
+
+def _font(size: int, bold: bool = False):
+    from matplotlib import font_manager
+    from PIL import ImageFont
+
+    return ImageFont.truetype(font_manager.findfont(font_manager.FontProperties(family="DejaVu Sans",
+                                                                                weight="bold" if bold else "normal")), size)

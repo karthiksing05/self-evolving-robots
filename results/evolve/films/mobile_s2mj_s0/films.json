@@ -12,14 +12,17 @@
    "seconds": 2.4,
    "sound": false,
    "clipping_mm": 0.0,
+   "change": "What changed: sensor bump switch → ultrasonic",
    "before": {
     "ok": false,
     "verdict": "sensing range short: reached the end in 79 s (76 s at best); 45 s allowed; in the dark it sees 0.00 m ahead, less than its 0.20 m length, so it touches each of 10 obstacles at <= 0.25 m/s and backs off (40 s)",
+    "headline": "Can't see far enough in the wood: it crawls and runs out of time",
     "recorded": "sensing_range_short"
    },
    "after": {
     "ok": true,
     "verdict": "reached in 28 s of 45, using 0.021 Wh",
+    "headline": "Makes it: the end of the route in 28 s (limit 45 s)",
     "recorded": true
    }
   },
@@ -30,17 +33,20 @@
    "task": "bedroom_train0",
    "file": "02_b010_bedroom.mp4",
    "poster": "02_b010_bedroom.jpg",
-   "seconds": 3.2,
+   "seconds": 3.4,
    "sound": false,
    "clipping_mm": 0.01,
+   "change": "What changed: battery: capacity 9.6 → 14.4; chassis: width 18 → 10, length 20 → 24, ride height 2 → 3; locomotion wheels4 → tracks (track length 24, idler height 7)",
    "before": {
     "ok": false,
     "verdict": "chassis wider than gap: the robot is 23.0 cm wide overall; the opening is 20.0 cm",
+    "headline": "Too wide to fit through the 20.0 cm doorway",
     "recorded": "chassis_wider_than_gap"
    },
    "after": {
     "ok": true,
     "verdict": "reached in 14 s of 60, using 0.011 Wh",
+    "headline": "Makes it: the end of the route in 14 s (limit 60 s)",
     "recorded": true
    }
   },
@@ -51,17 +57,20 @@
    "task": "garden_train0",
    "file": "02_b010_garden.mp4",
    "poster": "02_b010_garden.jpg",
-   "seconds": 5.2,
+   "seconds": 5.6,
    "sound": false,
    "clipping_mm": 0.22,
+   "change": "What changed: battery: capacity 9.6 → 14.4; chassis: width 18 → 10, length 20 → 24, ride height 2 → 3; locomotion wheels4 → tracks (track length 24, idler height 7)",
    "before": {
     "ok": false,
     "verdict": "belly hits step edge: the tub's belly at 2.0 cm grounded on the 9.0 cm wide, 5.0 cm deep trench (edge mu 0.75), at approach duty 0.69: stuck 12.9 cm along, its running gear turning at 0.46 m/s",
+    "headline": "Its belly grounds on the edge of the 9.0 cm trench",
     "recorded": "belly_hits_step_edge"
    },
    "after": {
     "ok": true,
     "verdict": "reached in 15 s of 60, using 0.013 Wh",
+    "headline": "Makes it: the end of the route in 15 s (limit 60 s)",
     "recorded": true
    }
   },
@@ -72,17 +81,20 @@
    "task": "porch_train0",
    "file": "02_b010_porch.mp4",
    "poster": "02_b010_porch.jpg",
-   "seconds": 3.9,
+   "seconds": 4.1,
    "sound": false,
    "clipping_mm": 0.84,
+   "change": "What changed: battery: capacity 9.6 → 14.4; chassis: width 18 → 10, length 20 → 24, ride height 2 → 3; locomotion wheels4 → tracks (track length 24, idler height 7)",
    "before": {
     "ok": false,
     "verdict": "step higher than climbable: its running gear slipped on the 5.50 cm edge (edge mu 0.75), at approach duty 0.33: stuck 3.6 cm along, its running gear turning at 0.07 m/s; at full duty it climbs edges up to 3.52 cm",
+    "headline": "Can't climb the 5.5 cm step: its wheels slip at the edge",
     "recorded": "step_higher_than_climbable"
    },
    "after": {
     "ok": true,
     "verdict": "reached in 10 s of 40, using 0.008 Wh",
+    "headline": "Makes it: the end of the route in 10 s (limit 40 s)",
     "recorded": true
    }
   }
