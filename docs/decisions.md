@@ -2194,3 +2194,42 @@ As predicted. Under real linkages, a sled clear of the glottis, and a blade that
 
   The peel blade left over the fortress at 40 s voids the cannonballs. Four pistons' worth of mechanisms compete for two pistons. At most one seed in three reaches the match.
 - **A solve takes about a minute per task** (40 s episodes at a 2 ms step take about a second, plus the search). A campaign seed takes hours, not minutes, so each campaign is asked for before it runs.
+
+**Building the world: what reachability exposed** (2026-11-03, before any campaign; System 1 on hand-made bodies, never kept as results).
+Each task was checked for one body that achieves it, so that no group measures an impossible goal. Each failure that came from the model, not the design, was fixed:
+- **The piston booms swung the wrong way.** The hinge's range had the wrong sign, so the flag boom swung down through the deck and the hook boom swung back over the robot. Now the stroke is q ∈ [0, θ0 − θ1].
+- **The booms sat near toggle.** With the cylinder's pin straight behind the pivot, a boom folded at 175° moved 0.5 rad for 0.2 in of rod. The pin now sits 90° beyond the middle of the swing, and a new law refuses a swing whose rod meets the boom below 20°.
+- **The flag boom's fold is a design parameter** (`fold_deg`, 100–175°).
+- **The needle valve rang at the 2 ms step.** As a damper on the 70 g rod it has a 0.1 ms time constant. Acting through the closed loop, that made the boom chatter and spiked the clip to 6 N. It is now c (dl/dq)² on the boom's hinge: the same power, integrated implicitly. The swing is smooth at 0.28 m/s of rod, and the clip carries 0.04 N.
+- **A clip or magnet now lets go on shear or pull, not on the push** that presses the flag onto its mount or onto the pole: a face takes that by contact.
+- **A timed flag boom catches only when it arrives with a face square.** That is about 0.5 s in each 5 s quarter-turn, and it cannot carry over to other speeds. The brief allows bought sensors, so a new part, `sensed_boom`, fires the boom a delay after a $15 long-range IR sensor sees a face square. It fixes the flag at 40 points on 16 of 36 settings on train, 9 of 36 at 2 rpm and 2 of 36 at 4.5 rpm.
+- **The peel chute could not have scored:**
+  - its side troughs were fixed at 25°, under the 27° friction angle of 0.5;
+  - its blade was mirrored for a clockwise top;
+  - its 3.2 in mouth dropped coins on the trough's wall;
+  - its junction did not scale with the frame's width;
+  - the deck had no slot for the trough;
+  - a slot across the floor caught coins' rims.
+
+  Now:
+  - the side slope and the trough width are parameters;
+  - the blade leads at −y and crosses the rim over the trough;
+  - a cross trough and a funnel run out to the side troughs;
+  - the deck is slotted;
+  - the sieve is two rails along the trough, below a V floor that centres each piece;
+  - the outer trough folds 15° forward of vertical, so it falls forward even when short.
+- **No sliding route fits at a friction of 0.5.** The fortress top is 11.5 in above the mounds, and the route from the rim to a mound's border is about 25 in. So the chute is acrylic-lined ($8 bought) and the pieces are plastic, about 0.3 between them; the top (0.4), mounds and floor are unchanged. With that, a legal 16 × 9.3 in body scored 99 and 79 points on two seeds, putting 7–9 coins on the gold mound. Its jewels, short cylinders, roll away when they tip onto their sides.
+- **Two mousetraps, not four.** The brief gives two; `KIT` had four.
+- **Each task reached by some body:**
+
+  | task | the body that reached it |
+  |---|---|
+  | activate | the stock |
+  | mermaids | a 24 in bar at 5.5 in, or the trap arms |
+  | cannon | the gate chute (27 points) |
+  | flag | the sensed boom (40) |
+  | heart | the hook boom, 1 of 16 random bodies (61) |
+  | gold and jewels | the peel chute (99 once) |
+
+**Open before any campaign.**
+- **The match may be impossible as the kit stands.** The cannon, the flag boom and the heart each need a piston, and the kit has two. The brief says only "a set of pneumatic and electrical actuators"; two pistons is this world's assumption. The other flag, the band mast, has not yet fixed the flag on any of 64 bodies and controls tried: at full extension it is rigid, and the pole's corners knock the flag. Either the kit count or a flag mechanism that needs no piston decides whether the match group is valid.

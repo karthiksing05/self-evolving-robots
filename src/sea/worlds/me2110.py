@@ -9,7 +9,7 @@ inside a 12 x 24 x 18 in box, behind the start line, to score six tasks in 40 s:
 - topple the mermaid and merman (24);
 - bring Davy Jones' heart from the chest back to the dock (61).
 
-It may use only the kit's actuators (2 gearmotors, 2 pistons on one tank, 4 mousetraps, 5 rubber bands) and
+It may use only the kit's actuators (2 gearmotors, 2 pistons on one tank, 2 mousetraps, 5 rubber bands) and
 gravity, may carry no magnets, and the parts bought must cost under $120 (prints at $0.05 per gram).  At 40 s it
 must be static, its pistons retracted.  The match is simulated in MuJoCo (``sea.sim.me2110_model``).
 
@@ -35,14 +35,16 @@ from sea.evolve.search import local_search
 from sea.sim import me2110_model as MM
 
 BOX = (12.0, 24.0, 18.0)  # in: the go/no-go box, length x width x height
-KIT = {"motors": 2, "pistons": 2, "mousetraps": 4, "bands": 5}
+KIT = {"motors": 2, "pistons": 2, "mousetraps": 2, "bands": 5}  # the brief: two mousetraps, five #64 bands
 BUDGET = 120.0
 PRINT_USD = 0.05  # per gram
 THRESH = {k: v / 2 for k, v in MM.MAX_POINTS.items()}
 TASKS = ("activate", "treasure", "flag", "cannon", "mermaids", "heart")
 # assumed prices (USD) for what the brief makes teams buy; kit parts cost nothing
 PRICE = {"plywood_in2": 0.0156, "wheel_pair": 6.0, "ball_caster": 3.0, "hinge": 1.0, "m3_screw": 0.05,
-         "alu_tube": 2.5, "dowel": 1.0, "string": 0.5, "steel_hook": 0.5, "drawer_pin": 0.3}
+         "alu_tube": 2.5, "dowel": 1.0, "string": 0.5, "steel_hook": 0.5, "drawer_pin": 0.3,
+         "ir_range_long": 15.0, "acrylic_sheet": 8.0}  # a bought sensor counts toward the budget (the kit's own IR sensor reaches 10 in)
+FLAG_BOOMS = ("piston_boom", "sensed_boom")
 PLY_G_IN2, POST_G_IN3 = 2.46, 9.8  # 1/4 in plywood, grams per square inch; posts, grams per cubic inch
 ELEC_G, MOTOR_G, TANK_G, VALVE_G, TRAP_G = 300.0, 200.0, 350.0, 80.0, 30.0
 
@@ -50,6 +52,12 @@ ELEC_G, MOTOR_G, TANK_G, VALVE_G, TRAP_G = 300.0, 200.0, 350.0, 80.0, 30.0
 def _p(lo: float, hi: float, unit: str, doc: str) -> Param:
     return Param(lo=lo, hi=hi, unit=unit, doc=doc)
 
+
+BOOM_PARAMS = {"boom_len": _p(6.0, 24.0, "in", "pivot to tip"),
+               "fold_deg": _p(100.0, 175.0, "deg", "the folded boom's angle from forward-level (180 lies back along "
+                              "the deck)"),
+               "pivot_z": _p(4.0, 17.0, "in", "the pivot's height (on a post at the deck's front edge)"),
+               "raise_deg": _p(10.0, 85.0, "deg", "the boom's angle above level when raised")}
 
 CATALOGUE = [
     PartType(name="ply_frame", slot="frame", stock=True, doc="a plywood frame: a base plate 1 in above the floor, a "
@@ -86,12 +94,14 @@ CATALOGUE = [
              params={"exit_z": _p(4.0, 14.0, "in", "the exit's floor height"),
                      "reach": _p(0.0, 14.0, "in", "how far ahead of the frame's front the exit is")}),
     PartType(name="no_flag", slot="flag", stock=True, doc="no flag mechanism", provides="nothing"),
-    PartType(name="piston_boom", slot="flag", doc="a wooden boom folded back along the deck, swung up and forward "
+    PartType(name="piston_boom", slot="flag", doc="a wooden boom folded back over the deck, swung up and forward "
              "by a piston through a lever; the flag is clipped at its tip, upright when raised", provides="places "
-             "what is clipped at its tip; uses one piston, which must retract by 40 s",
-             params={"boom_len": _p(6.0, 24.0, "in", "pivot to tip"),
-                     "pivot_z": _p(4.0, 17.0, "in", "the pivot's height (on a post at the deck's front edge)"),
-                     "raise_deg": _p(10.0, 85.0, "deg", "the boom's angle above level when raised")}),
+             "what is clipped at its tip at a set time after the robot stops; uses one piston, which must retract "
+             "by 40 s", params=BOOM_PARAMS),
+    PartType(name="sensed_boom", slot="flag", doc="the piston boom, fired by a bought long-range IR sensor on a 14 in "
+             "post at its pivot that looks ahead over the fortress wall and sees when a pole face is square to it",
+             provides="places what is clipped at its tip a set delay after a sensed cue; uses one piston and a $15 "
+             "sensor", params=BOOM_PARAMS),
     PartType(name="band_mast", slot="flag", doc="nested aluminium tubes on the deck's front edge, leaning forward, "
              "extended by rubber bands once released; the flag is clipped at the top", provides="lifts what is "
              "clipped at its top and stays extended; uses its bands and a release",
@@ -108,17 +118,20 @@ CATALOGUE = [
                      "hook_depth": _p(0.5, 6.0, "in", "the hook's drop below the tip"),
                      "drop_deg": _p(0.0, 60.0, "deg", "the boom's angle below level when pushed down")}),
     PartType(name="no_treasure", slot="treasure", stock=True, doc="no treasure mechanism", provides="nothing"),
-    PartType(name="peel_chute", slot="treasure", doc="a fold-out trough: a fixed inner section from the frame's "
+    PartType(name="peel_chute", slot="treasure", doc="a fold-out acrylic-lined trough: a fixed inner section from the frame's "
              "centre up to its front edge, an outer section folded up and latched that falls forward onto the "
              "inner's slope, with a blade at its tip that rides 1 in above the trough's floor at 40 degrees in plan; "
-             "a sieve slot near the low end drops jewels to a funnel on the right; coins cross it to a deflector "
-             "on the left; two side troughs fold down from the deck's sides at 25 degrees",
+             "a sieve of two rails near the low end drops jewels to a funnel on the right; coins cross it to a deflector "
+             "on the left; two side troughs fold down from the deck's sides onto stops at a set angle",
              provides="peels what the fortress turns into its blade and sorts it by size; uses a release",
              params={"reach": _p(2.0, 16.0, "in", "the outer section's length ahead of the frame's front"),
                      "junction_z": _p(2.0, 14.0, "in", "the trough's low end, at the frame's centre"),
                      "slope_deg": _p(10.0, 50.0, "deg", "the trough's slope"),
                      "side_len": _p(2.0, 16.0, "in", "each side trough's length"),
-                     "sieve_gap": _p(0.5, 3.0, "in", "the sieve slot's length along the trough")}),
+                     "side_deg": _p(15.0, 60.0, "deg", "the side troughs' slope below level when unfolded"),
+                     "sieve_gap": _p(0.5, 3.0, "in", "the gap between the sieve's two rails (a jewel is 1.5 in across, "
+                                     "a coin 2.5 in)"),
+                     "width": _p(2.8, 6.0, "in", "the troughs' inner width (a coin is 2.5 in across)")}),
     PartType(name="drive_trip", slot="release", stock=True, doc="latches tripped by a lever when the drive "
              "stops", provides="releases every latched part 0.2 s after the robot parks; no actuator"),
     PartType(name="cam_timer", slot="release", doc="a cam shaft on a gearmotor tripping each latch at its own time",
@@ -152,8 +165,8 @@ def _uses(body: Body) -> dict[str, int]:
     u["motors"] += 1 if P["release"].type == "cam_timer" else 0
     u["mousetraps"] += 1 if P["drive"].type == "mousetrap_car" else 0
     u["mousetraps"] += 2 if P["mermaid"].type == "trap_arms" else 0
-    u["pistons"] += sum(1 for s, t in (("cannon", "gate_chute"), ("flag", "piston_boom"), ("heart", "hook_boom"))
-                        if P[s].type == t)
+    u["pistons"] += sum(1 for s, t in (("cannon", ("gate_chute",)), ("flag", FLAG_BOOMS), ("heart", ("hook_boom",)))
+                        if P[s].type in t)
     if P["flag"].type == "band_mast":
         u["bands"] += int(round(P["flag"].params["bands"]))
     return u
@@ -187,6 +200,20 @@ def _print_g(body: Body) -> dict[str, float]:
     return out
 
 
+def _boom(rb: MM.Robot, slot: str) -> dict[str, float]:
+    """A piston boom's swing and pins (inches, frame coordinates): retracted and extended angles, the pivot, the rod's
+    pin along the boom (b) and the cylinder's pin (c from the pivot at phi, at cx, cz)."""
+    kind, p = rb.flag if slot == "flag" else rb.heart
+    if slot == "flag":
+        th0, th1, pz = math.radians(p["fold_deg"]), math.radians(p["raise_deg"]), p["pivot_z"]
+    else:
+        th0, th1, pz = math.radians(MM.HOOK_FOLD_DEG), -math.radians(p["drop_deg"]), rb.H
+    b, c, phi = MM.boom_pins(th0, th1)
+    px = rb.L / 2 - 0.5
+    return {"th0": th0, "th1": th1, "px": px, "pz": pz, "b": b, "c": c, "phi": phi,
+            "cx": px + c * math.cos(phi), "cz": pz + c * math.sin(phi)}
+
+
 def envelope(body: Body) -> tuple[float, float, float]:
     """The folded robot's extent before the start (length along x, width along y, height), inches."""
     rb = _robot(body)
@@ -204,21 +231,26 @@ def envelope(body: Body) -> tuple[float, float, float]:
     if kind == "gate_chute":
         x1, top = max(x1, front + p["reach"] + 0.3), max(top, p["exit_z"] + 2.2)
     kind, p = rb.flag
-    if kind == "piston_boom":
-        x0 = min(x0, front - 0.5 - p["boom_len"] * math.cos(math.radians(5)) - 0.3)
-        top = max(top, p["pivot_z"] + p["boom_len"] * math.sin(math.radians(5)) + 0.5)
+    if kind in FLAG_BOOMS:
+        fold = math.radians(p["fold_deg"])
+        bm = _boom(rb, "flag")
+        x0 = min(x0, front - 0.5 + p["boom_len"] * math.cos(fold) - 0.3, bm["cx"] - 0.5)
+        top = max(top, p["pivot_z"] + p["boom_len"] * math.sin(fold) + MM.FLAG_H, bm["cz"] + 0.5,
+                  MM.FLAG_SENSOR_Z + 0.5 if kind == "sensed_boom" else 0.0)
     elif kind == "band_mast":
         lean = math.radians(p["lean_deg"])
         top = max(top, H + p["stage_len"] * math.cos(lean) + 0.6)
         x1 = max(x1, front - 1.0 + p["stage_len"] * math.sin(lean) + 0.6)
     kind, p = rb.heart
     if kind == "hook_boom":
-        top = max(top, H + p["boom_len"] + 0.3)
+        top = max(top, H + p["boom_len"] + 0.3, _boom(rb, "heart")["cz"] + 0.5)
     kind, p = rb.treasure
     if kind == "peel_chute":
         lay = MM.peel_layout(rb, p)
-        top = max(top, lay["z_front"] + p["reach"] / math.cos(lay["slope"]) * math.sin(math.radians(85)) + 1.6,
-                  p["junction_z"] + p["side_len"] + 0.6)
+        fold, run_out = math.radians(MM.OUTER_FOLD_DEG), p["reach"] / math.cos(lay["slope"])
+        x1 = max(x1, front + run_out * math.cos(fold) + 1.6)
+        top = max(top, lay["z_front"] + run_out * math.sin(fold) + 1.6,
+                  max(lay["z_left"], lay["z_right"]) + p["side_len"] + 0.6)
     return x1 - x0, 2 * half_y, top
 
 
@@ -272,9 +304,22 @@ def _space(body: Body, task: str) -> tuple[dict[str, tuple[float, float]], dict[
     if P["cannon"].type == "gate_chute" and want & {"cannon"}:
         sp.update(gate_delay=(0.0, 2.0), gate_open=(0.2, 1.5))
         st.update(gate_delay=0.3, gate_open=0.7)
+    if P["treasure"].type == "peel_chute" and want & {"treasure"} and "park_x" in sp:
+        # the controller parks the chute's tip just short of the fortress's rim, its blade over the top
+        reach = P["frame"].params["length"] / 2 + P["treasure"].params["reach"]
+        st["park_x"] = min(max(MM.XF - MM.RF - 0.2 - reach, sp["park_x"][0]), sp["park_x"][1])
+    if P["flag"].type in FLAG_BOOMS and want & {"flag"} and "park_x" in sp:
+        # the controller aims the raised flag at the pole: its face 0.6 in into the near face (the boom presses it flat), centred across it
+        fp, L = P["flag"].params, P["frame"].params["length"]
+        reach = L / 2 - 0.5 + fp["boom_len"] * math.cos(math.radians(fp["raise_deg"])) + 0.4 + MM.FLAG_T
+        st["park_x"] = min(max(MM.XF - MM.POLE_HALF - reach + 0.6, sp["park_x"][0]), sp["park_x"][1])
+        st["y0"] = min(max(3.0, sp["y0"][0]), sp["y0"][1])
     if P["flag"].type == "piston_boom" and want & {"flag"}:
         sp.update(flag_at=(0.2, 20.0), flag_hold=(0.3, 15.0))
         st.update(flag_at=1.0, flag_hold=4.0)
+    if P["flag"].type == "sensed_boom" and want & {"flag"}:
+        sp.update(flag_delay=(0.0, 4.0), flag_hold=(0.3, 15.0))
+        st.update(flag_delay=0.2, flag_hold=4.0)
     if cam and P["flag"].type == "band_mast" and want & {"flag"}:
         sp["t_flag"], st["t_flag"] = (0.5, 30.0), 5.0
     if P["heart"].type == "hook_boom" and want & {"heart"}:
@@ -313,6 +358,8 @@ def _label(task: str, body: Body, r: MM.Result) -> str:
     if task == "flag":
         if any("pulled off" in e for _, e in r.events):
             return "flag_pulled_off_pole"
+        if body.parts["flag"].type == "sensed_boom" and not any("pole face square" in e for _, e in r.events):
+            return "pole_face_never_sensed"
         if "below the 24 in" in n:
             return "flag_below_24in"
         return "flag_never_met_pole_square"
@@ -357,7 +404,7 @@ class ME2110World:
                    "behind the start line, that in a 40 s match leaves the dock, sorts coins and jewels off a turning "
                    "fortress onto their mounds, runs a flag up a magnetic pole, drops cannonballs into its colour's "
                    "port, topples two merfolk and brings a heart back from a chest, using only the kit's two "
-                   "gearmotors, two pistons, four mousetraps and five rubber bands, for under $120.  System 1 places "
+                   "gearmotors, two pistons, two mousetraps and five rubber bands, for under $120.  System 1 places "
                    "it in the dock, chooses where it parks and how fast it drives, and times each mechanism.")
 
     def __init__(self) -> None:
@@ -417,7 +464,7 @@ class ME2110World:
         rows = [f"folded {env[0]:.1f} x {env[1]:.1f} x {env[2]:.1f} in (length x width x height); the box is "
                 f"{BOX[0]:g} x {BOX[1]:g} x {BOX[2]:g} in, either way round, height {BOX[2]:g} in",
                 f"kit actuators used: {u['motors']} of 2 gearmotors, {u['pistons']} of 2 pistons, {u['mousetraps']} of "
-                f"4 mousetraps, {u['bands']} of 5 rubber bands",
+                f"2 mousetraps, {u['bands']} of 5 rubber bands",
                 f"mass about {mass:.2f} kg; parts bought ${self._cost(body):.2f} of ${BUDGET:g}",
                 f"frame {rb.L:g} in long, {rb.W:g} in wide, deck at {rb.H:g} in; its front is at park_x + {rb.L / 2:g} in"]
         if rb.drive == "wheels2":
@@ -442,12 +489,13 @@ class ME2110World:
             rows.append(f"cannon chute: exit floor at {p['exit_z']:g} in, {p['reach']:g} in ahead of the front, "
                         f"{ln:.1f} in long ({'holds 4 balls' if ln >= 6.7 else 'too short for 4 balls'})")
         kind, p = rb.flag
-        if kind == "piston_boom":
-            th = math.radians(p["raise_deg"])
-            b, c = MM.boom_geometry(math.radians(175), th)
+        if kind in FLAG_BOOMS:
+            th, bm = math.radians(p["raise_deg"]), _boom(rb, "flag")
             rows.append(f"flag boom raised: tip {p['boom_len'] * math.cos(th):.1f} in ahead of its pivot at "
                         f"{p['pivot_z'] + p['boom_len'] * math.sin(th):.1f} in (the flag's top 1.5 in above); the "
-                        f"piston's pin {b:.2f} in along it, its cylinder {c:.2f} in behind the pivot")
+                        f"piston's pin {bm['b']:.2f} in along it, its cylinder pinned {bm['c']:.2f} in from the pivot "
+                        f"at {math.degrees(bm['phi']):.0f} deg; the rod meets the boom at "
+                        f"{MM.boom_transmission(bm['th0'], bm['th1']):.0f} deg at worst")
         elif kind == "band_mast":
             n, sl, lean = int(round(p["stages"])), p["stage_len"], math.radians(p["lean_deg"])
             full = sl + (n - 1) * (sl - 1.5)
@@ -465,8 +513,12 @@ class ME2110World:
             rows.append(f"peel chute deployed: trough tip {p['reach']:g} in ahead of the front, its floor at "
                         f"{lay['z_tip']:.1f} in, the blade's lower edge at {lay['blade_bottom']:.1f} in (the fortress "
                         f"top is at {MM.HF:g} in, a coin {MM.COIN_T:g} in thick); side trough exits {lay['side_exit_y']:.1f} "
-                        f"in either side of centre at {lay['side_exit_z']:.1f} in (the mounds' tops are {MM.MOUND_H:g} in "
-                        f"up, centred {MM.MOUNDS['gold'][1]:g} in either side, {MM.MOUNDS['gold'][0]:g} in out)")
+                        f"in either side of centre, coins (left) at {lay['coin_exit_z']:.1f} in, jewels (right) at "
+                        f"{lay['jewel_exit_z']:.1f} in (the mounds' tops are {MM.MOUND_H:g} in "
+                        f"up, centred {MM.MOUNDS['gold'][1]:g} in either side, {MM.MOUNDS['gold'][0]:g} in out), at "
+                        f"x = park_x; troughs slope {p['slope_deg']:g} deg and sides {p['side_deg']:g} deg (the troughs are "
+                        f"acrylic-lined: a piece slides only on a slope steeper than "
+                        f"{math.degrees(math.atan(MM.SLICK_MU)):.0f} deg)")
         rows.append("arena: start line x = 0; merfolk at (20, ±10) in, bases 3.5 / 3.7 in; chest 19.9-23.1 in out, "
                     "4.7 in wide, lid propped open (a 0.4 in bump shuts it); fortress edge 27.6 in out, its centre "
                     f"{MM.XF:g} in; pole faces 2 in from its centre; mounds at ({MM.MOUNDS['gold'][0]:g}, ±15) in")
@@ -508,15 +560,17 @@ class ME2110World:
             out.append(BomLine(item="drawer_pin", qty=2, slot="mermaid"))
         if P["cannon"].type == "gate_chute":
             out.append(BomLine(item="hinge", qty=1, slot="cannon"))
-        if P["flag"].type == "piston_boom":
+        if P["flag"].type in FLAG_BOOMS:
             out += [BomLine(item="dowel", qty=1, slot="flag"), BomLine(item="hinge", qty=2, slot="flag")]
+        if P["flag"].type == "sensed_boom":
+            out.append(BomLine(item="ir_range_long", qty=1, slot="flag"))
         if P["flag"].type == "band_mast":
             out.append(BomLine(item="alu_tube", qty=int(round(P["flag"].params["stages"])), slot="flag"))
         if P["heart"].type == "hook_boom":
             out += [BomLine(item="dowel", qty=1, slot="heart"), BomLine(item="steel_hook", qty=1, slot="heart"),
                     BomLine(item="hinge", qty=2, slot="heart")]
         if P["treasure"].type == "peel_chute":
-            out.append(BomLine(item="hinge", qty=3, slot="treasure"))
+            out += [BomLine(item="hinge", qty=3, slot="treasure"), BomLine(item="acrylic_sheet", qty=1, slot="treasure")]
         if P["release"].type == "cam_timer":
             out.append(BomLine(item="print:PLA", qty=15.0, slot="release", note="cam shaft"))
         return out
@@ -549,15 +603,22 @@ class ME2110World:
             ln = MM.chute_len(P["cannon"].params["exit_z"], P["cannon"].params["reach"], rb)
             if ln < 6.7:
                 errs.append(f"the cannon chute is {ln:.1f} in long ahead of the deck; four 40 mm balls need 6.7 in")
-        for slot, kind in (("flag", "piston_boom"), ("heart", "hook_boom")):
-            if P[slot].type == kind:
-                p = P[slot].params
-                th0, th1 = (math.radians(175), math.radians(p["raise_deg"])) if slot == "flag" else \
-                    (math.radians(95), -math.radians(p["drop_deg"]))
-                b, c = MM.boom_geometry(th0, th1)
-                if b < 0.5 or c + 0.5 > rb.L:
-                    errs.append(f"the {kind}'s piston would need its rod pin {b:.2f} in along the boom and its "
-                                f"cylinder {c:.2f} in behind the pivot; the frame is {rb.L:g} in long and the pin needs "
+        for slot, kinds in (("flag", FLAG_BOOMS), ("heart", ("hook_boom",))):
+            if P[slot].type in kinds:
+                kind = P[slot].type
+                p, bm = P[slot].params, _boom(rb, slot)
+                if bm["th0"] - bm["th1"] < math.radians(10):
+                    errs.append(f"the {kind} swings {math.degrees(bm['th0'] - bm['th1']):.0f} degrees; a stroke "
+                                "needs at least 10")
+                    continue
+                mu = MM.boom_transmission(bm["th0"], bm["th1"])
+                if mu < MM.MIN_TRANSMISSION_DEG:
+                    errs.append(f"the {kind}'s rod meets the boom at {mu:.0f} degrees at worst over its swing; below "
+                                f"{MM.MIN_TRANSMISSION_DEG:g} the piston pushes along the boom and cannot steer it")
+                if bm["b"] < 0.5 or bm["cx"] < -rb.L / 2 + 0.25 or bm["cz"] < MM.BELLY + 0.5:
+                    errs.append(f"the {kind}'s piston would need its rod pin {bm['b']:.2f} in along the boom and its "
+                                f"cylinder pinned at ({bm['cx']:.1f}, {bm['cz']:.1f}) in; the frame runs from "
+                                f"x = {-rb.L / 2:g} in, its base plate is at {MM.BELLY:g} in, and the rod pin needs "
                                 "0.5 in of boom")
                 if slot == "flag" and p["pivot_z"] < rb.H:
                     errs.append(f"the flag boom's pivot ({p['pivot_z']:g} in) is below the deck ({rb.H:g} in)")
@@ -571,11 +632,19 @@ class ME2110World:
                 errs.append(f"{int(round(p['stages'])) - 1} moving stages need a band each; it has {int(round(p['bands']))}")
         if P["treasure"].type == "peel_chute":
             lay = MM.peel_layout(rb, P["treasure"].params)
-            inner = rb.L / 2 / math.cos(lay["slope"]) - 1.0 - P["treasure"].params["sieve_gap"]
+            inner = rb.L / 2 / math.cos(lay["slope"]) - MM.SLOT0 - MM.SIEVE_LEN
             if inner < 0.5:
-                errs.append(f"the inner trough is {rb.L / 2 / math.cos(lay['slope']):.1f} in long; its 1 in ledge and "
-                            f"{P['treasure'].params['sieve_gap']:g} in sieve slot leave {inner:.1f} in of floor (0.5 in "
-                            "needed)")
+                errs.append(f"the inner trough is {rb.L / 2 / math.cos(lay['slope']):.1f} in long; its {MM.SLOT0:g} in "
+                            f"ledge and {MM.SIEVE_LEN:g} in sieve leave {inner:.1f} in of floor (0.5 in needed)")
+            if P["treasure"].params["sieve_gap"] > P["treasure"].params["width"] - 0.6:
+                errs.append("the sieve's gap leaves its rails less than 0.3 in wide in a trough of width "
+                            f"{P['treasure'].params['width']:g} in")
+            if lay["jewel_exit_z"] < 0.3 or lay["coin_exit_z"] < 0.3:
+                errs.append(f"the side troughs would end {min(lay['coin_exit_z'], lay['jewel_exit_z']):.1f} in up; "
+                            "the junction is too low for them to fall that far at their slope")
+            if lay["z_jewel0"] - lay["run"] * math.tan(lay["side_angle"]) < MM.BELLY + 0.4:
+                errs.append("the jewel funnel would pass through the base plate; raise the junction or flatten the "
+                            "side slope")
             if lay["z_front"] > rb.H + 6:
                 errs.append(f"the inner trough reaches {lay['z_front']:.1f} in at the front, more than 6 in above "
                             "the deck its posts stand on")

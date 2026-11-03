@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import math
-
 import pytest
 
 from sea.evolve.core import Body, Edit, World, apply
@@ -51,7 +49,7 @@ def test_protocol_tasks_and_catalogue():
 def test_the_rules_are_laws_before_trial():
     assert any("go/no-go box" in e for e in W.check(_body(Edit(slot="frame", params={"length": 20.0, "width": 20.0}))))
     three = _body(Edit(slot="cannon", type="gate_chute", params={"exit_z": 9.5, "reach": 9.0}),
-                  Edit(slot="flag", type="piston_boom", params={"boom_len": 8.0, "pivot_z": 12.0, "raise_deg": 40.0}),
+                  Edit(slot="flag", type="piston_boom", params={"boom_len": 8.0, "fold_deg": 150.0, "pivot_z": 12.0, "raise_deg": 40.0}),
                   Edit(slot="heart", type="hook_boom", params={"boom_len": 6.0, "hook_depth": 3.0, "drop_deg": 20.0}))
     assert _uses(three)["pistons"] == 3 > KIT["pistons"] and any("3 pistons" in e for e in W.check(three))
     cam = _body(Edit(slot="release", type="cam_timer"))
@@ -121,8 +119,38 @@ def test_a_magnet_catches_only_a_flag_flat_on_a_pole_face():
     assert mt.clip and not mt.magnet  # clipped to the mast, nowhere near the pole
 
 
+def test_a_piston_boom_swings_up_and_a_fold_near_toggle_is_refused():
+    boom = {"boom_len": 10.0, "fold_deg": 150.0, "pivot_z": 12.0, "raise_deg": 40.0}
+    body = _body(Edit(slot="flag", type="piston_boom", params=boom))
+    mt = MM.Match(_robot(body), V, {"y0": 0.0, "park_x": 10.0, "duty": 0.6, "flag_at": 1.0, "flag_hold": 4.0}, horizon=4.0)
+    mt.run()
+    assert mt.clip and mt.d.xpos[mt.flag_b][2] / MM.IN > 17.0  # raised over the pivot, the flag still clipped on
+    near = _body(Edit(slot="flag", type="piston_boom", params={**boom, "fold_deg": 175.0, "raise_deg": 10.0}))
+    assert any("cannot steer it" in e for e in W.check(near))
+
+
+def test_a_sensed_boom_fixes_the_flag_when_a_pole_face_turns_square():
+    body = _body(Edit(slot="flag", type="sensed_boom", params={"boom_len": 20.0, "fold_deg": 168.0, "pivot_z": 10.0,
+                                                                 "raise_deg": 45.0}),
+                 Edit(slot="frame", params={"length": 11.0, "width": 9.0, "deck_z": 6.0}))
+    assert W.check(body) == []
+    r = _match(body, horizon=12.0, duty=0.5, park_x=18.6, y0=3.0, flag_delay=0.0, flag_hold=6.0)
+    assert any("pole face square" in e for _, e in r.events) and r.points["flag"] == 40.0
+
+
+def test_the_peel_chute_sorts_coins_onto_their_mound():
+    body = _body(Edit(slot="treasure", type="peel_chute", params={"reach": 5.4, "junction_z": 7.32, "slope_deg": 20.0,
+                                                                   "side_len": 7.7, "side_deg": 18.0, "sieve_gap": 1.8,
+                                                                   "width": 4.5}),
+                 Edit(slot="frame", params={"length": 16.0, "width": 9.3, "deck_z": 9.0}))
+    assert W.check(body) == []
+    r = _match(body, horizon=40.0, duty=0.56, park_x=13.11, y0=0.23)
+    coins = int(r.notes["treasure"].split(" coins on the mound")[0])
+    assert coins >= 5 and r.points["treasure"] >= 50.0 and not r.laws
+
+
 @pytest.mark.slow
 def test_the_loop_runs_on_the_world(tmp_path):
     s = run(RunConfig(world="me2110", arm="s1", iterations=1), tmp_path / "s1", world=ME2110World(), log=lambda m: None)
     assert s["final_held_train"] == ["activate"] and len(s["curve"]) == 1
-    assert math.isclose(len(s["train_groups"]), 7)
+    assert s["train_groups"] == 7

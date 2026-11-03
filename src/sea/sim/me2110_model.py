@@ -63,6 +63,10 @@ DOCK = 30.0
 
 # masses (kg), assumed: the brief gives none
 M_COIN, M_JEWEL, M_BALL, M_HEART = 0.025, 0.012, 0.0027, 0.020
+# the treasure chute is lined with acrylic sheet and the coins and jewels are moulded plastic: about 0.3 between them
+# (at 0.5, printed PLA, no sliding route from the fortress top to a mound fits in its 11.5 in of drop)
+SLICK_MU = PIECE_MU = 0.3
+ACRYLIC = "0.75 0.85 0.95 0.6"
 M_FOLK = 0.20  # a printed figure on its base
 M_CHEST, M_LID = 0.15, 0.04
 
@@ -74,9 +78,14 @@ PISTON_V = 0.3  # m/s, the needle valve's limit on a stroke's speed
 CYL_CLOSED = 5.5  # in, a cylinder's pin-to-pin length retracted
 TRAP_T0, TRAP_T1, TRAP_ARM = 0.45, 0.20, 1.8  # N m at the set and sprung ends of 180 degrees; its own arm (in)
 BAND_K, BAND_L0 = 40.0, 3.5  # N/m per band, free length (in); stretched to at most 3 times
+HOOK_FOLD_DEG = 95.0  # the heart's hook boom stands just past upright when retracted
+MIN_TRANSMISSION_DEG = 20.0  # the least angle between a piston's rod and the boom it swings
+VALVE_C = P_TANK0 * math.pi * (BORE * IN / 2) ** 2 / PISTON_V  # N s/m: the needle valve, as a damper on the rod
 END_HOLD = 5.0  # N: what keeps a rod seated at an end of its stroke (the end cap reacts the rest of P A)
 RAMP_S = 0.4  # s: the drive's duty ramp
 IR_RANGE = 10.0  # in: the active IR sensor's reach
+FLAG_SENSOR_Z, FLAG_IR_RANGE = 14.0, 60.0  # in: the sensed boom's long-range IR sensor, its height and reach
+FACE_SQUARE_DEG = 2.0  # how near square a pole face must turn for the sensor's range reading to bottom out
 MAGNET_N, CLIP_N = 3.0, 1.0  # N: the flag's magnet on the pole, the clip that holds it to the robot
 HOLD_TICKS = 3  # event ticks (20 ms each) a clip or magnet must be overloaded before it lets go
 PROP_MOVE, PROP_TILT = 0.4, math.radians(6.0)
@@ -199,12 +208,12 @@ def _figures() -> str:
             x, y, z = XF + JEWEL_RING * math.cos(a), JEWEL_RING * math.sin(a), HF + JEWEL_T / 2
             out.append(f'<body name="jewel{k // 3}" pos="{_v(x * IN, y * IN, z * IN)}"><freejoint/>'
                        f'<geom type="cylinder" size="{_f(JEWEL_R * IN)} {_f(JEWEL_T / 2 * IN)}" mass="{M_JEWEL}" '
-                       f'rgba="0.2 0.85 0.9 1" class="item"/></body>')
+                       f'rgba="0.2 0.85 0.9 1" class="item" friction="{PIECE_MU} 0.005 0.0001"/></body>')
         else:
             x, y, z = XF + COIN_RING * math.cos(a), COIN_RING * math.sin(a), HF + COIN_T / 2
             out.append(f'<body name="coin{k - k // 3 - (1 if k % 3 == 2 else 0)}" pos="{_v(x * IN, y * IN, z * IN)}"><freejoint/>'
                        f'<geom type="cylinder" size="{_f(COIN_R * IN)} {_f(COIN_T / 2 * IN)}" mass="{M_COIN}" '
-                       f'rgba="0.95 0.78 0.15 1" class="item"/></body>')
+                       f'rgba="0.95 0.78 0.15 1" class="item" friction="{PIECE_MU} 0.005 0.0001"/></body>')
     return "".join(out)
 
 
@@ -282,39 +291,65 @@ class Build:
     wheels: list[str] = field(default_factory=list)
     balls: list[str] = field(default_factory=list)
     flag: bool = False
+    flag_sensed: bool = False
+
+
+def boom_pin_angle(theta0: float, theta1: float) -> float:
+    """Where the cylinder's pin sits about the boom's pivot: 90 degrees beyond the middle of the swing, so that the
+    rod, the pivot and the rod's pin come into line (toggle) only outside any swing of less than 180 degrees."""
+    return (theta0 + theta1) / 2 + math.pi / 2
 
 
 def boom_geometry(theta0: float, theta1: float) -> tuple[float, float]:
-    """A piston driving a boom about its pivot from ``theta0`` (retracted) to ``theta1`` (extended), angles from
-    +x in the x-z plane.  The cylinder's pin sits a distance c behind the pivot, the rod's pin a distance b along
-    the boom: rod length^2 = b^2 + c^2 + 2 b c cos(theta), which grows monotonically as theta falls from theta0 to
-    theta1 (both in [0, pi]).  Returns (b, c) in inches so that the retracted length is CYL_CLOSED and the stroke is
-    STROKE."""
-    c0, c1 = math.cos(theta0), math.cos(theta1)
+    """A piston driving a boom about its pivot from ``theta0`` (retracted) to ``theta1`` (extended, ``theta1 <
+    theta0``), angles from +x in the x-z plane.  The cylinder's pin sits a distance c from the pivot at
+    ``boom_pin_angle``, the rod's pin a distance b along the boom: rod length^2 = b^2 + c^2 - 2 b c cos(theta - phi),
+    which grows monotonically as theta falls from theta0 to theta1.  Returns (b, c) in inches so that the retracted
+    length is CYL_CLOSED and the stroke is STROKE."""
+    phi = boom_pin_angle(theta0, theta1)
+    c0, c1 = math.cos(theta0 - phi), math.cos(theta1 - phi)
     lo, hi = 0.05, 20.0
     for _ in range(80):  # bisection on b: l(theta1) - l(theta0) - STROKE
         b = (lo + hi) / 2
         c = _c_for(b, c0)
-        l1 = math.sqrt(max(b * b + c * c + 2 * b * c * c1, 0.0))
+        l1 = math.sqrt(max(b * b + c * c - 2 * b * c * c1, 0.0))
         lo, hi = (b, hi) if l1 - CYL_CLOSED < STROKE else (lo, b)
     b = (lo + hi) / 2
     return b, _c_for(b, c0)
 
 
+def boom_pins(theta0: float, theta1: float) -> tuple[float, float, float]:
+    """(b, c, phi): the rod's pin along the boom, the cylinder's pin from the pivot (inches) and its angle."""
+    return (*boom_geometry(theta0, theta1), boom_pin_angle(theta0, theta1))
+
+
+def boom_transmission(theta0: float, theta1: float, n: int = 64) -> float:
+    """The least angle (degrees) between the rod and the boom over the swing: the piston's push across the boom goes
+    as its sine, so near 0 the rod pushes along the boom (toggle) and cannot steer it."""
+    b, c, phi = boom_pins(theta0, theta1)
+    worst = 90.0
+    for k in range(n + 1):
+        th = theta0 + (theta1 - theta0) * k / n
+        e = np.array([math.cos(th), math.sin(th)])
+        u = b * e - c * np.array([math.cos(phi), math.sin(phi)])  # the rod pin less the cylinder pin
+        worst = min(worst, math.degrees(math.asin(min(1.0, abs(float(e[0] * u[1] - e[1] * u[0])) / float(np.linalg.norm(u))))))
+    return worst
+
+
 def _c_for(b: float, c0: float) -> float:
-    """The cylinder pin's distance c behind the pivot so that the rod length at cos(theta0) = c0 is CYL_CLOSED."""
-    # c^2 + 2 b c0 c + b^2 - CYL_CLOSED^2 = 0, the positive root
+    """The cylinder pin's distance c from the pivot so that the rod length at cos(theta0 - phi) = c0 is CYL_CLOSED."""
+    # c^2 - 2 b c0 c + b^2 - CYL_CLOSED^2 = 0, the positive root
     disc = (b * c0) ** 2 - (b * b - CYL_CLOSED ** 2)
-    return -b * c0 + math.sqrt(max(disc, 0.0))
+    return b * c0 + math.sqrt(max(disc, 0.0))
 
 
 def _piston_boom(bd: Build, name: str, mech: str, pivot: tuple[float, float, float], length: float, theta0: float,
                  theta1: float, boom_geoms: str) -> str:
     """A boom on a hinge (axis y) at ``pivot`` (frame coordinates, inches), driven by a piston through the closed
     loop cylinder-rod-boom.  The boom's own frame has +x along the boom, so ``boom_geoms`` are drawn at theta = 0."""
-    b, c = boom_geometry(theta0, theta1)
+    b, c, phi = boom_pins(theta0, theta1)
     px, py, pz = pivot
-    cx, cz = px - c, pz  # the cylinder's pin, behind the pivot on the frame
+    cx, cz = px + c * math.cos(phi), pz + c * math.sin(phi)  # the cylinder's pin, on a post from the frame
     bx, bz = px + b * math.cos(theta0), pz + b * math.sin(theta0)  # the rod's pin on the boom, retracted
     ang = math.atan2(bz - cz, bx - cx)
     rod_d = ROD / 2
@@ -322,15 +357,16 @@ def _piston_boom(bd: Build, name: str, mech: str, pivot: tuple[float, float, flo
            f'<joint name="{name}_cyl" type="hinge" axis="0 1 0" damping="0.001"/>'
            + _cap("", (0, 0, 0), (CYL_CLOSED - 0.8, 0, 0), BORE / 2 + 0.1, METAL, "robot", 0.08)
            + f'<body name="{name}_rod" pos="0 0 0"><joint name="{name}_rod" type="slide" axis="1 0 0" range="0 {_f(STROKE * IN)}" '
-           f'limited="true" armature="0.05" damping="{_f(P_TANK0 * math.pi * (BORE * IN / 2) ** 2 / PISTON_V)}"/>'
+           f'limited="true" armature="0.05" damping="{_f(0.01 * VALVE_C)}"/>'
            + _cap("", (1.0, 0, 0), (CYL_CLOSED, 0, 0), rod_d, "0.8 0.8 0.82 1", "robot", 0.02) + "</body></body>")
+    # a hinge about +y turns the boom's +x from theta0 to theta0 - q, so its stroke is q in [0, theta0 - theta1]
     boom = (f'<body name="{name}" pos="{_v(px * IN, py * IN, pz * IN)}" euler="0 {_f(-theta0)} 0">'
-            f'<joint name="{name}" type="hinge" axis="0 1 0" range="{_f(min(theta1, theta0) - theta0 - 0.05)} '
-            f'{_f(max(theta1, theta0) - theta0 + 0.05)}" limited="true" damping="0.01"/>' + boom_geoms + "</body>")
+            f'<joint name="{name}" type="hinge" axis="0 1 0" range="-0.05 {_f(theta0 - theta1 + 0.05)}" limited="true" '
+            f'damping="0.01"/>' + boom_geoms + "</body>")
     bd.eqs.append(f'<connect name="{name}_loop" body1="{name}_rod" body2="{name}" anchor="{_v(CYL_CLOSED * IN, 0, 0)}"/>')
     area_ext, area_ret = math.pi * (BORE * IN / 2) ** 2, math.pi * ((BORE * IN / 2) ** 2 - (ROD * IN / 2) ** 2)
     bd.acts.append(f'<motor name="{mech}_p" joint="{name}_rod" gear="1" ctrlrange="-400 400" ctrllimited="true"/>')
-    bd.pistons[mech] = {"a_ext": area_ext, "a_ret": area_ret, "b": b, "c": c, "theta0": theta0, "theta1": theta1,
+    bd.pistons[mech] = {"a_ext": area_ext, "a_ret": area_ret, "b": b, "c": c, "phi": phi, "hinge": name, "theta0": theta0, "theta1": theta1,
                         "length": length, "rod": f"{name}_rod", "travel": STROKE * IN}  # type: ignore[dict-item]
     return cyl + boom
 
@@ -342,7 +378,15 @@ def build_robot(rb: Robot) -> Build:
     body: list[str] = []
     plate = 0.25
     body.append(_box("frame_base", (L / 2, W / 2, plate / 2), (0, 0, BELLY + plate / 2), PLY, "robot", 0.4 * rb.frame_kg))
-    body.append(_box("frame_deck", (L / 2, W / 2, plate / 2), (0, 0, H - plate / 2), PLY, "robot", 0.25 * rb.frame_kg))
+    if rb.treasure[0] == "peel_chute":  # the deck has a slot over its front half where the inner trough passes
+        sw = rb.treasure[1]["width"] / 2 + 0.3
+        body.append(_box("frame_deck", (L / 4, W / 2, plate / 2), (-L / 4, 0, H - plate / 2), PLY, "robot",
+                         0.125 * rb.frame_kg))
+        for sy in (-1, 1):
+            body.append(_box("", (L / 4, (W / 2 - sw) / 2, plate / 2), (L / 4, sy * (sw + W / 2) / 2, H - plate / 2), PLY,
+                             "robot", 0.0625 * rb.frame_kg))
+    else:
+        body.append(_box("frame_deck", (L / 2, W / 2, plate / 2), (0, 0, H - plate / 2), PLY, "robot", 0.25 * rb.frame_kg))
     for sx in (-1, 1):
         for sy in (-1, 1):
             body.append(_box("", (0.375, 0.375, (H - BELLY) / 2), (sx * (L / 2 - 0.375), sy * (W / 2 - 0.375),
@@ -424,7 +468,7 @@ def build_robot(rb: Robot) -> Build:
         # the gate: a plate across the exit on a vertical slide, lifted by the piston (modelled as its rod)
         body.append(f'<body name="gate" pos="{_v(x1 * IN, 2.5 * IN, z1 * IN)}">'
                     f'<joint name="gate" type="slide" axis="0 0 1" range="0 {_f(2.0 * IN)}" limited="true" armature="0.05" '
-                    f'damping="{_f(P_TANK0 * math.pi * (BORE * IN / 2) ** 2 / PISTON_V)}"/>'
+                    f'damping="{_f(VALVE_C)}"/>'
                     + _box("gate_plate", (0.08, 0.9, 1.0), (0.12, 0, 1.0), METAL, "robot", 0.02) + "</body>")
         bd.acts.append('<motor name="gate_p" joint="gate" gear="1" ctrlrange="-200 200" ctrllimited="true"/>')
         bd.pistons["cannon"] = {"a_ext": math.pi * (BORE * IN / 2) ** 2,
@@ -439,14 +483,20 @@ def build_robot(rb: Robot) -> Build:
                        f'friction="0.3 0.005 0.0001"/></body>')
     # ---- flag
     kind, p = rb.flag
-    if kind == "piston_boom":
+    if kind in ("piston_boom", "sensed_boom"):
         Lb, zp, raise_ = p["boom_len"], p["pivot_z"], math.radians(p["raise_deg"])
-        th0 = math.radians(175.0)  # folded back along the deck
+        th0 = math.radians(p["fold_deg"])  # folded back over the deck
         # the flag's mount at the tip, turned so that the flag stands upright, facing +x, when the boom is raised
         geoms = (_cap("", (0, 0, 0), (Lb, 0, 0), 0.3, WOOD, "robot", 0.012 * Lb)
                  + f'<body name="flagmount" pos="{_v((Lb + 0.4) * IN, 0, 0)}" euler="0 {_f(raise_)} 0"></body>')
         body.append(_piston_boom(bd, "flagboom", "flag", (front - 0.5, -3.0, zp), Lb, th0, raise_, geoms))
         bd.flag = True
+        if kind == "sensed_boom":  # the sensor on its post beside the boom's pivot, looking along +x
+            body.append(_box("flag_sensor_post", (0.375, 0.375, (FLAG_SENSOR_Z - H) / 2), (front - 0.5, -4.5,
+                             (FLAG_SENSOR_Z + H) / 2), PLY, "robot", 0.03))
+            body.append(_box("flag_sensor", (0.4, 0.8, 0.4), (front - 0.3, -4.5, FLAG_SENSOR_Z), "0.15 0.15 0.15 1",
+                             "robot", 0.01))
+            bd.flag_sensed = True
     elif kind == "band_mast":
         n, sl, lean = int(round(p["stages"])), p["stage_len"], math.radians(p["lean_deg"])
         bands = int(round(p["bands"]))
@@ -473,7 +523,7 @@ def build_robot(rb: Robot) -> Build:
     kind, p = rb.heart
     if kind == "hook_boom":
         Lb, depth, drop = p["boom_len"], p["hook_depth"], math.radians(p["drop_deg"])
-        th0 = math.radians(95.0)
+        th0 = math.radians(HOOK_FOLD_DEG)
         geoms = (_cap("", (0, 0, 0), (Lb, 0, 0), 0.3, WOOD, "robot", 0.012 * Lb)
                  # the hook hangs from the tip: a bar straight down (at the extended angle) and a toe pointing back
                  + f'<body name="hook" pos="{_v(Lb * IN, 0, 0)}" euler="0 {_f(math.pi / 2 - drop)} 0">'
@@ -499,58 +549,98 @@ def chute_len(exit_z: float, reach: float, rb: Robot) -> float:
     return CHUTE_LEN if reach >= CHUTE_LEN or rear_z - 0.1 > rb.H else max(reach, 0.5)
 
 
-def _trough(name: str, length: float, width: float, rgba: str = PRINT, mass: float = 0.05) -> str:
+def _trough(name: str, length: float, width: float, rgba: str = PRINT, mass: float = 0.05, cls: str = "robot") -> str:
     """A U-trough along +x from its own origin: floor and two walls (inches)."""
-    return (_box(f"{name}_floor" if name else "", (length / 2, width / 2, 0.06), (length / 2, 0, 0), rgba, "robot", 0.6 * mass)
-            + _box("", (length / 2, 0.06, 0.6), (length / 2, width / 2 + 0.06, 0.55), rgba, "robot", 0.2 * mass)
-            + _box("", (length / 2, 0.06, 0.6), (length / 2, -width / 2 - 0.06, 0.55), rgba, "robot", 0.2 * mass))
+    return (_box(f"{name}_floor" if name else "", (length / 2, width / 2, 0.06), (length / 2, 0, 0), rgba, cls, 0.6 * mass)
+            + _box("", (length / 2, 0.06, 0.6), (length / 2, width / 2 + 0.06, 0.55), rgba, cls, 0.2 * mass)
+            + _box("", (length / 2, 0.06, 0.6), (length / 2, -width / 2 - 0.06, 0.55), rgba, cls, 0.2 * mass))
 
 
 def peel_layout(rb: Robot, p: dict[str, float]) -> dict[str, float]:
-    """Where the peel chute's pieces sit, in the frame's coordinates (inches), deployed."""
+    """Where the peel chute's pieces sit, in the frame's coordinates (inches), deployed.  Coins leave the inner
+    trough's low end onto a cross trough that runs out to the left (+y) side trough; jewels drop through the sieve
+    slot onto a funnel that runs out to the right (-y) one; both fall at the side troughs' slope."""
     s = math.radians(p["slope_deg"])
-    jz, reach = p["junction_z"], p["reach"]
+    jz, reach, tw = p["junction_z"], p["reach"], p["width"]
     front = rb.L / 2
     z_front = jz + front * math.tan(s)  # the fixed inner trough rises from the junction (frame centre) to the front
     z_tip = z_front + reach * math.tan(s)
-    side = math.radians(25.0)
+    side = math.radians(p["side_deg"])
+    run = rb.W / 2 + tw / 2 + 0.2  # from the trough's far wall out to the frame's side
+    z_coin0 = jz - 0.4  # the cross trough's floor at the trough's wall
+    z_jewel0 = jz + SLOT0 * math.sin(s) - JEWEL_T - 0.4  # the funnel's floor at the trough's wall, a jewel's height below
+    z_l, z_r = z_coin0 - run * math.tan(side), z_jewel0 - run * math.tan(side)  # the side troughs' hinges
+    drop = p["side_len"] * math.sin(side)
     return {"slope": s, "z_front": z_front, "z_tip": z_tip, "x_tip": front + reach, "blade_bottom": z_tip + 1.0,
-            "side_angle": side, "side_exit_z": jz - 0.6 - p["side_len"] * math.sin(side),
+            "side_angle": side, "run": run, "z_coin0": z_coin0, "z_jewel0": z_jewel0, "z_left": z_l, "z_right": z_r,
+            "side_exit_z": min(z_l, z_r) - drop, "coin_exit_z": z_l - drop, "jewel_exit_z": z_r - drop,
             "side_exit_y": rb.W / 2 + p["side_len"] * math.cos(side)}
+
+
+SLOT0 = 1.0  # in: the sieve's start, along the inner trough from its low end
+OUTER_FOLD_DEG = 75.0  # the outer trough stands folded 15 degrees forward of vertical, so it always falls forward
+SIEVE_LEN, CENTRE_TILT = 3.0, 10.0  # in, deg: the sieve rails' length; the V floor's tilt toward the middle
 
 
 def _treasure(bd: Build, rb: Robot, p: dict[str, float]) -> str:
     lay = peel_layout(rb, p)
     s, jz, reach, gap, side_len = lay["slope"], p["junction_z"], p["reach"], p["sieve_gap"], p["side_len"]
-    front, tw = rb.L / 2, 3.2  # trough inner width: wider than a coin
+    front, tw = rb.L / 2, p["width"]  # the troughs' inner width
+    side, run, W2 = lay["side_angle"], lay["run"], rb.W / 2
     out = []
     # the inner trough: fixed, from the junction at the frame centre up to the front, with the sieve slot near its
     # low end; a coin bridges the slot, a jewel drops through it
     run_in = front / math.cos(s)
-    slot0 = 1.0  # in from the junction along the trough
-    out.append(f'<body name="trough_in" pos="{_v(0, 0, jz * IN)}" euler="0 {_f(-s)} 0">'
-               + _box("trough_in_floor", ((run_in - slot0 - gap) / 2, tw / 2, 0.06), (slot0 + gap + (run_in - slot0 - gap) / 2, 0, 0),
-                      PRINT, "robot", 0.04)
-               + _box("", (slot0 / 2, tw / 2, 0.06), (slot0 / 2, 0, 0), PRINT, "robot", 0.01)
-               + _box("", (run_in / 2, 0.06, 0.6), (run_in / 2, tw / 2 + 0.06, 0.55), PRINT, "robot", 0.01)
-               + _box("", (run_in / 2, 0.06, 0.6), (run_in / 2, -tw / 2 - 0.06, 0.55), PRINT, "robot", 0.01) + "</body>")
-    # the coin deflector at the junction: a wall at 45 degrees in plan, turning coins left (+y) onto the left trough
-    out.append(_box("deflector", (2.4, 0.08, 0.8), (-0.6, 0.6, jz + 0.8), PRINT, "robot", 0.01, (0, 0, -math.pi / 4)))
-    out.append(_box("", (1.2, tw / 2 + 0.6, 0.06), (-0.4, 0.6, jz - 0.15), PRINT, "robot", 0.01, (math.radians(-12), 0, 0)))
-    # under the slot, a funnel to the right trough: a plate sloping down to -y
-    sx = (slot0 + gap / 2) * math.cos(s)
-    out.append(_box("jewel_funnel", (gap / 2 + 0.5, (rb.W / 2) / 2 + 0.3, 0.06),
-                    (sx, -(rb.W / 4), jz - 0.9 - 0.2), PRINT, "robot", 0.01, (math.radians(20), 0, 0)))
+    # the sieve: SIEVE_LEN of the floor is two flat rails along the trough with a sieve_gap between them; above it
+    # the floor is a shallow V (each half tilted CENTRE_TILT toward the middle) that centres every piece, so a coin
+    # arrives centred and bridges the rails flat while a jewel drops between them
+    rw = (tw - gap) / 2
+    tilt = math.radians(CENTRE_TILT)
+    dz = -tw / 2 * math.sin(tilt)  # the V's outer edges meet the outer trough's floor; its middle is dz lower
+    rails = "".join(_box("", (SIEVE_LEN / 2, rw / 2, 0.06), (SLOT0 + SIEVE_LEN / 2, sy * (gap / 2 + rw / 2), dz), PRINT,
+                         "slick", 0.01) for sy in (-1, 1))
+    up0, up = SLOT0 + SIEVE_LEN, run_in - SLOT0 - SIEVE_LEN
+    vee = "".join(_box("trough_in_floor" if sy > 0 else "", (up / 2, tw / 4, 0.06), (up0 + up / 2, sy * tw / 4,
+                       dz + tw / 4 * math.sin(tilt)), PRINT, "slick", 0.02, (sy * tilt, 0, 0)) for sy in (-1, 1))
+    out.append(f'<body name="trough_in" pos="{_v(0, 0, jz * IN)}" euler="0 {_f(-s)} 0">' + vee
+               + rails + _box("", (SLOT0 / 2, tw / 2, 0.06), (SLOT0 / 2, 0, dz), PRINT, "slick", 0.01)
+               + _box("", (run_in / 2, 0.06, 0.6), (run_in / 2, tw / 2 + 0.06, 0.55), PRINT, "slick", 0.01)
+               + _box("", (run_in / 2, 0.06, 0.6), (run_in / 2, -tw / 2 - 0.06, 0.55), PRINT, "slick", 0.01) + "</body>")
+    # the coin cross trough under the low end: from the right wall out to the left side, falling at the side slope,
+    # with a back wall and an end wall at its high end
+    xc0, xc1 = -3.2, 0.3
+    yc0 = -tw / 2 - 0.2
+    ln = run / math.cos(side)
+    zc = lay["z_coin0"] - run * math.tan(side) / 2
+    out.append(_box("coin_cross", ((xc1 - xc0) / 2, ln / 2, 0.06), ((xc0 + xc1) / 2, yc0 + run / 2, zc), PRINT, "slick",
+                    0.02, (-side, 0, 0)))
+    out.append(_box("", (0.06, ln / 2, 0.7), (xc0 - 0.06, yc0 + run / 2, zc + 0.6), PRINT, "slick", 0.01, (-side, 0, 0)))
+    out.append(_box("", ((xc1 - xc0) / 2, 0.06, 0.7), ((xc0 + xc1) / 2, yc0 - 0.06, lay["z_coin0"] + 0.6), PRINT,
+                    "slick", 0.005))
+    # the jewel funnel under the slot: from the left wall out to the right side, falling at the side slope, with
+    # walls front and back
+    xs0, xs1 = SLOT0 * math.cos(s) - 0.4, (SLOT0 + SIEVE_LEN) * math.cos(s) + 0.4
+    zj = lay["z_jewel0"] - run * math.tan(side) / 2
+    out.append(_box("jewel_funnel", ((xs1 - xs0) / 2, ln / 2, 0.06), ((xs0 + xs1) / 2, -(yc0 + run / 2), zj), PRINT,
+                    "slick", 0.02, (side, 0, 0)))
+    for xw in (xs0 - 0.06, xs1 + 0.06):
+        out.append(_box("", (0.06, ln / 2, 0.6), (xw, -(yc0 + run / 2), zj + 0.5), PRINT, "slick", 0.005, (side, 0, 0)))
     # the outer trough, folded up and latched; it falls forward onto its stop at the trough's slope
-    fold = math.radians(85.0)
+    fold = math.radians(OUTER_FOLD_DEG)
     blade = (f'<body name="blade" pos="{_v(reach / math.cos(s) * IN, 0, 0)}" euler="0 {_f(s)} 0">'
-             # a bracket up over the rim, then the blade inward over the top at 45 degrees in plan
-             + _box("", (0.1, 0.5, 0.55), (0.0, -1.2, 0.5), METAL, "robot", 0.01)
-             + _box("blade_plate", (2.4, 0.06, 0.55), (1.6, -1.0, 1.0 + 0.55), METAL, "robot", 0.02, (0, 0, math.radians(40)))
+             # a bracket up over the rim, then the blade inward over the top at 40 degrees in plan: the top turns
+             # clockwise, carrying the pieces at its near rim toward +y, so the blade's inner end leads at -y and a
+             # piece slides along it outward, toward the robot, and drops into the trough
+             + _box("", (0.1, 0.5, 0.55), (-0.8, 2.0, 0.5), METAL, "slick", 0.01)
+             # 5.5 in long, crossing the rim 2 in to the +y side of the trough's centreline: a piece rides the
+             # blade's upstream (-y) face, its centre about a radius off it, so it crosses the rim over the trough
+             + _box("blade_plate", (2.75, 0.06, 0.55), (-0.8 + 2.75 * math.cos(math.radians(40)),
+                    2.0 - 2.75 * math.sin(math.radians(40)), 1.0 + 0.55), METAL, "slick", 0.025,
+                    (0, 0, math.radians(-40)))
              + "</body>")
     out.append(f'<body name="trough_out" pos="{_v(front * IN, 0, lay["z_front"] * IN)}" euler="0 {_f(-fold)} 0">'
                f'<joint name="trough_out" type="hinge" axis="0 1 0" range="{_f(-0.02)} {_f(fold - s + 0.02)}" limited="true" '
-               f'damping="0.02"/>' + _trough("trough_out", reach / math.cos(s), tw, mass=0.012 * reach) + blade + "</body>")
+               f'damping="0.02"/>' + _trough("trough_out", reach / math.cos(s), tw, ACRYLIC, mass=0.012 * reach, cls="slick") + blade + "</body>")
     bd.eqs.append('<joint name="chute_latch0" joint1="trough_out" polycoef="0 0 0 0 0"/>')
     latches = ["chute_latch0"]
     # the side troughs, hinged along x at the deck's sides at the junction's height, folded up (5 degrees past
@@ -558,11 +648,11 @@ def _treasure(bd: Build, rb: Robot, p: dict[str, float]) -> str:
     fold_s = math.radians(85.0)
     for j, sy in enumerate((1, -1)):
         nm = f"side{j}"
-        zf = jz - 0.6 if j == 0 else jz - 1.4
-        out.append(f'<body name="{nm}" pos="{_v(0, sy * rb.W / 2 * IN, zf * IN)}" euler="{_f(sy * fold_s)} 0 0">'
+        zf, xm = (lay["z_left"], (xc0 + xc1) / 2) if j == 0 else (lay["z_right"], (xs0 + xs1) / 2)
+        out.append(f'<body name="{nm}" pos="{_v(xm * IN, sy * W2 * IN, zf * IN)}" euler="{_f(sy * fold_s)} 0 0">'
                    f'<joint name="{nm}" type="hinge" axis="{sy} 0 0" range="{_f(-(fold_s + lay["side_angle"]) - 0.02)} 0.02" '
                    f'limited="true" damping="0.02"/>'
-                   f'<body euler="0 0 {_f(sy * math.pi / 2)}">' + _trough(f"{nm}t", side_len, 3.2, mass=0.01 * side_len)
+                   f'<body euler="0 0 {_f(sy * math.pi / 2)}">' + _trough(f"{nm}t", side_len, max(tw, 3.4), ACRYLIC, mass=0.01 * side_len, cls="slick")
                    + "</body></body>")
         bd.eqs.append(f'<joint name="chute_latch{j + 1}" joint1="{nm}" polycoef="0 0 0 0 0"/>')
         latches.append(f"chute_latch{j + 1}")
@@ -594,6 +684,7 @@ def scene(rb: Robot, v: Variant, y0: float) -> tuple[str, Build]:
   <default class="arena"><geom contype="1" conaffinity="3"/></default>
   <default class="item"><geom contype="1" conaffinity="3"/></default>
   <default class="robot"><geom contype="2" conaffinity="1"/></default>
+  <default class="slick"><geom contype="2" conaffinity="1" friction="{SLICK_MU} 0.005 0.0001"/></default>
   <default class="flag"><geom contype="4" conaffinity="1"/></default>
   <equality solref="0.004 1"/>
   <joint solreflimit="0.004 1" solimplimit="0.99 0.999 0.0005"/>
@@ -682,7 +773,9 @@ class Match:
         self.magnet = False
         self.clip = self.bd.flag
         self.clip_over = self.magnet_over = 0
+        self.flag_best = 0.0  # how close the flag ever came to sitting square on a pole face, high enough (shaping)
         self.gate_t: float | None = None
+        self.face_t: float | None = None  # when the sensed boom's sensor saw a pole face square
         self.ball_flight: dict[int, tuple[float, float, float, float, bool] | None] = {}
         self.ball_from_robot: dict[int, bool] = {}
         self.laws: list[str] = []
@@ -804,8 +897,19 @@ class Match:
                 d.ctrl[self.aid[f"m_{j}"]] = trap_torque(q) if q < math.pi - 0.02 else 0.0
         # pistons
         t0 = self.arrived_t
+        for g in self.bd.pistons.values():
+            if "hinge" in g:  # a boom's needle valve, reflected onto its hinge: c (dl/dq)^2, the same power c v^2,
+                # so the integrator takes it implicitly (on the light rod, through the loop, it rings at 2 ms steps)
+                dof = m.jnt_dofadr[self.jid[g["hinge"]]]
+                th = g["theta0"] - d.qpos[m.jnt_qposadr[self.jid[g["hinge"]]]]
+                b, cc = g["b"] * IN, g["c"] * IN
+                ln = math.sqrt(max(b * b + cc * cc - 2 * b * cc * math.cos(th - g["phi"]), 1e-12))
+                m.dof_damping[dof] = 0.01 + VALVE_C * (b * cc * math.sin(th - g["phi"]) / ln) ** 2
         for mech in self.bd.pistons:
-            if mech in ("flag", "heart"):  # timed from the robot's arrival (its encoder says it has stopped)
+            if mech == "flag" and self.bd.flag_sensed:  # fired a delay after the sensor sees a face square
+                at, hold = c.get("flag_delay", 0.2), c.get("flag_hold", 1.0)
+                ext = self.face_t is not None and self.face_t + at <= t < self.face_t + at + hold
+            elif mech in ("flag", "heart"):  # timed from the robot's arrival (its encoder says it has stopped)
                 at, hold = c.get(f"{mech}_at", 99.0), c.get(f"{mech}_hold", 1.0)
                 ext = t0 is not None and t0 + at <= t < t0 + at + hold
             else:  # the cannon's gate: open for gate_open s, gate_delay s after the IR sees our port's tab
@@ -821,6 +925,25 @@ class Match:
             d.ctrl[self.aid["gate_p" if mech == "cannon" else f"{mech}_p"]] = f
         if "cannon" in self.bd.pistons and self.gate_t is None and self.arrived_t is not None:
             self._ir()
+        if self.bd.flag_sensed and self.face_t is None and self.arrived_t is not None and t > self.arrived_t + 0.3:
+            self._face()
+
+    def _face(self) -> None:
+        """The sensed boom's range sensor looks along the robot's +x over the fortress wall: when its beam lands on
+        the pole within range, the reading bottoms out as a face turns square to it."""
+        d, m = self.d, self.m
+        s = d.geom_xpos[m.geom("flag_sensor").id]
+        fx = d.xmat[self.bid["robot"]].reshape(3, 3)[:, 0]
+        rel = d.geom_xpos[self.pole_g] - s
+        along = float(rel[:2] @ fx[:2])
+        across = abs(float(rel[0] * fx[1] - rel[1] * fx[0]))
+        if not (0.0 < along < FLAG_IR_RANGE * IN and across < POLE_HALF * IN) or s[2] < HF * IN:
+            return
+        px = d.geom_xmat[self.pole_g].reshape(3, 3)[:, 0]
+        ang = math.degrees(math.atan2(px[1], px[0]) - math.atan2(fx[1], fx[0])) % 90.0
+        if min(ang, 90.0 - ang) < FACE_SQUARE_DEG:
+            self.face_t = d.time
+            self.log("the flag's sensor sees a pole face square")
 
     def _ir(self) -> None:
         """The IR sensor at the gate looks along +x: it sees our port's yellow tab when the tab faces it."""
@@ -897,16 +1020,31 @@ class Match:
         f = d.efc_force[: d.nefc][rows]
         return float(np.linalg.norm(f[:3])) if f.size else 0.0
 
+    def hold_load(self, name: str, press: float) -> float:
+        """The load (N) a weld holding the flag carries as a clip or magnet: shear plus pull, without the push that
+        presses the flag flat onto what holds it (a face takes that by contact).  ``press`` is +1 when that push
+        is along the flag's face normal (its mount behind it), -1 when against it (the pole in front)."""
+        d, e = self.d, self.eid[name]
+        rows = np.where((d.efc_type[: d.nefc] == mujoco.mjtConstraint.mjCNSTR_EQUALITY) & (d.efc_id[: d.nefc] == e))[0]
+        if rows.size < 3:
+            return 0.0
+        f = d.efc_force[rows[:3]]  # the weld's force on the flag, world frame
+        n = d.xmat[self.flag_b].reshape(3, 3)[:, 0]
+        fn = float(f @ n)
+        shear = f - fn * n
+        pull = max(0.0, -press * fn)
+        return float(math.sqrt(float(shear @ shear) + pull * pull))
+
     def _flag_events(self) -> None:
         """The clip lets go above CLIP_N; the magnet catches a flag pressed flat on a pole face, lets go above MAGNET_N."""
         d = self.d
-        self.clip_over = self.clip_over + 1 if self.clip and self.eq_force("clip") > CLIP_N else 0
+        self.clip_over = self.clip_over + 1 if self.clip and self.hold_load("clip", 1.0) > CLIP_N else 0
         if self.clip and self.clip_over >= HOLD_TICKS:
             self.clip = False
             d.eq_active[self.eid["clip"]] = 0
             self.log("the flag's clip lets go of the robot")
         if self.magnet:
-            self.magnet_over = self.magnet_over + 1 if self.eq_force("magnet") > MAGNET_N else 0
+            self.magnet_over = self.magnet_over + 1 if self.hold_load("magnet", -1.0) > MAGNET_N else 0
             if self.magnet_over >= HOLD_TICKS:
                 self.magnet = False
                 d.eq_active[self.eid["magnet"]] = 0
@@ -916,6 +1054,10 @@ class Match:
         local = R.T @ (d.xpos[self.flag_b] - d.geom_xpos[self.pole_g])
         nrm = d.xmat[self.flag_b].reshape(3, 3)[:, 0]  # the flag's face normal, world
         nl = R.T @ nrm
+        off = max(0.0, max(abs(local[0]), abs(local[1])) / IN - POLE_HALF - FLAG_T)
+        low = max(0.0, 24.0 - FLAG_H / 2 - d.xpos[self.flag_b][2] / IN)
+        skew = 1.0 - max(abs(nl[0]), abs(nl[1]))
+        self.flag_best = max(self.flag_best, max(0.0, 1.0 - (off + low + 10.0 * skew) / 30.0))
         for ax in (0, 1):
             for sgn in (-1, 1):
                 gap = sgn * local[ax] / IN - POLE_HALF - FLAG_T
@@ -979,10 +1121,7 @@ class Match:
         balls = [d.xpos[self.bid[nm]] / IN for nm in self.bd.balls]
         out["cannon"] = float(np.mean([max(0.0, 1 - np.linalg.norm(p - port) / 30.0) for p in balls])) if balls else 0.0
         if self.bd.flag:
-            R = d.geom_xmat[self.pole_g].reshape(3, 3)
-            loc = R.T @ (d.xpos[self.flag_b] - d.geom_xpos[self.pole_g]) / IN
-            gap = max(0.0, max(abs(loc[0]), abs(loc[1])) - POLE_HALF) + max(0.0, 24.0 - (loc[2] + (POLE_TOP + HF) / 2))
-            out["flag"] = 1.0 if self.magnet else max(0.0, 1 - gap / 30.0) * 0.8
+            out["flag"] = 1.0 if self.magnet else 0.8 * self.flag_best
         else:
             out["flag"] = 0.0
         hb = self.bid["heart"]
