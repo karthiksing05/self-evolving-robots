@@ -2433,3 +2433,12 @@ Nothing System 2 wrote could enter any of these.
 - every law gives the same output on those 13 bodies;
 - the full suite stays green with the same verdicts;
 - no result moves, and no campaign is re-run.
+
+**Measured.**
+- **Model equality.** The graph compiles the same model as the deleted builders on all 13 configurations: the revolute jaw, and the parallelogram, prismatic and long slide each at four values spanning their ranges. Bodies, joints, solids (positions, sizes, meshes), equalities, excluded pairs, the rods' data and masses all agree within 1e-6 (`tests/mech/test_seed_equivalence.py`). Planting a PLA density 0.1 % too high fails it.
+- **Law equality.** The laws reading the graph give the same output on all 13 bodies as they did reading name tables: the refusals (the 60-tooth pinion against the wrist, the 50 mm sector against the rolled wrist), the fastened pairs, the loose parts, the clashes and the carried gaps (`tests/mech/test_laws_equivalence.py`).
+- **The measured transmission angle** at the parallelogram's loop pin equals the old formula's within 0.1°. A follower pin moved onto the closing axis is now caught as a real geometric fault: the links come within about 10° of toggle. The old test planted that fault by overriding the formula.
+- **Two things are deferred, with reasons:**
+  - **The catalogue jaws' bill of materials stays the hand estimate** (`worlds/gripper.py`: PLA grams by formula, screws and bearings the graph does not yet hold). Taking it from the graph's volumes would change prices, and so the keep rule, so it needs its own measured decision. Mechanisms System 2 builds (C1) take theirs from the graph from the start.
+  - **The catalogue's kinematic facts stay `design/fingers.py`'s**, for the same reason. A built idea's facts come from the simulator.
+- **Full suite:** 710 passed, 2 skipped, 1 xfailed (the 683 before, plus the 27 equivalence tests).
