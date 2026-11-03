@@ -23,6 +23,7 @@ for the match it starts from what it found for each task.
 from __future__ import annotations
 
 import math
+import re
 import time
 import zlib
 from collections.abc import Sequence
@@ -215,6 +216,15 @@ def _boom(rb: MM.Robot, slot: str) -> dict[str, float]:
             "cx": px + c * math.cos(phi), "cz": pz + c * math.sin(phi)}
 
 
+def _part(label: str, P: dict[str, Any]) -> str:
+    """'the treasure's treasure_part3' -> 'the treasure (peel_chute)'; a named part keeps its name."""
+    mech, part = label[len("the "):].split("'s ", 1)
+    slot = "mermaid" if mech == "mermaid" else mech
+    kind = f" ({P[slot].type})" if slot in P else ""
+    named = "" if re.fullmatch(r"\w+_part\d+", part) else f"'s {part.replace('_', ' ')}"
+    return f"the {mech}{kind}{named}"
+
+
 def envelope(body: Body) -> tuple[float, float, float]:
     """The folded robot's extent before the start (length along x, width along y, height), inches."""
     rb = _robot(body)
@@ -250,8 +260,10 @@ def envelope(body: Body) -> tuple[float, float, float]:
         lay = MM.peel_layout(rb, p)
         fold, run_out = math.radians(MM.OUTER_FOLD_DEG), p["reach"] / math.cos(lay["slope"])
         x1 = max(x1, front + run_out * math.cos(fold) + 1.6)
+        side_up = math.radians(MM.SIDE_FOLD_DEG)
         top = max(top, lay["z_front"] + run_out * math.sin(fold) + 1.6,
-                  max(lay["z_left"], lay["z_right"]) + p["side_len"] + 0.6)
+                  max(lay["z_left"], lay["z_right"]) + p["side_len"] * math.sin(side_up) + 0.6)
+        half_y = max(half_y, W / 2 + MM.SIDE_OUT + p["side_len"] * math.cos(side_up) + 0.1)
     return x1 - x0, 2 * half_y, top
 
 
@@ -520,6 +532,8 @@ class ME2110World:
         return [
             "Every part must fit the 12 x 24 x 18 in box folded; anything larger must unfold after the start, by an "
             "actuator, a released spring or gravity.",
+            "Two parts cannot be in one place: every mechanism shares the base with the others, stowed, deployed and "
+            "on its way between, and fastened to the frame it may not swing into it.",
             "The kit's actuators are the budget that matters: each mechanism that moves needs one, and a gearmotor, "
             "piston, mousetrap or band used by one task is not available to another.",
             "A piston pushes pressure times area through a lever: the lever's arm trades force for swing; at 40 s "
@@ -640,6 +654,10 @@ class ME2110World:
             if lay["z_front"] > rb.H + 6:
                 errs.append(f"the inner trough reaches {lay['z_front']:.1f} in at the front, more than 6 in above "
                             "the deck its posts stand on")
+        if not errs:  # parts cannot share space: measured on the built model, every mechanism swept through its motion
+            for over, a, b, pose in MM.interference(rb):
+                errs.append(f"{_part(a, P)} and {_part(b, P)} pass {over:.2f} in into each other with {pose}; two "
+                            "parts cannot be in one place")
         return errs
 
     def manifest(self) -> dict[str, Any]:

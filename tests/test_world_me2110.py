@@ -142,11 +142,24 @@ def test_the_peel_chute_sorts_coins_onto_their_mound():
     body = _body(Edit(slot="treasure", type="peel_chute", params={"reach": 5.4, "junction_z": 7.32, "slope_deg": 20.0,
                                                                    "side_len": 7.7, "side_deg": 18.0, "sieve_gap": 1.8,
                                                                    "width": 4.5}),
-                 Edit(slot="frame", params={"length": 16.0, "width": 9.3, "deck_z": 9.0}))
+                 Edit(slot="frame", params={"length": 16.0, "width": 8.0, "deck_z": 9.0}))
     assert W.check(body) == []
     r = _match(body, horizon=40.0, duty=0.56, park_x=13.11, y0=0.23)
     coins = int(r.notes["treasure"].split(" coins on the mound")[0])
     assert coins >= 5 and r.points["treasure"] >= 50.0 and not r.laws
+
+
+def test_two_mechanisms_cannot_share_space():
+    frame = Edit(slot="frame", params={"length": 12.0, "width": 9.0, "deck_z": 8.0})
+    cannon = Edit(slot="cannon", type="gate_chute", params={"exit_z": 9.5, "reach": 9.8})
+    clear = _body(cannon, Edit(slot="mermaid", type="push_bar", params={"bar_w": 12.0, "bar_z": 4.0}), frame)
+    assert W.check(clear) == [] and MM.interference(_robot(clear)) == []
+    through = _body(cannon, Edit(slot="mermaid", type="push_bar", params={"bar_w": 12.0, "bar_z": 8.0}), frame)
+    errs = W.check(through)
+    assert len(errs) == 1 and "push_bar" in errs[0] and "gate_chute" in errs[0] and "one place" in errs[0]
+    # a mechanism fastened to the frame overlaps it where it is mounted; only going further in as it moves counts
+    arms = _body(Edit(slot="mermaid", type="trap_arms", params={"arm_len": 10.0, "arm_z": 5.0}))
+    assert MM.interference(_robot(arms)) == []
 
 
 @pytest.mark.slow

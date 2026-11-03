@@ -2248,3 +2248,34 @@ Each task was checked for one body that achieves it, so that no group measures a
 
 **Measured** (System 1 on the stock, before any campaign). The stock fails the match on every variant: 11 points on train (it parks back at x = -6.6 in, short of the merfolk) and 16 on both tests (11 + 5 for a merfolk moved). The prediction said 16; System 1's 10-sample search on train settled on a parking spot that misses the merfolk. The six task groups are untouched.
 - **No hand-written aim** (before any campaign). System 1's flag and treasure searches had started from a parking spot computed from the body's geometry (where the raised flag or the chute's tip lands). That was a designer's help, so it is gone: System 1 starts from the same default for every body, and finding the spot is the harness's job.
+
+## D-075 ME 2110 parts cannot share space (judge: world_me2110)
+
+**Why.** A physics review before the first campaign found that the robot's parts never meet. The robot class has contype 2 and conaffinity 1, so robot geoms never collide with one another. Most fixed mechanisms (the chute, the push bar, the sensor post, the tray) are geoms on the one robot body anyway, and MuJoCo never collides geoms on the same body. A push bar could stand inside the cannon chute, or a boom swing through a trough, and `check` would pass it. Once System 2 starts stacking mechanisms onto one base, every match point would be suspect. The campaign was stopped at iteration 1 (no result kept) and restarted after this change. The law:
+- every robot geom is tagged with its mechanism (frame, drive, mermaid, cannon, flag, heart, treasure; the flag plate rides its mount);
+- each mechanism is swept from stowed to deployed in 12 steps, with the others all stowed and then all deployed. Piston loops are closed analytically: the cylinder turns and the rod slides to keep the pin on the boom;
+- two mechanisms' parts may not overlap by more than 0.1 in anywhere;
+- a mechanism is fastened to the frame, so against the frame only the growth beyond its mounted overlap counts. A boom's pivot sits on the deck; a boom swinging down through the deck does not;
+- a piston's cylinder and rod may pass through the frame's plates (a slot is cut for them), never through another mechanism;
+- this is measured with `mj_geomDistance` on the compiled model, at 10–40 ms per body.
+
+The review also found two places where the model itself broke the law, through no choice of System 2's (world tier, in the same commit because the law exposed them):
+- the mousetrap's base was modelled inside the swinging arm and rotated through the frame's corner post. It is now screwed to the frame; only the bail swings;
+- the peel chute's side troughs stood folded with their walls toward the frame, 0.79 in through the deck. They now hinge 1.2 in outboard (`SIDE_OUT`), and the cross trough and funnel run out to them. `envelope` now counts the folded side troughs in the robot's width; it had left them out.
+
+**Prediction** (before the measurements below):
+- the stock and every hand-checked body that fits the box pass the law;
+- planted clashes are refused with both parts named: a push bar at the cannon's height, trap arms that swing through a side trough, and a hook boom whose tray meets the peel chute;
+- the peel chute's reachability body, honestly 13.2 in wide folded, no longer fits the box. An 8 in frame does fit, and there it still sorts.
+
+**Measured.** All three predictions held:
+- **Hand-checked bodies:** the stock, the trap arms, the cannon, the sensed boom and the peel chute body pass the law.
+- **Planted clashes:**
+  - push bar against the cannon chute's mount: 0.90 in;
+  - trap arms against a side trough: 0.22 in;
+  - hook tray against the peel chute: 0.38 in.
+- **Peel chute:** on an 8 in frame (the test body's width, 9.3 to 8 in) it scores 99 points (9 coins) with the same controls.
+- **Still idealised (noted, not changed):**
+  - parts of different mechanisms still do not collide in the dynamic sim. The sweep covers each mechanism's designed path, not a boom knocked off it;
+  - latches release at exact times;
+  - the magnet welds within 25° and 0.12 in.

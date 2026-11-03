@@ -31,6 +31,7 @@ and returns each task's points, what happened, and the laws the run broke.
 from __future__ import annotations
 
 import math
+import re
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -292,6 +293,8 @@ class Build:
     balls: list[str] = field(default_factory=list)
     flag: bool = False
     flag_sensed: bool = False
+    part_of: dict[str, str] = field(default_factory=dict)  # robot geom name -> the mechanism it belongs to
+    moves: dict[str, list[tuple[str, float, float]]] = field(default_factory=dict)  # mechanism -> (joint, stowed, deployed)
 
 
 def boom_pin_angle(theta0: float, theta1: float) -> float:
@@ -355,10 +358,11 @@ def _piston_boom(bd: Build, name: str, mech: str, pivot: tuple[float, float, flo
     rod_d = ROD / 2
     cyl = (f'<body name="{name}_cyl" pos="{_v(cx * IN, py * IN, cz * IN)}" euler="0 {_f(-ang)} 0">'
            f'<joint name="{name}_cyl" type="hinge" axis="0 1 0" damping="0.001"/>'
-           + _cap("", (0, 0, 0), (CYL_CLOSED - 0.8, 0, 0), BORE / 2 + 0.1, METAL, "robot", 0.08)
+           + _cap(f"{name}_cylinder", (0, 0, 0), (CYL_CLOSED - 0.8, 0, 0), BORE / 2 + 0.1, METAL, "robot", 0.08)
            + f'<body name="{name}_rod" pos="0 0 0"><joint name="{name}_rod" type="slide" axis="1 0 0" range="0 {_f(STROKE * IN)}" '
            f'limited="true" armature="0.05" damping="{_f(0.01 * VALVE_C)}"/>'
-           + _cap("", (1.0, 0, 0), (CYL_CLOSED, 0, 0), rod_d, "0.8 0.8 0.82 1", "robot", 0.02) + "</body></body>")
+           + _cap(f"{name}_rodbar", (1.0, 0, 0), (CYL_CLOSED, 0, 0), rod_d, "0.8 0.8 0.82 1", "robot", 0.02)
+           + "</body></body>")
     # a hinge about +y turns the boom's +x from theta0 to theta0 - q, so its stroke is q in [0, theta0 - theta1]
     boom = (f'<body name="{name}" pos="{_v(px * IN, py * IN, pz * IN)}" euler="0 {_f(-theta0)} 0">'
             f'<joint name="{name}" type="hinge" axis="0 1 0" range="-0.05 {_f(theta0 - theta1 + 0.05)}" limited="true" '
@@ -368,6 +372,7 @@ def _piston_boom(bd: Build, name: str, mech: str, pivot: tuple[float, float, flo
     bd.acts.append(f'<motor name="{mech}_p" joint="{name}_rod" gear="1" ctrlrange="-400 400" ctrllimited="true"/>')
     bd.pistons[mech] = {"a_ext": area_ext, "a_ret": area_ret, "b": b, "c": c, "phi": phi, "hinge": name, "theta0": theta0, "theta1": theta1,
                         "length": length, "rod": f"{name}_rod", "travel": STROKE * IN}  # type: ignore[dict-item]
+    bd.moves[mech] = [(name, 0.0, theta0 - theta1)]
     return cyl + boom
 
 
@@ -376,6 +381,7 @@ def build_robot(rb: Robot) -> Build:
     bd = Build()
     L, W, H = rb.L, rb.W, rb.H
     body: list[str] = []
+    marks: list[tuple[int, str]] = [(0, "frame")]
     plate = 0.25
     body.append(_box("frame_base", (L / 2, W / 2, plate / 2), (0, 0, BELLY + plate / 2), PLY, "robot", 0.4 * rb.frame_kg))
     if rb.treasure[0] == "peel_chute":  # the deck has a slot over its front half where the inner trough passes
@@ -383,7 +389,7 @@ def build_robot(rb: Robot) -> Build:
         body.append(_box("frame_deck", (L / 4, W / 2, plate / 2), (-L / 4, 0, H - plate / 2), PLY, "robot",
                          0.125 * rb.frame_kg))
         for sy in (-1, 1):
-            body.append(_box("", (L / 4, (W / 2 - sw) / 2, plate / 2), (L / 4, sy * (sw + W / 2) / 2, H - plate / 2), PLY,
+            body.append(_box(f"frame_deck_{'lr'[sy > 0]}", (L / 4, (W / 2 - sw) / 2, plate / 2), (L / 4, sy * (sw + W / 2) / 2, H - plate / 2), PLY,
                              "robot", 0.0625 * rb.frame_kg))
     else:
         body.append(_box("frame_deck", (L / 2, W / 2, plate / 2), (0, 0, H - plate / 2), PLY, "robot", 0.25 * rb.frame_kg))
@@ -393,6 +399,7 @@ def build_robot(rb: Robot) -> Build:
                                                                    (H + BELLY) / 2), PLY, "robot", 0.05 * rb.frame_kg))
     body.append(_box("electronics", (min(2.5, L / 2 - 1), min(2.0, W / 2 - 1), 0.75), (-L / 4, 0, BELLY + plate + 0.75),
                      "0.2 0.5 0.3 1", "robot", 0.15 * rb.frame_kg))
+    marks.append((len(body), "drive"))
     # ---- drive
     if rb.drive in ("wheels2", "mousetrap_car"):
         r = rb.wheel_r
@@ -423,6 +430,7 @@ def build_robot(rb: Robot) -> Build:
             for sy in (-1, 1):
                 body.append(_box("", (0.5, 0.5, BELLY / 2), (sx * (L / 2 - 0.5), sy * (W / 2 - 0.5), BELLY / 2), RUBBER,
                                  "robot", 0.01, None, 'friction="0.8 0.005 0.0001"'))
+    marks.append((len(body), "mermaid"))
     front = L / 2
     # ---- mermaid
     kind, p = rb.mermaid
@@ -439,12 +447,15 @@ def build_robot(rb: Robot) -> Build:
             # folded along the frame's side pointing back; the trap swings it out and forward through 180 degrees
             body.append(f'<body name="{nm}" pos="{_v(front * IN, sy * (W / 2) * IN, z * IN)}" euler="0 0 {_f(math.pi)}">'
                         f'<joint name="{nm}" type="hinge" axis="0 0 {-sy}" range="0 {_f(math.pi)}" limited="true" damping="0.002"/>'
-                        + _cap("", (0, 0, 0), (a, 0, 0), 0.25, PRINT, "robot", 0.004 * a + 0.01)
-                        + _box("", (0.6, 0.6, 0.4), (-0.3, 0, -0.9), "0.7 0.55 0.3 1", "robot", 0.03) + "</body>")
+                        + _cap("", (0, 0, 0), (a, 0, 0), 0.25, PRINT, "robot", 0.004 * a + 0.01) + "</body>")
+            # the trap's base, screwed to the frame under the arm's hinge; only its bail (the arm) swings
+            body.append(_box("", (0.6, 0.6, 0.4), (front + 0.3, sy * (W / 2), z - 0.9), "0.7 0.55 0.3 1", "robot", 0.03))
             bd.eqs.append(f'<joint name="arm_latch{j}" joint1="{nm}" polycoef="0 0 0 0 0"/>')
             bd.acts.append(f'<motor name="m_{nm}" joint="{nm}" gear="1" ctrlrange="0 1" ctrllimited="true"/>')
         bd.traps["mermaid"] = ["arm0", "arm1"]
+        bd.moves["mermaid"] = [("arm0", 0.0, math.pi), ("arm1", 0.0, math.pi)]
         bd.latches["mermaid"] = ["arm_latch0", "arm_latch1"]
+    marks.append((len(body), "cannon"))
     # ---- cannon: a chute on the deck that tilts down to its exit, a gate at the exit on a piston
     kind, p = rb.cannon
     if kind == "gate_chute":
@@ -471,6 +482,7 @@ def build_robot(rb: Robot) -> Build:
                     f'damping="{_f(VALVE_C)}"/>'
                     + _box("gate_plate", (0.08, 0.9, 1.0), (0.12, 0, 1.0), METAL, "robot", 0.02) + "</body>")
         bd.acts.append('<motor name="gate_p" joint="gate" gear="1" ctrlrange="-200 200" ctrllimited="true"/>')
+        bd.moves["cannon"] = [("gate", 0.0, 2.0 * IN)]
         bd.pistons["cannon"] = {"a_ext": math.pi * (BORE * IN / 2) ** 2,
                                 "a_ret": math.pi * ((BORE * IN / 2) ** 2 - (ROD * IN / 2) ** 2), "rod": "gate",  # type: ignore[dict-item]
                                 "travel": 2.0 * IN}
@@ -481,6 +493,7 @@ def build_robot(rb: Robot) -> Build:
             bd.xml += (f'<body name="ball{k}" pos="{{X}}{_f(bx * IN)} {{Y}}{_f(2.5 * IN)} {_f(bz * IN)}"><freejoint/>'
                        f'<geom type="sphere" size="{_f(BALL_R * IN)}" mass="{M_BALL}" rgba="0.05 0.05 0.05 1" class="item" '
                        f'friction="0.3 0.005 0.0001"/></body>')
+    marks.append((len(body), "flag"))
     # ---- flag
     kind, p = rb.flag
     if kind in ("piston_boom", "sensed_boom"):
@@ -515,10 +528,12 @@ def build_robot(rb: Robot) -> Build:
                              0.004 * sl * (6 - s)))
             close += "</body>"
             bd.eqs.append(f'<joint name="mast_latch{s}" joint1="mast{s}" polycoef="0 0 0 0 0"/>')
+            bd.moves.setdefault("flag", []).append((f"mast{s}", 0.0, travel * IN))
         inner += f'<body name="flagmount" pos="{_f(0.7 * IN)} 0 {_f((sl - 1.6) * IN)}" euler="0 {_f(-lean)} 0"></body>'
         body.append(inner + close)
         bd.latches["flag"] = [f"mast_latch{s}" for s in range(1, n)]
         bd.flag = True
+    marks.append((len(body), "heart"))
     # ---- heart: a hook boom, pushed down into the chest by its piston and pulled back up by it
     kind, p = rb.heart
     if kind == "hook_boom":
@@ -531,12 +546,28 @@ def build_robot(rb: Robot) -> Build:
                  + _cap("hook_toe", (depth, 0, 0), (depth, 0, -1.2), 0.15, METAL, "robot", 0.004) + "</body>")
         body.append(_piston_boom(bd, "hookboom", "heart", (front - 0.5, 0.0, H), Lb, th0, -drop, geoms))
         body.append(_box("tray", (1.8, 1.8, 0.1), (front - 2.5, 0, H + 0.1), PRINT, "robot", 0.02))
+    marks.append((len(body), "treasure"))
     # ---- treasure: the peel blade on a fold-out trough, a size sieve, and two side troughs to the mounds
     kind, p = rb.treasure
     if kind == "peel_chute":
         body.append(_treasure(bd, rb, p))
-    bd.xml = ("".join(body), bd.xml)  # type: ignore[assignment]
+    marks.append((len(body), ""))
+    tree = "".join(_tag(bd, "".join(body[i:j]), mech) for (i, mech), (j, _) in zip(marks, marks[1:], strict=False))
+    bd.xml = (tree, bd.xml)  # type: ignore[assignment]
     return bd
+
+
+def _tag(bd: Build, xml: str, mech: str) -> str:
+    """Name every geom of one mechanism's XML that has no name, and note which mechanism each geom belongs to."""
+    def one(mt: re.Match[str]) -> str:
+        nm = re.match(r'<geom name="([^"]+)"', mt.group(0))
+        if nm:
+            bd.part_of[nm.group(1)] = mech
+            return mt.group(0)
+        name = f"{mech}_part{sum(1 for v in bd.part_of.values() if v == mech)}"
+        bd.part_of[name] = mech
+        return f'<geom name="{name}" ' + mt.group(0)[len("<geom "):]
+    return re.sub(r"<geom [^>]*>", one, xml)
 
 
 CHUTE_LEN, CHUTE_DEG = 7.0, 8.0  # in, deg: the cannon chute holds four balls on a gentle slope to its exit
@@ -566,7 +597,7 @@ def peel_layout(rb: Robot, p: dict[str, float]) -> dict[str, float]:
     z_front = jz + front * math.tan(s)  # the fixed inner trough rises from the junction (frame centre) to the front
     z_tip = z_front + reach * math.tan(s)
     side = math.radians(p["side_deg"])
-    run = rb.W / 2 + tw / 2 + 0.2  # from the trough's far wall out to the frame's side
+    run = rb.W / 2 + tw / 2 + 0.2 + SIDE_OUT  # from the trough's far wall out to the side troughs' hinges
     z_coin0 = jz - 0.4  # the cross trough's floor at the trough's wall
     z_jewel0 = jz + SLOT0 * math.sin(s) - JEWEL_T - 0.4  # the funnel's floor at the trough's wall, a jewel's height below
     z_l, z_r = z_coin0 - run * math.tan(side), z_jewel0 - run * math.tan(side)  # the side troughs' hinges
@@ -574,9 +605,13 @@ def peel_layout(rb: Robot, p: dict[str, float]) -> dict[str, float]:
     return {"slope": s, "z_front": z_front, "z_tip": z_tip, "x_tip": front + reach, "blade_bottom": z_tip + 1.0,
             "side_angle": side, "run": run, "z_coin0": z_coin0, "z_jewel0": z_jewel0, "z_left": z_l, "z_right": z_r,
             "side_exit_z": min(z_l, z_r) - drop, "coin_exit_z": z_l - drop, "jewel_exit_z": z_r - drop,
-            "side_exit_y": rb.W / 2 + p["side_len"] * math.cos(side)}
+            "side_exit_y": rb.W / 2 + SIDE_OUT + p["side_len"] * math.cos(side)}
 
 
+SIDE_OUT = 1.2  # in: the side troughs hinge this far outboard of the frame, so that folded up their walls (1.15 in
+# tall, facing the frame) clear the deck's edge
+SIDE_WALL = 1.15  # in: a trough's floor and wall height
+SIDE_FOLD_DEG = 85.0  # the side troughs stand folded 5 degrees past vertical, outward
 SLOT0 = 1.0  # in: the sieve's start, along the inner trough from its low end
 OUTER_FOLD_DEG = 75.0  # the outer trough stands folded 15 degrees forward of vertical, so it always falls forward
 SIEVE_LEN, CENTRE_TILT = 3.0, 10.0  # in, deg: the sieve rails' length; the V floor's tilt toward the middle
@@ -643,19 +678,21 @@ def _treasure(bd: Build, rb: Robot, p: dict[str, float]) -> str:
                f'damping="0.02"/>' + _trough("trough_out", reach / math.cos(s), tw, ACRYLIC, mass=0.012 * reach, cls="slick") + blade + "</body>")
     bd.eqs.append('<joint name="chute_latch0" joint1="trough_out" polycoef="0 0 0 0 0"/>')
     latches = ["chute_latch0"]
+    bd.moves["treasure"] = [("trough_out", 0.0, fold - s)]
     # the side troughs, hinged along x at the deck's sides at the junction's height, folded up (5 degrees past
     # vertical, outward) and latched; released, each falls outward onto its stop at SIDE_DEG below level
-    fold_s = math.radians(85.0)
+    fold_s = math.radians(SIDE_FOLD_DEG)
     for j, sy in enumerate((1, -1)):
         nm = f"side{j}"
         zf, xm = (lay["z_left"], (xc0 + xc1) / 2) if j == 0 else (lay["z_right"], (xs0 + xs1) / 2)
-        out.append(f'<body name="{nm}" pos="{_v(xm * IN, sy * W2 * IN, zf * IN)}" euler="{_f(sy * fold_s)} 0 0">'
+        out.append(f'<body name="{nm}" pos="{_v(xm * IN, sy * (W2 + SIDE_OUT) * IN, zf * IN)}" euler="{_f(sy * fold_s)} 0 0">'
                    f'<joint name="{nm}" type="hinge" axis="{sy} 0 0" range="{_f(-(fold_s + lay["side_angle"]) - 0.02)} 0.02" '
                    f'limited="true" damping="0.02"/>'
                    f'<body euler="0 0 {_f(sy * math.pi / 2)}">' + _trough(f"{nm}t", side_len, max(tw, 3.4), ACRYLIC, mass=0.01 * side_len, cls="slick")
                    + "</body></body>")
         bd.eqs.append(f'<joint name="chute_latch{j + 1}" joint1="{nm}" polycoef="0 0 0 0 0"/>')
         latches.append(f"chute_latch{j + 1}")
+        bd.moves["treasure"].append((nm, 0.0, -(fold_s + side)))
     bd.latches["treasure"] = latches
     return "".join(out)
 
@@ -723,6 +760,87 @@ def _add_flag(xml: str) -> str:
     xml = xml.replace("</worldbody>", flag + "</worldbody>", 1)
     return xml.replace("</equality>", '<weld name="clip" body1="flag" body2="flagmount"/>'
                        '<weld name="magnet" body1="flag" body2="fortress" active="false"/></equality>', 1)
+
+
+# ---------------------------------------------------------------- the law that parts stay clear of each other
+MOUNT_TOL = 0.1  # in: two mechanisms' parts may overlap this much where one is fastened to the other
+SWEEP_N = 12  # poses along each mechanism's motion, stowed to deployed
+
+
+def _pose(m: mujoco.MjModel, d: mujoco.MjData, bd: Build, mech: str, u: float) -> None:
+    """Put one mechanism a fraction u of the way from stowed to deployed, closing its piston's loop."""
+    for jn, q0, q1 in bd.moves.get(mech, []):
+        d.qpos[m.jnt_qposadr[m.joint(jn).id]] = q0 + u * (q1 - q0)
+    pist = bd.pistons.get(mech)
+    if pist and "hinge" in pist:  # a boom: the cylinder turns and its rod slides to keep the rod's pin on the boom
+        b, c, phi, th0 = pist["b"], pist["c"], pist["phi"], pist["theta0"]
+
+        def rod(th: float) -> tuple[float, float]:
+            dx, dz = b * math.cos(th) - c * math.cos(phi), b * math.sin(th) - c * math.sin(phi)
+            return math.atan2(dz, dx), math.hypot(dx, dz)
+        q = d.qpos[m.jnt_qposadr[m.joint(pist["hinge"]).id]]
+        a0, _ = rod(th0)
+        a, ln = rod(th0 - q)
+        d.qpos[m.jnt_qposadr[m.joint(f"{pist['hinge']}_cyl").id]] = a0 - a
+        d.qpos[m.jnt_qposadr[m.joint(pist["rod"]).id]] = (ln - CYL_CLOSED) * IN
+
+
+def interference(rb: Robot, n: int = SWEEP_N, tol: float = MOUNT_TOL) -> list[tuple[float, str, str, str]]:
+    """Every pair of parts that pass into each other by more than ``tol`` (inches): each mechanism swept from stowed
+    to deployed with the others all stowed, then all deployed (the flag rides its mount).  Two mechanisms' parts may
+    not overlap anywhere.  A mechanism is fastened to the frame, so against the frame what counts is how much further
+    in it goes as it moves than where it is mounted.  Returns (overlap in, one part, the other, the pose) per pair of
+    mechanisms, worst first."""
+    xml, bd = scene(rb, Variant(), 0.0)
+    m = mujoco.MjModel.from_xml_string(xml)
+    d = mujoco.MjData(m)
+    mech_of = {m.geom(nm).id: mech for nm, mech in bd.part_of.items()}
+    if bd.flag:
+        for g in range(m.ngeom):
+            if m.geom_bodyid[g] == m.body("flag").id:
+                mech_of[g] = "flag"
+    geoms = sorted(mech_of)
+
+    def slotted(g1: int, g2: int) -> bool:  # a piston's cylinder or rod passes through a slot cut in a plate
+        n1, n2 = sorted((m.geom(g1).name, m.geom(g2).name), key=lambda x: not x.startswith("frame_"))
+        return n1.startswith(("frame_base", "frame_deck")) and n2.endswith(("_cylinder", "_rodbar"))
+    pairs = [(g1, g2) for i, g1 in enumerate(geoms) for g2 in geoms[i + 1:]
+             if mech_of[g1] != mech_of[g2] and not slotted(g1, g2)]
+    flag_adr = m.jnt_qposadr[m.body("flag").jntadr[0]] if bd.flag else None
+    mount = m.body("flagmount").id if bd.flag else None
+    worst: dict[tuple[str, ...], tuple[float, str, str, str]] = {}
+    mechs = sorted(bd.moves)
+    for others in (0.0, 1.0):
+        for mv in mechs or [""]:
+            over: dict[tuple[int, int], list[float]] = {}
+            for k in range(n + 1 if mechs else 1):
+                mujoco.mj_resetData(m, d)
+                for o in mechs:
+                    _pose(m, d, bd, o, k / n if o == mv else others)
+                mujoco.mj_kinematics(m, d)
+                if flag_adr is not None:
+                    d.qpos[flag_adr:flag_adr + 3] = d.xpos[mount]
+                    d.qpos[flag_adr + 3:flag_adr + 7] = d.xquat[mount]
+                    mujoco.mj_kinematics(m, d)
+                for g1, g2 in pairs:
+                    r = m.geom_rbound[g1] + m.geom_rbound[g2]
+                    if np.sum((d.geom_xpos[g1] - d.geom_xpos[g2]) ** 2) > r * r:
+                        dist = 0.0
+                    else:
+                        dist = min(0.0, mujoco.mj_geomDistance(m, d, g1, g2, 0.01, None) / IN)
+                    over.setdefault((g1, g2), []).append(-dist)
+            for (g1, g2), ov in over.items():
+                frame = "frame" in (mech_of[g1], mech_of[g2])
+                k = int(np.argmax(ov))
+                bad = ov[k] - (min(ov) if frame else 0.0)
+                if bad > tol:
+                    key = tuple(sorted((mech_of[g1], mech_of[g2])))
+                    if key not in worst or bad > worst[key][0]:
+                        pose = (f"the {mv} {round(100 * k / n)} % deployed, the rest "
+                                f"{'deployed' if others else 'stowed'}") if mechs else "at rest"
+                        worst[key] = (bad, f"the {mech_of[g1]}'s {m.geom(g1).name}", f"the {mech_of[g2]}'s "
+                                      f"{m.geom(g2).name}", pose)
+    return sorted(worst.values(), reverse=True)
 
 
 # ---------------------------------------------------------------- the match
