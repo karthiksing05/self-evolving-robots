@@ -70,6 +70,25 @@ def test_the_voice_puts_its_energy_where_the_tract_resonates():
     assert 600 < freqs[np.argmax(spec)] < 840
 
 
+def test_a_sealed_stop_is_heard_as_silence_then_a_burst_and_an_unsealed_one_never_goes_quiet():
+    from sea.worlds import phonology as P
+
+    r = P.rig(_body(PHON, Edit(slot="tongue", type="tip_tongue", params={"rail_start": 3.25, "stroke": 1.3}),
+                    Edit(slot="lips", type="round_lips", params={"max_protrusion": 1.6})))
+    velar = {"lip_radius": 0.8, "protrusion": 0.0, "tip_height": 0.0, "tip_place": 1.0, "tongue_height": 1.3, "tongue_place": 7.4}
+    assert float(P.tract(r, {k: np.array([v]) for k, v in velar.items()})[0].min()) < P.A_CLOSE
+    def rms(x):  # over 10 ms windows
+        return np.sqrt(np.convolve(x.astype(float) ** 2, np.ones(220) / 220, "valid"))
+
+    sealed = rms(F._utter(r, velar))
+    quiet = np.flatnonzero(sealed < 1e-3 * sealed.max())
+    assert quiet.size > 0.06 * F.SR  # the closure: at least 60 ms of silence
+    after = sealed[quiet[-1]:quiet[-1] + int(0.03 * F.SR)]
+    assert after.max() > 0.2 * sealed.max()  # then the release, loud enough to hear
+    narrow = rms(F._utter(r, velar | {"tongue_height": 0.9}))
+    assert narrow[int(0.05 * F.SR):-int(0.1 * F.SR)].min() > 1e-2 * narrow.max()
+
+
 def test_silent_films_play_together_and_sounding_ones_in_turn():
     still = [np.zeros((40, 60, 3), np.uint8)]
     b, a = F.Clip(still * 10, False, "no"), F.Clip(still * 4, True, "yes")

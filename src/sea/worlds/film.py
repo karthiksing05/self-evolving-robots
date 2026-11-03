@@ -5,7 +5,8 @@ Each film replays one attempt with the controls the run recorded, so nothing is 
   parameters, filmed by a camera that follows the object, and the verdict is the judge's on that replay.
 - **Talking robot:** the CAD at System 1's recorded posture, the formants the simulator computes for it,
   and the sound. The sound is a 120 Hz pulse train through the simulator's own transfer function. A
-  stop is silent, because its closure is the point.
+  stop is heard inside a vowel (/a·C·a/), with a release burst shaped by the cavity in front of the
+  closure (`_utter`).
 - **Mobile explorer:** an animation of the simulator's verdict, not physics. The world is quasi-static,
   so the CAD is posed over terrain built from the route's features, settled where its wheels or tracks
   rest. It stops where the replayed attempt, at the route's nominal dimensions, failed.
@@ -325,6 +326,73 @@ def _speak(gain_db: np.ndarray, seconds: float = 1.2, f0: float = 120.0) -> np.n
     return (0.8 * out / max(np.abs(out).max(), 1e-9)).astype(np.float32)
 
 
+def _noise(gain_db: np.ndarray, n: int, rng: np.random.Generator) -> np.ndarray:
+    """``n`` samples of white noise shaped by a gain over FREQ (above 5 kHz it keeps falling, 12 dB/octave)."""
+    f = np.fft.rfftfreq(n, 1 / SR)
+    top = gain_db[-1] - 12 * np.log2(np.maximum(f, P.FREQ[-1]) / P.FREQ[-1])
+    g = np.where(f <= P.FREQ[-1], np.interp(f, P.FREQ, gain_db), top)
+    out = np.fft.irfft(np.fft.rfft(rng.standard_normal(n)) * 10 ** (g / 20), n)
+    return out / max(np.abs(out).max(), 1e-9)
+
+
+def _utter(r: P.Rig, ctl: dict[str, float], seed: int = 0, f0: float = 120.0) -> np.ndarray:
+    """A stop heard the way a listener hears one: inside a vowel, as /a·C·a/.  The tract glides from an open
+    posture into the recorded one and back, voiced by a pulse train through the simulator's transfer function
+    at each instant.  If the recorded posture seals the tube (< A_CLOSE), the voice stops for the closure,
+    then the release bursts: noise at the closure, shaped by the cavity in front of it, which is what tells
+    /p/, /t/ and /k/ apart (a front cavity of a few cm rings near 1.5-3 kHz for /k/; none for /p/), then
+    aspiration through the opening tract.  A posture that does not seal has no burst: the voice runs on
+    through the narrowing, and what is heard is a vowel, not a stop."""
+    rng = np.random.default_rng(seed)
+    lo = {k: v[0] for k, v in r.controls.items()}
+    hi = {k: v[1] for k, v in r.controls.items()}
+    open_ = {k: (hi[k] if k in ("jaw", "lip_radius") else lo[k] if k.endswith("height") or k in ("protrusion", "larynx")
+                 else ctl[k]) for k in ctl}
+    areas_c, lens_c, dist_c = P.tract(r, {k: np.array([v]) for k, v in ctl.items()})
+    sealed = float(areas_c.min()) < P.A_CLOSE
+    v1, glide, hold, burst, asp, v2 = 0.28, 0.06, 0.10, 0.025, 0.06, 0.32
+    # the area function along the utterance, every 5 ms: open -> closure -> (hold) -> open
+    hop = 0.005
+    t_in, t_hold = v1, v1 + glide
+    t_rel = t_hold + (hold if sealed else 0.04)
+    total = t_rel + burst + asp + glide + v2
+    ts = np.arange(0, total + hop, hop)
+    w = np.where(ts < t_rel, np.clip((ts - t_in) / glide, 0, 1), np.clip(1 - (ts - t_rel) / (burst + asp + glide), 0, 1))
+    post = {k: np.array([(1 - x) * open_[k] + x * ctl[k] for x in w]) for k in ctl}
+    areas, lens, _ = P.tract(r, post)
+    gains = P.transfer_db(np.maximum(areas, 0.08), lens)  # (frames, FREQ)
+    t = np.arange(int(total * SR)) / SR
+    voiced = np.ones_like(t)
+    if sealed:  # voiceless: the glottis stops as the seal forms and starts again after the aspiration
+        voiced = np.clip(np.maximum((t_hold - t) / 0.015, (t - (t_rel + burst + asp)) / 0.02), 0, 1)
+    pitch = f0 * (1.06 - 0.10 * t / total) * (1 + 0.004 * np.sin(2 * np.pi * 5.0 * t))
+    phase = 2 * np.pi * np.cumsum(pitch) / SR
+    fi = np.clip(t / hop, 0, len(ts) - 1)
+    voice = np.zeros_like(t)
+    for k in range(1, int(4800 / f0)):
+        g = np.array([np.interp(k * f0, P.FREQ, row) for row in gains])  # gain at harmonic k, per frame
+        voice += 10 ** (np.interp(fi, np.arange(len(ts)), g) / 20) / k * np.sin(k * phase)
+    voice *= voiced * np.clip(np.minimum(t / 0.04, (total - t) / 0.08), 0, 1)
+    voice = 0.75 * voice / max(np.abs(voice).max(), 1e-9)
+    if not sealed:
+        return voice.astype(np.float32)
+    # the burst: noise at the closure through the sections in front of it, mouth radiation included
+    i = int(np.argmin(areas_c[0]))
+    front_a, front_l = areas_c[:, i + 1:], lens_c[:, i + 1:]
+    if front_a.shape[1]:
+        g_burst = P.transfer_db(np.maximum(front_a, 0.08), front_l)[0]
+    else:  # a lip closure has no front cavity: a diffuse burst, falling with frequency
+        g_burst = -6 * np.log2(np.maximum(P.FREQ, 500) / 500)
+    nb, na = int(burst * SR), int((asp + glide / 2) * SR)
+    b = _noise(g_burst, nb, rng) * np.exp(-np.arange(nb) / (0.008 * SR))  # a release lasts tens of ms (velars longest)
+    j = int(np.searchsorted(ts, t_rel + burst + asp / 2))  # aspiration: glottal noise through the opening tract
+    a = _noise(gains[min(j, len(ts) - 1)], na, rng) * np.linspace(1, 0, na) ** 1.5
+    s0 = int(t_rel * SR)
+    voice[s0:s0 + nb] += 0.55 * b[:len(voice) - s0]
+    voice[s0 + nb:s0 + nb + na] += 0.25 * a[:max(0, len(voice) - s0 - nb)]
+    return (0.9 * voice / max(np.abs(voice).max(), 1e-9)).astype(np.float32)
+
+
 def phonology(body: Body, task: Task, controls: dict[str, float], seed: int = 0, size: tuple[int, int] = (480, 330)) -> Clip:
     """The body at the recorded posture: its CAD, what the simulator hears and, for a vowel, the sound.  A
     posture's verdict draws on no seed; ``seed`` keeps the signature common to every world."""
@@ -346,7 +414,8 @@ def phonology(body: Body, task: Task, controls: dict[str, float], seed: int = 0,
         audio = _speak(P.transfer_db(np.maximum(areas, 0.08), lens)[0])
         frame = caption(img, bottom=said)
         return Clip([frame] * int(len(audio) * FPS / SR), ok, said, audio)
-    return Clip([caption(img, bottom=said)] * int(1.2 * FPS), ok, said, np.zeros(int(1.2 * SR), np.float32))
+    audio = _utter(r, ctl, seed)
+    return Clip([caption(img, bottom=said)] * int(len(audio) * FPS / SR), ok, said, audio)
 
 
 # ---------------------------------------------------------------- the mobile explorer: an animation of the verdict
