@@ -1,0 +1,240 @@
+{
+ "run": "mobile_s2routes_s2",
+ "world": "mobile",
+ "frames": [
+  {
+   "iteration": 0,
+   "id": "stock",
+   "held": 6,
+   "groups": 13,
+   "changes": [],
+   "body": {
+    "id": "stock",
+    "parent": null,
+    "parts": {
+     "chassis": {
+      "type": "printed_tub",
+      "params": {
+       "width": 18.0,
+       "length": 20.0,
+       "ride_height": 2.0
+      }
+     },
+     "locomotion": {
+      "type": "wheels4",
+      "params": {
+       "wheel_radius": 3.0
+      }
+     },
+     "drive": {
+      "type": "n20_gearmotor",
+      "params": {
+       "gear_ratio": 100.0
+      }
+     },
+     "battery": {
+      "type": "nimh_pack",
+      "params": {
+       "capacity": 9.6
+      }
+     },
+     "sensor": {
+      "type": "bump_switch",
+      "params": {}
+     }
+    }
+   },
+   "file": "00_stock.png",
+   "views": [
+    "three-quarter",
+    "side"
+   ]
+  },
+  {
+   "iteration": 1,
+   "id": "b002",
+   "held": 11,
+   "groups": 13,
+   "changes": [
+    "battery: nimh_pack \u2192 liion_pack (capacity 18.8)",
+    "chassis: length 20 \u2192 22, ride_height 2 \u2192 3, width 18 \u2192 12",
+    "locomotion: wheels4 \u2192 tracks (idler_height 6.5, track_length 24)"
+   ],
+   "body": {
+    "id": "b002",
+    "parent": "stock",
+    "parts": {
+     "chassis": {
+      "type": "printed_tub",
+      "params": {
+       "width": 12.0,
+       "length": 22.0,
+       "ride_height": 3.0
+      }
+     },
+     "locomotion": {
+      "type": "tracks",
+      "params": {
+       "track_length": 24.0,
+       "idler_height": 6.5
+      }
+     },
+     "drive": {
+      "type": "n20_gearmotor",
+      "params": {
+       "gear_ratio": 100.0
+      }
+     },
+     "battery": {
+      "type": "liion_pack",
+      "params": {
+       "capacity": 18.8
+      }
+     },
+     "sensor": {
+      "type": "bump_switch",
+      "params": {}
+     }
+    }
+   },
+   "move": "swap",
+   "gained": [
+    "garden",
+    "greenhouse",
+    "patio",
+    "porch",
+    "sandbox"
+   ],
+   "lost": [],
+   "cost": "$24.50, 180 machine min",
+   "why": [
+    "Wheels4 tops out at r = 4.5 cm, which would be 9 cm tall and break under_sofa. Even then it would climb only about 5.4 cm on concrete and would still drop into a 9 cm trench. So no wheel value fixes these three tasks. Tracks at 24 cm should do it. They bridge 0.45 x 24 = 10.8 cm, more than 9.2. They climb about 6.5 cm, enough for the 5.5 cm step. Two tracks of about 4 x 24 cm give roughly 190 cm2 of contact, under 0.4 kPa and well under 1 cm of sinkage. Their top is 6.5 + 1.5 = 8 cm and the tub top is 7 cm, both under the 9 cm sofa. Tracks run one motor per side, so two of the four N20s on hand are reused. The 2S Li-ion pack (7.4 V nominal, 8.4 V charged, inside the N20's 3-9 V) raises speed and force by about 1.5x. That offsets the 1.8 cm sprocket and having half as many motors. It also carries 18.8 Wh at 92 g, lighter than the current 108 g NiMH pack, to cover the extra rolling resistance over the lawn's 5000 m. Cost: $14 track kit + $10.50 for the pack = $24.50, 4 days' lead, about 57 min of print. The 12 cm inner width aims to keep overall width under 19.7 cm for the bedroom door."
+   ],
+   "file": "01_b002.png",
+   "views": [
+    "three-quarter",
+    "side"
+   ]
+  },
+  {
+   "iteration": 2,
+   "id": "b01t0",
+   "held": 12,
+   "groups": 13,
+   "changes": [
+    "drive: n20_gearmotor \u2192 n20_encoder_gearmotor (gear_ratio 50)"
+   ],
+   "body": {
+    "id": "b01t0",
+    "parent": "b012",
+    "parts": {
+     "chassis": {
+      "type": "printed_tub",
+      "params": {
+       "width": 12.0,
+       "length": 22.0,
+       "ride_height": 3.0
+      }
+     },
+     "locomotion": {
+      "type": "tracks",
+      "params": {
+       "track_length": 24.0,
+       "idler_height": 6.5
+      }
+     },
+     "drive": {
+      "type": "n20_encoder_gearmotor",
+      "params": {
+       "gear_ratio": 50.0
+      }
+     },
+     "battery": {
+      "type": "liion_pack",
+      "params": {
+       "capacity": 18.8
+      }
+     },
+     "sensor": {
+      "type": "bump_switch",
+      "params": {}
+     }
+    }
+   },
+   "move": "tune",
+   "gained": [
+    "bedroom"
+   ],
+   "lost": [],
+   "cost": "$12.00, 0 machine min",
+   "why": [
+    "the loop fits b012's new drive before judging it (tuning trial 1 of 4)"
+   ],
+   "file": "02_b01t0.png",
+   "views": [
+    "three-quarter",
+    "side"
+   ]
+  },
+  {
+   "iteration": 3,
+   "id": "b020",
+   "held": 13,
+   "groups": 13,
+   "changes": [
+    "sensor: bump_switch \u2192 ultrasonic"
+   ],
+   "body": {
+    "id": "b020",
+    "parent": "b01t0",
+    "parts": {
+     "chassis": {
+      "type": "printed_tub",
+      "params": {
+       "width": 12.0,
+       "length": 22.0,
+       "ride_height": 3.0
+      }
+     },
+     "locomotion": {
+      "type": "tracks",
+      "params": {
+       "track_length": 24.0,
+       "idler_height": 6.5
+      }
+     },
+     "drive": {
+      "type": "n20_encoder_gearmotor",
+      "params": {
+       "gear_ratio": 50.0
+      }
+     },
+     "battery": {
+      "type": "liion_pack",
+      "params": {
+       "capacity": 18.8
+      }
+     },
+     "sensor": {
+      "type": "ultrasonic",
+      "params": {}
+     }
+    }
+   },
+   "move": "swap",
+   "gained": [
+    "hallway"
+   ],
+   "lost": [],
+   "cost": "$2.50, 0 machine min",
+   "why": [
+    "Changing chassis, drive or locomotion values gives a bump switch no range. Both parameter trials on chassis and locomotion left sensing_range_short failing, so the sensor itself has to change. In the catalogue: the camera lights only 0.12 m in the dark, which is still less than the 0.22 m body length. The lidar cannot be bought. That leaves the HC-SR04. It ranges to 2 m in any light, about 9 times the body length. That removes the 40 s of back-offs and the 0.25 m/s cap. 8 m of corridor at roughly 0.5 m/s plus 3 m of open wood at cruise speed fits well inside 45 s. In iteration 1 this same sensor gained hallway on an earlier body and lost nothing. The current body is different (encoder N20 at 50:1), so this is not the refused duplicate. Cost: $2.50 of the $23.50 left, 2 days of the 7, no machine time."
+   ],
+   "file": "03_b020.png",
+   "views": [
+    "three-quarter",
+    "side"
+   ]
+  }
+ ]
+}

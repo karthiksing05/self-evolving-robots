@@ -1,0 +1,954 @@
+{
+ "run": "mobile_s2routes_s2",
+ "summary": {
+  "world": "mobile",
+  "arm": "s2",
+  "seed": 2,
+  "final_body": {
+   "id": "b020",
+   "parent": "b01t0",
+   "parts": {
+    "chassis": {
+     "type": "printed_tub",
+     "params": {
+      "width": 12.0,
+      "length": 22.0,
+      "ride_height": 3.0
+     }
+    },
+    "locomotion": {
+     "type": "tracks",
+     "params": {
+      "track_length": 24.0,
+      "idler_height": 6.5
+     }
+    },
+    "drive": {
+     "type": "n20_encoder_gearmotor",
+     "params": {
+      "gear_ratio": 50.0
+     }
+    },
+    "battery": {
+     "type": "liion_pack",
+     "params": {
+      "capacity": 18.8
+     }
+    },
+    "sensor": {
+     "type": "ultrasonic",
+     "params": {}
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 2.6,
+    "wall_s": 1.0
+   },
+   {
+    "iteration": 1,
+    "body": "b002",
+    "held_groups": 11,
+    "tasks_passed": 11,
+    "sim_s": 82.9,
+    "wall_s": 124.0
+   },
+   {
+    "iteration": 2,
+    "body": "b01t0",
+    "held_groups": 12,
+    "tasks_passed": 12,
+    "sim_s": 150.2,
+    "wall_s": 194.1
+   },
+   {
+    "iteration": 3,
+    "body": "b020",
+    "held_groups": 13,
+    "tasks_passed": 13,
+    "sim_s": 171.1,
+    "wall_s": 216.5
+   }
+  ],
+  "train_groups": 13,
+  "final_held_train": [
+   "bedroom",
+   "garden",
+   "greenhouse",
+   "hallway",
+   "kitchen",
+   "lawn",
+   "living_room",
+   "patio",
+   "porch",
+   "sandbox",
+   "shed",
+   "study",
+   "under_sofa"
+  ],
+  "test": {
+   "final_held": [
+    "bedroom",
+    "garden",
+    "greenhouse",
+    "hallway",
+    "kitchen",
+    "lawn",
+    "living_room",
+    "patio",
+    "porch",
+    "sandbox",
+    "shed",
+    "study",
+    "under_sofa"
+   ],
+   "stock_held": [
+    "kitchen",
+    "lawn",
+    "living_room",
+    "shed",
+    "study",
+    "under_sofa"
+   ],
+   "final_tasks": 26,
+   "stock_tasks": 13,
+   "n": 26
+  },
+  "spent": {
+   "usd": 39.0,
+   "fab_minutes": 179.9,
+   "lead_days": 4.0,
+   "owned": {
+    "cell_18650": 2.0,
+    "bump_switch": 2.0,
+    "n20_encoder_gearmotor_50": 2.0,
+    "driver_tb6612": 2.0,
+    "hc_sr04": 1.0,
+    "bms_board": 1.0,
+    "n20_gearmotor_100": 4.0,
+    "nimh_aa": 4.0,
+    "tire_oring": 4.0,
+    "rubber_track_kit": 1.0
+   }
+  },
+  "ideas": [],
+  "sim_s": 215.3,
+  "attempts": 1805,
+  "proposals": {
+   "total": 9,
+   "tried": 8,
+   "refused": 1,
+   "ideas": 0,
+   "kept": 3,
+   "rejected_regression": 2,
+   "moves": {
+    "params": 2,
+    "swap": 5,
+    "idea": 0,
+    "tune": 1,
+    "merge": 1
+   },
+   "mean_prediction_precision": 0.8
+  },
+  "frontier": [],
+  "wall_s": 226.5,
+  "llm": {
+   "calls": 3,
+   "tokens_in": 33937,
+   "tokens_out": 11625,
+   "usd_list_price": 0.451
+  }
+ },
+ "final_body": "battery: liion_pack (capacity=18.8); chassis: printed_tub (length=22, ride_height=3, width=12); drive: n20_encoder_gearmotor (gear_ratio=50); locomotion: tracks (idler_height=6.5, track_length=24); sensor: ultrasonic",
+ "final_bom": [
+  {
+   "item": "print:PLA",
+   "qty": 115.5,
+   "slot": "chassis",
+   "note": ""
+  },
+  {
+   "item": "print:PLA",
+   "qty": 64.4,
+   "slot": "locomotion",
+   "note": "hubs, arms, mounts"
+  },
+  {
+   "item": "rubber_track_kit",
+   "qty": 1.0,
+   "slot": "locomotion",
+   "note": ""
+  },
+  {
+   "item": "n20_encoder_gearmotor_50",
+   "qty": 2.0,
+   "slot": "drive",
+   "note": ""
+  },
+  {
+   "item": "driver_tb6612",
+   "qty": 1.0,
+   "slot": "drive",
+   "note": ""
+  },
+  {
+   "item": "cell_18650",
+   "qty": 2.0,
+   "slot": "battery",
+   "note": ""
+  },
+  {
+   "item": "bms_board",
+   "qty": 1.0,
+   "slot": "battery",
+   "note": ""
+  },
+  {
+   "item": "hc_sr04",
+   "qty": 1.0,
+   "slot": "sensor",
+   "note": ""
+  }
+ ],
+ "stock_bom": [
+  {
+   "item": "print:PLA",
+   "qty": 140.8,
+   "slot": "chassis",
+   "note": ""
+  },
+  {
+   "item": "print:PLA",
+   "qty": 40.8,
+   "slot": "locomotion",
+   "note": "hubs, arms, mounts"
+  },
+  {
+   "item": "tire_oring",
+   "qty": 4.0,
+   "slot": "locomotion",
+   "note": ""
+  },
+  {
+   "item": "n20_gearmotor_100",
+   "qty": 4.0,
+   "slot": "drive",
+   "note": ""
+  },
+  {
+   "item": "driver_tb6612",
+   "qty": 2.0,
+   "slot": "drive",
+   "note": ""
+  },
+  {
+   "item": "nimh_aa",
+   "qty": 4.0,
+   "slot": "battery",
+   "note": ""
+  },
+  {
+   "item": "bump_switch",
+   "qty": 2.0,
+   "slot": "sensor",
+   "note": ""
+  }
+ ],
+ "judge_key": "6a39708c8a2d",
+ "iterations": [
+  {
+   "iteration": 0,
+   "body": "battery: nimh_pack (capacity=9.6); chassis: printed_tub (length=20, ride_height=2, width=18); drive: n20_gearmotor (gear_ratio=100); locomotion: wheels4 (wheel_radius=3); sensor: bump_switch",
+   "held": [
+    "kitchen",
+    "lawn",
+    "living_room",
+    "shed",
+    "study",
+    "under_sofa"
+   ],
+   "failing_mechanisms": {
+    "belly_hits_step_edge": 4,
+    "chassis_wider_than_gap": 1,
+    "sensing_range_short": 1,
+    "sinks_in_sand": 1
+   },
+   "failing": {
+    "bedroom_train0": {
+     "mechanism": "chassis_wider_than_gap",
+     "detail": "stopped at feature 2/3, a 20.0 cm opening centred +2.0 cm off the robot's line: the robot is 23.0 cm wide overall; the opening is 19.7 cm"
+    },
+    "hallway_train0": {
+     "mechanism": "sensing_range_short",
+     "detail": "reached the end in 83 s (76 s at best); 45 s allowed; in the dark it sees 0.00 m ahead, less than its 0.20 m length, so it touches each of 10 obstacles at <= 0.25 m/s and backs off (40 s)"
+    },
+    "porch_train0": {
+     "mechanism": "belly_hits_step_edge",
+     "detail": "stopped at feature 2/3, a 5.5 cm step up (concrete, mu 0.75): the tub's belly at 2.0 cm grounded on the 5.48 cm edge (edge mu 0.78), at approach duty 1.00: stuck 15.5 cm along, its running gear turning at 0.75 m/s"
+    },
+    "garden_train0": {
+     "mechanism": "belly_hits_step_edge",
+     "detail": "stopped at feature 3/4, a 9.0 cm wide, 5.0 cm deep trench (concrete edges, mu 0.75): the tub's belly at 2.0 cm grounded on the 9.2 cm wide, 5.1 cm deep trench (edge mu 0.74), at approach duty 0.58: stuck 13.1 cm along, its running gear turning at 0.33 m/s"
+    },
+    "sandbox_train0": {
+     "mechanism": "sinks_in_sand",
+     "detail": "stopped at feature 3/4, 1.5 m of loose sand (it takes 0.75 kPa to sink 1 cm): ground pressure 2.84 kPa on 15 cm2 of contact sinks it 3.78 cm; it climbs out of 2.00 cm (belly clearance 2.0 cm)"
+    },
+    "patio_train0": {
+     "mechanism": "belly_hits_step_edge",
+     "detail": "stopped at feature 2/3, 3 steps of 7.5 cm on 18 cm treads (concrete, mu 0.75): the tub's belly at 2.0 cm grounded on the 3 7.4 cm steps on 18 cm treads (edge mu 0.79), at approach duty 0.94: stuck 15.4 cm along, its running gear turning at 0.70 m/s"
+    },
+    "greenhouse_train0": {
+     "mechanism": "belly_hits_step_edge",
+     "detail": "stopped at feature 2/3, a 2.5 cm hose across the way (grass): the tub's belly at 2.0 cm grounded on the 2.5 cm hose (edge mu 0.56), at approach duty 1.00: stuck 15.7 cm along, its running gear turning at 0.71 m/s"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "chassis (length=20, ride_height=3, width=12); locomotion (wheel_radius=4)",
+     "base": null,
+     "mechanism": "chassis_wider_than_gap (bedroom: 23.0 cm overall against a 19.7 cm opening) and belly_hits_step_edge on the 2.5 cm hose (greenhouse: the 2.0 cm belly grounds on a 2.5 cm edge)",
+     "principle": "A robot fits through an opening only if its overall width plus its steering error is less than the opening. A rigid chassis gets over an edge only if its belly stays above the edge. A larger wheel meets an edge lower on its rim, so it climbs higher.",
+     "hypothesis": "Overall width is the inner width plus 2.5 cm of running gear on each side (18 + 5 = 23). An inner width of 12 gives 17 cm overall; with the 1.0 cm steering error at full duty that is 18 cm, inside 19.7. Raising ride_height to 3 cm puts the belly above the 2.5 cm hose. Wheel radius 3 to 4 scales the measured climb on grass from 3.05 to about 4.07 cm, which covers the hose. Overall height becomes max(2r = 8, 3 + 4 = 7) = 8 cm, which still fits under the 9 cm sofa. This is a params move: no parts to buy, about 46 g of print. No swap is needed for these two failures.",
+     "predicted_gains": [
+      "bedroom",
+      "greenhouse"
+     ],
+     "risks": [
+      "under_sofa: height rises to 8 cm against a 9 cm overhang, a 1 cm margin",
+      "shed: a bigger wheel cuts the stall force at the ground to about 9.6 N, still about 5x the roughly 1.8 N the 22 deg ramp needs",
+      "the narrower tub has less room for electronics; the length stays at 20 cm"
+     ],
+     "idea": null,
+     "result": "not kept (another proposal gained more): gained bedroom, greenhouse, sandbox, lost none; costs $0.00, 170 machine min",
+     "gained": [
+      "bedroom",
+      "greenhouse",
+      "sandbox"
+     ],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "bedroom",
+       "greenhouse"
+      ],
+      "hit": [
+       "bedroom",
+       "greenhouse"
+      ],
+      "missed": [],
+      "unpredicted": [
+       "sandbox"
+      ],
+      "precision": 1.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 170.4,
+      "lines": [
+       "bump_switch x2: provided (reused)",
+       "driver_tb6612 x2: provided (reused)",
+       "n20_gearmotor_100 x4: provided (reused)",
+       "nimh_aa x4: provided (reused)",
+       "tire_oring x4: provided (reused)",
+       "print:PLA 107.2 g for chassis: 107 machine minutes",
+       "print:PLA 63.2 g for locomotion: 63 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "belly_hits_step_edge",
+      "sensing_range_short"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "sensor -> ultrasonic",
+     "base": null,
+     "mechanism": "sensing_range_short (hallway: it sees 0.00 m ahead in the dark, so it touches 10 obstacles at <= 0.25 m/s and backs off for 40 s; 76 s at best against 45 s allowed)",
+     "principle": "Among obstacles a robot may go only as fast as it can stop within its sensing range. With 2 m of range in any light it can keep cruising and steer around obstacles instead of bumping into them.",
+     "hypothesis": "No chassis or drive value gives the bump switch any range, so the sensor itself must change. The HC-SR04 ranges to 2 m in the dark, adds no height, uses 0.08 W and costs $2.50 with 2 days' lead. The camera only lights 0.12 m in the dark, less than the 0.20 m body length, and the lidar cannot be bought. Removing the 40 s of back-offs and the 0.25 m/s cap should bring the 11 m route well under 45 s.",
+     "predicted_gains": [
+      "hallway"
+     ],
+     "risks": [
+      "none expected: no height, negligible mass, and 0.08 W barely changes the lawn energy budget"
+     ],
+     "idea": null,
+     "result": "not kept (another proposal gained more): gained hallway, lost none; costs $2.50, 0 machine min",
+     "gained": [
+      "hallway"
+     ],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "hallway"
+      ],
+      "hit": [
+       "hallway"
+      ],
+      "missed": [],
+      "unpredicted": [],
+      "precision": 1.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 2.5,
+      "lead_days": 2.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "driver_tb6612 x2: provided (reused)",
+       "hc_sr04 x1: 0 provided, buy 1 at $2.5 ($2.50, 2 days)",
+       "n20_gearmotor_100 x4: provided (reused)",
+       "nimh_aa x4: provided (reused)",
+       "tire_oring x4: provided (reused)"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "belly_hits_step_edge",
+      "chassis_wider_than_gap",
+      "sinks_in_sand"
+     ]
+    },
+    {
+     "k": 2,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "locomotion -> tracks (idler_height=6.5, track_length=24); battery -> liion_pack (capacity=18.8); chassis (length=22, ride_height=3, width=12)",
+     "base": null,
+     "mechanism": "belly_hits_step_edge on the 5.5 cm porch step and the 9.2 cm x 5.1 cm trench, and sinks_in_sand (2.84 kPa on 15 cm2 sinks it 3.78 cm, deeper than its 2.0 cm belly)",
+     "principle": "A track climbs any edge that meets its sloped front run, up to about its front idler height. A rigid vehicle bridges a gap while its centre of mass stays over support, about 0.45 of the track's contact length. A long contact patch lowers ground pressure and therefore sinkage.",
+     "hypothesis": "Wheels4 tops out at r = 4.5 cm, which would be 9 cm tall and break under_sofa. Even then it would climb only about 5.4 cm on concrete and would still drop into a 9 cm trench. So no wheel value fixes these three tasks. Tracks at 24 cm should do it. They bridge 0.45 x 24 = 10.8 cm, more than 9.2. They climb about 6.5 cm, enough for the 5.5 cm step. Two tracks of about 4 x 24 cm give roughly 190 cm2 of contact, under 0.4 kPa and well under 1 cm of sinkage. Their top is 6.5 + 1.5 = 8 cm and the tub top is 7 cm, both under the 9 cm sofa. Tracks run one motor per side, so two of the four N20s on hand are reused. The 2S Li-ion pack (7.4 V nominal, 8.4 V charged, inside the N20's 3-9 V) raises speed and force by about 1.5x. That offsets the 1.8 cm sprocket and having half as many motors. It also carries 18.8 Wh at 92 g, lighter than the current 108 g NiMH pack, to cover the extra rolling resistance over the lawn's 5000 m. Cost: $14 track kit + $10.50 for the pack = $24.50, 4 days' lead, about 57 min of print. The 12 cm inner width aims to keep overall width under 19.7 cm for the bedroom door.",
+     "predicted_gains": [
+      "porch",
+      "garden",
+      "sandbox",
+      "greenhouse",
+      "bedroom"
+     ],
+     "risks": [
+      "lawn: tracks roll harder on grass. 18.8 Wh (about 16 Wh usable) should cover 5000 m even at about 9 J/m, which needs about 12.5 Wh, and the 0.35 m/s average required is below the about 0.69 m/s top speed",
+      "under_sofa: the 8 cm track top leaves a 1 cm margin under the 9 cm overhang",
+      "bedroom/garden openings: the track adds an unknown width per side, and the 12 cm inner width is meant to absorb it",
+      "patio is not predicted to pass: its 7.4 cm steps exceed the 6.5 cm idler, and a taller idler would break under_sofa"
+     ],
+     "idea": null,
+     "result": "KEPT: gained garden, greenhouse, patio, porch, sandbox, lost none; costs $24.50, 180 machine min",
+     "gained": [
+      "garden",
+      "greenhouse",
+      "patio",
+      "porch",
+      "sandbox"
+     ],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "bedroom",
+       "garden",
+       "greenhouse",
+       "porch",
+       "sandbox"
+      ],
+      "hit": [
+       "garden",
+       "greenhouse",
+       "porch",
+       "sandbox"
+      ],
+      "missed": [
+       "bedroom"
+      ],
+      "unpredicted": [
+       "patio"
+      ],
+      "precision": 0.8,
+      "lost": []
+     },
+     "resources": {
+      "usd": 24.5,
+      "lead_days": 4.0,
+      "fab_minutes": 179.9,
+      "lines": [
+       "bms_board x1: 0 provided, buy 1 at $1.5 ($1.50, 3 days)",
+       "bump_switch x2: provided (reused)",
+       "cell_18650 x2: 0 provided, buy 2 at $4.5 ($9.00, 3 days)",
+       "driver_tb6612 x1: provided (reused)",
+       "n20_gearmotor_100 x2: provided (reused)",
+       "rubber_track_kit x1: 0 provided, buy 1 at $14 ($14.00, 4 days)",
+       "print:PLA 115.5 g for chassis: 116 machine minutes",
+       "print:PLA 64.4 g for locomotion: 64 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "gap_margin_below_drift",
+      "sensing_range_short"
+     ]
+    },
+    {
+     "k": "m",
+     "move": "merge",
+     "declared_move": "merge",
+     "edit": "chassis -> printed_tub (length=22, ride_height=3, width=12); locomotion -> tracks (idler_height=6.5, track_length=24); battery -> liion_pack (capacity=18.8); sensor -> ultrasonic",
+     "base": null,
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the union of kept-eligible proposals b002, b001, which change disjoint slots",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "not kept (another proposal gained more): gained garden, greenhouse, hallway, porch, sandbox, lost none; costs $27.00, 180 machine min",
+     "gained": [
+      "garden",
+      "greenhouse",
+      "hallway",
+      "porch",
+      "sandbox"
+     ],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 27.0,
+      "lead_days": 4.0,
+      "fab_minutes": 179.9,
+      "lines": [
+       "bms_board x1: 0 provided, buy 1 at $1.5 ($1.50, 3 days)",
+       "cell_18650 x2: 0 provided, buy 2 at $4.5 ($9.00, 3 days)",
+       "driver_tb6612 x1: provided (reused)",
+       "hc_sr04 x1: 0 provided, buy 1 at $2.5 ($2.50, 2 days)",
+       "n20_gearmotor_100 x2: provided (reused)",
+       "rubber_track_kit x1: 0 provided, buy 1 at $14 ($14.00, 4 days)",
+       "print:PLA 115.5 g for chassis: 116 machine minutes",
+       "print:PLA 64.4 g for locomotion: 64 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "gap_margin_below_drift",
+      "step_higher_than_climbable"
+     ]
+    }
+   ],
+   "accepted": "b002",
+   "notes": "I'm proposing three body changes. Each is tried on its own; the first two change different slots and can also be tried together. Patio (three 7.4 cm steps) is not expected to pass under any of them.\n\n1. **Narrower, higher body on bigger wheels (params only, no purchases).** Inner width 18 \u2192 12 cm, ride height 2 \u2192 3 cm, wheel radius 3 \u2192 4 cm.\n   - Bedroom: overall width drops from 23.0 to 17 cm, or 18 cm with the 1.0 cm steering error, which fits the 19.7 cm door opening.\n   - Greenhouse: the belly sits at 3 cm, above the 2.5 cm hose. The bigger wheel should climb about 4.07 cm on grass, up from 3.05.\n   - Overall height becomes 8 cm, still under the 9 cm sofa.\n\n2. **Ultrasonic sensor ($2.50, 2 days).** It sees 2 m ahead in the dark, so the hallway run no longer bumps and backs off from all 10 obstacles (40 s of the current 76 s best). That should bring it under 45 s.\n   - The camera only lights 0.12 m in the dark, shorter than the 0.20 m body.\n   - The lidar cannot be bought.\n\n3. **Tracks with a Li-ion pack ($24.50, 4 days, about 57 min of printing).** Track length 24 cm, front idler at 6.5 cm, 2-cell 18.8 Wh pack, tub 12 cm wide and 22 cm long.\n   - Porch: climbs about 6.5 cm, enough for the 5.5 cm step.\n   - Garden: bridges about 10.8 cm, enough for the 9.2 cm trench.\n   - Sandbox: ground pressure falls from 2.84 to about 0.3 kPa, so it should sink well under 1 cm instead of 3.78 cm.\n   - The track top is at 8 cm, so under_sofa still fits.\n   - The pack raises voltage and energy to make up for running on two motors instead of four and for harder rolling on the lawn.\n   - No wheel size fixes porch, trench and sand together without growing taller than the sofa allows.\n\n**Held groups at risk:**\n- **Under_sofa:** the first and third changes both leave only 1 cm of headroom.\n- **Lawn:** under the third change the tracks use more energy over 5000 m of grass. The 18.8 Wh pack should cover it, but the margin is an estimate.\n\n**If I had to buy:**\n- Change 2: one HC-SR04 sensor, $2.50.\n- Change 3: one rubber track kit and two 18650 cells with a protection board, $24.50.\n- Both together: $27.00 of the $60.00 budget, within the 7-day lead-time limit.",
+   "llm": {
+    "tag": "iter00",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 71.0,
+    "tokens_in": 10952,
+    "tokens_out": 7461,
+    "usd_list_price": 0.2192,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 124.0,
+   "stop": null
+  },
+  {
+   "iteration": 1,
+   "body": "battery: liion_pack (capacity=18.8); chassis: printed_tub (length=22, ride_height=3, width=12); drive: n20_gearmotor (gear_ratio=100); locomotion: tracks (idler_height=6.5, track_length=24); sensor: bump_switch",
+   "held": [
+    "garden",
+    "greenhouse",
+    "kitchen",
+    "lawn",
+    "living_room",
+    "patio",
+    "porch",
+    "sandbox",
+    "shed",
+    "study",
+    "under_sofa"
+   ],
+   "failing_mechanisms": {
+    "gap_margin_below_drift": 1,
+    "sensing_range_short": 1
+   },
+   "failing": {
+    "bedroom_train0": {
+     "mechanism": "gap_margin_below_drift",
+     "detail": "stopped at feature 2/3, a 20.0 cm opening centred +2.0 cm off the robot's line: 0.87 cm to spare per side; it came +1.57 cm off centre (steering error sigma 0.94 cm at duty 0.69) and met the jamb: stuck 11.2 cm along, its running gear turning at 0.30 m/s"
+    },
+    "hallway_train0": {
+     "mechanism": "sensing_range_short",
+     "detail": "reached the end in 81 s (77 s at best); 45 s allowed; in the dark it sees 0.00 m ahead, less than its 0.22 m length, so it touches each of 10 obstacles at <= 0.25 m/s and backs off (40 s)"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "sensor -> ultrasonic",
+     "base": null,
+     "mechanism": "sensing_range_short (hallway): in the dark it sees 0.00 m ahead, less than its 0.22 m length, so it touches 10 obstacles at <=0.25 m/s and backs off 4 s each (40 s); best 77 s against 45 s allowed",
+     "principle": "Among obstacles a robot may go only as fast as it can stop within its sensing range. One that cannot see a body length ahead must touch, back off and turn.",
+     "hypothesis": "No chassis, drive or locomotion value gives the bump switch any range, so the sensor itself must change. The HC-SR04 ranges to 2 m in any light, which is far more than the 0.22 m body length. That removes the 40 s of touch-and-back-off and lifts the 0.25 m/s cap. 8 m at about 0.5 m/s plus 3 m of open wood fits within 45 s. In iteration 1 the same swap gained hallway and lost nothing. It was only displaced because the tracks proposal gained more, so it was never refused or failed. The camera lights only 0.12 m in the dark, and the lidar cannot be bought. Cost: hc_sr04 x1, $2.50, 2 days.",
+     "predicted_gains": [
+      "hallway"
+     ],
+     "risks": [
+      "under_sofa: the sonar adds no height, so it stays 8.0 cm under the 9.0 cm overhang",
+      "lawn: 0.08 W more electronics is about 3% of 2.5 W, and the range is 10.8 km against 5 km needed"
+     ],
+     "idea": null,
+     "result": "refused before trial: this exact body was already trialled: iteration 1: kept-eligible: gained garden, greenhouse, hallway, porch, sandbox, lost none; costs $27.00, 180 machine min",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 2.5,
+      "lead_days": 2.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "bms_board x1: provided (reused)",
+       "cell_18650 x2: provided (reused)",
+       "driver_tb6612 x1: provided (reused)",
+       "hc_sr04 x1: 0 provided, buy 1 at $2.5 ($2.50, 2 days)",
+       "n20_gearmotor_100 x2: provided (reused)",
+       "rubber_track_kit x1: provided (reused)"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    },
+    {
+     "k": 1,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "chassis (length=22, ride_height=3, width=10)",
+     "base": null,
+     "mechanism": "gap_margin_below_drift (bedroom): 18.0 cm overall in a 20.0 cm opening leaves 0.87 cm per side; it came +1.57 cm off centre (sigma 0.94 cm at duty 0.69) and met the jamb",
+     "principle": "A robot passes an opening only if its overall width plus its steering error fits; the running gear adds to the width.",
+     "hypothesis": "The overall width is 12 cm of tub plus 3 cm of track on each side, 18 cm in all. Taking the inner width to its floor of 10 cm gives 16 cm overall and about 1.87 cm to spare per side. That doubles the margin to about 2 sigma at duty 0.69, and more at lower duty, where sigma falls toward 0.49 cm. System 1 can still trade speed for accuracy. Every other geometry stays the same: track 24 cm for the 9 cm trench, idler 6.5 cm for the 7.5 and 5.5 cm steps, ride height 3 cm for the hose, height 8 cm for the sofa. This costs nothing beyond a lighter reprint of the tub.",
+     "predicted_gains": [
+      "bedroom"
+     ],
+     "risks": [
+      "garden: the 28 cm opening only gets easier",
+      "shed/patio: a narrower track base reduces lateral stability on the 22 deg ramp and the steps. The climbs are straight on, so they should hold.",
+      "Packaging: a 10 cm inner width must still hold 2 18650 cells (6.5 cm long), the TB6612 and the motors. It is tight but fits lengthwise in 22 cm."
+     ],
+     "idea": null,
+     "result": "rejected: lost patio (patio: step_higher_than_climbable, stopped at feature 2/3, 3 steps of 7.5 cm on 18 cm treads (concrete, mu 0.75): its running gear slipped on the 3 7.4 cm steps on 18 cm tread)",
+     "gained": [],
+     "lost": [
+      "patio"
+     ],
+     "prediction": {
+      "predicted": [
+       "bedroom"
+      ],
+      "hit": [],
+      "missed": [
+       "bedroom"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": [
+       "patio"
+      ]
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 103.6,
+      "lines": [
+       "bms_board x1: provided (reused)",
+       "bump_switch x2: provided (reused)",
+       "cell_18650 x2: provided (reused)",
+       "driver_tb6612 x1: provided (reused)",
+       "n20_gearmotor_100 x2: provided (reused)",
+       "rubber_track_kit x1: provided (reused)",
+       "print:PLA 103.6 g for chassis: 104 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "step_higher_than_climbable"
+     ]
+    },
+    {
+     "k": 2,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "drive -> n20_encoder_gearmotor (gear_ratio=100)",
+     "base": null,
+     "mechanism": "gap_margin_below_drift (bedroom): steering error sigma 0.94 cm at duty 0.69 against 0.87 cm of margin per side",
+     "principle": "A robot passes an opening only if its overall width plus its steering error fits. Closed-loop wheel speed cuts the steering error.",
+     "hypothesis": "The encoder N20 gives the same force and speed with 40% less steering error: sigma about 0.56 cm at duty 0.69 and 0.29 cm at the slowest duty. The 1.57 cm drift that hit the jamb was about 1.7 sigma, and at about 0.56 cm the same spread falls inside the 0.87 cm margin far more often. Setting gear_ratio to 100 keeps the 16.4 N stall force and 0.70 m/s that every held climb and the lawn survey timing were tuned to. This attacks the drift directly and works independently of the width change in the chassis slot. Cost: 2 x n20_encoder_gearmotor_100 at $6, $12 in all, 4 days; the TB6612 is reused.",
+     "predicted_gains": [
+      "bedroom"
+     ],
+     "risks": [
+      "All held groups: force and speed are unchanged at the 100:1 ratio. The only risk is if encoder motors weigh more than 11 g, which would slightly reduce the climb margins (3.02x its weight in stall force)."
+     ],
+     "idea": null,
+     "result": "rejected: lost patio (patio: step_higher_than_climbable, stopped at feature 2/3, 3 steps of 7.5 cm on 18 cm treads (concrete, mu 0.75): its running gear slipped on the 3 7.4 cm steps on 18 cm tread); it would gain bedroom",
+     "gained": [
+      "bedroom"
+     ],
+     "lost": [
+      "patio"
+     ],
+     "prediction": {
+      "predicted": [
+       "bedroom"
+      ],
+      "hit": [
+       "bedroom"
+      ],
+      "missed": [],
+      "unpredicted": [],
+      "precision": 1.0,
+      "lost": [
+       "patio"
+      ]
+     },
+     "resources": {
+      "usd": 12.0,
+      "lead_days": 4.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "bms_board x1: provided (reused)",
+       "bump_switch x2: provided (reused)",
+       "cell_18650 x2: provided (reused)",
+       "driver_tb6612 x1: provided (reused)",
+       "n20_encoder_gearmotor_100 x2: 0 provided, buy 2 at $6 ($12.00, 4 days)",
+       "rubber_track_kit x1: provided (reused)"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "sensing_range_short",
+      "step_higher_than_climbable"
+     ]
+    },
+    {
+     "k": "t0",
+     "move": "tune",
+     "declared_move": "tune",
+     "edit": "drive (gear_ratio=50)",
+     "base": "b012",
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the loop fits b012's new drive before judging it (tuning trial 1 of 4)",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "KEPT: gained bedroom, lost none; costs $12.00, 0 machine min",
+     "gained": [
+      "bedroom"
+     ],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 12.0,
+      "lead_days": 4.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "bms_board x1: provided (reused)",
+       "bump_switch x2: provided (reused)",
+       "cell_18650 x2: provided (reused)",
+       "driver_tb6612 x1: provided (reused)",
+       "n20_encoder_gearmotor_50 x2: 0 provided, buy 2 at $6 ($12.00, 4 days)",
+       "rubber_track_kit x1: provided (reused)"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "sensing_range_short"
+     ]
+    }
+   ],
+   "accepted": "b01t0",
+   "notes": "The three proposals:\n\n1. **Hallway: swap the bump switch for the ultrasonic sensor.** The HC-SR04 ranges to 2 m in any light, so the robot no longer has to touch each obstacle and it is not held to 0.25 m/s. This exact swap gained hallway and lost nothing in iteration 1. It was only set aside because the tracks proposal gained more. Cost: $2.50, 2 days.\n\n2. **Bedroom, free option: narrow the tub from 12 cm to 10 cm inside.** That makes the robot 16 cm overall and roughly doubles the margin per side to about 1.87 cm. Nothing else about the body changes. The one real risk is fitting the electronics into a 10 cm tub. Packaging is my judgement, not something the brief calculates.\n\n3. **Bedroom, alternative: swap to the N20 motors with encoders, at the same 100:1 gear.** These cut the steering error by 40%, to about 0.56 cm, without changing pulling force or top speed. Cost: $12.00, 4 days.\n\nIf all three are kept, the total spend is $14.50 with the longest lead time 4 days, inside the $35.50 and 7 days available. The hallway swap and one of the bedroom changes would be enough on their own; the trials will show whether it's 2 or 3.",
+   "llm": {
+    "tag": "iter01",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 30.8,
+    "tokens_in": 11155,
+    "tokens_out": 3000,
+    "usd_list_price": 0.1315,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 70.1,
+   "stop": null
+  },
+  {
+   "iteration": 2,
+   "body": "battery: liion_pack (capacity=18.8); chassis: printed_tub (length=22, ride_height=3, width=12); drive: n20_encoder_gearmotor (gear_ratio=50); locomotion: tracks (idler_height=6.5, track_length=24); sensor: bump_switch",
+   "held": [
+    "bedroom",
+    "garden",
+    "greenhouse",
+    "kitchen",
+    "lawn",
+    "living_room",
+    "patio",
+    "porch",
+    "sandbox",
+    "shed",
+    "study",
+    "under_sofa"
+   ],
+   "failing_mechanisms": {
+    "sensing_range_short": 1
+   },
+   "failing": {
+    "hallway_train0": {
+     "mechanism": "sensing_range_short",
+     "detail": "reached the end in 80 s (75 s at best); 45 s allowed; in the dark it sees 0.00 m ahead, less than its 0.22 m length, so it touches each of 10 obstacles at <= 0.25 m/s and backs off (40 s)"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "sensor -> ultrasonic",
+     "base": null,
+     "mechanism": "sensing_range_short: in the dark the bump switch sees 0.00 m ahead, less than the 0.22 m body length. So the robot touches each of the 10 obstacles at no more than 0.25 m/s and backs off for 4 s each, which costs 40 s. Its best run took 75 s against the 45 s allowed.",
+     "principle": "Among obstacles a robot may go only as fast as it can stop within its sensing range. A robot that cannot see an obstacle a body length ahead has to touch it, back off and turn.",
+     "hypothesis": "Changing chassis, drive or locomotion values gives a bump switch no range. Both parameter trials on chassis and locomotion left sensing_range_short failing, so the sensor itself has to change. In the catalogue: the camera lights only 0.12 m in the dark, which is still less than the 0.22 m body length. The lidar cannot be bought. That leaves the HC-SR04. It ranges to 2 m in any light, about 9 times the body length. That removes the 40 s of back-offs and the 0.25 m/s cap. 8 m of corridor at roughly 0.5 m/s plus 3 m of open wood at cruise speed fits well inside 45 s. In iteration 1 this same sensor gained hallway on an earlier body and lost nothing. The current body is different (encoder N20 at 50:1), so this is not the refused duplicate. Cost: $2.50 of the $23.50 left, 2 days of the 7, no machine time.",
+     "predicted_gains": [
+      "hallway"
+     ],
+     "risks": [
+      "under_sofa: the sonar sits on the tub's front face and adds no height, so the robot stays 8.0 cm tall under the 9.0 cm overhang.",
+      "bedroom and garden: no width is added, so the 18 cm overall width and the encoder's steering error are unchanged.",
+      "lawn: the sonar draws only 0.08 W more than the 2.50 W of electronics. Range drops from about 16.2 km by roughly 3%, far more than the 5 km survey needs.",
+      "patio, porch and shed: the sonar weighs a few grams, which is negligible against 0.56 kg and the stall force margin of 1.50 times the robot's weight."
+     ],
+     "idea": null,
+     "result": "KEPT: gained hallway, lost none; costs $2.50, 0 machine min",
+     "gained": [
+      "hallway"
+     ],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "hallway"
+      ],
+      "hit": [
+       "hallway"
+      ],
+      "missed": [],
+      "unpredicted": [],
+      "precision": 1.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 2.5,
+      "lead_days": 2.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "bms_board x1: provided (reused)",
+       "cell_18650 x2: provided (reused)",
+       "driver_tb6612 x1: provided (reused)",
+       "hc_sr04 x1: 0 provided, buy 1 at $2.5 ($2.50, 2 days)",
+       "n20_encoder_gearmotor_50 x2: provided (reused)",
+       "rubber_track_kit x1: provided (reused)"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    }
+   ],
+   "accepted": "b020",
+   "notes": "I'm proposing one change: swap the sensor from the bump switch to the ultrasonic sonar. None of the other catalogue options can fix this: the camera lights only 0.12 m in the dark, short of the 0.22 m body length, and the lidar cannot be bought. Item to buy: hc_sr04 x1 at $2.50, 2 days. That leaves $21.00 in the budget.",
+   "llm": {
+    "tag": "iter02",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 12.0,
+    "tokens_in": 11830,
+    "tokens_out": 1164,
+    "usd_list_price": 0.1003,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 22.3,
+   "stop": null
+  },
+  {
+   "iteration": 3,
+   "body": "battery: liion_pack (capacity=18.8); chassis: printed_tub (length=22, ride_height=3, width=12); drive: n20_encoder_gearmotor (gear_ratio=50); locomotion: tracks (idler_height=6.5, track_length=24); sensor: ultrasonic",
+   "held": [
+    "bedroom",
+    "garden",
+    "greenhouse",
+    "hallway",
+    "kitchen",
+    "lawn",
+    "living_room",
+    "patio",
+    "porch",
+    "sandbox",
+    "shed",
+    "study",
+    "under_sofa"
+   ],
+   "failing_mechanisms": {},
+   "failing": {},
+   "proposals": [],
+   "accepted": null,
+   "notes": "",
+   "llm": {},
+   "seconds": null,
+   "stop": "all groups held"
+  }
+ ],
+ "llm_calls": [
+  {
+   "tag": "iter00",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 71.0,
+   "tokens_in": 10952,
+   "tokens_out": 7461,
+   "usd_list_price": 0.2192,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter01",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 30.8,
+   "tokens_in": 11155,
+   "tokens_out": 3000,
+   "usd_list_price": 0.1315,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter02",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 12.0,
+   "tokens_in": 11830,
+   "tokens_out": 1164,
+   "usd_list_price": 0.1003,
+   "billing": "plan",
+   "error": ""
+  }
+ ]
+}

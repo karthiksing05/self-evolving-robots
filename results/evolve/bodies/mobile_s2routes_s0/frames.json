@@ -1,0 +1,182 @@
+{
+ "run": "mobile_s2routes_s0",
+ "world": "mobile",
+ "frames": [
+  {
+   "iteration": 0,
+   "id": "stock",
+   "held": 6,
+   "groups": 13,
+   "changes": [],
+   "body": {
+    "id": "stock",
+    "parent": null,
+    "parts": {
+     "chassis": {
+      "type": "printed_tub",
+      "params": {
+       "width": 18.0,
+       "length": 20.0,
+       "ride_height": 2.0
+      }
+     },
+     "locomotion": {
+      "type": "wheels4",
+      "params": {
+       "wheel_radius": 3.0
+      }
+     },
+     "drive": {
+      "type": "n20_gearmotor",
+      "params": {
+       "gear_ratio": 100.0
+      }
+     },
+     "battery": {
+      "type": "nimh_pack",
+      "params": {
+       "capacity": 9.6
+      }
+     },
+     "sensor": {
+      "type": "bump_switch",
+      "params": {}
+     }
+    }
+   },
+   "file": "00_stock.png",
+   "views": [
+    "three-quarter",
+    "side"
+   ]
+  },
+  {
+   "iteration": 1,
+   "id": "b00m",
+   "held": 9,
+   "groups": 13,
+   "changes": [
+    "chassis: ride_height 2 \u2192 4, width 18 \u2192 10",
+    "sensor: bump_switch \u2192 ultrasonic"
+   ],
+   "body": {
+    "id": "b00m",
+    "parent": "stock",
+    "parts": {
+     "chassis": {
+      "type": "printed_tub",
+      "params": {
+       "width": 10.0,
+       "length": 20.0,
+       "ride_height": 4.0
+      }
+     },
+     "locomotion": {
+      "type": "wheels4",
+      "params": {
+       "wheel_radius": 3.0
+      }
+     },
+     "drive": {
+      "type": "n20_gearmotor",
+      "params": {
+       "gear_ratio": 100.0
+      }
+     },
+     "battery": {
+      "type": "nimh_pack",
+      "params": {
+       "capacity": 9.6
+      }
+     },
+     "sensor": {
+      "type": "ultrasonic",
+      "params": {}
+     }
+    }
+   },
+   "move": "merge",
+   "gained": [
+    "bedroom",
+    "greenhouse",
+    "hallway"
+   ],
+   "lost": [],
+   "cost": "$2.50, 96 machine min",
+   "why": [
+    "The wheels add 5 cm to the inner width, so a 10 cm chassis gives 15 cm overall. With the 1.0 cm sigma and the 2 cm offset of the opening, that still fits 20 cm. A 4 cm belly sits above the 2.5 cm hose, and the wheels already climb 3.05 cm on grass. Total height becomes 8 cm, still under the 9 cm sofa.",
+    "The HC-SR04 sonar ranges 2 m in any light, so the robot can stop well before each obstacle at full speed. That removes the 40 s of bump-and-back-off and brings the 8 m corridor well under 45 s. No sensor setting can fix this, because the bump switch has no range at all. Cost $2.50, 2 days."
+   ],
+   "file": "01_b00m.png",
+   "views": [
+    "three-quarter",
+    "side"
+   ]
+  },
+  {
+   "iteration": 2,
+   "id": "b011",
+   "held": 13,
+   "groups": 13,
+   "changes": [
+    "battery: nimh_pack \u2192 liion_pack (capacity 18.8)",
+    "chassis: length 20 \u2192 26",
+    "locomotion: wheels4 \u2192 tracks (idler_height 7, track_length 26)"
+   ],
+   "body": {
+    "id": "b011",
+    "parent": "b00m",
+    "parts": {
+     "chassis": {
+      "type": "printed_tub",
+      "params": {
+       "width": 10.0,
+       "length": 26.0,
+       "ride_height": 4.0
+      }
+     },
+     "locomotion": {
+      "type": "tracks",
+      "params": {
+       "track_length": 26.0,
+       "idler_height": 7.0
+      }
+     },
+     "drive": {
+      "type": "n20_gearmotor",
+      "params": {
+       "gear_ratio": 100.0
+      }
+     },
+     "battery": {
+      "type": "liion_pack",
+      "params": {
+       "capacity": 18.8
+      }
+     },
+     "sensor": {
+      "type": "ultrasonic",
+      "params": {}
+     }
+    }
+   },
+   "move": "swap",
+   "gained": [
+    "garden",
+    "patio",
+    "porch",
+    "sandbox"
+   ],
+   "lost": [],
+   "cost": "$24.50, 188 machine min",
+   "why": [
+    "Last time this was refused only on geometry: a 30 cm track on a 20 cm tub. Now the tub is 26 cm, matching a 26 cm track. That bridges about 0.45\u00d726 \u2248 11.7 cm, more than the 9 cm trench. The 7 cm idler (track top at 8.5 cm) meets the 5.5 cm porch edge on the sloped run. The tub rides 4 cm above the track contact line, so the belly cannot ground on an edge the track is crossing. Sand pressure drops to a few hundred Pa, under 0.5 cm of sinkage. Tracks run one N20 per side through a 1.8 cm sprocket, so force per motor is about 1.67\u00d7 the 3 cm wheel. The 2-cell Li-ion pack (7.4 V, inside the N20's 3\u20139 V) restores force and speed, giving about 0.7 m/s no-load. It also replaces the 8.16 Wh NiMH, which could not cover 5 km of tracked rolling resistance; I estimate about 7 J/m, so roughly 10 Wh, against about 16 Wh usable. I would buy rubber_track_kit $14, plus cell_18650 x2 $9 and bms_board $1.5 = $24.50. Lead time is 4 days. Printing the tub and track frames is about 230 machine min."
+   ],
+   "file": "02_b011.png",
+   "views": [
+    "three-quarter",
+    "side"
+   ]
+  }
+ ]
+}

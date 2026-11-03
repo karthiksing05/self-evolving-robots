@@ -1,0 +1,228 @@
+{
+ "run": "mobile_s2routes_s1",
+ "world": "mobile",
+ "body": "b020",
+ "films": [
+  {
+   "group": "kitchen",
+   "task": "kitchen_train0",
+   "file": "kitchen.mp4",
+   "poster": "kitchen.jpg",
+   "clipping_mm": 0.06,
+   "stock": {
+    "ok": true,
+    "verdict": "reached in 12 s of 40, using 0.008 Wh",
+    "headline": "Makes it: the end of the route in 12 s (limit 40 s)"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "reached in 13 s of 40, using 0.011 Wh",
+    "headline": "Makes it: the end of the route in 13 s (limit 40 s)"
+   }
+  },
+  {
+   "group": "living_room",
+   "task": "living_room_train0",
+   "file": "living_room.mp4",
+   "poster": "living_room.jpg",
+   "clipping_mm": 0.28,
+   "stock": {
+    "ok": true,
+    "verdict": "reached in 12 s of 40, using 0.009 Wh",
+    "headline": "Makes it: the end of the route in 12 s (limit 40 s)"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "reached in 13 s of 40, using 0.011 Wh",
+    "headline": "Makes it: the end of the route in 13 s (limit 40 s)"
+   }
+  },
+  {
+   "group": "under_sofa",
+   "task": "under_sofa_train0",
+   "file": "under_sofa.mp4",
+   "poster": "under_sofa.jpg",
+   "clipping_mm": 0.07,
+   "stock": {
+    "ok": true,
+    "verdict": "reached in 6 s of 40, using 0.004 Wh",
+    "headline": "Makes it: the end of the route in 6 s (limit 40 s)"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "reached in 6 s of 40, using 0.005 Wh",
+    "headline": "Makes it: the end of the route in 6 s (limit 40 s)"
+   }
+  },
+  {
+   "group": "bedroom",
+   "task": "bedroom_train0",
+   "file": "bedroom.mp4",
+   "poster": "bedroom.jpg",
+   "clipping_mm": 0.01,
+   "stock": {
+    "ok": false,
+    "verdict": "chassis wider than gap: the robot is 23.0 cm wide overall; the opening is 20.0 cm",
+    "headline": "Too wide to fit through the 20.0 cm doorway"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "reached in 15 s of 60, using 0.012 Wh",
+    "headline": "Makes it: the end of the route in 15 s (limit 60 s)"
+   }
+  },
+  {
+   "group": "hallway",
+   "task": "hallway_train0",
+   "file": "hallway.mp4",
+   "poster": "hallway.jpg",
+   "clipping_mm": 0.01,
+   "stock": {
+    "ok": false,
+    "verdict": "sensing range short: reached the end in 78 s (76 s at best); 45 s allowed; in the dark it sees 0.00 m ahead, less than its 0.20 m length, so it touches each of 10 obstacles at <= 0.25 m/s and backs off (40 s)",
+    "headline": "Can't see far enough in the wood: it crawls and runs out of time"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "reached in 31 s of 45, using 0.025 Wh",
+    "headline": "Makes it: the end of the route in 31 s (limit 45 s)"
+   }
+  },
+  {
+   "group": "porch",
+   "task": "porch_train0",
+   "file": "porch.mp4",
+   "poster": "porch.jpg",
+   "clipping_mm": 0.43,
+   "stock": {
+    "ok": false,
+    "verdict": "step higher than climbable: its running gear slipped on the 5.50 cm edge (edge mu 0.75), at approach duty 0.83: stuck 3.6 cm along, its running gear turning at 0.33 m/s; at full duty it climbs edges up to 3.61 cm",
+    "headline": "Can't climb the 5.5 cm step: its wheels slip at the edge"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "reached in 9 s of 40, using 0.008 Wh",
+    "headline": "Makes it: the end of the route in 9 s (limit 40 s)"
+   }
+  },
+  {
+   "group": "garden",
+   "task": "garden_train0",
+   "file": "garden.mp4",
+   "poster": "garden.jpg",
+   "clipping_mm": 0.04,
+   "stock": {
+    "ok": false,
+    "verdict": "belly hits step edge: the tub's belly at 2.0 cm grounded on the 9.0 cm wide, 5.0 cm deep trench (edge mu 0.75), at approach duty 0.43: stuck 12.3 cm along, its running gear turning at 0.24 m/s",
+    "headline": "Its belly grounds on the edge of the 9.0 cm trench"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "reached in 14 s of 60, using 0.012 Wh",
+    "headline": "Makes it: the end of the route in 14 s (limit 60 s)"
+   }
+  },
+  {
+   "group": "sandbox",
+   "task": "sandbox_train0",
+   "file": "sandbox.mp4",
+   "poster": "sandbox.jpg",
+   "clipping_mm": 0.27,
+   "stock": {
+    "ok": false,
+    "verdict": "sinks in sand: ground pressure 2.84 kPa on 15 cm2 of contact sinks it 3.79 cm; it climbs out of 2.00 cm (belly clearance 2.0 cm)",
+    "headline": "Sinks in the sand"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "reached in 14 s of 60, using 0.012 Wh",
+    "headline": "Makes it: the end of the route in 14 s (limit 60 s)"
+   }
+  },
+  {
+   "group": "shed",
+   "task": "shed_train0",
+   "file": "shed.mp4",
+   "poster": "shed.jpg",
+   "clipping_mm": 0.29,
+   "stock": {
+    "ok": true,
+    "verdict": "reached in 12 s of 60, using 0.011 Wh",
+    "headline": "Makes it: the end of the route in 12 s (limit 60 s)"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "reached in 13 s of 60, using 0.013 Wh",
+    "headline": "Makes it: the end of the route in 13 s (limit 60 s)"
+   }
+  },
+  {
+   "group": "patio",
+   "task": "patio_train0",
+   "file": "patio.mp4",
+   "poster": "patio.jpg",
+   "clipping_mm": 0.58,
+   "stock": {
+    "ok": false,
+    "verdict": "belly hits step edge: the tub's belly at 2.0 cm grounded on the 3 7.5 cm steps on 18 cm treads (edge mu 0.75), at approach duty 0.54: stuck 14.8 cm along, its running gear turning at 0.34 m/s",
+    "headline": "Its belly grounds on the edge of the 3 steps"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "reached in 7 s of 60, using 0.006 Wh",
+    "headline": "Makes it: the end of the route in 7 s (limit 60 s)"
+   }
+  },
+  {
+   "group": "study",
+   "task": "study_train0",
+   "file": "study.mp4",
+   "poster": "study.jpg",
+   "clipping_mm": 0.29,
+   "stock": {
+    "ok": true,
+    "verdict": "reached in 13 s of 45, using 0.009 Wh",
+    "headline": "Makes it: the end of the route in 13 s (limit 45 s)"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "reached in 14 s of 45, using 0.011 Wh",
+    "headline": "Makes it: the end of the route in 14 s (limit 45 s)"
+   }
+  },
+  {
+   "group": "greenhouse",
+   "task": "greenhouse_train0",
+   "file": "greenhouse.mp4",
+   "poster": "greenhouse.jpg",
+   "clipping_mm": 0.23,
+   "stock": {
+    "ok": false,
+    "verdict": "belly hits step edge: the tub's belly at 2.0 cm grounded on the 2.5 cm hose (edge mu 0.55), at approach duty 0.99: stuck 15.8 cm along, its running gear turning at 0.72 m/s",
+    "headline": "Its belly grounds on the edge of the 2.5 cm cord"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "reached in 12 s of 60, using 0.011 Wh",
+    "headline": "Makes it: the end of the route in 12 s (limit 60 s)"
+   }
+  },
+  {
+   "group": "lawn",
+   "task": "lawn_train0",
+   "file": "lawn.mp4",
+   "poster": "lawn.jpg",
+   "clipping_mm": 0.07,
+   "stock": {
+    "ok": true,
+    "verdict": "reached in 8991 s of 14400, using 7.936 Wh",
+    "headline": "Makes it: the end of the route in 8991 s (limit 14400 s)"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "reached in 12834 s of 14400, using 11.426 Wh",
+    "headline": "Makes it: the end of the route in 12834 s (limit 14400 s)"
+   }
+  }
+ ]
+}

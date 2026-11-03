@@ -1,0 +1,242 @@
+{
+ "run": "mobile_s2routes_s1",
+ "world": "mobile",
+ "frames": [
+  {
+   "iteration": 0,
+   "id": "stock",
+   "held": 6,
+   "groups": 13,
+   "changes": [],
+   "body": {
+    "id": "stock",
+    "parent": null,
+    "parts": {
+     "chassis": {
+      "type": "printed_tub",
+      "params": {
+       "width": 18.0,
+       "length": 20.0,
+       "ride_height": 2.0
+      }
+     },
+     "locomotion": {
+      "type": "wheels4",
+      "params": {
+       "wheel_radius": 3.0
+      }
+     },
+     "drive": {
+      "type": "n20_gearmotor",
+      "params": {
+       "gear_ratio": 100.0
+      }
+     },
+     "battery": {
+      "type": "nimh_pack",
+      "params": {
+       "capacity": 9.6
+      }
+     },
+     "sensor": {
+      "type": "bump_switch",
+      "params": {}
+     }
+    }
+   },
+   "file": "00_stock.png",
+   "views": [
+    "three-quarter",
+    "side"
+   ]
+  },
+  {
+   "iteration": 1,
+   "id": "b00m",
+   "held": 11,
+   "groups": 13,
+   "changes": [
+    "battery: nimh_pack \u2192 liion_pack (capacity 18.8)",
+    "chassis: length 20 \u2192 24, ride_height 2 \u2192 4.5, width 18 \u2192 12",
+    "locomotion: wheels4 \u2192 tracks (idler_height 6, track_length 24)",
+    "sensor: bump_switch \u2192 ultrasonic"
+   ],
+   "body": {
+    "id": "b00m",
+    "parent": "stock",
+    "parts": {
+     "chassis": {
+      "type": "printed_tub",
+      "params": {
+       "width": 12.0,
+       "length": 24.0,
+       "ride_height": 4.5
+      }
+     },
+     "locomotion": {
+      "type": "tracks",
+      "params": {
+       "track_length": 24.0,
+       "idler_height": 6.0
+      }
+     },
+     "drive": {
+      "type": "n20_gearmotor",
+      "params": {
+       "gear_ratio": 100.0
+      }
+     },
+     "battery": {
+      "type": "liion_pack",
+      "params": {
+       "capacity": 18.8
+      }
+     },
+     "sensor": {
+      "type": "ultrasonic",
+      "params": {}
+     }
+    }
+   },
+   "move": "merge",
+   "gained": [
+    "garden",
+    "greenhouse",
+    "hallway",
+    "porch",
+    "sandbox"
+   ],
+   "lost": [],
+   "cost": "$27.00, 186 machine min",
+   "why": [
+    "An idler at 6 cm meets the 5.6 cm porch edge on the sloped run, and the track stands 7.5 cm tall, under the 9 cm sofa. A 24 cm contact length bridges gaps up to about 10.8 cm, more than the 8.8 cm trench. Two 24 cm tracks give about 140 cm\u00b2 of contact, roughly 0.4 kPa, which sinks well under 1 cm in sand. The tracks' extra mass and rolling resistance threaten the 5000 m lawn, so the swap includes 2S Li-ion (18.8 Wh, 92 g, 7.4 V). That doubles the energy, weighs less than the current NiMH pack, and raises the N20 voltage. With two motors on 1.8 cm sprockets the stall force is about 16 N and no-load speed about 0.69 m/s. That is fast enough for 5000 m in 14400 s, which needs 0.35 m/s. Narrowing the tub to 12 cm keeps the robot narrow enough for the bedroom door. To buy: rubber_track_kit $14 (4 d), cell_18650 \u00d72 $9 and bms_board $1.5 (3 d). Total $24.50, within 4 days. Patio's 7.6 cm steps would need an idler near 7.5 cm, which stands about 9 cm tall, so they still conflict with under_sofa.",
+    "No params value of bump_switch gives it any range; touching is how it senses. The HC-SR04 ranges 2 m in any light, adds no height and draws 0.08 W. It lets System 1 cruise the 8 m dark corridor and steer around obstacles, removing roughly 40 s of back-offs. Cost: $2.50 and 2 days. The camera sees only 0.12 m in the dark, and the lidar cannot be bought."
+   ],
+   "file": "01_b00m.png",
+   "views": [
+    "three-quarter",
+    "side"
+   ]
+  },
+  {
+   "iteration": 2,
+   "id": "b010",
+   "held": 12,
+   "groups": 13,
+   "changes": [
+    "chassis: width 12 \u2192 10"
+   ],
+   "body": {
+    "id": "b010",
+    "parent": "b00m",
+    "parts": {
+     "chassis": {
+      "type": "printed_tub",
+      "params": {
+       "width": 10.0,
+       "length": 24.0,
+       "ride_height": 4.5
+      }
+     },
+     "locomotion": {
+      "type": "tracks",
+      "params": {
+       "track_length": 24.0,
+       "idler_height": 6.0
+      }
+     },
+     "drive": {
+      "type": "n20_gearmotor",
+      "params": {
+       "gear_ratio": 100.0
+      }
+     },
+     "battery": {
+      "type": "liion_pack",
+      "params": {
+       "capacity": 18.8
+      }
+     },
+     "sensor": {
+      "type": "ultrasonic",
+      "params": {}
+     }
+    }
+   },
+   "move": "params",
+   "gained": [
+    "bedroom"
+   ],
+   "lost": [],
+   "cost": "$0.00, 111 machine min",
+   "why": [
+    "Inner width 12 \u2192 10 cm (the bottom of the range) makes the robot 16 cm wide overall. That leaves 2.0 cm per side: 2.2 sigma at duty 0.63 and about 4 sigma at the slowest duty (sigma 0.49). System 1 already handles the +2 cm offset with its line setting. This costs nothing but a tub reprint of about 160 machine min. It is cheaper and gives more margin than encoder motors, which cost $12 and only cut sigma to about 0.53, about 1.9 sigma of margin."
+   ],
+   "file": "02_b010.png",
+   "views": [
+    "three-quarter",
+    "side"
+   ]
+  },
+  {
+   "iteration": 3,
+   "id": "b020",
+   "held": 13,
+   "groups": 13,
+   "changes": [
+    "locomotion: idler_height 6 \u2192 7, track_length 24 \u2192 28"
+   ],
+   "body": {
+    "id": "b020",
+    "parent": "b010",
+    "parts": {
+     "chassis": {
+      "type": "printed_tub",
+      "params": {
+       "width": 10.0,
+       "length": 24.0,
+       "ride_height": 4.5
+      }
+     },
+     "locomotion": {
+      "type": "tracks",
+      "params": {
+       "track_length": 28.0,
+       "idler_height": 7.0
+      }
+     },
+     "drive": {
+      "type": "n20_gearmotor",
+      "params": {
+       "gear_ratio": 100.0
+      }
+     },
+     "battery": {
+      "type": "liion_pack",
+      "params": {
+       "capacity": 18.8
+      }
+     },
+     "sensor": {
+      "type": "ultrasonic",
+      "params": {}
+     }
+    }
+   },
+   "move": "params",
+   "gained": [
+    "patio"
+   ],
+   "lost": [],
+   "cost": "$0.00, 73 machine min",
+   "why": [
+    "This is the highest idler that keeps the robot as tall as it is now. With the idler at 7.0 cm the track top is at 8.5 cm, the same as the tub top (4.5 ride height + 4 cm tub). The robot stays 8.5 cm tall, which already passes the 9.0 cm sofa. The 7.4 cm idler made it 8.9 cm tall and lost under_sofa, so the true height limit is between 8.5 and 8.9 cm. A 28 cm track (allowed on the 24 cm tub, since 32 needed 28-36) puts more weight on the rear run that pushes the front run into the nosing. It also spans the 19.5 cm step diagonal more firmly, so once the front is up the robot rides the nosings like a 22.6 deg slope, below its 33.3 deg traction limit. This tests whether pushing plus grouser bite carries a 7.0 cm idler over 0.6 cm more of edge. I rate it no better than even odds, but it costs only a reprint of the track frames, and no other parameter value can reach higher without breaking the sofa clearance."
+   ],
+   "file": "03_b020.png",
+   "views": [
+    "three-quarter",
+    "side"
+   ]
+  }
+ ]
+}

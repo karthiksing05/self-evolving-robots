@@ -1,0 +1,126 @@
+{
+ "run": "mobile_s2routes_s1",
+ "world": "mobile",
+ "films": [
+  {
+   "frame": 1,
+   "id": "b00m",
+   "group": "garden",
+   "task": "garden_train0",
+   "file": "01_b00m_garden.mp4",
+   "poster": "01_b00m_garden.jpg",
+   "seconds": 5.5,
+   "sound": false,
+   "clipping_mm": 0.04,
+   "change": "What changed: battery nimh pack → liion pack (capacity 18.8); chassis: width 18 → 12, length 20 → 24, ride height 2 → 4.5; locomotion wheels4 → tracks (track length 24, idler height 6); sensor bump switch → ultrasonic",
+   "before": {
+    "ok": false,
+    "verdict": "belly hits step edge: the tub's belly at 2.0 cm grounded on the 9.0 cm wide, 5.0 cm deep trench (edge mu 0.75), at approach duty 0.43: stuck 12.3 cm along, its running gear turning at 0.24 m/s",
+    "headline": "Its belly grounds on the edge of the 9.0 cm trench",
+    "recorded": "belly_hits_step_edge"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "reached in 14 s of 60, using 0.012 Wh",
+    "headline": "Makes it: the end of the route in 14 s (limit 60 s)",
+    "recorded": true
+   }
+  },
+  {
+   "frame": 1,
+   "id": "b00m",
+   "group": "hallway",
+   "task": "hallway_train0",
+   "file": "01_b00m_hallway.mp4",
+   "poster": "01_b00m_hallway.jpg",
+   "seconds": 2.4,
+   "sound": false,
+   "clipping_mm": 0.01,
+   "change": "What changed: battery nimh pack → liion pack (capacity 18.8); chassis: width 18 → 12, length 20 → 24, ride height 2 → 4.5; locomotion wheels4 → tracks (track length 24, idler height 6); sensor bump switch → ultrasonic",
+   "before": {
+    "ok": false,
+    "verdict": "sensing range short: reached the end in 78 s (76 s at best); 45 s allowed; in the dark it sees 0.00 m ahead, less than its 0.20 m length, so it touches each of 10 obstacles at <= 0.25 m/s and backs off (40 s)",
+    "headline": "Can't see far enough in the wood: it crawls and runs out of time",
+    "recorded": "sensing_range_short"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "reached in 31 s of 45, using 0.025 Wh",
+    "headline": "Makes it: the end of the route in 31 s (limit 45 s)",
+    "recorded": true
+   }
+  },
+  {
+   "frame": 1,
+   "id": "b00m",
+   "group": "sandbox",
+   "task": "sandbox_train0",
+   "file": "01_b00m_sandbox.mp4",
+   "poster": "01_b00m_sandbox.jpg",
+   "seconds": 4.2,
+   "sound": false,
+   "clipping_mm": 0.27,
+   "change": "What changed: battery nimh pack → liion pack (capacity 18.8); chassis: width 18 → 12, length 20 → 24, ride height 2 → 4.5; locomotion wheels4 → tracks (track length 24, idler height 6); sensor bump switch → ultrasonic",
+   "before": {
+    "ok": false,
+    "verdict": "sinks in sand: ground pressure 2.84 kPa on 15 cm2 of contact sinks it 3.79 cm; it climbs out of 2.00 cm (belly clearance 2.0 cm)",
+    "headline": "Sinks in the sand",
+    "recorded": "sinks_in_sand"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "reached in 14 s of 60, using 0.012 Wh",
+    "headline": "Makes it: the end of the route in 14 s (limit 60 s)",
+    "recorded": true
+   }
+  },
+  {
+   "frame": 2,
+   "id": "b010",
+   "group": "bedroom",
+   "task": "bedroom_train0",
+   "file": "02_b010_bedroom.mp4",
+   "poster": "02_b010_bedroom.jpg",
+   "seconds": 6.5,
+   "sound": false,
+   "clipping_mm": 0.21,
+   "change": "What changed: chassis: width 12 → 10",
+   "before": {
+    "ok": false,
+    "verdict": "clipped gap edge: 1.00 cm to spare per side; it came +1.15 cm off centre (steering error sigma 0.89 cm at duty 0.63) and met the jamb: stuck 14.0 cm along, its running gear turning at 0.27 m/s",
+    "headline": "Clips the frame of the 20.0 cm doorway",
+    "recorded": "not_found_by_search"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "reached in 15 s of 60, using 0.012 Wh",
+    "headline": "Makes it: the end of the route in 15 s (limit 60 s)",
+    "recorded": true
+   }
+  },
+  {
+   "frame": 3,
+   "id": "b020",
+   "group": "patio",
+   "task": "patio_train0",
+   "file": "03_b020_patio.mp4",
+   "poster": "03_b020_patio.jpg",
+   "seconds": 6.4,
+   "sound": false,
+   "clipping_mm": 0.58,
+   "change": "What changed: locomotion: track length 24 → 28, idler height 6 → 7",
+   "before": {
+    "ok": false,
+    "verdict": "step higher than climbable: its running gear slipped on the 3 7.5 cm steps on 18 cm treads (edge mu 0.75), at approach duty 0.56: stuck 16.4 cm along, its running gear turning at 0.27 m/s; at full duty it climbs edges up to 5.95 cm",
+    "headline": "Can't climb the 3 steps: its tracks slip at the edge",
+    "recorded": "step_higher_than_climbable"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "reached in 7 s of 60, using 0.006 Wh",
+    "headline": "Makes it: the end of the route in 7 s (limit 60 s)",
+    "recorded": true
+   }
+  }
+ ]
+}

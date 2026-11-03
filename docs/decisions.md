@@ -1975,6 +1975,32 @@ These test different things: pitch and tipping across several nosings, a round o
 - Driving straight at a 3 cm step, the X pattern's side forces cancel: 0.0 cm of drift across it.
 - No held route moved, and every mobile, film and CAD test passed. The mecanum wheels still gain nothing over the stock (they lose the gravel ramp, where loose ground clogs their rollers).
 
+**The campaign under D-069 and D-070** (three seeds, 10 iterations allowed; `results/evolve/mobile_s2routes_s{0,1,2}.json`).
+
+| seed | train groups by iteration | final train | test routes (stock) | kept body |
+|---|---|---|---|---|
+| s0 | 6 → 9 → 13 at 2 | **13/13** | 13 (6) | tracks 7 × 26 cm on a 26 × 10 cm tub, 4 cm ride; N20 100:1; Li-ion 2 cells; sonar |
+| s1 | 6 → 11 → 12 → 13 at 3 | **13/13** | 12 (6), lost the patio | tracks 7 × 28 cm on a 24 × 10 cm tub, 4.5 cm ride; N20 100:1; Li-ion; sonar |
+| s2 | 6 → 11 → 12 → 13 at 3 | **13/13** | 13 (6) | tracks 6.5 × 24 cm on a 22 × 12 cm tub, 3 cm ride; encoder N20 50:1; Li-ion; sonar |
+
+- **D-069's prediction held:** 13/13 on every seed, not just two. System 2 named the patio steps from iteration 0 ("belly_hits_step_edge on … the 7.5 cm patio steps"), and every seed answered with tracks, a Li-ion pack and a sonar.
+- **D-069's measured conflict was wrong.** It said no catalogue body holds every route: an 8 cm idler climbs the stairs but will not pass under the sofa. All three finals pass under the sofa with idlers of 6.5–7 cm, and climb the stairs.
+- **Why: the patio verdict is a knife edge.** Each body was replayed on the patio's train placement under five search seeds (System 1's full search each time):
+
+  | body | patio climbed |
+  |---|---|
+  | D-063 seed 0 final (7 × 24, NiMH) | 2 / 5 |
+  | D-063 seed 1 final (6.5 × 24, Li-ion), measured as slipping in D-069 | 3 / 5 |
+  | this campaign's s0 | 4 / 5 |
+  | this campaign's s1 | 4 / 5 |
+  | this campaign's s2 | 3 / 5 |
+
+  - Every tracked body climbs on some seeds and slips on others. D-069's probe was one seed per body, so it read 2–3 in 5 as "slips".
+  - A run needs its own seed to succeed (with `confirm=2` on fresh noise inside it), so the 13/13 is partly the search's luck. s1's test placement, 5 % different, slipped.
+  - The longer finals (26–28 cm tracks, 4 of 5) are steadier than the 24 cm ones (2–3 of 5), as D-069 expected from treads shorter than the robot. Steadier is not reliable.
+- **Open fault, for the next judge-tier change:** a group held on one search seed is not "held" when its verdict flips on half of them. The fix to weigh is to score a route by its success rate over several search seeds, with a threshold, at the cost of several times the trial time per body. Until then the patio's 13/13 reads "climbs on most seeds".
+- **Films:** `results/evolve/films/mobile_s2routes_s*` holds before→after films of the changes the seeds kept. `results/evolve/gallery/mobile_s2routes_s*` holds the stock beside each final on every route, replayed in MuJoCo under each run's seed.
+
 ## D-071 The talking robot's drives obey the laws of the linkages that move them (judge: world_phonology)
 
 **Why.** The phonology world gives System 1 position controls (`phonology.rig`): a tongue place, a cam lift, a lip radius. The bench rig's CAD (`worlds/rig_cad.py`, tooling) draws a servo and a linkage behind each control, but nothing checked that the linkage can make the motion. A probe of the CAD's linkages at the ends of every control range, for bodies at the catalogue's corners, found two parts that cannot be built as described:
