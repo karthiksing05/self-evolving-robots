@@ -197,6 +197,64 @@ def test_mobile_film_never_draws_the_robot_inside_the_ground(route, locomotion):
     assert drive.clipping_mm() <= 0.5
 
 
+def _model(world, task):
+    """The judge's MuJoCo model for a replay of ``task`` on the stock body, as the film builds it."""
+    got = []
+
+    def probe(model):
+        got.append(model)
+        raise _Stop
+
+    with pytest.raises(_Stop):
+        F.gripper(world.stock(), task, {}, 0, probe=probe, render=False)
+    return got[0]
+
+
+def test_dressing_the_film_scene_leaves_the_physics_alone():
+    """The studio look changes colours, lights, render settings and the drawn scan only; a staged copy of the
+    model steps to the same state, bit for bit, as the judge's."""
+    import copy
+
+    import mujoco
+
+    w = GripperWorld()
+    plain = _model(w, _task(w, "reg_sugar_box"))
+    staged = copy.deepcopy(plain)
+    F._stage(staged, 96, 72)
+    states = []
+    for m in (plain, staged):
+        d = mujoco.MjData(m)
+        d.ctrl[:] = 0.3 * (m.actuator_ctrlrange[:, 0] + m.actuator_ctrlrange[:, 1])
+        for _ in range(400):
+            mujoco.mj_step(m, d)
+        states.append((d.qpos.copy(), d.qvel.copy(), d.ncon))
+    assert np.array_equal(states[0][0], states[1][0]) and np.array_equal(states[0][1], states[1][1])
+    assert states[0][2] == states[1][2]
+
+
+def test_the_drawn_scan_lies_inside_the_parts_the_simulator_collides_with():
+    """A decimated scan sticks out of its convex collision parts by up to 3 mm (the sugar box), which drew a
+    fingertip resting on the simulated surface inside the object; the film pulls the scan inside them."""
+    import copy
+
+    w = GripperWorld()
+    m = copy.deepcopy(_model(w, _task(w, "reg_sugar_box")))
+
+    def worst(m) -> float:
+        scans = [g for g in range(m.ngeom) if m.body(m.geom_bodyid[g]).name.startswith("ctl_")
+                 and m.geom_group[g] <= 2 and m.geom_type[g] == 7]
+        out = 0.0
+        for g in scans:
+            mid, (rot, pos) = m.geom_dataid[g], F._frame(m, g)
+            v = m.mesh_vert[m.mesh_vertadr[mid]:m.mesh_vertadr[mid] + m.mesh_vertnum[mid]].astype(float) @ rot.T + pos
+            out = max(out, float(F._outside(v, F._hulls(m, g)).max()))
+        return 1000 * out
+
+    assert worst(m) > 2.0  # the scan as imported
+    F._stage(m, 96, 72)
+    assert worst(m) < 0.05
+
+
 def test_gripper_film_measures_how_deep_the_drawn_hand_goes_into_the_object():
     """A film shows the drawn meshes, which differ from the simulated hulls by about a millimetre; a film
     deeper than CLIP_MM is not written (film_bodies)."""

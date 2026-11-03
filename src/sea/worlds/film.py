@@ -2,7 +2,10 @@
 
 Each film replays one attempt with the controls the run recorded, so nothing is searched again:
 - **Gripper:** the simulator itself. The pick is replayed in MuJoCo with System 1's recorded grasp
-  parameters, filmed by a camera that follows the object, and the verdict is the judge's on that replay.
+  parameters, and the verdict is the judge's on that replay. The film's copy of the scene is dressed for
+  people (`_stage`): printed-part colours, a key and rim light with soft shadows, a table under the board
+  and a studio backdrop, all visual only. The camera follows the jaws and the object; a level close-up on
+  the moving fingertip draws MuJoCo's contact forces; stretches where nothing moves play faster, marked.
 - **Talking robot:** the CAD at System 1's recorded posture, the formants the simulator computes for it,
   and the sound. The sound is a 120 Hz pulse train through the simulator's own transfer function. A
   stop is heard inside a vowel (/a·C·a/), with a release burst shaped by the cavity in front of the
@@ -216,8 +219,202 @@ def encode(frames: list[np.ndarray], path: Path, audio: np.ndarray | None = None
     Image.fromarray(frames[-1]).save(path.with_suffix(".jpg"), quality=85)
 
 
-# ---------------------------------------------------------------- the gripper: the simulator itself
-def gripper(body: Body, task: Task, controls: dict[str, float], seed: int = 0, size: tuple[int, int] = (480, 360),
+# ---------------------------------------------------------------- the gripper: the simulator itself, dressed for people
+PLA = (0.90, 0.88, 0.84, 1.0)  # printed parts, off-white as the CAD pictures draw them
+SERVO = (0.14, 0.14, 0.15, 1.0)
+BIRCH = (0.62, 0.50, 0.36, 1.0)  # the tabletop board
+CYC = (np.array([238.0, 240.0, 242.0]), np.array([203.0, 206.0, 210.0]))  # studio backdrop: top, horizon
+SLATE = (np.array([70.0, 76.0, 84.0]), np.array([38.0, 42.0, 48.0]))  # the close-up's darker backdrop
+SS = 2  # supersampling: the backdrop goes in at twice the size, then the frame is filtered down
+FAST = 4  # how much faster than real time a stretch where nothing moves plays
+STILL = 0.004  # m/s: below this, fingertips and object are both still
+
+
+def _stage(m, w: int, h: int) -> None:
+    """Dress the film's own copy of the scene: colours, materials, its light and render quality.  Only visual
+    fields change, none the physics reads, so the replay and its verdict are the judge's."""
+    for i in range(m.nmat):
+        servo = "sts3215" in m.mat(i).name
+        m.mat_rgba[i] = SERVO if servo else PLA
+        m.mat_specular[i], m.mat_shininess[i] = (0.5, 0.6) if servo else (0.15, 0.2)
+    for g in range(m.ngeom):
+        name, body = m.geom(g).name, m.body(m.geom_bodyid[g]).name
+        if name == "floor":
+            m.geom_rgba[g] = (*CYC[1] / 255, 1.0)
+        elif name == "panel_board":
+            m.geom_rgba[g] = BIRCH
+        elif body.startswith("ctl_") and m.geom_group[g] <= 2:
+            m.geom_rgba[g, :3] = m.geom_rgba[g, :3] ** 0.8  # a scan's mean texture colour, lifted a little
+            if m.geom_type[g] == 7 and m.geom_contype[g] == 0 and m.geom_conaffinity[g] == 0:
+                _shrinkwrap(m, g)
+        elif m.geom_matid[g] < 0 and np.allclose(m.geom_rgba[g, :3], 0.5) and m.geom_group[g] <= 2:
+            m.geom_rgba[g] = PLA  # printed linkage parts left at the default grey
+    m.light_diffuse[:], m.light_specular[:], m.light_castshadow[:] = 0.12, 0.0, False  # the studio rig lights it
+    m.vis.headlight.ambient[:], m.vis.headlight.diffuse[:], m.vis.headlight.specular[:] = 0.32, 0.30, 0.05
+    m.vis.quality.shadowsize, m.vis.quality.offsamples = 8192, 4
+    m.vis.global_.offwidth, m.vis.global_.offheight = max(m.vis.global_.offwidth, SS * w), max(m.vis.global_.offheight, SS * h)
+
+
+def _frame(m, g: int) -> tuple[np.ndarray, np.ndarray]:
+    import mujoco
+
+    rot = np.zeros(9)
+    mujoco.mju_quat2Mat(rot, m.geom_quat[g])
+    return rot.reshape(3, 3), m.geom_pos[g].copy()
+
+
+def _hulls(m, g: int) -> list[tuple[np.ndarray, np.ndarray]]:
+    """The planes (normals, offsets) of each convex collision part of geom ``g``'s body, in that body's frame."""
+    import trimesh
+
+    out = []
+    for c in range(m.ngeom):
+        if m.geom_bodyid[c] != m.geom_bodyid[g] or m.geom_group[c] != 3 or m.geom_type[c] != 7:
+            continue
+        mid, (rot, pos) = m.geom_dataid[c], _frame(m, c)
+        v = m.mesh_vert[m.mesh_vertadr[mid]:m.mesh_vertadr[mid] + m.mesh_vertnum[mid]] @ rot.T + pos
+        h = trimesh.convex.convex_hull(v)
+        out.append((h.face_normals, np.einsum("ij,ij->i", h.face_normals, h.triangles[:, 0])))
+    return out
+
+
+def _outside(p: np.ndarray, hulls) -> np.ndarray:
+    """How far each point lies outside every convex part (<= 0: inside one), metres."""
+    return np.min([np.max(p @ n.T - off[None, :], axis=1) for n, off in hulls], axis=0)
+
+
+def _shrinkwrap(m, g: int) -> None:
+    """Pull the drawn scan of geom ``g`` back inside its body's collision parts.  A decimated scan sticks out
+    of the convex parts the simulator collides with by up to 3 mm (the sugar box), so a fingertip resting on
+    the simulated surface was drawn inside the scan.  Each vertex outside every part is projected onto the
+    nearest part (alternating projections onto its violated faces); the scan collides with nothing, so the
+    physics is untouched and what is drawn is what is simulated."""
+    hulls = _hulls(m, g)
+    if not hulls:
+        return
+    mid, (rot, pos) = m.geom_dataid[g], _frame(m, g)
+    sl = slice(m.mesh_vertadr[mid], m.mesh_vertadr[mid] + m.mesh_vertnum[mid])
+    v = m.mesh_vert[sl].astype(float) @ rot.T + pos
+    out = _outside(v, hulls) > 0
+    if not out.any():
+        return
+    near = np.argmin([np.max(v[out] @ n.T - off[None, :], axis=1) for n, off in hulls], axis=0)
+    p = v[out]
+    for k, (n, off) in enumerate(hulls):
+        q = p[near == k]
+        for _ in range(60):
+            viol = q @ n.T - off[None, :]
+            worst = np.argmax(viol, axis=1)
+            over = viol[np.arange(len(q)), worst]
+            if not (over > 0).any():
+                break
+            q = q - np.maximum(over, 0)[:, None] * n[worst] * 1.02
+        p[near == k] = q
+    v[out] = p
+    m.mesh_vert[sl] = (v - pos) @ rot
+
+
+def _studio(scn, target: np.ndarray, azimuth: float) -> None:
+    """A key light with soft shadows, from the camera's front left and above; a cool rim from behind."""
+    import mujoco
+
+    a = math.radians(azimuth)
+    fwd = np.array([math.cos(a), math.sin(a), 0.0])
+    left = np.array([-math.sin(a), math.cos(a), 0.0])
+    for off, diffuse, spec, shadow in ((-0.45 * fwd + 0.35 * left + [0, 0, 0.75], 0.62, 0.25, True),
+                                       (0.55 * fwd - 0.2 * left + [0, 0, 0.45], 0.30, 0.10, False)):
+        if scn.nlight >= len(scn.lights):
+            return
+        L = scn.lights[scn.nlight]
+        scn.nlight += 1
+        pos = target + off
+        L.pos, L.dir = pos, (target - pos) / np.linalg.norm(target - pos)
+        L.type, L.headlight, L.castshadow = mujoco.mjtLightType.mjLIGHT_SPOT, 0, shadow
+        L.diffuse, L.specular, L.ambient = [diffuse] * 3, [spec] * 3, [0.0] * 3
+        L.cutoff, L.exponent, L.attenuation = 45.0, 2.0, [1.0, 0.0, 0.0]
+        L.bulbradius, L.softness, L.range, L.intensity, L.id, L.texid = 0.08, 0.6, 10.0, 0.0, -1, -1
+
+
+def _table(m, d) -> list[tuple[np.ndarray, np.ndarray, tuple[float, ...]]]:
+    """Boxes (half sizes, centre, colour) for a table under the board and the arm's base.  In the judge's scene
+    the board is a 1 cm plank at z = 0 over a floor 0.4 m down, which reads as a plank floating in the air; the
+    table goes into the drawn scene only (mjvScene), so nothing collides with it."""
+    g = m.geom("panel_board").id
+    top = float(d.geom_xpos[g][2] - m.geom_size[g][2]) - 2e-4
+    floor = m.geom("floor").id
+    ground = float(d.geom_xpos[floor][2] + m.geom_size[floor][2])
+    cx, hx, hy, t = 0.2, 0.45, 0.42, 0.02
+    boxes = [(np.array([hx, hy, t]), np.array([cx, 0.0, top - t]), (0.80, 0.80, 0.78, 1.0))]
+    leg = (top - 2 * t - ground) / 2
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            boxes.append((np.array([0.02, 0.02, leg]), np.array([cx + sx * (hx - 0.05), sy * (hy - 0.05), ground + leg]),
+                          (0.30, 0.31, 0.33, 1.0)))
+    return boxes
+
+
+class _View:
+    """One camera drawn over the studio backdrop: rendered at SS times the size with its depth, the empty
+    pixels (nothing hit) painted with the backdrop, then filtered down so silhouettes stay clean.  ``props``
+    are boxes drawn into the scene only (``_table``)."""
+
+    def __init__(self, m, w: int, h: int, props=(), cyc=CYC):
+        import mujoco
+
+        self.w, self.h, self.props = w, h, list(props)
+        self.colour, self.depth = mujoco.Renderer(m, SS * h, SS * w), mujoco.Renderer(m, SS * h, SS * w)
+        self.depth.enable_depth_rendering()
+        self.far = 0.99 * m.vis.map.zfar * m.stat.extent
+        y = np.linspace(0.0, 1.0, SS * h)[:, None, None] ** 0.8
+        self.backdrop = (cyc[0] * (1 - y) + cyc[1] * y).astype(np.float32)
+
+    def shot(self, d, cam, opt) -> np.ndarray:
+        import mujoco
+
+        for r in (self.colour, self.depth):
+            r.update_scene(d, cam, opt)
+            scn = r.scene
+            for half, pos, rgba in self.props:
+                if scn.ngeom < scn.maxgeom:
+                    mujoco.mjv_initGeom(scn.geoms[scn.ngeom], mujoco.mjtGeom.mjGEOM_BOX, half, pos, np.eye(3).ravel(),
+                                        np.array(rgba, np.float32))
+                    scn.ngeom += 1
+            _studio(scn, np.array(cam.lookat), cam.azimuth)
+        img = self.colour.render().astype(np.float32)
+        empty = self.depth.render() >= self.far
+        img = np.where(empty[..., None], self.backdrop, img)
+        return img.reshape(self.h, SS, self.w, SS, 3).mean((1, 3)).astype(np.uint8)
+
+    def close(self) -> None:
+        self.colour.close()
+        self.depth.close()
+
+
+def _tips(m, d, pts: dict[str, dict[int, np.ndarray]]) -> dict[str, np.ndarray]:
+    """The lowest drawn point of each finger, world frame: where the hand meets the object."""
+    out = {}
+    for side, by in pts.items():
+        world = np.concatenate([p @ d.geom_xmat[g].reshape(3, 3).T + d.geom_xpos[g] for g, p in by.items()])
+        out[side] = world[np.argmin(world[:, 2])]
+    return out
+
+
+def _inset(img: np.ndarray, small: np.ndarray, label: str) -> np.ndarray:
+    """``small`` framed in the top right corner of ``img``, under the label band, with its own label."""
+    from PIL import Image, ImageDraw
+
+    h, w = small.shape[:2]
+    x, y = img.shape[1] - w - 10, 40
+    out = img.copy()
+    out[y - 2:y + h + 2, x - 2:x + w + 2] = 250
+    out[y:y + h, x:x + w] = small
+    im = Image.fromarray(out)
+    ImageDraw.Draw(im, "RGBA").rectangle([x, y + h - 20, x + w, y + h], fill=(*PAPER, 170))
+    ImageDraw.Draw(im).text((x + 6, y + h - 18), label, fill=INK, font=_font(12))
+    return np.asarray(im)
+
+
+def gripper(body: Body, task: Task, controls: dict[str, float], seed: int = 0, size: tuple[int, int] = (720, 540),
             probe: Callable[[Any], Callable[[Any], None]] | None = None, render: bool = True) -> Clip:
     """Replay the pick in MuJoCo with the recorded grasp parameters under the run's ``seed``, whose
     domain-randomization draw the verdict was judged on.  System 1 records {} for its first attempt and for
@@ -248,17 +445,36 @@ def gripper(body: Body, task: Task, controls: dict[str, float], seed: int = 0, s
     progs = candidate_programs(obj, panel, cfg)
     prog = next((p for _, p in progs if prims <= set(re.findall(r"[a-z_]+", str(p)))), progs[0][1])
     runner = PanelRunner(panel, cfg, 0)
+    m = runner.sim.model
     w, h = size
-    ren = mujoco.Renderer(runner.sim.model, h, w) if render else None
+    iw, ih = int(w * 0.36), int(h * 0.36)
+    if render:
+        _stage(m, w, h)
+    main = close = None
+    if render:
+        d0 = mujoco.MjData(m)
+        mujoco.mj_kinematics(m, d0)
+        table = _table(m, d0)
+        main, close = _View(m, w, h, table), _View(m, iw, ih, table, SLATE)
+        # contact force arrows (MuJoCo scales length by the mean body mass, width by the mean size): 25 N to 6 cm
+        m.vis.map.force, m.vis.scale.forcewidth = 0.0024 * m.stat.meanmass, 0.003 / m.stat.meansize
     opt = mujoco.MjvOption()
     opt.geomgroup[:] = [1, 1, 1, 0, 0, 0]
-    cam = mujoco.MjvCamera()
-    cam.distance, cam.azimuth, cam.elevation = 0.32, 150.0, -14.0
+    forces = mujoco.MjvOption()
+    forces.geomgroup[:] = opt.geomgroup
+    forces.flags[mujoco.mjtVisFlag.mjVIS_CONTACTFORCE] = 1
+    cam, side = mujoco.MjvCamera(), mujoco.MjvCamera()
+    cam.azimuth, cam.elevation = 145.0, -20.0
+    side.distance, side.elevation = 0.13, 0.0  # level with the fingertip: a top face is seen edge on
+    names = {m.body(i).name for i in range(m.nbody)}
+    moving = {m.body(b).id for b in ("moving_jaw_so101_v1", "jaw_coupler", "jaw_carriage") if b in names}
+    fingers = {"fixed": _robot_points(m, {m.body("gripper").id}, 300), "moving": _robot_points(m, moving, 300)}
     judge = _judge(obj, panel, limits)
     shots: list[list[np.ndarray]] = []
     hooks: list[Any] = []
     depths: list[Any] = []
     orig = X.Episode.tick
+    state: dict[str, Any] = {}
 
     def tick(ep, q):
         orig(ep, q)
@@ -266,16 +482,41 @@ def gripper(body: Body, task: Task, controls: dict[str, float], seed: int = 0, s
             hooks[-1](ep.sim.data)
         if depths:
             depths[-1](ep.sim.data)
-        if ren is None:
+        if main is None:
             return
-        p = ep.sim.data.xpos[ep.sim.controls[obj.id].body_id]
-        cam.lookat[:] = [p[0], p[1], 0.05]
-        ren.update_scene(ep.sim.data, cam, opt)
+        d = ep.sim.data
+        tips = _tips(m, d, fingers)
+        mid, p = (tips["fixed"] + tips["moving"]) / 2, d.xpos[ep.sim.controls[obj.id].body_id].copy()
+        # a frame every 2 ticks (real time at 25 frames/s); FAST times as far apart while nothing moves
+        prev = state.get("last")
+        speed = 0.0 if prev is None else max(np.linalg.norm(mid - prev[1]), np.linalg.norm(p - prev[2])) / max(ep.t - prev[0], 1e-6)
+        still = prev is not None and speed < STILL
+        due = state.get("due", 0.0)
+        if ep.t + 1e-9 < due:
+            return
+        state["last"], state["due"] = (ep.t, mid, p), ep.t + (2 * FAST if still else 2) * X.TICK_DT
+        target = np.array([(mid[0] + p[0]) / 2, (mid[1] + p[1]) / 2, max(0.5 * (mid[2] + p[2]), 0.04)])
+        span = float(np.linalg.norm(mid - p))
+        look, dist = state.get("look"), float(np.clip(0.34 + 1.1 * span, 0.36, 0.56))
+        k = 1.0 if look is None else 0.25
+        state["look"] = target if look is None else (1 - k) * look + k * target
+        state["dist"] = dist if look is None else (1 - k) * state["dist"] + k * dist
+        cam.lookat[:], cam.distance = state["look"], state["dist"]
+        img = main.shot(d, cam, opt)
+        # the close-up looks at the moving fingertip, level, so a tip on a rim reads as on it, not in it
+        line = tips["moving"] - tips["fixed"]
+        az = math.degrees(math.atan2(line[1], line[0]))
+        across = min((az + 90, az - 90), key=lambda a: abs((a - cam.azimuth + 180) % 360 - 180))
+        side.azimuth = across + 35 * np.sign(((cam.azimuth - across + 180) % 360) - 180)  # turned toward the main view
+        side.lookat[:] = tips["moving"]
+        img = _inset(img, close.shot(d, side, forces), "moving fingertip · arrows: contact forces")
         up = (ep.sim.control_q(obj.id) - ep.q_rest0[obj.id]) * 1000
-        shots[-1].append(caption(ren.render().copy(), bottom=f"t {ep.t:4.1f} s   lifted {max(up, 0.0):.0f} mm"))
+        pace = f"   ▸▸ {FAST}× (nothing moving)" if still else ""
+        shots[-1].append(caption(img, bottom=f"t {ep.t:4.1f} s   lifted {max(up, 0.0):.0f} mm{pace}"))
 
     def take(ecfg, n: int):
         shots.append([])
+        state.clear()
         if probe is not None:
             hooks.append(probe(runner.sim.model))
         if render:
@@ -294,8 +535,9 @@ def gripper(body: Body, task: Task, controls: dict[str, float], seed: int = 0, s
             takes.append(take(replace(ecfg, perception_offset=off), 1))
     finally:
         X.Episode.tick = orig
-        if ren is not None:
-            ren.close()
+        for v in (main, close):
+            if v is not None:
+                v.close()
     i = 0
     if len(takes) == 2:  # run_system1: the retry if it passed or stopped structurally, else the better of the two
         travel = runner.sim.controls[obj.id].spec.travel
