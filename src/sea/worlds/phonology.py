@@ -390,6 +390,27 @@ def _span(lo: float, hi: float) -> str:
     return f"{lo:.3g}" if abs(hi - lo) < 1e-6 else f"{lo:.3g}-{hi:.3g}"
 
 
+_SWEPT: dict[str, list[str]] = {}
+
+
+def _assembled(body: Body) -> list[str]:
+    """The rig as built, at each end of each control's range (``rig_cad.sweep``): a part that floats, comes loose
+    or shares material with another it is not joined to cannot be built (D-077).  About 50 s; cached per body."""
+    from sea.worlds import rig_cad
+
+    key = body.key()
+    if key not in _SWEPT:
+        out = []
+        for r in rig_cad.sweep(body):
+            at = f"with {r['control']} at {r['value']:g}"
+            out += [f"assembly: the {p} touches nothing that holds it {at}" for p in r["floating"]]
+            out += [f"assembly: the {a} and the {b} share material, a region up to {' x '.join(f'{x:.1f}' for x in reg)} "
+                    f"mm, {at}; they are not joined and cannot be in one place" for a, b, reg in r["undeclared"]]
+            out += [f"assembly: the {a} comes off the {b} it is joined to {at}" for a, b, *_ in r["loose"]]
+        _SWEPT[key] = list(dict.fromkeys(out))
+    return _SWEPT[key]
+
+
 class PhonologyWorld:
     name = "phonology"
     description = ("A mechanical talking robot (after the Waseda Talker): a cast-silicone vocal tract excited by a "
@@ -464,10 +485,12 @@ class PhonologyWorld:
         r = rig(body)
         if r.servos > CHANNELS:
             errs.append(f"the body needs {r.servos} servos and the servo controller drives {CHANNELS} channels")
-        return errs + linkages.faults(r, body.parts)
+        errs += linkages.faults(r, body.parts)
+        return errs if errs else _assembled(body)
 
     def manifest(self) -> dict[str, Any]:
         return copy.deepcopy(MANIFEST)
+
 
     # -------------------------------------------------- System 1
     def babble(self, body: Body) -> Babble:

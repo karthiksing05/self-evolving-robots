@@ -243,6 +243,15 @@ def _crr(s: Spec, surf: str) -> float:
     return c * 1.2 + 0.02 if s.loco == "mecanum4" else c + (0.008 if s.loco == "rocker_bogie6" else 0.0)
 
 
+def _part_name(geom: str) -> str:
+    """A model geom's name as a part: 'w10' -> 'wheel w10', 'w00_roller3' -> 'roller of wheel w00'."""
+    if "_roller" in geom:
+        return f"roller of wheel {geom.split('_')[0]}"
+    if geom.startswith(("rocker_link", "bogie_link")):
+        return geom.replace("_link", " link ")
+    return f"wheel {geom}" if geom[:1] == "w" else geom
+
+
 def _robot(s: Spec, surf: str) -> MM.Robot:
     """The body as the MuJoCo model takes it (SI units), on ``surf``."""
     per = {"tracks": 2, "rocker_bogie6": 6}.get(s.loco, 4)
@@ -688,6 +697,14 @@ class MobileWorld:
         if s.f_stall < 0.3 * s.m * G:
             errs.append(f"the drive's {s.f_stall:.1f} N stall force cannot start {s.m:.2f} kg up a modest slope "
                         f"(it needs at least {0.3 * s.m * G:.1f} N)")
+        if not errs:  # parts cannot share space: the built model, its rockers and bogies swung (D-077)
+            seen = set()
+            for a, b, depth, pose in MM.self_clashes(_robot(s, "wood")):
+                if (pair := (_part_name(a), _part_name(b))) in seen:
+                    continue
+                seen.add(pair)
+                errs.append(f"the {_part_name(a)} and the {_part_name(b)} pass {1000 * depth:.1f} mm into each other "
+                            f"({pose}); two parts cannot be in one place")
         return errs
 
     def manifest(self) -> dict[str, Any]:

@@ -430,7 +430,7 @@ class _Rig:
         self.join(k_pad, self.cast)
         self.crank(K.sled_pin(c["tongue_place"]), K.rail_crank(to.params["rail_start"], to.type), zk, k_guide)
         if to.type == "tip_tongue":
-            self.tip()
+            self.tip(k_pad)
 
     def crank(self, x_pin: float, ck: K.Crank, zk: float, on: str) -> None:
         """The rail servo stands in front of the rail; a crank on its horn and a connecting rod slide the sled
@@ -449,7 +449,7 @@ class _Rig:
         self.link("connecting rod", "tongue", tip, (x_pin, y_pin, z), (k_crank, on), UP,
                   "printed link from the crank to the sled's pin", r=1.6, eye=3.2, material="printed")
 
-    def tip(self) -> None:
+    def tip(self, pad: str) -> None:
         """Two servos on a bridge over the tract carry the tip blade through a five-bar linkage: together they set
         where it presses (x) and how deep (z).  The blade hangs under the palate on a stem through the cast's roof."""
         c = self.c
@@ -481,6 +481,10 @@ class _Rig:
                          "the alveolar ridge for /t/", section=True)
         self.join(k_bl, k_stem, "joint")
         self.join(k_bl, self.cast)
+        # the blade from the roof and the pad from the floor may close the same section: two soft membranes then
+        # press on each other (and on the stem's end) and seal it, as the tract's area, never below zero, has them
+        self.join(k_bl, pad, "meets")
+        self.join(k_stem, pad, "meets")
 
     def pneumatic(self) -> None:
         c = self.c

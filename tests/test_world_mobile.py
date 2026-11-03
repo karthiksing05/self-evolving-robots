@@ -200,6 +200,19 @@ def test_the_pack_voltage_drives_the_motors_within_the_winding_range():
                                                                     params={"capacity": 18.8}))))  # 8.4 V: in range
 
 
+
+def test_a_robots_parts_cannot_pass_into_each_other():
+    """D-077: a large mecanum wheel's rollers reach into the tub; big wheels on a short bogie run into each other."""
+    assert MM.self_clashes(_robot(_spec(W.stock()), "wood")) == []
+    big = W.check(_body(Edit(slot="locomotion", type="mecanum4", params={"wheel_radius": 4.0})))
+    assert len(big) == 4 and all("roller of wheel" in e and "tub" in e and "1.8 mm" in e for e in big)
+    assert W.check(_body(Edit(slot="locomotion", type="mecanum4", params={"wheel_radius": 3.0}))) == []
+    rb = W.check(_body(Edit(slot="locomotion", type="rocker_bogie6",
+                            params={"wheel_radius": 6.0, "bogie_length": 10.0})))
+    assert len(rb) == 4 and all("wheel w" in e and "20.0 mm" in e for e in rb)  # 12 cm wheels 10 cm apart
+    assert W.check(_body(Edit(slot="locomotion", type="rocker_bogie6",
+                              params={"wheel_radius": 4.0, "bogie_length": 12.0}))) == []
+
 def test_mechanism_names_the_body_or_the_search():
     gold, stock = _spec(_body(*GOLD)), _spec(W.stock())
     bedroom = ROUTES["bedroom"][2]

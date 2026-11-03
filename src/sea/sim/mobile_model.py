@@ -32,6 +32,10 @@ import mujoco
 import numpy as np
 
 DT = 0.001
+# A wheeled robot's parts meet each other (D-076): a wheel, a rocker or a bogie that swings into the tub or into
+# another wheel is stopped there, as the real one is (bit 4 on both sides).  A track's rollers overlap by design,
+# standing for one belt, so a tracked robot's parts keep to the ground only.
+SELF = (2 | 4, 1 | 4)
 SOLREF, SOLIMP = "0.004 1", "0.95 0.99 0.001"
 ROLLER_GAP = 0.012  # m between track rollers: under half the lowest edge they meet
 SIDE = {"tracks": 0.030, "rocker_bogie6": 0.035, "mecanum4": 0.030, "wheels4": 0.025}
@@ -96,7 +100,7 @@ def _mecanum(nm: str, r: float, side: float, lean: float, kg: float) -> str:
     rollers = "".join(
         f'<body name="{nm}_r{k}" pos="{c[0]:.5f} {c[1]:.5f} {c[2]:.5f}">'
         f'<joint name="{nm}_r{k}" type="hinge" axis="{a[0]:.5f} {a[1]:.5f} {a[2]:.5f}" damping="1e-6" armature="1e-8"/>'
-        f'<geom type="capsule" size="{ROLLER_R * r:.5f}" fromto="{-half * a[0]:.5f} {-half * a[1]:.5f} {-half * a[2]:.5f} '
+        f'<geom name="{nm}_roller{k}" type="capsule" size="{ROLLER_R * r:.5f}" fromto="{-half * a[0]:.5f} {-half * a[1]:.5f} {-half * a[2]:.5f} '
         f'{half * a[0]:.5f} {half * a[1]:.5f} {half * a[2]:.5f}" mass="{0.4 * kg / ROLLERS:.6f}" rgba="0.12 0.12 0.13 1" '
         f'class="robot"/></body>' for k, (c, a) in enumerate(roller_axes(r, lean)))
     return hub + rollers
@@ -139,17 +143,18 @@ def _robot_xml(rb: Robot) -> tuple[str, str, str, list[str]]:
         for j, y in enumerate(ys):
             rk, bg = f"rocker{j}", f"bogie{j}"
             w0, w1, w2 = (f"w{k}{j}" for k in range(3))
-            link = f'<geom type="capsule" size="0.004" fromto="0 0 0 {xs[2] - pr[0]:.5f} 0 {r - pr[1]:.5f}" mass="0.01" rgba="0.8 0.8 0.78 1" class="robot"/>'
+            ly = (1 if y > 0 else -1) * (side / 2 + 0.006)  # the links run outboard of the wheels, on stub axles
+            link = f'<geom name="rocker_link{j}" type="capsule" size="0.004" fromto="0 {ly:.5f} 0 {xs[2] - pr[0]:.5f} {ly:.5f} {r - pr[1]:.5f}" mass="0.01" rgba="0.8 0.8 0.78 1" class="robot"/>'
             bog = (f'<body name="{bg}" pos="{pb[0] - pr[0]:.5f} 0 {pb[1] - pr[1]:.5f}">'
-                   f'<joint name="{bg}" type="hinge" axis="0 1 0" range="-0.7 0.7" limited="true"/>'
-                   f'<geom type="capsule" size="0.004" fromto="{xs[0] - pb[0]:.5f} 0 {r - pb[1]:.5f} {xs[1] - pb[0]:.5f} 0 {r - pb[1]:.5f}" mass="0.01" rgba="0.8 0.8 0.78 1" class="robot"/>'
+                   f'<joint name="{bg}" type="hinge" axis="0 1 0" range="-40 40" limited="true"/>'
+                   f'<geom name="bogie_link{j}" type="capsule" size="0.004" fromto="{xs[0] - pb[0]:.5f} {ly:.5f} {r - pb[1]:.5f} {xs[1] - pb[0]:.5f} {ly:.5f} {r - pb[1]:.5f}" mass="0.01" rgba="0.8 0.8 0.78 1" class="robot"/>'
                    + "".join(f'<body name="{w}" pos="{x - pb[0]:.5f} 0 {r - pb[1]:.5f}">{joint(w, n_load, r)}'
                              + _cyl_y(w, (0, 0, 0), r, side / 2, wheel_rgba, rb.wheel_kg) + "</body>"
                              for w, x in ((w0, xs[0]), (w1, xs[1]))) + "</body>")
             front = (f'<body name="{w2}" pos="{xs[2] - pr[0]:.5f} 0 {r - pr[1]:.5f}">{joint(w2, n_load, r)}'
                      + _cyl_y(w2, (0, 0, 0), r, side / 2, wheel_rgba, rb.wheel_kg) + "</body>")
             bodies.append(f'<body name="{rk}" pos="0 {y:.5f} {pr[1] - zc:.5f}">'
-                          f'<joint name="{rk}" type="hinge" axis="0 1 0" range="-0.6 0.6" limited="true"/>'
+                          f'<joint name="{rk}" type="hinge" axis="0 1 0" range="-34 34" limited="true"/>'
                           + link + bog + front + "</body>")
             driven += [w0, w1, w2]
         eqs.append('<joint joint1="rocker0" joint2="rocker1" polycoef="0 -1 0 0 0"/>')  # the differential bar
@@ -182,6 +187,33 @@ def _robot_xml(rb: Robot) -> tuple[str, str, str, list[str]]:
                     f'biasprm="0 0 {-t / rb.omega0:.6f}" ctrlrange="-1 1" ctrllimited="true" '
                     f'forcerange="{-t:.6f} {t:.6f}" forcelimited="true"/>')
     return tree, "".join(eqs), "".join(acts), driven
+
+
+def self_clashes(rb: Robot, tol: float = 0.0005) -> list[tuple[str, str, float, str]]:
+    """Parts of the robot that pass into each other (more than ``tol`` m), at rest and with each rocker and bogie
+    at the ends and middle of its swing: (part, part, depth m, pose).  A track's rollers overlap by design."""
+    if rb.loco == "tracks":
+        return []
+    m, _, _ = build(rb, "floor", {}, 0.5)
+    d = mujoco.MjData(m)
+    swing = [m.joint(n).id for n in ("rocker0", "bogie0", "bogie1")] if rb.loco == "rocker_bogie6" else []
+    poses = [{}] + [{j: v} for j in swing for v in m.jnt_range[j]]
+    worst: dict[tuple[str, str], tuple[float, str]] = {}
+    for pose in poses:
+        mujoco.mj_resetData(m, d)
+        d.qpos[2] += 0.2  # off the ground: only the robot's own parts meet
+        for j, v in pose.items():
+            d.qpos[m.jnt_qposadr[j]] = v
+            if m.joint(j).name == "rocker0":  # the differential turns the other rocker the other way
+                d.qpos[m.jnt_qposadr[m.joint("rocker1").id]] = -v
+        mujoco.mj_forward(m, d)
+        for c in d.contact[:d.ncon]:
+            if c.dist < -tol:
+                key = tuple(sorted((m.geom(c.geom1).name, m.geom(c.geom2).name)))
+                what = ", ".join(f"{m.joint(j).name} {v:+.2f} rad" for j, v in pose.items()) or "at rest"
+                if key not in worst or -c.dist > worst[key][0]:
+                    worst[key] = (-float(c.dist), what)
+    return [(a, b, dz, what) for (a, b), (dz, what) in sorted(worst.items(), key=lambda kv: -kv[1][0])]
 
 
 EDGES = ("step", "trench", "stairs", "bump", "threshold")  # obstacles met at an approach duty, that can throw it back
@@ -263,7 +295,7 @@ def build(rb: Robot, kind: str, f: dict[str, float], mu: float) -> tuple[mujoco.
   <option timestep="{DT}" integrator="implicitfast" cone="elliptic" impratio="10"/>
   <visual><global offwidth="1920" offheight="1080"/><quality shadowsize="4096"/></visual>
   <default>
-    <default class="robot"><geom contype="2" conaffinity="1" friction="{0.5 * mu:.4f} 0.005 0.0001" solref="{SOLREF}" solimp="{SOLIMP}" condim="3"/></default>
+    <default class="robot"><geom contype="{SELF[0] if rb.loco != 'tracks' else 2}" conaffinity="{SELF[1] if rb.loco != 'tracks' else 1}" friction="{0.5 * mu:.4f} 0.005 0.0001" solref="{SOLREF}" solimp="{SOLIMP}" condim="3"/></default>
     <default class="ground"><geom contype="1" conaffinity="2" solref="{SOLREF}" solimp="{SOLIMP}" condim="3"/></default>
     <equality solref="{SOLREF}" solimp="{SOLIMP}"/>
   </default>

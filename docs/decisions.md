@@ -2368,3 +2368,39 @@ The long slide reached 20 of 21 groups (D-066) on exactly this idealisation.
   - a link-driven or tie-rod levelled pad (3);
   - a convex rocker pad (3).
 - **None of these ideas could be tried:** an idea is recorded, not built, because the catalogue has no part for it. This is the case for the design-creativity work: ideas built from real links, joints and guides rather than catalogue entries.
+## D-077 The mobile robot's parts cannot pass into each other; the talking robot is checked as built (judge: world_mobile, world_phonology)
+
+**Why.** After D-076 closed the gripper, the request was that every world's physics be resolved. Two worlds still had a gap.
+- **Mobile.** The MuJoCo model (D-061) gave the robot's parts no contact with each other. A geometry that put a wheel through a rocker link, or a roller into the tub, drove as if the parts were ghosts.
+- **Talking robot.** Its CAD sweep (`rig_cad.sweep`) found floating, loose and unjoined overlapping parts, but only the pictures used it; `check` never ran it. The sweep itself was wrong in one place: the tip blade (from the roof) and the tongue pad (from the floor) close the same section for /t/, and the sweep called their meeting a fault and their parting "loose".
+
+**Change.**
+- **Mobile (`sim/mobile_model.py`, `worlds/mobile.py`).**
+  - The robot's wheeled parts collide with each other in the simulator, through a separate contact class. A track's rollers overlap by design, so tracks keep the old classes.
+  - Before trial, `self_clashes` builds the robot off the ground at rest, and with each rocker and bogie at the ends of its range. `check` refuses a body whose parts pass more than 0.5 mm into each other, naming the parts, the depth and the pose.
+  - Rollers and linkage geoms are named so the refusal can say which parts.
+  - **Two model faults found by the law, fixed.**
+    - **The rocker-bogie was rigid.** Its joint ranges were written as radians (±0.6 and ±0.7) in a model that reads degrees, so since D-061 the rocker could turn only ±0.6° and each bogie ±0.7°. They are now ±34° and ±40°, as the catalogue says ("the bogie can tilt about 40 degrees").
+    - **The links ran through the wheels.** The rocker and bogie links lay in the wheels' own plane, so a 6 cm wheel's disc held its rocker's pivot. A real rocker-bogie carries its wheels on stub axles beside the links, so the links now run 6 mm outboard of the wheels.
+- **Talking robot (`worlds/phonology.py`, `worlds/rig_cad.py`, `design/language.py`).**
+  - `check` runs the assembly sweep once the linkage laws pass, and reports every floating, loose or unjoined overlapping part as "assembly: …", with the control and value at which it happens. About 50 s, cached per body.
+  - A new joint kind, `meets`, covers two soft parts that may press on each other at some postures and be apart at others. The tip blade and its stem each meet the tongue pad.
+- **Recorded, not modelled:**
+  - **Tracks:** a dense row of driven rollers stands in for an inextensible belt (D-061). That is fair for the step, trench and stairs, where the belt's own sag does not decide the verdict.
+  - **Sonar cone:** the HC-SR04's 15° cone already covers the corridor's edges from 0.76 m, inside its 2 m range, so the cone does not bind any route.
+  - **Motor heating:** neither the N20 nor the JGA25 publishes thermal constants, so the routes, all under 90 s, are not judged on heat.
+  - **Talking robot actuation force:** closing a section takes about 4–5 N (≈1.1·E·L·t³/R² for the silicone tract, E ≈ 0.6 MPa). An MG90S on a 9 mm crank gives about 24 N, so force does not bind.
+
+**Prediction** (written with the change; the mecanum and rocker-bogie corners had already been probed when the law was written, so only the kept-body lines are a true prediction):
+- the stock bodies of both worlds pass;
+- every kept mobile body (all tracked) and every kept talking-robot body (s2sounds, s2link, three seeds each) passes, so no result moves;
+- in mobile, catalogue corners with big wheels on short linkages are refused: a large mecanum wheel's rollers reach into the tub, and large rocker-bogie wheels on a short bogie reach into each other.
+
+**Measured.**
+- The stock bodies pass. All six kept mobile bodies are tracked and pass; all six kept talking-robot bodies pass the assembly sweep.
+- **Mobile refusals at catalogue corners:**
+  - mecanum, wheel radius 4 cm: each wheel's rollers pass 1.8 mm into the tub; 3 cm passes;
+  - rocker-bogie, wheel 6 cm and bogie 10 cm: neighbouring wheels pass 20.0 mm into each other, at rest and with the rocker swung;
+  - rocker-bogie with wheels 6/14, 6/18, 5/10, 4/12 and 3/8 (wheel cm / bogie cm): passes.
+  - Before the links moved outboard, wheel 6 / bogie 14 (the tests' distractor), 6/18 and 5/10 were refused for a link inside a wheel, 7.8–15.3 mm. That refusal was the model's fault, not the body's.
+- No kept result is judged differently, so no campaign is re-run.

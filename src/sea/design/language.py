@@ -30,9 +30,11 @@ GRID = 5.0  # mm, where fixed parts stand on a base plate
 SHARP_DEG = 60.0  # a convex edge whose faces turn by more than this is sharp (a tessellated 1 mm round turns by ~20)
 TOUCH = 0.5  # mm, parts this close are in contact
 
-JointKind = Literal["joint", "contact", "guide"]
+JointKind = Literal["joint", "contact", "guide", "meets"]
 # joint: the two share material by design (a pin, a screw in its thread, a horn on its spline, a bonded insert);
-# contact: they touch (a foot on the plate, a follower on its cam); guide: a rod passes through a hole with clearance.
+# contact: they touch (a foot on the plate, a follower on its cam); guide: a rod passes through a hole with clearance;
+# meets: soft parts that may press on each other at some postures and are apart at others (two membranes closing
+# one section of a tract): neither their meeting nor their parting is a fault.
 
 
 def tessellate(shape, tol: float = 0.1, angle: float = 0.3) -> trimesh.Trimesh:
@@ -156,7 +158,7 @@ def interference(asm: Assembly, touch: float = TOUCH) -> dict[str, list]:
 
     solids = {m.key: Solid(m.key, m.key, m.part.mesh) for m in asm.members}
     eye = np.eye(4)
-    allowed = {frozenset((a, b)) for a, b, kind in asm.joints if kind in ("joint", "contact")}
+    allowed = {frozenset((a, b)) for a, b, kind in asm.joints if kind in ("joint", "contact", "meets")}
     keys = list(solids)
     bad = []
     for i, a in enumerate(keys):
