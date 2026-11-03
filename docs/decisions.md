@@ -2021,3 +2021,10 @@ The sled and crank law and the clash law above were added, the stand and clamp r
   No other law refuses a corner, so the drives are built for their parts' ranges.
 - The clash law turns 14–21 % of a tip tongue's 600 sampled postures into failures. That is how many of the postures System 1 could reach before were ones the parts cannot take.
 - **The three-seed re-run:** 13/13 train groups on each seed. The c1 final holds every sound without a clashing posture. A run that proposes a long rail on a short cast loses that proposal.
+
+**Measured** (`results/evolve/phonology_s2link_s{0,1,2}.json`).
+- **Three seeds:** each seed held 13/13 train groups at iteration 1 and 26/26 test tasks. Each kept the same body as c1 (`short_cast` 13.5 + `tip_tongue` 3.25/1.3 + `round_lips` 1.6) after 1 System 2 call and 4 proposals.
+- **Refusals:** no proposal was refused, because none reached for a long rail.
+- **Stock on the test split:** 12 or 13 of 26 tasks, as before.
+
+As predicted. Under real linkages, a sled clear of the glottis, and a blade that cannot press through the pad, the c1 talker still says every sound. The 21 % of its sampled postures that clash were never the ones it needed.
