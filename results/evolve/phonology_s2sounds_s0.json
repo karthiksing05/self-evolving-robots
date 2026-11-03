@@ -1,0 +1,2178 @@
+{
+ "run": "phonology_s2sounds_s0",
+ "summary": {
+  "world": "phonology",
+  "arm": "s2",
+  "seed": 0,
+  "final_body": {
+   "id": "b082",
+   "parent": "b00m",
+   "parts": {
+    "tract": {
+     "type": "short_cast",
+     "params": {
+      "length": 13.2
+     }
+    },
+    "tongue": {
+     "type": "tip_tongue",
+     "params": {
+      "rail_start": 3.25,
+      "stroke": 1.3
+     }
+    },
+    "lips": {
+     "type": "round_lips",
+     "params": {
+      "max_protrusion": 1.6
+     }
+    }
+   }
+  },
+  "curve": [
+   {
+    "iteration": 0,
+    "body": "stock",
+    "held_groups": 6,
+    "tasks_passed": 6,
+    "sim_s": 0.6,
+    "wall_s": 0.8
+   },
+   {
+    "iteration": 1,
+    "body": "b00m",
+    "held_groups": 16,
+    "tasks_passed": 16,
+    "sim_s": 2.1,
+    "wall_s": 57.9
+   },
+   {
+    "iteration": 2,
+    "body": "b00m",
+    "held_groups": 16,
+    "tasks_passed": 16,
+    "sim_s": 2.1,
+    "wall_s": 109.6
+   },
+   {
+    "iteration": 3,
+    "body": "b00m",
+    "held_groups": 16,
+    "tasks_passed": 16,
+    "sim_s": 2.9,
+    "wall_s": 151.2
+   },
+   {
+    "iteration": 4,
+    "body": "b00m",
+    "held_groups": 16,
+    "tasks_passed": 16,
+    "sim_s": 2.9,
+    "wall_s": 243.9
+   },
+   {
+    "iteration": 5,
+    "body": "b00m",
+    "held_groups": 16,
+    "tasks_passed": 16,
+    "sim_s": 3.6,
+    "wall_s": 327.4
+   },
+   {
+    "iteration": 6,
+    "body": "b00m",
+    "held_groups": 16,
+    "tasks_passed": 16,
+    "sim_s": 3.6,
+    "wall_s": 455.0
+   },
+   {
+    "iteration": 7,
+    "body": "b00m",
+    "held_groups": 16,
+    "tasks_passed": 16,
+    "sim_s": 3.6,
+    "wall_s": 583.3
+   },
+   {
+    "iteration": 8,
+    "body": "b00m",
+    "held_groups": 16,
+    "tasks_passed": 16,
+    "sim_s": 3.6,
+    "wall_s": 703.0
+   },
+   {
+    "iteration": 9,
+    "body": "b082",
+    "held_groups": 17,
+    "tasks_passed": 17,
+    "sim_s": 4.2,
+    "wall_s": 793.7
+   }
+  ],
+  "train_groups": 17,
+  "final_held_train": [
+   "aa",
+   "ae",
+   "ah",
+   "ao",
+   "eh",
+   "er",
+   "ih",
+   "iy",
+   "k",
+   "ka",
+   "p",
+   "s",
+   "sh",
+   "t",
+   "ta",
+   "uh",
+   "uw"
+  ],
+  "test": {
+   "final_held": [
+    "aa",
+    "ae",
+    "ah",
+    "ao",
+    "eh",
+    "er",
+    "ih",
+    "iy",
+    "k",
+    "p",
+    "s",
+    "sh",
+    "t",
+    "uh",
+    "uw"
+   ],
+   "stock_held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "final_tasks": 31,
+   "stock_tasks": 12,
+   "n": 34
+  },
+  "spent": {
+   "usd": 24.0,
+   "fab_minutes": 294.6,
+   "lead_days": 3.0,
+   "owned": {
+    "servo_mg90s": 5.0,
+    "pushrod_kit": 2.0,
+    "rail_100mm": 1.0
+   }
+  },
+  "ideas": [
+   {
+    "name": "long_horn_tip_linkage",
+    "description": "The tip_tongue with its two-servo tip linkage rebuilt: 1.5x longer printed servo horns and a moved ball-link pivot. The same MG90S servos then move the tip blade about 1.5x farther per degree. Torque at the blade drops to about 2/3, which is still enough to press the silicone blade shut against the 1.2 cm bore. Servo noise at the blade grows by the same 1.5x, so the s channel (0.05-0.15 cm2) gets touchier.",
+    "slot": "tongue",
+    "needs": [
+     {
+      "item": "print:PLA",
+      "qty": 14.0,
+      "usd_each": null,
+      "lead_days": null
+     },
+     {
+      "item": "pushrod_kit",
+      "qty": 1.0,
+      "usd_each": null,
+      "lead_days": null
+     },
+     {
+      "item": "cast:silicone",
+      "qty": 4.0,
+      "usd_each": null,
+      "lead_days": null
+     }
+    ],
+    "test": "Add a tip-linkage gain parameter (degrees per cm of tip travel) to tip_tongue, ranging over about 0.65-1.0x the current value, and re-run ta, t, s and sh.",
+    "iteration": 3,
+    "cost": {
+     "usd": 0.0,
+     "usd_estimated": 0.0,
+     "lead_days": 0.0,
+     "fab_minutes": 26.8,
+     "lines": [
+      "print:PLA 14 g: 17 machine min",
+      "pushrod_kit x1: provided",
+      "cast:silicone 4 g: 10 machine min"
+     ],
+     "new_items": [],
+     "missing": [],
+     "fits_budget": true
+    }
+   },
+   {
+    "name": "high_speed_tip_servo",
+    "description": "Replace tip servo 1 of the tip_tongue linkage with a high-speed metal-gear micro servo (e.g. a helicopter tail-rotor class part, about 0.05 s/60\u00b0 at 5 V, 9 g, MG90S footprint and spline). It mounts on the same horn and pushrod and uses the same controller channel, so the servo count stays at 6 of 6. The linkage geometry and the tip's 0.3-5 cm place range and 0-1.3 height range are unchanged, so every held posture is reproduced exactly. Only the transition time falls by half. The 32\u00b0 tip release then takes about 27 ms. If the drawstring is also swapped (a second unit, budget permitting later), the 53\u00b0 clean pair takes about 44 ms. Both fit the 50 ms window, so the release is heard as a stop, not a glide.",
+    "slot": "tongue",
+    "needs": [
+     {
+      "item": "high_speed_micro_servo_0.05s",
+      "qty": 1.0,
+      "usd_each": 15.0,
+      "lead_days": 5.0
+     },
+     {
+      "item": "print:PLA",
+      "qty": 3.0,
+      "usd_each": null,
+      "lead_days": null
+     }
+    ],
+    "test": "The simulator needs a servo speed attribute for each channel, so the syllable check can be judged on transition time (50 ms) instead of a fixed 30\u00b0 per MG90S. The tip servo 1 channel would be set to 0.05 s/60\u00b0.",
+    "iteration": 5,
+    "cost": {
+     "usd": 0.0,
+     "usd_estimated": 15.0,
+     "lead_days": 5.0,
+     "fab_minutes": 3.6,
+     "lines": [
+      "print:PLA 3 g: 4 machine min"
+     ],
+     "new_items": [
+      "high_speed_micro_servo_0.05s x1: not on the manifest; estimated $15.00"
+     ],
+     "missing": [],
+     "fits_budget": true
+    }
+   },
+   {
+    "name": "differential_tip_linkage",
+    "description": "This replaces tip_tongue's two-servo tip linkage with a printed differential bellcrank. Both MG90S servos drive a common rocker through ball-link pushrods. Turning the servos together raises or lowers the blade, and turning them in opposition slides it along the palate between 0.3 and 5 cm. The blade, the body pad, the rail and the cam are reused unchanged. A height change at fixed place is shared equally between the two servos, so the /t/ release (\u0394height of about 0.65) costs each servo about half of today's 32\u00b0. The workspace becomes a diamond: full height is available across about 0.3-3.5 cm of place, which covers t, s and sh.",
+    "slot": "tongue",
+    "needs": [
+     {
+      "item": "print:PLA",
+      "qty": 22.0,
+      "usd_each": null,
+      "lead_days": null
+     },
+     {
+      "item": "pushrod_kit",
+      "qty": 1.0,
+      "usd_each": null,
+      "lead_days": null
+     },
+     {
+      "item": "servo_mg90s",
+      "qty": 2.0,
+      "usd_each": null,
+      "lead_days": null
+     }
+    ],
+    "test": "A tip_tongue variant whose tip controls (tip_height, tip_place) map to servo angles through \u03b81 = a\u00b7h + b\u00b7p and \u03b82 = a\u00b7h \u2212 b\u00b7p. Choose a so the full 1.3 height spans about 153\u00b0 of \u03b81+\u03b82 combined (about 76\u00b0 per servo), and choose b so the 4.7 cm of place spans the remaining throw. Then rerun ta, t, s and sh, and check the largest per-servo turn on the ta closure-to-vowel pair.",
+    "iteration": 6,
+    "cost": {
+     "usd": 0.0,
+     "usd_estimated": 0.0,
+     "lead_days": 0.0,
+     "fab_minutes": 26.4,
+     "lines": [
+      "print:PLA 22 g: 26 machine min",
+      "pushrod_kit x1: provided",
+      "servo_mg90s x2: provided"
+     ],
+     "new_items": [],
+     "missing": [],
+     "fits_budget": true
+    }
+   },
+   {
+    "name": "glottal_offset_pad_carriage",
+    "description": "A printed offset arm on the tip_tongue body carriage. It carries the cam follower and silicone pad 1.0 cm toward the glottis from the rail carriage, instead of having the carriage trail 2.5 cm behind the pad. The cam stays on the carriage and lifts the pad through a short printed rocker on the arm, so the stroke (1.3 cm) and the cam servo's turn are unchanged. The carriage's clearance to the reed housing is the same as today, but the pad itself can descend to about 1.5 cm above the glottis. That opens a low-pharynx constriction, which raises F1 and lowers F2 for /\u0251/ on a shortened 13.0 cm cast. The tip blade linkage is untouched, so t, s and sh keep their mechanics.",
+    "slot": "tongue",
+    "needs": [
+     {
+      "item": "print:PLA",
+      "qty": 10.0,
+      "usd_each": null,
+      "lead_days": null
+     },
+     {
+      "item": "cast:silicone",
+      "qty": 2.0,
+      "usd_each": null,
+      "lead_days": null
+     }
+    ],
+    "test": "In the simulator, cut the tip_tongue sled clearance from 2.5 cm behind the pad to 1.5 cm, so the pad may reach 1.5 cm above the glottis. Then run tract length 13.0 with rail_start 4.0 and stroke 1.3: the pad reaches 11.0 cm behind the teeth, 2.0 cm above the glottis. Re-fit ta and check ka, iy, uw, er and aa.",
+    "iteration": 7,
+    "cost": {
+     "usd": 0.0,
+     "usd_estimated": 0.0,
+     "lead_days": 0.0,
+     "fab_minutes": 17.0,
+     "lines": [
+      "print:PLA 10 g: 12 machine min",
+      "cast:silicone 2 g: 5 machine min"
+     ],
+     "new_items": [],
+     "missing": [],
+     "fits_budget": true
+    }
+   }
+  ],
+  "sim_s": 6.3,
+  "attempts": 8781,
+  "proposals": {
+   "total": 22,
+   "tried": 13,
+   "refused": 5,
+   "ideas": 4,
+   "kept": 2,
+   "rejected_regression": 5,
+   "moves": {
+    "params": 15,
+    "swap": 2,
+    "idea": 4,
+    "tune": 0,
+    "merge": 1
+   },
+   "mean_prediction_precision": 0.333
+  },
+  "frontier": [],
+  "wall_s": 794.4,
+  "llm": {
+   "calls": 9,
+   "tokens_in": 107595,
+   "tokens_out": 74723,
+   "usd_list_price": 2.197
+  }
+ },
+ "final_body": "lips: round_lips (max_protrusion=1.6); tongue: tip_tongue (rail_start=3.25, stroke=1.3); tract: short_cast (length=13.2)",
+ "final_bom": [
+  {
+   "item": "servo_mg90s",
+   "qty": 2.0,
+   "slot": "lips",
+   "note": ""
+  },
+  {
+   "item": "pushrod_kit",
+   "qty": 1.0,
+   "slot": "lips",
+   "note": ""
+  },
+  {
+   "item": "print:PLA",
+   "qty": 18.0,
+   "slot": "lips",
+   "note": ""
+  },
+  {
+   "item": "cast:silicone",
+   "qty": 14.0,
+   "slot": "lips",
+   "note": ""
+  },
+  {
+   "item": "servo_mg90s",
+   "qty": 4.0,
+   "slot": "tongue",
+   "note": ""
+  },
+  {
+   "item": "rail_100mm",
+   "qty": 1.0,
+   "slot": "tongue",
+   "note": ""
+  },
+  {
+   "item": "pushrod_kit",
+   "qty": 1.0,
+   "slot": "tongue",
+   "note": ""
+  },
+  {
+   "item": "print:PLA",
+   "qty": 38.0,
+   "slot": "tongue",
+   "note": ""
+  },
+  {
+   "item": "cast:silicone",
+   "qty": 12.0,
+   "slot": "tongue",
+   "note": ""
+  },
+  {
+   "item": "cast:silicone",
+   "qty": 39.6,
+   "slot": "tract",
+   "note": ""
+  },
+  {
+   "item": "print:PLA",
+   "qty": 52.8,
+   "slot": "tract",
+   "note": ""
+  }
+ ],
+ "stock_bom": [
+  {
+   "item": "servo_mg90s",
+   "qty": 1.0,
+   "slot": "lips",
+   "note": ""
+  },
+  {
+   "item": "print:PLA",
+   "qty": 15.0,
+   "slot": "lips",
+   "note": ""
+  },
+  {
+   "item": "cast:silicone",
+   "qty": 10.0,
+   "slot": "lips",
+   "note": ""
+  },
+  {
+   "item": "servo_mg90s",
+   "qty": 2.0,
+   "slot": "tongue",
+   "note": ""
+  },
+  {
+   "item": "rail_100mm",
+   "qty": 1.0,
+   "slot": "tongue",
+   "note": ""
+  },
+  {
+   "item": "print:PLA",
+   "qty": 25.0,
+   "slot": "tongue",
+   "note": ""
+  },
+  {
+   "item": "cast:silicone",
+   "qty": 8.0,
+   "slot": "tongue",
+   "note": ""
+  },
+  {
+   "item": "cast:silicone",
+   "qty": 40.5,
+   "slot": "tract",
+   "note": ""
+  },
+  {
+   "item": "print:PLA",
+   "qty": 54.0,
+   "slot": "tract",
+   "note": ""
+  }
+ ],
+ "judge_key": "6a39708c8a2d",
+ "iterations": [
+  {
+   "iteration": 0,
+   "body": "lips: jaw_lips (rest_area=3); tongue: cam_tongue (rail_start=3.25, stroke=0.95); tract: short_cast (length=13.5)",
+   "held": [
+    "aa",
+    "ae",
+    "ah",
+    "eh",
+    "ih",
+    "iy"
+   ],
+   "failing_mechanisms": {
+    "f2_floor_too_high": 3,
+    "no_closure_at_alveolar": 2,
+    "no_closure_at_velar": 2,
+    "f3_floor_too_high": 1,
+    "no_closure_at_lips": 1,
+    "no_channel_at_s": 1,
+    "no_channel_at_sh": 1
+   },
+   "failing": {
+    "ao_train0": {
+     "mechanism": "f2_floor_too_high",
+     "detail": "F 704/1067 Hz vs target 570/840 (F1 +24%, F2 +27%); over 601 open postures (System 1's map and its best) this body's F2 spans 1067-3086 Hz; with F1 within 10% of 570 Hz it spans 1126-1925 Hz; target F2 840 Hz"
+    },
+    "uh_train0": {
+     "mechanism": "f2_floor_too_high",
+     "detail": "F 489/1136 Hz vs target 440/1020 (F1 +11%, F2 +11%); over 601 open postures (System 1's map and its best) this body's F2 spans 1074-3086 Hz; with F1 within 10% of 440 Hz it spans 1147-2225 Hz; target F2 1020 Hz"
+    },
+    "uw_train0": {
+     "mechanism": "f2_floor_too_high",
+     "detail": "F 418/1211 Hz vs target 300/870 (F1 +39%, F2 +39%); over 601 open postures (System 1's map and its best) this body's F2 spans 1074-3086 Hz; with F1 within 10% of 300 Hz it spans 1747-3086 Hz; target F2 870 Hz"
+    },
+    "er_train0": {
+     "mechanism": "f3_floor_too_high",
+     "detail": "F 689/1480/2769 Hz vs target 490/1350/1690 (F1 +41%, F3 +64%); over 601 open postures (System 1's map and its best) this body's F3 spans 2770-4296 Hz; with F1 within 10% of 490 and F2 within 10% of 1350 Hz it spans 2984-3419 Hz; target F3 1690 Hz"
+    },
+    "p_train0": {
+     "mechanism": "no_closure_at_lips",
+     "detail": "narrowest 0.20 cm2 at 3.1 cm behind the teeth, airway elsewhere 1.07 cm2; the lips close to 3.00 cm2 at the least (a seal is < 0.05 cm2); tongue body: 3.25-10.2 cm behind the teeth, smallest area 0.20 cm2; lips: smallest opening 3.00 cm2"
+    },
+    "t_train0": {
+     "mechanism": "no_closure_at_alveolar",
+     "detail": "narrowest 0.20 cm2 at 4.2 cm behind the teeth, airway elsewhere 1.23 cm2; no articulator reaches the alveolar place (0-1.5 cm behind the teeth); tongue body: 3.25-10.2 cm behind the teeth, smallest area 0.20 cm2; lips: smallest opening 3.00 cm2"
+    },
+    "k_train0": {
+     "mechanism": "no_closure_at_velar",
+     "detail": "narrowest 0.20 cm2 at 4.8 cm behind the teeth, airway elsewhere 1.20 cm2; tongue body reaches the velar place (5.5-8.5 cm behind the teeth) but narrows it to 0.20 cm2 at the least (a seal is < 0.05 cm2); tongue body: 3.25-10.2 cm behind the teeth, smallest area 0.20 cm2; lips: smallest opening 3.00 cm2"
+    },
+    "s_train0": {
+     "mechanism": "no_channel_at_s",
+     "detail": "narrowest 0.27 cm2 at 3.1 cm behind the teeth, airway elsewhere 1.14 cm2; the hiss peaks at 3160 Hz vs 4000-8000; no posture makes a 0.05-0.15 cm2 channel 0-1.5 cm behind the teeth with the airway open elsewhere; reached by no articulator; narrowest sampled there none (no sampled posture is narrowest there)"
+    },
+    "sh_train0": {
+     "mechanism": "no_channel_at_sh",
+     "detail": "narrowest 0.20 cm2 at 3.7 cm behind the teeth, airway elsewhere 1.20 cm2; the hiss peaks at 3211 Hz vs 2000-4000; no posture makes a 0.05-0.15 cm2 channel 1.5-3.5 cm behind the teeth with the airway open elsewhere; reached by tongue body; narrowest sampled there 0.20 cm2"
+    },
+    "ta_train0": {
+     "mechanism": "no_closure_at_alveolar",
+     "detail": "closure: narrowest 0.20 cm2 at 4.2 cm behind the teeth, airway elsewhere 1.23 cm2; vowel: F 783/1218 Hz vs target 730/1090 (F2 +12%); the rail servo turns 79 degrees between them (at most 30); its closure alone: no articulator reaches the alveolar place (0-1.5 cm behind the teeth); tongue body: 3.25-10.2 cm behind the teeth, smallest area 0.20 cm2; lips: smallest opening 3.00 cm2"
+    },
+    "ka_train0": {
+     "mechanism": "no_closure_at_velar",
+     "detail": "closure: narrowest 0.20 cm2 at 9.8 cm behind the teeth, airway elsewhere 1.20 cm2; vowel: F 702/1185 Hz vs target 730/1090; the jaw servo turns 22 degrees between them (at most 30); its closure alone: tongue body reaches the velar place (5.5-8.5 cm behind the teeth) but narrows it to 0.20 cm2 at the least (a seal is < 0.05 cm2); tongue body: 3.25-10.2 cm behind the teeth, smallest area 0.20 cm2; l"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "tongue (rail_start=3.25, stroke=1.3)",
+     "base": null,
+     "mechanism": "no_closure_at_velar (k): the tongue body reaches 5.5-8.5 cm but narrows it only to 0.20 cm2. no_channel_at_sh: the narrowest it gets at 1.5-3.5 cm is 0.20 cm2, and the channel must be 0.05-0.15 cm2.",
+     "principle": "A stop needs an articulator that seals the bore at its place, and a fricative needs a channel narrower than a vowel's but wider than a seal. The cam lift sets how far the pad presses into the 1.2 cm bore radius. Above 1.2 cm the pad squeezes the tube shut, so a 1.3 cm lift spans both the 0.05-0.15 cm2 channel range and a full seal.",
+     "hypothesis": "The stroke is 0.95 cm, and 0.95 is short of the 1.2 cm radius. That is the only reason the smallest area is 0.20 cm2. Raising it to 1.3 cm (the top of the range) lets System 1 seal at the velar place for /k/. It also lets it hold a 0.05-0.15 cm2 channel near 3.1-3.5 cm, where System 1's best /\u0283/ posture already sits and its hiss already peaks at 3211 Hz, inside 2000-4000 Hz. I keep rail_start at 3.25 so the pad still reaches 10.25 cm, which /\u0251/ and the other back vowels use. This costs nothing to buy and is the cheapest move that fixes the cause rather than the symptom.",
+     "predicted_gains": [
+      "k",
+      "sh"
+     ],
+     "risks": [
+      "iy, ih: with a larger lift, a high-front posture can tighten past the 0.15 cm2 vowel floor, which makes F1 sensitive to noise. The control range just extends to 1.3, so the old 0-0.95 postures are still available and System 1 can stay at them.",
+      "aa, ah, ae: the back-constriction postures they use are unchanged and still in range."
+     ],
+     "idea": null,
+     "result": "not kept (another proposal gained more): gained k, ka, sh, lost none; costs $0.00, 50 machine min",
+     "gained": [
+      "k",
+      "ka",
+      "sh"
+     ],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "k",
+       "sh"
+      ],
+      "hit": [
+       "k",
+       "sh"
+      ],
+      "missed": [],
+      "unpredicted": [
+       "ka"
+      ],
+      "precision": 1.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 50.0,
+      "lines": [
+       "rail_100mm x1: provided (reused)",
+       "servo_mg90s x3: provided (reused)",
+       "print:PLA 25.0 g for tongue: 30 machine minutes",
+       "cast:silicone 8.0 g for tongue: 20 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "f2_floor_too_high",
+      "f3_floor_too_high",
+      "no_channel_at_s",
+      "no_closure_at_alveolar",
+      "no_closure_at_lips"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "tongue -> tip_tongue (rail_start=3.25, stroke=1.3)",
+     "base": null,
+     "mechanism": "no_closure_at_alveolar (t, ta) and no_channel_at_s: no articulator reaches 0-1.5 cm behind the teeth, because the body pad's rail starts at 3.25 cm. Also no_closure_at_velar (k, ka), since the stroke of 0.95 cm is under the 1.2 cm bore radius.",
+     "principle": "An articulator acts only within its mechanism's travel. The cam pad's rail_start range bottoms out at 2.5 cm, so no value of the cam_tongue's parameters reaches the ridge. The catalogue's tip_tongue adds a blade that slides 0.3-5 cm behind the teeth and can seal the full bore. A syllable also needs every servo to turn 30 degrees or less between closure and vowel. With a separate tip, the body pad can hold the /\u0251/ posture through the /t/ closure, and only the tip has to move at release.",
+     "hypothesis": "The tip blade seals at 0.3-1.5 cm for /t/, and partly closed it gives a 0.05-0.15 cm2 channel at the ridge for /s/. The front cavity there is short, so the hiss should land in 4000-8000 Hz. For /t\u0251/, the body pad holds the pharyngeal /\u0251/ constriction during the closure, so the rail servo no longer has to make the 79-degree trip it needs now. I also set the body stroke to 1.3 cm, which gives the velar seal for /k/ and the /\u0283/ channel. For /k\u0251/, the move from a velar seal near 8.5 cm to the pharyngeal /\u0251/ near 9.5 cm is about 15 degrees on the rail servo (106 degrees over 7 cm). Whether the cam's height change also stays under 30 degrees, the trial will decide. Bill: pushrod_kit $4 (2 days), servo_mg90s x4 on hand, rail_100mm reused. The brief prices the swap at $12, 3 days and 76 machine minutes, all within budget.",
+     "predicted_gains": [
+      "t",
+      "s",
+      "k",
+      "sh",
+      "ta",
+      "ka"
+     ],
+     "risks": [
+      "iy, ih, eh: if the tip blade's resting position intrudes into the front cavity, F2 for front vowels shifts. A retracted tip leaves the bore as it is, and System 1 refits.",
+      "Channel count: 4 tongue servos plus lips. With jaw_lips that is 5 of 6 channels, and with round_lips (2 servos) it is exactly 6, so the combined body still fits."
+     ],
+     "idea": null,
+     "result": "not kept (another proposal gained more): gained k, ka, s, sh, t, ta, uh, uw, lost none; costs $12.00, 76 machine min",
+     "gained": [
+      "k",
+      "ka",
+      "s",
+      "sh",
+      "t",
+      "ta",
+      "uh",
+      "uw"
+     ],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "k",
+       "ka",
+       "s",
+       "sh",
+       "t",
+       "ta"
+      ],
+      "hit": [
+       "k",
+       "ka",
+       "s",
+       "sh",
+       "t",
+       "ta"
+      ],
+      "missed": [],
+      "unpredicted": [
+       "uh",
+       "uw"
+      ],
+      "precision": 1.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 12.0,
+      "lead_days": 3.0,
+      "fab_minutes": 75.6,
+      "lines": [
+       "pushrod_kit x1: 0 provided, buy 1 at $4 ($4.00, 2 days)",
+       "rail_100mm x1: provided (reused)",
+       "servo_mg90s x5: 4 provided, buy 1 at $8 ($8.00, 3 days)",
+       "print:PLA 38.0 g for tongue: 46 machine minutes",
+       "cast:silicone 12.0 g for tongue: 30 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "f2_floor_too_high",
+      "no_closure_at_lips"
+     ]
+    },
+    {
+     "k": 2,
+     "move": "swap",
+     "declared_move": "swap",
+     "edit": "lips -> round_lips (max_protrusion=1.6)",
+     "base": null,
+     "mechanism": "f2_floor_too_high (ao, uh, uw): the lowest F2 is 1067-1074 Hz overall. With F1 near 300 Hz it is 1747 Hz, far above /u/'s 870 Hz, because the lips never narrow below 3.00 cm2 and cannot protrude. Also no_closure_at_lips (p): the smallest lip opening is 3.00 cm2, and a seal needs under 0.05 cm2.",
+     "principle": "The lip opening is a velocity maximum of every formant, so closing and protruding the lips lowers F1, F2 and F3. Lengthening the lip tube lowers all formants together. The jaw_lips rest_area range is 2.5-3.5 cm2, so no jaw_lips value closes them: the part has to be redesigned, and round_lips (opening 0-6.6 cm2, plus up to 1.6 cm of protrusion) is that redesign in the catalogue.",
+     "hypothesis": "The drawstring takes the lip opening to 0 cm2, which seals for /p/ while the tongue is lowered to keep the airway open. Narrowing the lips to a small opening, with the ring pushed out 1.6 cm (the tube goes from 14.5 to 16.1 cm, about 10% lower overall), and a back tongue constriction should pull F2 down toward 840-1020 Hz and F1 down toward 300-570 Hz. That covers /\u0254/, /\u028a/ and /u/. Bill: pushrod_kit $4 (2 days), 2 servos reused, 57 machine minutes.",
+     "predicted_gains": [
+      "p",
+      "uw",
+      "uh",
+      "ao"
+     ],
+     "risks": [
+      "ae and aa need a wide-open mouth. round_lips opens to 6.6 cm2 against the current 6.90 cm2, only 0.3 cm2 less, and with no protrusion the lip tube is 1 cm, the same as now. F1 for ae (660 Hz) and aa (730 Hz) should stay within 10%.",
+      "iy, ih: these need an unrounded lip tube of 1 cm with the protrusion at zero, which matches the current geometry."
+     ],
+     "idea": null,
+     "result": "not kept (another proposal gained more): gained ao, p, uh, uw, lost none; costs $4.00, 57 machine min",
+     "gained": [
+      "ao",
+      "p",
+      "uh",
+      "uw"
+     ],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "ao",
+       "p",
+       "uh",
+       "uw"
+      ],
+      "hit": [
+       "ao",
+       "p",
+       "uh",
+       "uw"
+      ],
+      "missed": [],
+      "unpredicted": [],
+      "precision": 1.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 4.0,
+      "lead_days": 2.0,
+      "fab_minutes": 56.6,
+      "lines": [
+       "pushrod_kit x1: 0 provided, buy 1 at $4 ($4.00, 2 days)",
+       "rail_100mm x1: provided (reused)",
+       "servo_mg90s x4: provided (reused)",
+       "print:PLA 18.0 g for lips: 22 machine minutes",
+       "cast:silicone 14.0 g for lips: 35 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "f3_floor_too_high",
+      "no_channel_at_s",
+      "no_channel_at_sh",
+      "no_closure_at_alveolar",
+      "no_closure_at_velar"
+     ]
+    },
+    {
+     "k": "m",
+     "move": "merge",
+     "declared_move": "merge",
+     "edit": "tongue -> tip_tongue (rail_start=3.25, stroke=1.3); lips -> round_lips (max_protrusion=1.6)",
+     "base": null,
+     "mechanism": "",
+     "principle": "",
+     "hypothesis": "the union of kept-eligible proposals b001, b002, which change disjoint slots",
+     "predicted_gains": [],
+     "risks": [],
+     "idea": null,
+     "result": "KEPT: gained ao, er, k, ka, p, s, sh, t, uh, uw, lost none; costs $24.00, 132 machine min",
+     "gained": [
+      "ao",
+      "er",
+      "k",
+      "ka",
+      "p",
+      "s",
+      "sh",
+      "t",
+      "uh",
+      "uw"
+     ],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 24.0,
+      "lead_days": 3.0,
+      "fab_minutes": 132.2,
+      "lines": [
+       "pushrod_kit x2: 0 provided, buy 2 at $4 ($8.00, 2 days)",
+       "rail_100mm x1: provided (reused)",
+       "servo_mg90s x6: 4 provided, buy 2 at $8 ($16.00, 3 days)",
+       "print:PLA 18.0 g for lips: 22 machine minutes",
+       "cast:silicone 14.0 g for lips: 35 machine minutes",
+       "print:PLA 38.0 g for tongue: 46 machine minutes",
+       "cast:silicone 12.0 g for tongue: 30 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "transition_too_slow"
+     ]
+    }
+   ],
+   "accepted": "b00m",
+   "notes": "I'm sending three proposals. In order of cost:\n\n1. **Params: stroke 1.3 (free).** The tongue can't seal or form a fricative channel because its 0.95 cm lift is less than the 1.2 cm bore radius. Raising the lift to 1.3 cm should gain /k/ and /\u0283/.\n2. **Swap the tongue for tip_tongue, with stroke 1.3 ($12, 3 days, 76 machine min).** Nothing reaches 0-1.5 cm behind the teeth, so the tongue needs a tip blade. This should gain /t/ and /s/, and also /t\u0251/, because the body pad can hold the /\u0251/ shape through the /t/ closure.\n3. **Swap the lips for round_lips, protrusion 1.6 ($4, 2 days, 57 machine min).** The lips never close below 3.00 cm2 and can't push forward. Closing and protruding them should gain /p/ and pull F2 down for /u/, /\u028a/ and /\u0254/.\n\nProposals 1 and 2 change the same slot, so whichever does better is the one that can be combined with 3. The tip_tongue and round_lips swaps together cost $16, need 3 days of lead time (bought in parallel) and 133 machine minutes, all within budget, and use exactly 6 of the 6 controller channels.\n\nI'm keeping the tract as it is this round. Lengthening it (long_cast, 203 machine min) moves every formant at once, which risks the six held vowels. I'd rather first see how much rounding fixes the low F2.\n\n/\u025d/ (low F3) probably needs constrictions at the tip, the body and the lips together, and only becomes possible if both swaps are kept. I'm not predicting it this round.",
+   "llm": {
+    "tag": "iter00",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 54.3,
+    "tokens_in": 11111,
+    "tokens_out": 5369,
+    "usd_list_price": 0.1787,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 57.9,
+   "stop": null
+  },
+  {
+   "iteration": 1,
+   "body": "lips: round_lips (max_protrusion=1.6); tongue: tip_tongue (rail_start=3.25, stroke=1.3); tract: short_cast (length=13.5)",
+   "held": [
+    "aa",
+    "ae",
+    "ah",
+    "ao",
+    "eh",
+    "er",
+    "ih",
+    "iy",
+    "k",
+    "ka",
+    "p",
+    "s",
+    "sh",
+    "t",
+    "uh",
+    "uw"
+   ],
+   "failing_mechanisms": {
+    "transition_too_slow": 1
+   },
+   "failing": {
+    "ta_train0": {
+     "mechanism": "transition_too_slow",
+     "detail": "closure: narrowest 0.02 cm2 at 0.3 cm behind the teeth, airway elsewhere 0.62 cm2; vowel: F 647/1148 Hz vs target 730/1090 (F1 -11%); the tip servo 1 turns 32 degrees between them (at most 30); each half holds alone, but of 15 clean closures and 3 clean vowels found, the nearest pair is 53 degrees apart on the drawstring servo (88 ms); a stop's release must reach the vowel within 30 degrees (50 ms"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "",
+     "base": null,
+     "mechanism": "transition_too_slow: tip servo 1 turns 32 degrees (limit 30) between the /t/ closure (tip_height 1.11) and /\u0251/ (tip_height 0.464), and even so the vowel's F1 is only 647 Hz against 730 (-11%). The tip has to drop a long way because the vowel needs all the F1 it can get. Both System 1 postures put tongue_place at 10.2, which is the end of the rail (10.25 cm behind the teeth, 3.25 cm above the glottis).",
+     "principle": "F1 rises as the constriction moves down into the pharynx, into the glottal half of the tube. Moving the pad lower raises F1 at any given tip height. The vowel can then reach 730 Hz with the tip held higher, so the tip servo turns less between closure and release.",
+     "hypothesis": "rail_start goes from 3.25 to 4.0, the top of its range. The 7 cm rail then reaches 11.0 cm behind the teeth, 2.5 cm above the glottis instead of 3.25 cm, which is deeper in the pharynx. The pinned tongue_place parameter shows the optimizer wants this. With F1 now rising more easily for /\u0251/, System 1 can keep tip_height near 0.6-0.7 in the vowel and stay within 30 degrees of the 1.11 closure, while F1 reaches 730\u00b110%. Tract length cannot do this without moving every formant, and the tip linkage has no parameters. This move costs $0, about 76 machine min to recast and reprint the tongue.",
+     "predicted_gains": [
+      "ta"
+     ],
+     "risks": [
+      "iy/ih/eh: the pad's front limit moves back from 3.25 to 4.0 cm behind the teeth. A palatal constriction for high F2 (iy 2290) has to sit about 4-5 cm back or be made by the tip blade, which reaches 0.3-5 cm. I expect it to survive, but it is the main risk.",
+      "sh: if the held /\u0283/ used the pad at about 3.1-3.5 cm, it now has to use the tip blade, which reaches 1.5-3.5 cm and can make a channel.",
+      "k/ka: the velar range 5.5-8.5 cm is still inside 4.0-11.0. ka needs the pad and lips to move little, and that should if anything get easier."
+     ],
+     "idea": null,
+     "result": "refused before trial: the edit leaves the body unchanged",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "pushrod_kit x2: provided (reused)",
+       "rail_100mm x1: provided (reused)",
+       "servo_mg90s x6: provided (reused)"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    },
+    {
+     "k": 1,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "",
+     "base": null,
+     "mechanism": "transition_too_slow: the /\u0251/ posture only gets F1 to 647 Hz (it needs at least 657) with the tip still partly raised. The sampled F1 ceiling is 745 Hz, right at the 730 target, so the vowel needs a fully open tip, and opening it fully means a turn over 30 degrees.",
+     "principle": "Every formant scales with 1/L. A shorter tube raises the F1 ceiling, so an /\u0251/ with a partly raised tip, which is close to the sealed /t/ posture, still reaches F1 730.",
+     "hypothesis": "Tract length goes from 13.5 to 13.0 cm, which raises every formant by about 3.8%. The F1 ceiling goes from about 745 to 774 Hz, so F1 at 730 is reachable at a higher tip height and a smaller tip servo turn. I am keeping the change modest: the F2 floor moves from about 800 to 831 Hz, still inside uw (783-957) and ao (756-924). The lowest F3 moves from about 1641 to 1704 Hz, still under er's 1859 limit. max_protrusion stays at 1.6 to pull the low vowels back down. Cost: $0, about 165 machine min to recast.",
+     "predicted_gains": [
+      "ta"
+     ],
+     "risks": [
+      "uw/ao: the F2 floor goes up about 31 Hz. System 1 can still round and protrude to 1.6 cm, and the targets sit within 10% of the new floor.",
+      "er: the F3 floor goes up about 60 Hz, which is still under the 1859 Hz bound.",
+      "aa: F2 1090 has to stay under 1199, and the F2 floor in the high-F1 band rises from 1118 to about 1160. That is tight, but lip protrusion lowers it."
+     ],
+     "idea": null,
+     "result": "refused before trial: the edit leaves the body unchanged",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "pushrod_kit x2: provided (reused)",
+       "rail_100mm x1: provided (reused)",
+       "servo_mg90s x6: provided (reused)"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    },
+    {
+     "k": 2,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "",
+     "base": null,
+     "mechanism": "transition_too_slow: same diagnosis as the rail_start=4.0 proposal (tongue_place pinned at the back end of the rail, F1 647 Hz against 730), but with a hedge on the risk to the front vowels.",
+     "principle": "F1 rises when the constriction moves lower into the pharynx. A smaller shift buys part of that F1 gain and keeps the pad's front limit nearer the palate, which iy needs for high F2.",
+     "hypothesis": "rail_start 3.7 lets the pad reach 10.7 cm behind the teeth, 2.8 cm above the glottis. That should raise F1 by enough (we need about 10 Hz over the minimum, more for noise margin) for the tip to stay a few degrees higher in the vowel. The pad's front limit stays at 3.7 cm, which keeps a palatal constriction available for iy, ih and sh. Cost: $0, about 76 machine min.",
+     "predicted_gains": [
+      "ta"
+     ],
+     "risks": [
+      "iy/sh: the pad's front limit moves back only 0.45 cm, and the tip blade still covers 0.3-5 cm, so I expect both to hold.",
+      "ta may still miss by a degree or two if the F1 gain is too small. That is the trade for the lower risk."
+     ],
+     "idea": null,
+     "result": "refused before trial: the edit leaves the body unchanged",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 0.0,
+      "lines": [
+       "pushrod_kit x2: provided (reused)",
+       "rail_100mm x1: provided (reused)",
+       "servo_mg90s x6: provided (reused)"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    }
+   ],
+   "accepted": null,
+   "notes": "I traced the /t\u0251/ failure to one coupling: the vowel needs F1 at its ceiling (the sampled maximum is 745 Hz, the target 730), so the tip blade has to drop all the way, and that takes tip servo 1 two degrees past its 30-degree limit. The tip linkage has no parameters and no catalogue part improves it. Instead, each proposal raises F1 by other means so the tip can stay higher in the vowel: a lower pharyngeal pad (tongue_place is pinned at the end of the rail), or a slightly shorter tract. All three proposals cost $0. If the tongue and tract proposals each pass, they change different slots and are tried together, at about 241 machine min of the 468 available.",
+   "llm": {
+    "tag": "iter01",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 51.2,
+    "tokens_in": 10191,
+    "tokens_out": 4753,
+    "usd_list_price": 0.1588,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 51.7,
+   "stop": null
+  },
+  {
+   "iteration": 2,
+   "body": "lips: round_lips (max_protrusion=1.6); tongue: tip_tongue (rail_start=3.25, stroke=1.3); tract: short_cast (length=13.5)",
+   "held": [
+    "aa",
+    "ae",
+    "ah",
+    "ao",
+    "eh",
+    "er",
+    "ih",
+    "iy",
+    "k",
+    "ka",
+    "p",
+    "s",
+    "sh",
+    "t",
+    "uh",
+    "uw"
+   ],
+   "failing_mechanisms": {
+    "transition_too_slow": 1
+   },
+   "failing": {
+    "ta_train0": {
+     "mechanism": "transition_too_slow",
+     "detail": "closure: narrowest 0.02 cm2 at 0.3 cm behind the teeth, airway elsewhere 0.62 cm2; vowel: F 647/1148 Hz vs target 730/1090 (F1 -11%); the tip servo 1 turns 32 degrees between them (at most 30); each half holds alone, but of 15 clean closures and 3 clean vowels found, the nearest pair is 53 degrees apart on the drawstring servo (88 ms); a stop's release must reach the vowel within 30 degrees (50 ms"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "tongue (rail_start=4, stroke=1.3)",
+     "base": null,
+     "mechanism": "transition_too_slow, caused by the /\u0251/ F1 ceiling. The best /\u0251/ reaches only F1 647 Hz (-11% of 730; the sampled maximum is 745 Hz). To raise F1 at all, System 1 has to drop the tip a long way, from tip_height 1.11 to 0.464, so tip servo 1 turns 32\u00b0 (limit 30) and the nearest clean pair is 53\u00b0 apart. tongue_place sits at its 10.2 cm limit in both postures, so the body pad cannot get any deeper into the pharynx.",
+     "principle": "F1 rises as the constriction moves down into the pharynx, the glottal half of the tube, and that same move lowers F2. A deeper pharyngeal pad gives /\u0251/ more F1, so the tip can stay closer to its closure height in the vowel and turn less.",
+     "hypothesis": "The iteration-2 version of this move was refused because its edit list was empty, so this time the edit is explicit. rail_start goes from 3.25 to 4.0 cm. The pad then reaches 11.0 cm behind the teeth, 2.5 cm above the glottis instead of 3.25 cm. F1 for /\u0251/ should go well past 657 Hz with the tip left higher, so the tip servo turn should fall under 30\u00b0. No other parameter can do this: tongue_place is pinned at its limit, and stroke is already at its 1.3 cm maximum. No purchase needed, $0.",
+     "predicted_gains": [
+      "ta"
+     ],
+     "risks": [
+      "iy/ih/eh: the pad's front limit moves back from 3.25 to 4.0 cm, which could cost palatal F2. They should survive because the tip blade can still form front constrictions from 0.3 to 5 cm, and the pad still covers 4-11 cm.",
+      "k/ka: the velar seal at 5.5-8.5 cm is still inside 4-11 cm. Degrees per cm on the rail servo are unchanged, so the /k\u0251/ turn should not grow, and a deeper /\u0251/ helps it.",
+      "sh: the channel at 1.5-3.5 cm is made by the tip, which this edit does not change."
+     ],
+     "idea": null,
+     "result": "rejected: gained nothing; still failing: transition_too_slow",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "ta"
+      ],
+      "hit": [],
+      "missed": [
+       "ta"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 75.6,
+      "lines": [
+       "pushrod_kit x2: provided (reused)",
+       "rail_100mm x1: provided (reused)",
+       "servo_mg90s x6: provided (reused)",
+       "print:PLA 38.0 g for tongue: 46 machine minutes",
+       "cast:silicone 12.0 g for tongue: 30 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "transition_too_slow"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "tract (length=13)",
+     "base": null,
+     "mechanism": "transition_too_slow, caused by the /\u0251/ F1 ceiling: the best vowel reaches only F1 647 Hz, against a sampled maximum of 745 Hz. To get there, the tip has to open 32\u00b0 away from the closure.",
+     "principle": "Every formant scales with 1/L. A shorter tube raises the F1 ceiling, so /\u0251/ reaches 730 Hz with a tighter front posture and less servo travel.",
+     "hypothesis": "Length goes from 13.5 to 13.0 cm, which raises every formant by about 3.8%. The F1 ceiling should go from about 745 to about 774 Hz, so System 1 can hold /\u0251/ with the tip higher, a turn under 30\u00b0. The cut is kept modest on purpose. The F2 floor should go from 800 to about 831 Hz, still inside uw (783-957) and ao (756-924). The lowest F3 should go from 1641 to about 1704 Hz, still inside er (1521-1859). Both sets of lips keep protrusion available to lengthen the tube where needed. No purchase needed, $0; the recast uses machine time only.",
+     "predicted_gains": [
+      "ta"
+     ],
+     "risks": [
+      "uw/ao: their F2 floors rise by about 31 Hz but stay inside their 10% bands, and lip protrusion up to 1.6 cm makes up for it.",
+      "er: the F3 floor rises to about 1704 Hz, against a band ceiling of 1859 Hz.",
+      "iy: F2 floor and ceiling both rise, which helps reach 2290 Hz."
+     ],
+     "idea": null,
+     "result": "rejected: gained nothing; still failing: transition_too_slow",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "ta"
+      ],
+      "hit": [],
+      "missed": [
+       "ta"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 159.9,
+      "lines": [
+       "pushrod_kit x2: provided (reused)",
+       "rail_100mm x1: provided (reused)",
+       "servo_mg90s x6: provided (reused)",
+       "cast:silicone 39.0 g for tract: 98 machine minutes",
+       "print:PLA 52.0 g for tract: 62 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "transition_too_slow"
+     ]
+    },
+    {
+     "k": 2,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "tongue (rail_start=3.7, stroke=1.3)",
+     "base": null,
+     "mechanism": "transition_too_slow: the /\u0251/ F1 ceiling forces a 32\u00b0 tip turn, and tongue_place is pinned at its 10.2 cm limit.",
+     "principle": "F1 rises as the constriction moves deeper into the pharynx.",
+     "hypothesis": "This is a lower-risk hedge on proposal 1. rail_start 3.7 lets the pad reach 10.7 cm behind the teeth, 2.8 cm above the glottis. That should give /\u0251/ enough extra F1 (about 10 Hz is needed, more for noise margin) for the tip to stay a few degrees higher, while the pad's front limit stays further forward for the front vowels.",
+     "predicted_gains": [
+      "ta"
+     ],
+     "risks": [
+      "iy/ih: a small loss of palatal reach (3.25 to 3.7 cm). The tip covers the front.",
+      "k/ka: unchanged, since the velar place is still on the rail."
+     ],
+     "idea": null,
+     "result": "rejected: lost ka (ka: transition_too_slow, passed once, failed a confirmation: closure: narrowest 0.00 cm2 at 7.6 cm behind the teeth, airway elsewhere 0.53 cm2; vowel: F 738/1148 Hz )",
+     "gained": [],
+     "lost": [
+      "ka"
+     ],
+     "prediction": {
+      "predicted": [
+       "ta"
+      ],
+      "hit": [],
+      "missed": [
+       "ta"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": [
+       "ka"
+      ]
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 75.6,
+      "lines": [
+       "pushrod_kit x2: provided (reused)",
+       "rail_100mm x1: provided (reused)",
+       "servo_mg90s x6: provided (reused)",
+       "print:PLA 38.0 g for tongue: 46 machine minutes",
+       "cast:silicone 12.0 g for tongue: 30 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "transition_too_slow"
+     ]
+    }
+   ],
+   "accepted": null,
+   "notes": "The one failing task, /t\u0251/, has a closure that is already good and a vowel F1 stuck about 11% low. The real fault is the vowel's F1 ceiling: it forces the tip to drop too far (a 32\u00b0 turn against the 30\u00b0 limit). The two different-slot proposals (tongue rail_start 4.0, tract 13.0) can be merged if both are kept-eligible. In iteration 2, all three proposals were refused because their edit lists were empty, so every edit here names its slot and values explicitly. None of these needs a purchase, and the $16 budget is untouched.",
+   "llm": {
+    "tag": "iter02",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 39.1,
+    "tokens_in": 10690,
+    "tokens_out": 3820,
+    "usd_list_price": 0.1443,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 41.6,
+   "stop": null
+  },
+  {
+   "iteration": 3,
+   "body": "lips: round_lips (max_protrusion=1.6); tongue: tip_tongue (rail_start=3.25, stroke=1.3); tract: short_cast (length=13.5)",
+   "held": [
+    "aa",
+    "ae",
+    "ah",
+    "ao",
+    "eh",
+    "er",
+    "ih",
+    "iy",
+    "k",
+    "ka",
+    "p",
+    "s",
+    "sh",
+    "t",
+    "uh",
+    "uw"
+   ],
+   "failing_mechanisms": {
+    "transition_too_slow": 1
+   },
+   "failing": {
+    "ta_train0": {
+     "mechanism": "transition_too_slow",
+     "detail": "closure: narrowest 0.02 cm2 at 0.3 cm behind the teeth, airway elsewhere 0.62 cm2; vowel: F 647/1148 Hz vs target 730/1090 (F1 -11%); the tip servo 1 turns 32 degrees between them (at most 30); each half holds alone, but of 15 clean closures and 3 clean vowels found, the nearest pair is 53 degrees apart on the drawstring servo (88 ms); a stop's release must reach the vowel within 30 degrees (50 ms"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "tract (length=13); tongue (rail_start=4, stroke=1.3)",
+     "base": null,
+     "mechanism": "transition_too_slow in ta: in the best attempt, tip servo 1 turns 32\u00b0 (limit 30) between the alveolar seal (tip_height 1.11, place 0.3) and the vowel (tip_height 0.464). At that tip height the /\u0251/ comes out at F1 647, which is 11% low (it needs \u2265657). The tip can't drop further without breaking the turn limit, and while it stays up near the lips it pulls F1 down. Only 3 clean /\u0251/ postures exist at all, because /\u0251/ sits at the corner of the vowel space: F1 ceiling 745, and in the F1 650-900 band the F2 floor is 1118 against a limit of 1199.",
+     "principle": "Pharyngeal constriction: a constriction near the glottis raises F1 and lowers F2. Every formant scales with 1/L. A shorter tract lifts the F1 ceiling. A deeper pharyngeal pad pulls F2 back down, so the two together grow the high-F1, low-F2 corner instead of just shifting it.",
+     "hypothesis": "Each half was tried alone and neither gained. Length 13.0 adds about 3.5% to every formant: the best vowel goes to about 670/1188, but F2 is then right at the 1199 edge, so the vowel fails on noise. rail_start 4.0 alone lets the pad reach 11.0 cm behind the teeth (2.0 cm above the glottis at 13.0), but without the length change it gives too little extra F1. Together, the shorter tube gives F1 headroom above 657 with the tip left at about 0.5 or higher. The deeper pharyngeal pad (10.2 \u2192 up to 11.0 cm) pulls F2 back toward 1090, so more clean /\u0251/ postures should exist close to the seal posture, and tip servo 1 can stay under 30\u00b0. The loop never tried these together because neither one was eligible to be kept on its own. Swaps can't fix this: jaw_lips/spread_lips cannot seal (rest gap \u22652.5 cm2, so p is lost), long_rail_tongue has no tip (t, s and ta are lost), long_cast lowers the F1 ceiling, and larynx_tube is over budget.",
+     "predicted_gains": [
+      "ta"
+     ],
+     "risks": [
+      "aa/ka: the F2 floor rises about 3.5% with the shorter tract. The deeper pharyngeal pad should offset this, and rail_start 4 alone lost nothing in iteration 3.",
+      "uw (F2 870): the F2 floor of 800 goes to about 828, still inside 783-957.",
+      "er (F3 1690): the F3 floor of 1641 goes to about 1699, inside 1521-1859 but with less margin.",
+      "iy/ih: the body pad's front limit moves from 3.25 to 4.0 cm. The tip blade can still form the palatal constriction, and rail_start 4 alone held them.",
+      "k: the velar range 5.5-8.5 cm is still inside the 4.0-11.0 rail."
+     ],
+     "idea": null,
+     "result": "refused before trial: tongue rail: it carries the pad to 11.00 cm behind the teeth, and its sled, 2.5 cm behind the pad, would run into the glottis's hardware (the glottis is at 13.00 cm): the pad may go back to 10.50 cm",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 235.5,
+      "lines": [
+       "pushrod_kit x2: provided (reused)",
+       "rail_100mm x1: provided (reused)",
+       "servo_mg90s x6: provided (reused)",
+       "print:PLA 38.0 g for tongue: 46 machine minutes",
+       "cast:silicone 12.0 g for tongue: 30 machine minutes",
+       "cast:silicone 39.0 g for tract: 98 machine minutes",
+       "print:PLA 52.0 g for tract: 62 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    },
+    {
+     "k": 1,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "tract (length=12.75); tongue (rail_start=4, stroke=1.3)",
+     "base": null,
+     "mechanism": "transition_too_slow in ta. The vowel F1 is 647 against a minimum of 657 while the tip stays high enough to re-seal within 30\u00b0. Tip servo 1 turns 32\u00b0.",
+     "principle": "Formants scale with 1/L, and a pharyngeal constriction raises F1 and lowers F2.",
+     "hypothesis": "This is a stronger hedge on proposal 1. Length 12.75 raises formants by about 5%: the best vowel's F1 goes from 647 to about 680, enough margin for servo noise with the tip held near 0.55 or higher, which keeps tip servo 1 well under 30\u00b0. The F2 rise (1148 \u2192 about 1205) has to be absorbed by the deeper pharyngeal pad at rail_start 4.0 (reach 11.0 cm, 1.75 cm above the glottis) and by the 1.6 cm protrusion still available. If F2 can't be absorbed, aa fails and this is rejected, which would tell us the length lever is used up.",
+     "predicted_gains": [
+      "ta"
+     ],
+     "risks": [
+      "aa/ka: the F2 floor in the high-F1 band goes from about 1118 to about 1175, near the 1199 limit. This is the main risk, and it depends on the pharyngeal pad lowering F2.",
+      "er: the F3 floor goes from about 1641 to about 1720, still inside 1859.",
+      "uw: the F2 floor goes to about 840, still inside 957.",
+      "iy/ih: the pad's front limit moves to 4.0 cm. The tip covers the palate."
+     ],
+     "idea": null,
+     "result": "refused before trial: tongue rail: it carries the pad to 11.00 cm behind the teeth, and its sled, 2.5 cm behind the pad, would run into the glottis's hardware (the glottis is at 12.75 cm): the pad may go back to 10.25 cm",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 232.3,
+      "lines": [
+       "pushrod_kit x2: provided (reused)",
+       "rail_100mm x1: provided (reused)",
+       "servo_mg90s x6: provided (reused)",
+       "print:PLA 38.0 g for tongue: 46 machine minutes",
+       "cast:silicone 12.0 g for tongue: 30 machine minutes",
+       "cast:silicone 38.2 g for tract: 96 machine minutes",
+       "print:PLA 51.0 g for tract: 61 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    },
+    {
+     "k": 2,
+     "move": "idea",
+     "declared_move": "idea",
+     "edit": "",
+     "base": null,
+     "mechanism": "transition_too_slow: tip servo 1 needs 32\u00b0 to go from a seal to a tip height that leaves /\u0251/'s F1 alone. Over its full range it turns 153\u00b0, a property of the linkage geometry that no catalogue parameter touches.",
+     "principle": "A stop is heard only if every servo turns \u226430\u00b0 (50 ms) between closure and vowel. A linkage with more blade travel per servo degree cuts the turn the release needs.",
+     "hypothesis": "Lengthen the tip servo horns and relocate the linkage pivot so the tip blade covers its 1.3 cm height in about 100\u00b0 instead of 153\u00b0. The 32\u00b0 release becomes about 21\u00b0, so the tip can drop fully clear of the front cavity, and /\u0251/ reaches the 738/1148 that ka already achieves. This is a fallback if the length + pharynx moves fail. It is not testable this round.",
+     "predicted_gains": [
+      "ta"
+     ],
+     "risks": [
+      "s/sh: 1.5x the servo noise at the blade makes the 0.05-0.15 cm2 channel harder to hold repeatably.",
+      "t: less seal force at the blade."
+     ],
+     "idea": {
+      "name": "long_horn_tip_linkage",
+      "description": "The tip_tongue with its two-servo tip linkage rebuilt: 1.5x longer printed servo horns and a moved ball-link pivot. The same MG90S servos then move the tip blade about 1.5x farther per degree. Torque at the blade drops to about 2/3, which is still enough to press the silicone blade shut against the 1.2 cm bore. Servo noise at the blade grows by the same 1.5x, so the s channel (0.05-0.15 cm2) gets touchier.",
+      "slot": "tongue",
+      "needs": [
+       {
+        "item": "print:PLA",
+        "qty": 14.0,
+        "usd_each": null,
+        "lead_days": null
+       },
+       {
+        "item": "pushrod_kit",
+        "qty": 1.0,
+        "usd_each": null,
+        "lead_days": null
+       },
+       {
+        "item": "cast:silicone",
+        "qty": 4.0,
+        "usd_each": null,
+        "lead_days": null
+       }
+      ],
+      "test": "Add a tip-linkage gain parameter (degrees per cm of tip travel) to tip_tongue, ranging over about 0.65-1.0x the current value, and re-run ta, t, s and sh."
+     },
+     "result": "idea recorded, not tested: long_horn_tip_linkage; it would need $0.00 from the manifest, 0 days, 27 machine min; within the budget left",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": null,
+     "still_failing": []
+    }
+   ],
+   "accepted": null,
+   "notes": "The one failing group is ta (/t\u0251/), and the cause is a slow release, not a missing posture. Tip servo 1 turns 32\u00b0 between the seal and the vowel, against a 30\u00b0 limit. To stay inside the limit, the vowel has to keep the tip up at height 0.464, and there F1 comes out at 647 Hz, 11% under the 730 target. Each half of the syllable works on its own.\n\n**Why I didn't swap a part:** every catalogue swap loses a group we already have.\n- jaw_lips and spread_lips can't close below a 2.5 cm2 gap, so /p/ is lost.\n- long_rail_tongue has no tip blade, so t, s and ta are lost.\n- long_cast lowers the F1 ceiling, which works against /\u0251/.\n- larynx_tube needs $23 of parts and $16 is left.\n\n**Why proposals 1 and 2 combine two moves:** iteration 3 tried a shorter tract (13.0 cm) and a deeper tongue pad (rail_start 4.0) separately, and neither gained. /\u0251/ sits at a corner of the vowel space: highest F1 is 745 Hz, and lowest F2 at high F1 is 1118 Hz against a 1199 limit. A shorter tract lifts F1 but pushes F2 over its limit. A deeper pad pulls F2 back down. Only the two together should open room for /\u0251/ close to the seal posture. The loop never tried them together because neither was eligible to be kept alone.\n- **Proposal 1:** 13.0 cm tract, lower risk.\n- **Proposal 2:** 12.75 cm tract, stronger. The main risk is that F2 goes over the limit and /\u0251/ (aa) breaks.\n\n**Proposal 3 is a recorded idea, not tested:** longer servo horns on the tip linkage, so the release needs about 21\u00b0 instead of 32\u00b0. It would cost $4 for a pushrod kit (2-day lead), plus 14 g of printed plastic and 4 g of silicone. The trade-off is that the /s/ channel gets more sensitive to servo noise.\n\nNone of the moves spends any budget except the idea's pushrod kit.",
+   "llm": {
+    "tag": "iter03",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 92.6,
+    "tokens_in": 11368,
+    "tokens_out": 9012,
+    "usd_list_price": 0.2536,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 92.7,
+   "stop": null
+  },
+  {
+   "iteration": 4,
+   "body": "lips: round_lips (max_protrusion=1.6); tongue: tip_tongue (rail_start=3.25, stroke=1.3); tract: short_cast (length=13.5)",
+   "held": [
+    "aa",
+    "ae",
+    "ah",
+    "ao",
+    "eh",
+    "er",
+    "ih",
+    "iy",
+    "k",
+    "ka",
+    "p",
+    "s",
+    "sh",
+    "t",
+    "uh",
+    "uw"
+   ],
+   "failing_mechanisms": {
+    "transition_too_slow": 1
+   },
+   "failing": {
+    "ta_train0": {
+     "mechanism": "transition_too_slow",
+     "detail": "closure: narrowest 0.02 cm2 at 0.3 cm behind the teeth, airway elsewhere 0.62 cm2; vowel: F 647/1148 Hz vs target 730/1090 (F1 -11%); the tip servo 1 turns 32 degrees between them (at most 30); each half holds alone, but of 15 clean closures and 3 clean vowels found, the nearest pair is 53 degrees apart on the drawstring servo (88 ms); a stop's release must reach the vowel within 30 degrees (50 ms"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "tract (length=13); tongue (rail_start=3.5, stroke=1.3)",
+     "base": null,
+     "mechanism": "transition_too_slow on /t\u0251/. Tip servo 1 turns 32\u00b0 (the limit is 30\u00b0) to go from the seal at tip_height 1.11 to the vowel at 0.464. At 0.464 the blade still narrows the tube 0.4 cm behind the teeth, which is a velocity maximum near the lips, so F1 is pulled down to 647 Hz (11% low against 730). Releasing the tip further would fix F1 but costs more servo turn. The real deficit is F1 headroom in the vowel while the tip is still partly raised.",
+     "principle": "F1 rises when the constriction moves down into the pharynx (the glottal half of the tube), and every formant scales with 1/L. Moving the pad deeper raises F1 and lowers F2 together, which is what /\u0251/ needs. Shortening the tube raises all formants, F1 included.",
+     "hypothesis": "This is the iteration-4 combination, which was refused for sled collision, now made geometrically legal. With length 13.0 and rail_start 3.5 the pad reaches 10.5 cm behind the teeth, exactly 2.5 cm above the glottis (the sled limit), against 3.25 cm now. Each half alone (13.0 with pad 3.5 cm above the glottis, or a deeper pad on 13.5) gained nothing. Together, the +3.8% length scaling (647\u2192~672 Hz) adds to the F1 rise from the deeper pharyngeal pad. The deeper pad's F2 fall offsets the scaling's F2 rise (1148\u2192~1192), keeping F2 under 1199. That leaves F1 margin for the tip to stay at about 0.55 or higher, a turn of about 27\u00b0 or less on tip servo 1. No catalogue part changes the tip's gearing, and the long-horn idea is already recorded, so the cheapest real fix is this params move.",
+     "predicted_gains": [
+      "ta"
+     ],
+     "risks": [
+      "uw/ao: the F2 floor rises from 800 to about 830 Hz. That is still inside uw (783-957) and ao (756-924), and protrusion still has 0.16 cm of headroom.",
+      "er: the lowest F3 goes from 1641 to about 1705, inside 1521-1859.",
+      "ka: moving rail_start shifts the rail servo's mapping. rail_start 3.7 once lost ka on a noise confirmation. Velar closures at 5.5-8.5 cm are still covered by the 3.5-10.5 cm pad range, and higher F1 helps the ka vowel (738 Hz already).",
+      "iy/ih: the pad's front end moves 0.25 cm back. Palatal constrictions sit at about 4-6 cm, still in reach, and the F2 ceiling rises with the shorter tube."
+     ],
+     "idea": null,
+     "result": "rejected: gained nothing; still failing: transition_too_slow",
+     "gained": [],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "ta"
+      ],
+      "hit": [],
+      "missed": [
+       "ta"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 235.5,
+      "lines": [
+       "pushrod_kit x2: provided (reused)",
+       "rail_100mm x1: provided (reused)",
+       "servo_mg90s x6: provided (reused)",
+       "print:PLA 38.0 g for tongue: 46 machine minutes",
+       "cast:silicone 12.0 g for tongue: 30 machine minutes",
+       "cast:silicone 39.0 g for tract: 98 machine minutes",
+       "print:PLA 52.0 g for tract: 62 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "transition_too_slow"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "tract (length=12.75); tongue (rail_start=3.25, stroke=1.3)",
+     "base": null,
+     "mechanism": "transition_too_slow on /t\u0251/: the vowel F1 is 647 Hz with the tip only partly released (tip servo 1 turns 32\u00b0 against a 30\u00b0 limit), so it lacks F1 headroom.",
+     "principle": "Formants scale with 1/L, and a pharyngeal constriction (glottal half) raises F1 and lowers F2.",
+     "hypothesis": "This is a stronger version that keeps the current rail_start (no change to rail mapping, so ka is safer). At 12.75 cm the existing pad reach of 10.25 cm sits 2.5 cm above the glottis, legal at the sled limit, and formants rise 5.9%: F1 647\u2192~685 Hz, comfortably in band even with the tip held higher. F2 would rise to about 1216, which the deeper pad and the remaining protrusion (1.44\u21921.6) must pull back under 1199.",
+     "predicted_gains": [
+      "ta"
+     ],
+     "risks": [
+      "uw/ao: the F2 floor rises to about 847 Hz, still inside uw (783-957) and ao (756-924) but with less margin.",
+      "er: the lowest F3 rises to about 1738, inside 1859.",
+      "aa/ah/ae: F1 and F2 rise about 6%. The aa F2 of 1090 needs the deeper pad and lip rounding to compensate.",
+      "ka unchanged mapping: there is no rail_start change."
+     ],
+     "idea": null,
+     "result": "rejected: lost iy (iy: f1_floor_too_high, F 298/2090 Hz vs target 270/2290 (F1 +10%); over 162 open postures (System 1's map and its best) this body's F1 spans 198-812 Hz; with F2 wi)",
+     "gained": [],
+     "lost": [
+      "iy"
+     ],
+     "prediction": {
+      "predicted": [
+       "ta"
+      ],
+      "hit": [],
+      "missed": [
+       "ta"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": [
+       "iy"
+      ]
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 156.7,
+      "lines": [
+       "pushrod_kit x2: provided (reused)",
+       "rail_100mm x1: provided (reused)",
+       "servo_mg90s x6: provided (reused)",
+       "cast:silicone 38.2 g for tract: 96 machine minutes",
+       "print:PLA 51.0 g for tract: 61 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "f1_floor_too_high"
+     ]
+    },
+    {
+     "k": 2,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "tract (length=13.25); tongue (rail_start=3.75, stroke=1.3)",
+     "base": null,
+     "mechanism": "transition_too_slow on /t\u0251/: F1 is short (647 vs 730) with the tip at 0.464, so the tip cannot release enough within 30\u00b0.",
+     "principle": "A pharyngeal constriction raises F1. A modestly shorter tube raises all formants.",
+     "hypothesis": "This is the lowest-risk member of the family. At length 13.25 the pad reaches 10.75 cm behind the teeth, again 2.5 cm above the glottis at the sled limit, and formants rise only 1.9%, so the vowel floors for uw, ao and er barely move. Most of the F1 gain here comes from the deeper pharyngeal pad, with only a little from length scaling.",
+     "predicted_gains": [
+      "ta"
+     ],
+     "risks": [
+      "ka: rail_start 3.75 is near the 3.7 value that once failed a ka noise confirmation. A slightly higher F1 helps the ka vowel, but the velar closure-to-vowel spacing on the rail is unchanged.",
+      "uw/ao/er: floors rise only about 2%, so they should be safe."
+     ],
+     "idea": null,
+     "result": "rejected: lost ka (ka: transition_too_slow, closure: narrowest 0.01 cm2 at 8.6 cm behind the teeth, airway elsewhere 0.53 cm2; vowel: F 710/1064 Hz vs target 730/1090; narrowest 0.15 c)",
+     "gained": [],
+     "lost": [
+      "ka"
+     ],
+     "prediction": {
+      "predicted": [
+       "ta"
+      ],
+      "hit": [],
+      "missed": [
+       "ta"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": [
+       "ka"
+      ]
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 238.7,
+      "lines": [
+       "pushrod_kit x2: provided (reused)",
+       "rail_100mm x1: provided (reused)",
+       "servo_mg90s x6: provided (reused)",
+       "print:PLA 38.0 g for tongue: 46 machine minutes",
+       "cast:silicone 12.0 g for tongue: 30 machine minutes",
+       "cast:silicone 39.8 g for tract: 100 machine minutes",
+       "print:PLA 53.0 g for tract: 64 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "transition_too_slow"
+     ]
+    }
+   ],
+   "accepted": null,
+   "notes": "The diagnosis is the same for all three proposals. Tip servo 1 misses the 30\u00b0 limit for /t\u0251/ by only 2\u00b0, because the /\u0251/ vowel runs out of F1 while the tip is still partly raised near the lips. Each proposal pairs a shorter tract with the deepest pad position the sled limit allows (the pad 2.5 cm above the glottis), and they vary only the tract length: 13.0, 12.75 or 13.25 cm. Tried alone in iteration 3, neither the deeper pad nor the shorter tract gained anything. Tried together in iteration 4, the combination was refused because the sled would have hit the glottis hardware; these values respect that limit. Nothing needs buying: $0, 0 days, about 203 machine min for the recast tract, plus about 50 for the tongue rail where rail_start changes. Neither of the other tongue parts that can be built (cam_tongue, long_rail_tongue) has a tip, so either would lose t and s, and the tip-linkage gearing fix is already recorded as an idea.",
+   "llm": {
+    "tag": "iter04",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 81.3,
+    "tokens_in": 12164,
+    "tokens_out": 7466,
+    "usd_list_price": 0.229,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 83.5,
+   "stop": null
+  },
+  {
+   "iteration": 5,
+   "body": "lips: round_lips (max_protrusion=1.6); tongue: tip_tongue (rail_start=3.25, stroke=1.3); tract: short_cast (length=13.5)",
+   "held": [
+    "aa",
+    "ae",
+    "ah",
+    "ao",
+    "eh",
+    "er",
+    "ih",
+    "iy",
+    "k",
+    "ka",
+    "p",
+    "s",
+    "sh",
+    "t",
+    "uh",
+    "uw"
+   ],
+   "failing_mechanisms": {
+    "transition_too_slow": 1
+   },
+   "failing": {
+    "ta_train0": {
+     "mechanism": "transition_too_slow",
+     "detail": "closure: narrowest 0.02 cm2 at 0.3 cm behind the teeth, airway elsewhere 0.62 cm2; vowel: F 647/1148 Hz vs target 730/1090 (F1 -11%); the tip servo 1 turns 32 degrees between them (at most 30); each half holds alone, but of 15 clean closures and 3 clean vowels found, the nearest pair is 53 degrees apart on the drawstring servo (88 ms); a stop's release must reach the vowel within 30 degrees (50 ms"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "idea",
+     "declared_move": "idea",
+     "edit": "",
+     "base": null,
+     "mechanism": "transition_too_slow on ta: tip servo 1 must turn 32\u00b0 (limit 30\u00b0) to drop the tip from its 0.3 cm alveolar seal (tip_height 1.11) to the /\u0251/ posture (0.46). If the tip stays higher, F1 falls below 657 Hz (best vowel 647/1148). The nearest pair that is clean on both halves is 53\u00b0 apart on the drawstring servo, 88 ms against the 50 ms window.",
+     "principle": "A stop is heard only if the release reaches the vowel within about 50 ms. That is a limit on time, and the degree limit exists only because an MG90S turns 60\u00b0 in 0.1 s. A faster servo on the articulator that releases the stop brings the same angle inside the window without changing either posture.",
+     "hypothesis": "The body can already make both halves of ta. The only problem is release speed. Parameter moves have been tried and fail on two fronts. Shortening the tract (13.0, 13.25, 12.75) raises F2 past 1199 Hz along with F1, and at 12.75 lost iy. Moving the pad deeper (rail_start 3.7, 4.0, or 3.75 with length 13.25) pushes ka's closure past 8.5 cm, because the rail servo allows only 2 cm in 30\u00b0. No tip_tongue parameter changes tip servo 1's 153\u00b0 range. No catalogue swap keeps p (the jaw lips' rest gap is at least 2.5 cm\u00b2) or t and s (long_rail_tongue has no tip). The larynx tube and the pneumatic tongue were refused. A servo at 0.05 s/60\u00b0 on tip servo 1, and optionally on the drawstring, covers 32\u00b0 in about 27 ms and 53\u00b0 in about 44 ms.",
+     "predicted_gains": [
+      "ta"
+     ],
+     "risks": [
+      "None of the held groups depend on servo speed except the syllables. ka uses the rail and cam servos, not tip servo 1, so it is unaffected. The postures for every vowel, stop and fricative are geometrically identical, because the horn, linkage and ranges are unchanged."
+     ],
+     "idea": {
+      "name": "high_speed_tip_servo",
+      "description": "Replace tip servo 1 of the tip_tongue linkage with a high-speed metal-gear micro servo (e.g. a helicopter tail-rotor class part, about 0.05 s/60\u00b0 at 5 V, 9 g, MG90S footprint and spline). It mounts on the same horn and pushrod and uses the same controller channel, so the servo count stays at 6 of 6. The linkage geometry and the tip's 0.3-5 cm place range and 0-1.3 height range are unchanged, so every held posture is reproduced exactly. Only the transition time falls by half. The 32\u00b0 tip release then takes about 27 ms. If the drawstring is also swapped (a second unit, budget permitting later), the 53\u00b0 clean pair takes about 44 ms. Both fit the 50 ms window, so the release is heard as a stop, not a glide.",
+      "slot": "tongue",
+      "needs": [
+       {
+        "item": "high_speed_micro_servo_0.05s",
+        "qty": 1.0,
+        "usd_each": 15.0,
+        "lead_days": 5.0
+       },
+       {
+        "item": "print:PLA",
+        "qty": 3.0,
+        "usd_each": null,
+        "lead_days": null
+       }
+      ],
+      "test": "The simulator needs a servo speed attribute for each channel, so the syllable check can be judged on transition time (50 ms) instead of a fixed 30\u00b0 per MG90S. The tip servo 1 channel would be set to 0.05 s/60\u00b0."
+     },
+     "result": "idea recorded, not tested: high_speed_tip_servo; it would need $0.00 from the manifest + $15.00 estimated for new items, 5 days, 4 machine min; within the budget left (high_speed_micro_servo_0.05s x1: not on the manifest; estimated $15.00)",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": null,
+     "still_failing": []
+    }
+   ],
+   "accepted": null,
+   "notes": "Parameter moves are used up for ta: tract-length moves fail on F2 or iy, and moving the pad deeper breaks ka through the rail servo's 2 cm in 30\u00b0. No catalogue swap keeps p, t and s. The binding limit is tip servo 1's 32\u00b0 release against 30\u00b0. The fast servo idea (about $15, 5 d, fits the $16 / 7 d left) complements the zero-cost long_horn_tip_linkage idea from iteration 4. If the trial must stay in degrees, the long-horn re-gearing is the one to build. No catalogue part or parameter trial is proposed this round, because each family left has already failed on the record.",
+   "llm": {
+    "tag": "iter05",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 127.6,
+    "tokens_in": 12907,
+    "tokens_out": 12359,
+    "usd_list_price": 0.3329,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 127.6,
+   "stop": null
+  },
+  {
+   "iteration": 6,
+   "body": "lips: round_lips (max_protrusion=1.6); tongue: tip_tongue (rail_start=3.25, stroke=1.3); tract: short_cast (length=13.5)",
+   "held": [
+    "aa",
+    "ae",
+    "ah",
+    "ao",
+    "eh",
+    "er",
+    "ih",
+    "iy",
+    "k",
+    "ka",
+    "p",
+    "s",
+    "sh",
+    "t",
+    "uh",
+    "uw"
+   ],
+   "failing_mechanisms": {
+    "transition_too_slow": 1
+   },
+   "failing": {
+    "ta_train0": {
+     "mechanism": "transition_too_slow",
+     "detail": "closure: narrowest 0.02 cm2 at 0.3 cm behind the teeth, airway elsewhere 0.62 cm2; vowel: F 647/1148 Hz vs target 730/1090 (F1 -11%); the tip servo 1 turns 32 degrees between them (at most 30); each half holds alone, but of 15 clean closures and 3 clean vowels found, the nearest pair is 53 degrees apart on the drawstring servo (88 ms); a stop's release must reach the vowel within 30 degrees (50 ms"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "idea",
+     "declared_move": "idea",
+     "edit": "",
+     "base": null,
+     "mechanism": "transition_too_slow on ta. Both postures work on their own: the closure is 0.02 cm2 at 0.3 cm behind the teeth with 0.62 cm2 open elsewhere, and the vowel is 647/1148 Hz. Releasing the tip from tip_height 1.11 to 0.464, with place almost unchanged (0.30 to 0.43), turns tip servo 1 by 32\u00b0 against a 30\u00b0 limit. Lowering the tip less leaves a narrowing at the teeth, which sits at F1's velocity maximum and pulls F1 down to 647, under the 657 floor. A vowel with the tip fully down (ka's vowel, 738/1148) would need an even larger turn.",
+     "principle": "A syllable counts only if every servo between the two postures turns 30\u00b0 or less. The turn that matters is the largest single-servo angle, not the total motion. A linkage that spreads one articulator's displacement across two servos halves the largest turn for the same posture change. The physics of the closure and the vowel stay exactly as they are.",
+     "hypothesis": "No catalogue part or parameter fixes this, and the record shows why.\n- Tract length (13.0, 12.75, 13.25) moves F1 and F2 together. F2 sits at about 1148 against a 1199 ceiling, and the F1 650-900 band's F2 floor is 1118, so shortening gained nothing at 13.0 and lost iy at 12.75.\n- A deeper pad (rail_start 3.7, 4.0, 3.75) gained nothing or lost ka, because ka's own 30\u00b0 rail budget (about 2 cm of rail at 15\u00b0/cm) ties its vowel place to a closure at 8.5 cm or less.\n- tip_tongue has no parameter that touches the tip linkage.\n- jaw_lips and spread_lips cannot seal (rest area of at least 2.5 cm2), so p would be lost. long_rail_tongue has no tip, so t, s and sh would be lost. pneumatic_tongue and larynx_tube are refused (no manifold; $23 against $16).\n- Adding a ridge or changing the bore does not help: it shifts the seal gap and the vowel gap by the same offset, so the release travel stays the same.\n\nSo the part itself has to change. The idea is to rebuild the tip linkage as a sum/difference (differential) bellcrank: tip height follows (\u03b81+\u03b82) and tip place follows (\u03b81\u2212\u03b82). A pure height drop of 0.65 at fixed place then turns each servo about 16-20\u00b0. That fits under 30\u00b0 with enough margin for servo noise, and System 1 can even drop the tip further toward the 738 Hz F1 seen in ka's vowel. This is different from the recorded long-horn idea, which cuts degrees per cm on one servo and shrinks the reachable place range. It is also different from the high-speed servo idea, which needs an item off the manifest. This one uses only printed parts plus one pushrod kit.",
+     "predicted_gains": [
+      "ta"
+     ],
+     "risks": [
+      "t: the alveolar seal needs full tip height at 0.3-1.5 cm. A differential linkage reaches less height at the far ends of the place range, but 0.3-1.5 cm sits near the middle of the difference, so the full 1.3 height is kept there.",
+      "s, sh: the channels sit at 0-3.5 cm, which is inside the full-height part of the workspace. Only the 3.5-5 cm, near-full-height corner is lost, and no held group uses it.",
+      "ka, k, the vowels: the body pad, cam, rail, lips and tract are unchanged, and the tip can still drop to height 0 everywhere."
+     ],
+     "idea": {
+      "name": "differential_tip_linkage",
+      "description": "This replaces tip_tongue's two-servo tip linkage with a printed differential bellcrank. Both MG90S servos drive a common rocker through ball-link pushrods. Turning the servos together raises or lowers the blade, and turning them in opposition slides it along the palate between 0.3 and 5 cm. The blade, the body pad, the rail and the cam are reused unchanged. A height change at fixed place is shared equally between the two servos, so the /t/ release (\u0394height of about 0.65) costs each servo about half of today's 32\u00b0. The workspace becomes a diamond: full height is available across about 0.3-3.5 cm of place, which covers t, s and sh.",
+      "slot": "tongue",
+      "needs": [
+       {
+        "item": "print:PLA",
+        "qty": 22.0,
+        "usd_each": null,
+        "lead_days": null
+       },
+       {
+        "item": "pushrod_kit",
+        "qty": 1.0,
+        "usd_each": null,
+        "lead_days": null
+       },
+       {
+        "item": "servo_mg90s",
+        "qty": 2.0,
+        "usd_each": null,
+        "lead_days": null
+       }
+      ],
+      "test": "A tip_tongue variant whose tip controls (tip_height, tip_place) map to servo angles through \u03b81 = a\u00b7h + b\u00b7p and \u03b82 = a\u00b7h \u2212 b\u00b7p. Choose a so the full 1.3 height spans about 153\u00b0 of \u03b81+\u03b82 combined (about 76\u00b0 per servo), and choose b so the 4.7 cm of place spans the remaining throw. Then rerun ta, t, s and sh, and check the largest per-servo turn on the ta closure-to-vowel pair."
+     },
+     "result": "idea recorded, not tested: differential_tip_linkage; it would need $0.00 from the manifest, 0 days, 26 machine min; within the budget left",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": null,
+     "still_failing": []
+    }
+   ],
+   "accepted": null,
+   "notes": "BOM: 22 g PLA (about 26 machine min). One new pushrod_kit ($4, 2 days) for the extra ball links on the rocker. The two tip servos are reused from the current tip_tongue. Total about $4, 2 days and 26 min, within the $16 / 7 days / 468 min left. I am proposing no parameter move this round. Every slot's parameter family that bears on ta has been tried: tract 12.75-13.25, rail_start 3.5-4.0, and their combinations. Those trials failed on the F2 ceiling of 1199, the iy F1 floor or ka's rail budget. Capping max_protrusion would only take away the F2-lowering lever the ta vowel uses (protrusion 1.44), and it would put uw, uh, ao and er at risk.",
+   "llm": {
+    "tag": "iter06",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 128.3,
+    "tokens_in": 13022,
+    "tokens_out": 11878,
+    "usd_list_price": 0.3242,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 128.3,
+   "stop": null
+  },
+  {
+   "iteration": 7,
+   "body": "lips: round_lips (max_protrusion=1.6); tongue: tip_tongue (rail_start=3.25, stroke=1.3); tract: short_cast (length=13.5)",
+   "held": [
+    "aa",
+    "ae",
+    "ah",
+    "ao",
+    "eh",
+    "er",
+    "ih",
+    "iy",
+    "k",
+    "ka",
+    "p",
+    "s",
+    "sh",
+    "t",
+    "uh",
+    "uw"
+   ],
+   "failing_mechanisms": {
+    "transition_too_slow": 1
+   },
+   "failing": {
+    "ta_train0": {
+     "mechanism": "transition_too_slow",
+     "detail": "closure: narrowest 0.02 cm2 at 0.3 cm behind the teeth, airway elsewhere 0.62 cm2; vowel: F 647/1148 Hz vs target 730/1090 (F1 -11%); the tip servo 1 turns 32 degrees between them (at most 30); each half holds alone, but of 15 clean closures and 3 clean vowels found, the nearest pair is 53 degrees apart on the drawstring servo (88 ms); a stop's release must reach the vowel within 30 degrees (50 ms"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "idea",
+     "declared_move": "idea",
+     "edit": "",
+     "base": null,
+     "mechanism": "transition_too_slow on ta: the vowel side can't reach /\u0251/ F1 (647 Hz, needs \u2265657) unless the tip blade drops far from its alveolar seal. Tip servo 1 turns 32\u00b0 (limit 30\u00b0). In the sampled space, the F1 650-900 band has an F2 floor of 1118 Hz against the /\u0251/ ceiling of 1199, so any move that raises F1 also pushes F2 out of band. System 1 then holds F2 down by rounding the lips and protruding them 1.44 cm, keeping the tip partly raised, and that costs F1.",
+     "principle": "F1 rises, and F2 falls, as the constriction moves down into the pharynx, the glottal half of the tube. A narrowing low in the pharynx is the one articulation that raises F1 and lowers F2 together. Shortening the tube raises both together, because every formant scales with 1/L. The fix is a pharyngeal pad that can sit lower than the sled allows today, used with a shorter cast.",
+     "hypothesis": "The parameter ladder for this mechanism is used up. Tract 13.0, 12.75 and 13.25 raise F2 with F1: nothing gained, iy lost at 12.75. A deeper pad hits the sled rule. rail_start 4.0 reaches 11.0 cm, 2.5 cm above the glottis, only at length 13.5, where it gained nothing. Length 13.0 with rail_start 4.0 was refused because the sled would hit the glottis hardware. Length 13.0 with rail_start 3.5 is legal but gained nothing. The limit is the carriage sitting 2.5 cm behind the pad. If the pad is hung on a printed offset arm on the glottal side of the carriage, the carriage keeps its clearance and the pad can go to about 1.5 cm above the glottis. At length 13.0 with rail_start 4.0, the pad would reach 11.0 cm behind the teeth, 2.0 cm above the glottis. The 13.0 cast raises F1 about 3.8% (647\u2192~672). The low pharyngeal narrowing adds F1 and pulls F2 back under ~1150, where 13.0 alone left it at the 1192 edge. With F1 margin of about 15-40 Hz above the 657 edge, the vowel tolerates a tip held higher and closer to the seal. Tip servo 1 then needs well under 30\u00b0 to release, and the lips need not move far from the closure posture either. No catalogue part does this. long_rail_tongue has no tip, so t, s and sh would be lost. larynx_tube is refused on cost ($23 against $16 left). long_cast lowers F1 about 12%, which loses aa. The tip-gearing ideas from iterations 4, 6 and 7 attack the servo side. This idea attacks the vowel side.",
+     "predicted_gains": [
+      "ta"
+     ],
+     "risks": [
+      "ka: the rail mapping changes (rail_start 4.0), and the velar closure must stay 5.5-8.5 cm behind the teeth. rail_start 4.0 at length 13.5 held ka in iteration 3, and the pad still covers 4.0-11.0 cm, which spans the velar band.",
+      "iy: 13.0 raises the F1 floor about 3.8% (177\u2192~184 Hz) against a 297 ceiling. iy was lost only at 12.75 (+5.9%, F1 298), and 13.0 alone held it.",
+      "uw/ao/er: floors rise about 3.8%. F2 800\u2192~831 against uw's lower bound of 783, and lowest F3 1641\u2192~1704 against er's upper bound of 1859. Length 13.0 held all of these in iterations 3 and 5."
+     ],
+     "idea": {
+      "name": "glottal_offset_pad_carriage",
+      "description": "A printed offset arm on the tip_tongue body carriage. It carries the cam follower and silicone pad 1.0 cm toward the glottis from the rail carriage, instead of having the carriage trail 2.5 cm behind the pad. The cam stays on the carriage and lifts the pad through a short printed rocker on the arm, so the stroke (1.3 cm) and the cam servo's turn are unchanged. The carriage's clearance to the reed housing is the same as today, but the pad itself can descend to about 1.5 cm above the glottis. That opens a low-pharynx constriction, which raises F1 and lowers F2 for /\u0251/ on a shortened 13.0 cm cast. The tip blade linkage is untouched, so t, s and sh keep their mechanics.",
+      "slot": "tongue",
+      "needs": [
+       {
+        "item": "print:PLA",
+        "qty": 10.0,
+        "usd_each": null,
+        "lead_days": null
+       },
+       {
+        "item": "cast:silicone",
+        "qty": 2.0,
+        "usd_each": null,
+        "lead_days": null
+       }
+      ],
+      "test": "In the simulator, cut the tip_tongue sled clearance from 2.5 cm behind the pad to 1.5 cm, so the pad may reach 1.5 cm above the glottis. Then run tract length 13.0 with rail_start 4.0 and stroke 1.3: the pad reaches 11.0 cm behind the teeth, 2.0 cm above the glottis. Re-fit ta and check ka, iy, uw, er and aa."
+     },
+     "result": "idea recorded, not tested: glottal_offset_pad_carriage; it would need $0.00 from the manifest, 0 days, 17 machine min; within the budget left",
+     "gained": [],
+     "lost": [],
+     "prediction": null,
+     "resources": null,
+     "still_failing": []
+    }
+   ],
+   "accepted": null,
+   "notes": "I'm proposing one change this round. It's an idea, so it gets recorded and costed but not tried in the simulator.\n\n**Why not a parameter move:** the record has already covered this. Tract length 13.0, 12.75 and 13.25 all raise F1 and F2 together. Rail_start 3.7 and 4.0 move the pad deeper, and the deepest legal pairing (13.0 cast with rail_start 4.0) was refused because the sled would hit the glottis hardware. Nothing else in the current parts' ranges addresses the coupling: stroke must stay above 1.2 to seal /k/, and max_protrusion is already at its 1.6 maximum.\n\n**Why not a swap:**\n- jaw_lips and spread_lips have a 2.5-3.5 cm2 rest gap, so they can't seal and would lose /p/.\n- long_rail_tongue has no tip, so it would lose t, s and sh.\n- long_cast drops the F1 ceiling to about 656 Hz, so it would lose aa.\n- larynx_tube and pneumatic_tongue are refused on budget and on supply.\n\n**How this idea differs from the three already recorded:** the long-horn linkage, the faster servo and the differential linkage all fix the tip-servo side. This one fixes the vowel side. A deeper pad together with the 13.0 cast should let /\u0251/ hold its F1 with the tip near its seal, so the release needs less tip servo turn.\n\n**Cost:** $0, 0 days and about 15 machine minutes (10 g PLA and 2 g silicone), all from the manifest. It leaves the $16 budget untouched.\n\nIf a builder is ever added, I'd still rank the long-horn tip linkage (iteration 4) as the most direct fix, since it attacks the 32\u00b0 turn itself.",
+   "llm": {
+    "tag": "iter07",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 119.8,
+    "tokens_in": 13038,
+    "tokens_out": 11571,
+    "usd_list_price": 0.3182,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 119.8,
+   "stop": null
+  },
+  {
+   "iteration": 8,
+   "body": "lips: round_lips (max_protrusion=1.6); tongue: tip_tongue (rail_start=3.25, stroke=1.3); tract: short_cast (length=13.5)",
+   "held": [
+    "aa",
+    "ae",
+    "ah",
+    "ao",
+    "eh",
+    "er",
+    "ih",
+    "iy",
+    "k",
+    "ka",
+    "p",
+    "s",
+    "sh",
+    "t",
+    "uh",
+    "uw"
+   ],
+   "failing_mechanisms": {
+    "transition_too_slow": 1
+   },
+   "failing": {
+    "ta_train0": {
+     "mechanism": "transition_too_slow",
+     "detail": "closure: narrowest 0.02 cm2 at 0.3 cm behind the teeth, airway elsewhere 0.62 cm2; vowel: F 647/1148 Hz vs target 730/1090 (F1 -11%); the tip servo 1 turns 32 degrees between them (at most 30); each half holds alone, but of 15 clean closures and 3 clean vowels found, the nearest pair is 53 degrees apart on the drawstring servo (88 ms); a stop's release must reach the vowel within 30 degrees (50 ms"
+    }
+   },
+   "proposals": [
+    {
+     "k": 0,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "tract (length=13.1)",
+     "base": null,
+     "mechanism": "transition_too_slow: tip servo 1 turns 32\u00b0 (limit 30\u00b0) between the /t/ closure and /\u0251/. It has to turn that far because /\u0251/ only reaches F1 647 Hz (needs \u2265657) once the tip has dropped to 0.464, while F2 1148 Hz is already near its 1199 Hz ceiling.",
+     "principle": "Every formant scales with 1/L. The two record points around this length fail on opposite edges. At 13.5 cm F1 is 11% low. At 13.0 cm F1 rises 3.8%, but F2 goes to about 1192, 7 Hz under 1199, so the vowel fails on servo noise. A length in between puts both formants inside their bands with some margin, so the tip can stay higher and turn less.",
+     "hypothesis": "At length 13.1 the effective tube (lips included) is about 2.7% shorter. At System 1's best posture F1 goes 647 to about 665 and F2 1148 to about 1179. That leaves about 8 Hz of F1 margin and 20 Hz of F2 margin. System 1 can then spend the F1 margin on a higher vowel tip_height (above 0.464), which cuts the tip servo 1 release from 32\u00b0 to 30\u00b0 or less. rail_start stays at 3.25, so the pad still reaches 10.25 cm, now 2.85 cm above the glottis. That is legal under the 2.5 cm sled rule, and the ka pad mapping is unchanged. The other untried moves fail on cost or on held groups. A lips swap (jaw or spread) cannot seal, so p is lost. Swapping to the cam or long-rail tongue loses the tip, and with it t and s. long_cast lowers F1. larynx_tube costs $23, over the $16 left.",
+     "predicted_gains": [
+      "ta"
+     ],
+     "risks": [
+      "iy: the F1 floor rises about 2.7%. It failed at 12.75 (F1 298 against a 297 limit) but held at 13.0, and 13.1 is longer than 13.0, so it should hold.",
+      "uw/ao/uh/er: their F2 and F3 floors rise less than they did at 13.0, which held all four.",
+      "ka: the vowel moves up 2.7%. ka's /\u0251/ was about 738/1148, so F1 goes up away from its floor and F2 stays under 1199. The rail mapping does not change."
+     ],
+     "idea": null,
+     "result": "rejected: lost er (er: f2_floor_too_high, F 489/1509/1896 Hz vs target 490/1350/1690 (F2 +12%, F3 +12%); over 162 open postures (System 1's map and its best) this body's F2 spans 751)",
+     "gained": [],
+     "lost": [
+      "er"
+     ],
+     "prediction": {
+      "predicted": [
+       "ta"
+      ],
+      "hit": [],
+      "missed": [
+       "ta"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": [
+       "er"
+      ]
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 161.1,
+      "lines": [
+       "pushrod_kit x2: provided (reused)",
+       "rail_100mm x1: provided (reused)",
+       "servo_mg90s x6: provided (reused)",
+       "cast:silicone 39.3 g for tract: 98 machine minutes",
+       "print:PLA 52.4 g for tract: 63 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "f2_floor_too_high"
+     ]
+    },
+    {
+     "k": 1,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "tract (length=13.25); tongue (rail_start=3.5, stroke=1.3)",
+     "base": null,
+     "mechanism": "transition_too_slow: the /\u0251/ F1 shortfall (647 against \u2265657) forces the tip down far enough that tip servo 1 turns 32\u00b0 against a 30\u00b0 limit.",
+     "principle": "A constriction deeper in the pharynx, toward the glottal half of the tube, raises F1. A modest shortening raises all formants by 1/L. Splitting the F1 gain between the two keeps F2 under its 1199 ceiling, which killed 13.0 alone.",
+     "hypothesis": "Length 13.25 adds about 1.7% to every formant. rail_start 3.5 lets the pad reach 10.5 cm, 2.75 cm above the glottis, which is sled-legal. That is 0.25 cm deeper than now, and it raises F1 without raising F2 much. The record brackets this point. (13.25, 3.75) lost ka only on a noise confirmation: its ka vowel was 710/1064 with the narrowest point at 0.15 cm2, because the pad went too deep and too tight. (13.0, 3.5) gained nothing because F2 sat on its ceiling. This point is shallower than the first and shorter than neither, so F1 should land near 665 to 670 and F2 near 1170, with room to raise the tip.",
+     "predicted_gains": [
+      "ta"
+     ],
+     "risks": [
+      "ka: the rail mapping changes by 0.25 cm, half the step that lost ka at 3.75. System 1 refits ka's pad place, and the pad can still sit anywhere from 3.5 to 10.5 cm, so the 5.5 to 8.5 cm velar seal is untouched.",
+      "iy: F1 rises about 1.7%, less than at 13.0, which held.",
+      "eh/ih/ae: the pad front limit moves back from 3.25 to 3.5 cm. These vowels are made with the pad at mid-palate, and the tip can still constrict from 0.3 to 5 cm."
+     ],
+     "idea": null,
+     "result": "rejected: lost ka (ka: transition_too_slow, closure: narrowest 0.05 cm2 at 6.9 cm behind the teeth, airway elsewhere 0.27 cm2; vowel: F 652/1180 Hz vs target 730/1090 (F1 -11%); the ra)",
+     "gained": [],
+     "lost": [
+      "ka"
+     ],
+     "prediction": {
+      "predicted": [
+       "ta"
+      ],
+      "hit": [],
+      "missed": [
+       "ta"
+      ],
+      "unpredicted": [],
+      "precision": 0.0,
+      "lost": [
+       "ka"
+      ]
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 238.7,
+      "lines": [
+       "pushrod_kit x2: provided (reused)",
+       "rail_100mm x1: provided (reused)",
+       "servo_mg90s x6: provided (reused)",
+       "print:PLA 38.0 g for tongue: 46 machine minutes",
+       "cast:silicone 12.0 g for tongue: 30 machine minutes",
+       "cast:silicone 39.8 g for tract: 100 machine minutes",
+       "print:PLA 53.0 g for tract: 64 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": [
+      "transition_too_slow"
+     ]
+    },
+    {
+     "k": 2,
+     "move": "params",
+     "declared_move": "params",
+     "edit": "tract (length=13.2); tongue (rail_start=3.25, stroke=1.3)",
+     "base": null,
+     "mechanism": "transition_too_slow: the tip servo 1 release is 32\u00b0 against a 30\u00b0 limit, because /\u0251/ is 10 Hz short on F1 at the tip height the release allows.",
+     "principle": "Formants scale with 1/L. This is the low-risk middle point of the length bracket, 13.0 (F2 edge) to 13.5 (F1 edge), with the rail unchanged.",
+     "hypothesis": "At 13.2 formants rise about 2.2%: F1 is about 661 at the current posture and F2 about 1173. This is a hedge on proposal 1 that trades a little F1 margin for more F2 margin, in case the 13.0 failure was F2 noise with more spread than I estimate. Even 2 to 4 Hz of extra F1 headroom lets System 1 lift the vowel tip a few hundredths, and that is all a 2\u00b0 cut needs.",
+     "predicted_gains": [
+      "ta"
+     ],
+     "risks": [
+      "iy and the rounded vowels: the shift is smaller than at 13.0, which held them all.",
+      "ka: same rail mapping, and its vowel F1 moves away from the floor."
+     ],
+     "idea": null,
+     "result": "KEPT: gained ta, lost none; costs $0.00, 162 machine min",
+     "gained": [
+      "ta"
+     ],
+     "lost": [],
+     "prediction": {
+      "predicted": [
+       "ta"
+      ],
+      "hit": [
+       "ta"
+      ],
+      "missed": [],
+      "unpredicted": [],
+      "precision": 1.0,
+      "lost": []
+     },
+     "resources": {
+      "usd": 0.0,
+      "lead_days": 0.0,
+      "fab_minutes": 162.4,
+      "lines": [
+       "pushrod_kit x2: provided (reused)",
+       "rail_100mm x1: provided (reused)",
+       "servo_mg90s x6: provided (reused)",
+       "cast:silicone 39.6 g for tract: 99 machine minutes",
+       "print:PLA 52.8 g for tract: 63 machine minutes"
+      ],
+      "errors": []
+     },
+     "still_failing": []
+    }
+   ],
+   "accepted": "b082",
+   "notes": "The only failing group is ta. Its mechanism is transition_too_slow: tip servo 1 turns 32\u00b0, and the limit is 30\u00b0.\n\nThe cause is a tight formant window. /\u0251/ needs F1 at 657 Hz or more, but at the tip height the release allows it only reaches 647. F2 is 1148 against a 1199 ceiling, and the brief's lowest F2 when F1 is 650-900 Hz is 1118.\n\nThe record brackets the tract length:\n- 13.5 cm fails because F1 is too low.\n- 13.0 cm fails because F2 sits at its ceiling.\n- 12.75 cm also loses iy.\n- Moving the pad deeper hits the sled rule, or loses ka on servo noise (rail_start 3.7 and 3.75).\n\nSo I am proposing untried lengths inside that bracket (13.1, 13.2, and 13.25 with rail_start 3.5).\n\nNo catalogue swap can do this without breaking a held group:\n- jaw_lips and spread_lips have a 2.5 cm2 rest gap, so they cannot seal the lips and p is lost.\n- The cam and long-rail tongues have no tip, so t, s and sh are lost.\n- long_cast lowers F1.\n- larynx_tube costs $23, over the $16 left.\n- pneumatic_tongue needs a valve manifold that cannot be bought.\n\nIf none of these is kept, the real fix is one of the linkage ideas already recorded, costing $0 and about 26 machine minutes. long_horn_tip_linkage or differential_tip_linkage would cut tip servo 1's degrees per cm of tip travel, and that addresses the 32\u00b0 directly.\n\nEach proposal needs only a recast from parts on hand, with nothing to buy:\n- A tract recast takes about 165 machine minutes.\n- A tongue recast takes about 76.\n- Any one proposal fits in the 468 minutes left.",
+   "llm": {
+    "tag": "iter08",
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "seconds": 88.7,
+    "tokens_in": 13104,
+    "tokens_out": 8495,
+    "usd_list_price": 0.2572,
+    "billing": "plan",
+    "error": ""
+   },
+   "seconds": 90.7,
+   "stop": null
+  },
+  {
+   "iteration": 9,
+   "body": "lips: round_lips (max_protrusion=1.6); tongue: tip_tongue (rail_start=3.25, stroke=1.3); tract: short_cast (length=13.2)",
+   "held": [
+    "aa",
+    "ae",
+    "ah",
+    "ao",
+    "eh",
+    "er",
+    "ih",
+    "iy",
+    "k",
+    "ka",
+    "p",
+    "s",
+    "sh",
+    "t",
+    "ta",
+    "uh",
+    "uw"
+   ],
+   "failing_mechanisms": {},
+   "failing": {},
+   "proposals": [],
+   "accepted": null,
+   "notes": "",
+   "llm": {},
+   "seconds": null,
+   "stop": "all groups held"
+  }
+ ],
+ "llm_calls": [
+  {
+   "tag": "iter00",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 54.3,
+   "tokens_in": 11111,
+   "tokens_out": 5369,
+   "usd_list_price": 0.1787,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter01",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 51.2,
+   "tokens_in": 10191,
+   "tokens_out": 4753,
+   "usd_list_price": 0.1588,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter02",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 39.1,
+   "tokens_in": 10690,
+   "tokens_out": 3820,
+   "usd_list_price": 0.1443,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter03",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 92.6,
+   "tokens_in": 11368,
+   "tokens_out": 9012,
+   "usd_list_price": 0.2536,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter04",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 81.3,
+   "tokens_in": 12164,
+   "tokens_out": 7466,
+   "usd_list_price": 0.229,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter05",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 127.6,
+   "tokens_in": 12907,
+   "tokens_out": 12359,
+   "usd_list_price": 0.3329,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter06",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 128.3,
+   "tokens_in": 13022,
+   "tokens_out": 11878,
+   "usd_list_price": 0.3242,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter07",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 119.8,
+   "tokens_in": 13038,
+   "tokens_out": 11571,
+   "usd_list_price": 0.3182,
+   "billing": "plan",
+   "error": ""
+  },
+  {
+   "tag": "iter08",
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "seconds": 88.7,
+   "tokens_in": 13104,
+   "tokens_out": 8495,
+   "usd_list_price": 0.2572,
+   "billing": "plan",
+   "error": ""
+  }
+ ]
+}

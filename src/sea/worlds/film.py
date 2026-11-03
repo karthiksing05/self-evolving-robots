@@ -902,7 +902,7 @@ def phonology(body: Body, task: Task, controls: dict[str, float], seed: int = 0,
         names, a0 = linkages.servo_angles(r, body.parts, arr)
         a1 = linkages.servo_angles(r, body.parts, varr)[1]
         turn = float(np.abs(a1 - a0).max(initial=0.0))
-        ok = ok and turn <= P.TURN
+        ok = bool(ok and turn <= P.TURN)
         release = turn / linkages.SERVO_SPEED
         said = (f"closure: {said}; vowel: {P.PhonologyWorld._said(task.data['vowel'], fv[0], cv[0])}; the servos "
                 f"take {1000 * release:.0f} ms between them")

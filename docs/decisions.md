@@ -2073,3 +2073,23 @@ As predicted. Under real linkages, a sled clear of the glottis, and a blade that
 - **The c1 final** (`tip_tongue` + `round_lips`, 13.5 cm) holds /ʃ/, /ta/ and /ka/. /s/ is uncertain: the rounded lips' 1 cm tube puts most of its alveolar channels' peaks below 4 kHz, and 9 of 21 sampled channels lie in the band.
 - **Bodies with spread or jaw lips** hold /s/ easily (44–48 of 47–48 sampled channels in the band) but lose /uw/, /uh/, /ao/ and /p/, which need rounding.
 - **Three-seed campaign:** 16 or 17 of 17 train groups on each seed, from more than one System 2 call. /s/ against the rounded vowels is the conflict the catalogue may not resolve.
+
+**Measured, System 1 on the train tasks** (before the campaign):
+- **Stock:** 6/17, none of the new groups. /s/ and /ʃ/ fail with `no_channel_at_*`; /ta/ and /ka/ fail on their closures. As predicted.
+- **The c1 final:** 16/17. It holds /s/, /ʃ/ and /ka/. /ta/ fails as `transition_too_slow`: the nearest clean pair is 53° apart on the drawstring servo.
+  - The prediction was wrong on both halves: /s/ was the uncertain one, and /ta/ was expected to hold.
+- **Tip tongue with jaw or spread lips:** 14 and 12 of 17. Each loses /p/ and the rounded vowels, as predicted, and also /ta/ or /ka/ by a few degrees.
+- **A 17/17 body exists in the catalogue:** the c1 body with its rail starting 3.5 cm back. It holds the syllables on train and one test task. The /ɑ/ target moved up 3 % takes more than 30° from either closure. So the gold test requires every train group, and every test group but the syllables.
+
+**Measured, the campaign** (`results/evolve/phonology_s2sounds_s{0,1,2}.json`; films and galleries in `results/evolve/{films,gallery}/phonology_s2sounds_s*`).
+
+| seed | train groups by iteration | System 2 calls | final body | test groups (stock) |
+|---|---|---|---|---|
+| s0 | 6 → 16 → … → 17 at 9 | 9 | c1, cast 13.2 cm | 15 (6), loses /ta/, /ka/ |
+| s1 | 6 → 16, then 16 through 10 | 10 | c1 | 15 (6), loses /ta/, /ka/ |
+| s2 | 6 → 15 → 17 at 2 | 2 | c1 with rail 3.0, cast 13.0 cm | 15 (6), loses /ta/, /ɝ/ |
+
+- **As predicted:** 16 or 17 of 17 train groups per seed, from more than one call.
+- **The conflict was not the predicted one.** /s/ was held on every seed. The last group was /ta/ each time, at the 30° edge, and the syllables are what the test split loses.
+- **System 2 found the lever:** the cast's length and where the rail starts, so /ɑ/ reaches its F1 with the tip blade held higher. s0 and s2 found settings that work. s1 tried rail starts of 3.5–4.0 cm on 13.25–13.4 cm casts, and less protrusion. Each missed /ta/ by a few degrees or lost /ka/. It never tried 3.5 cm on the 13.5 cm cast, which holds all 17.
+- **A harness fault:** in s0's second call, System 2 wrote three proposals whose values were only in their prose (rail_start 3.25 → 4.0, a shorter cast), with an empty `edits` list. The loop refused each as "the edit leaves the body unchanged" and the iteration was lost. The refusal should name the fault, no edits given, so the next call can correct it.

@@ -1,0 +1,102 @@
+{
+ "run": "phonology_s2sounds_s0",
+ "world": "phonology",
+ "films": [
+  {
+   "frame": 1,
+   "id": "b00m",
+   "group": "ao",
+   "task": "ao_train0",
+   "file": "01_b00m_ao.mp4",
+   "poster": "01_b00m_ao.jpg",
+   "seconds": 5.6,
+   "sound": true,
+   "clipping_mm": 0.0,
+   "change": "What changed: lips jaw lips → round lips (max protrusion 1.6); tongue cam tongue → tip tongue (rail start 3.25, stroke 1.3)",
+   "before": {
+    "ok": false,
+    "verdict": "F 704/1067 Hz vs target 570/840 (F1 +24%, F2 +27%)",
+    "headline": "Not /ɔ/ yet: a resonance falls outside its target",
+    "recorded": "f2_floor_too_high"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "F 561/853 Hz vs target 570/840",
+    "headline": "Sounds like /ɔ/: both resonances inside their targets",
+    "recorded": true
+   }
+  },
+  {
+   "frame": 1,
+   "id": "b00m",
+   "group": "er",
+   "task": "er_train0",
+   "file": "01_b00m_er.mp4",
+   "poster": "01_b00m_er.jpg",
+   "seconds": 5.6,
+   "sound": true,
+   "clipping_mm": 0.0,
+   "change": "What changed: lips jaw lips → round lips (max protrusion 1.6); tongue cam tongue → tip tongue (rail start 3.25, stroke 1.3)",
+   "before": {
+    "ok": false,
+    "verdict": "F 688/1482/2770 Hz vs target 490/1350/1690 (F1 +40%, F3 +64%)",
+    "headline": "Not /ɝ/ yet: a resonance falls outside its target",
+    "recorded": "f3_floor_too_high"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "F 458/1465/1743 Hz vs target 490/1350/1690",
+    "headline": "Sounds like /ɝ/: both resonances inside their targets",
+    "recorded": true
+   }
+  },
+  {
+   "frame": 1,
+   "id": "b00m",
+   "group": "k",
+   "task": "k_train0",
+   "file": "01_b00m_k.mp4",
+   "poster": "01_b00m_k.jpg",
+   "seconds": 7.3,
+   "sound": true,
+   "clipping_mm": 0.0,
+   "change": "What changed: lips jaw lips → round lips (max protrusion 1.6); tongue cam tongue → tip tongue (rail start 3.25, stroke 1.3)",
+   "before": {
+    "ok": false,
+    "verdict": "narrowest 0.20 cm2 at 4.8 cm behind the teeth, airway elsewhere 1.22 cm2",
+    "headline": "Never seals the tube, so no /k/: the voice runs straight through",
+    "recorded": "no_closure_at_velar"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "narrowest 0.00 cm2 at 8.2 cm behind the teeth, airway elsewhere 0.72 cm2",
+    "headline": "Seals the tube in the right place: a clean /k/",
+    "recorded": true
+   }
+  },
+  {
+   "frame": 2,
+   "id": "b082",
+   "group": "ta",
+   "task": "ta_train0",
+   "file": "02_b082_ta.mp4",
+   "poster": "02_b082_ta.jpg",
+   "seconds": 7.4,
+   "sound": true,
+   "clipping_mm": 0.0,
+   "change": "What changed: tract: length 13.5 → 13.2",
+   "before": {
+    "ok": false,
+    "verdict": "closure: narrowest 0.03 cm2 at 0.3 cm behind the teeth, airway elsewhere 0.68 cm2; vowel: F 646/1155 Hz vs target 730/1090 (F1 -12%); the servos take 51 ms between them",
+    "headline": "Too slow for /ta/: the servos take 51 ms to open into the vowel, heard as a glide",
+    "recorded": "transition_too_slow"
+   },
+   "after": {
+    "ok": true,
+    "verdict": "closure: narrowest 0.02 cm2 at 1.4 cm behind the teeth, airway elsewhere 0.54 cm2; vowel: F 688/1118 Hz vs target 730/1090; the servos take 45 ms between them",
+    "headline": "A clean /ta/: sealed, released and into the vowel in 45 ms",
+    "recorded": true
+   }
+  }
+ ]
+}

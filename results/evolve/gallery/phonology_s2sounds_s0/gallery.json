@@ -1,0 +1,296 @@
+{
+ "run": "phonology_s2sounds_s0",
+ "world": "phonology",
+ "body": "b082",
+ "films": [
+  {
+   "group": "iy",
+   "task": "iy_train0",
+   "file": "iy.mp4",
+   "poster": "iy.jpg",
+   "clipping_mm": 0.0,
+   "stock": {
+    "ok": true,
+    "verdict": "F 279/2420 Hz vs target 270/2290",
+    "headline": "Sounds like /i/: both resonances inside their targets"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "F 287/2182 Hz vs target 270/2290",
+    "headline": "Sounds like /i/: both resonances inside their targets"
+   }
+  },
+  {
+   "group": "ih",
+   "task": "ih_train0",
+   "file": "ih.mp4",
+   "poster": "ih.jpg",
+   "clipping_mm": 0.0,
+   "stock": {
+    "ok": true,
+    "verdict": "F 395/1984 Hz vs target 390/1990",
+    "headline": "Sounds like /ɪ/: both resonances inside their targets"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "F 401/2019 Hz vs target 390/1990",
+    "headline": "Sounds like /ɪ/: both resonances inside their targets"
+   }
+  },
+  {
+   "group": "eh",
+   "task": "eh_train0",
+   "file": "eh.mp4",
+   "poster": "eh.jpg",
+   "clipping_mm": 0.0,
+   "stock": {
+    "ok": true,
+    "verdict": "F 524/1848 Hz vs target 530/1840",
+    "headline": "Sounds like /ɛ/: both resonances inside their targets"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "F 518/1884 Hz vs target 530/1840",
+    "headline": "Sounds like /ɛ/: both resonances inside their targets"
+   }
+  },
+  {
+   "group": "ae",
+   "task": "ae_train0",
+   "file": "ae.mp4",
+   "poster": "ae.jpg",
+   "clipping_mm": 0.0,
+   "stock": {
+    "ok": true,
+    "verdict": "F 657/1662 Hz vs target 660/1720",
+    "headline": "Sounds like /æ/: both resonances inside their targets"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "F 632/1744 Hz vs target 660/1720",
+    "headline": "Sounds like /æ/: both resonances inside their targets"
+   }
+  },
+  {
+   "group": "aa",
+   "task": "aa_train0",
+   "file": "aa.mp4",
+   "poster": "aa.jpg",
+   "clipping_mm": 0.0,
+   "stock": {
+    "ok": true,
+    "verdict": "F 761/1147 Hz vs target 730/1090",
+    "headline": "Sounds like /ɑ/: both resonances inside their targets"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "F 663/1178 Hz vs target 730/1090",
+    "headline": "Sounds like /ɑ/: both resonances inside their targets"
+   }
+  },
+  {
+   "group": "ao",
+   "task": "ao_train0",
+   "file": "ao.mp4",
+   "poster": "ao.jpg",
+   "clipping_mm": 0.0,
+   "stock": {
+    "ok": false,
+    "verdict": "F 704/1067 Hz vs target 570/840 (F1 +24%, F2 +27%)",
+    "headline": "Not /ɔ/ yet: a resonance falls outside its target"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "F 522/782 Hz vs target 570/840",
+    "headline": "Sounds like /ɔ/: both resonances inside their targets"
+   }
+  },
+  {
+   "group": "uh",
+   "task": "uh_train0",
+   "file": "uh.mp4",
+   "poster": "uh.jpg",
+   "clipping_mm": 0.0,
+   "stock": {
+    "ok": false,
+    "verdict": "F 489/1137 Hz vs target 440/1020 (F1 +11%, F2 +11%)",
+    "headline": "Not /ʊ/ yet: a resonance falls outside its target"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "F 439/1026 Hz vs target 440/1020",
+    "headline": "Sounds like /ʊ/: both resonances inside their targets"
+   }
+  },
+  {
+   "group": "uw",
+   "task": "uw_train0",
+   "file": "uw.mp4",
+   "poster": "uw.jpg",
+   "clipping_mm": 0.0,
+   "stock": {
+    "ok": false,
+    "verdict": "F 418/1212 Hz vs target 300/870 (F1 +39%, F2 +39%)",
+    "headline": "Not /u/ yet: a resonance falls outside its target"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "F 283/901 Hz vs target 300/870",
+    "headline": "Sounds like /u/: both resonances inside their targets"
+   }
+  },
+  {
+   "group": "ah",
+   "task": "ah_train0",
+   "file": "ah.mp4",
+   "poster": "ah.jpg",
+   "clipping_mm": 0.0,
+   "stock": {
+    "ok": true,
+    "verdict": "F 669/1217 Hz vs target 640/1190",
+    "headline": "Sounds like /ʌ/: both resonances inside their targets"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "F 644/1184 Hz vs target 640/1190",
+    "headline": "Sounds like /ʌ/: both resonances inside their targets"
+   }
+  },
+  {
+   "group": "er",
+   "task": "er_train0",
+   "file": "er.mp4",
+   "poster": "er.jpg",
+   "clipping_mm": 0.0,
+   "stock": {
+    "ok": false,
+    "verdict": "F 688/1482/2770 Hz vs target 490/1350/1690 (F1 +40%, F3 +64%)",
+    "headline": "Not /ɝ/ yet: a resonance falls outside its target"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "F 498/1331/1666 Hz vs target 490/1350/1690",
+    "headline": "Sounds like /ɝ/: both resonances inside their targets"
+   }
+  },
+  {
+   "group": "p",
+   "task": "p_train0",
+   "file": "p.mp4",
+   "poster": "p.jpg",
+   "clipping_mm": 0.0,
+   "stock": {
+    "ok": false,
+    "verdict": "narrowest 0.20 cm2 at 3.1 cm behind the teeth, airway elsewhere 1.07 cm2",
+    "headline": "Never seals the tube, so no /p/: the voice runs straight through"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "narrowest 0.00 cm2 at the lips, airway elsewhere 4.51 cm2",
+    "headline": "Seals the tube in the right place: a clean /p/"
+   }
+  },
+  {
+   "group": "t",
+   "task": "t_train0",
+   "file": "t.mp4",
+   "poster": "t.jpg",
+   "clipping_mm": 0.0,
+   "stock": {
+    "ok": false,
+    "verdict": "narrowest 0.20 cm2 at 4.2 cm behind the teeth, airway elsewhere 1.21 cm2",
+    "headline": "Never seals the tube, so no /t/: the voice runs straight through"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "narrowest 0.00 cm2 at 1.4 cm behind the teeth, airway elsewhere 4.34 cm2",
+    "headline": "Seals the tube in the right place: a clean /t/"
+   }
+  },
+  {
+   "group": "k",
+   "task": "k_train0",
+   "file": "k.mp4",
+   "poster": "k.jpg",
+   "clipping_mm": 0.0,
+   "stock": {
+    "ok": false,
+    "verdict": "narrowest 0.20 cm2 at 4.8 cm behind the teeth, airway elsewhere 1.22 cm2",
+    "headline": "Never seals the tube, so no /k/: the voice runs straight through"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "narrowest 0.02 cm2 at 6.3 cm behind the teeth, airway elsewhere 0.75 cm2",
+    "headline": "Seals the tube in the right place: a clean /k/"
+   }
+  },
+  {
+   "group": "s",
+   "task": "s_train0",
+   "file": "s.mp4",
+   "poster": "s.jpg",
+   "clipping_mm": 0.0,
+   "stock": {
+    "ok": false,
+    "verdict": "narrowest 0.27 cm2 at 3.1 cm behind the teeth, airway elsewhere 1.15 cm2; the hiss peaks at 3152 Hz vs 4000-8000",
+    "headline": "Not /s/ yet: no channel in its place"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "narrowest 0.06 cm2 at 0.3 cm behind the teeth, airway elsewhere 2.54 cm2; the hiss peaks at 4802 Hz vs 4000-8000",
+    "headline": "Hisses like /s/: a channel in its place, the hiss peaking in its band"
+   }
+  },
+  {
+   "group": "sh",
+   "task": "sh_train0",
+   "file": "sh.mp4",
+   "poster": "sh.jpg",
+   "clipping_mm": 0.0,
+   "stock": {
+    "ok": false,
+    "verdict": "narrowest 0.20 cm2 at 3.7 cm behind the teeth, airway elsewhere 1.18 cm2; the hiss peaks at 3197 Hz vs 2000-4000",
+    "headline": "Not /ʃ/ yet: no channel in its place"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "narrowest 0.10 cm2 at 2.5 cm behind the teeth, airway elsewhere 1.05 cm2; the hiss peaks at 2365 Hz vs 2000-4000",
+    "headline": "Hisses like /ʃ/: a channel in its place, the hiss peaking in its band"
+   }
+  },
+  {
+   "group": "ta",
+   "task": "ta_train0",
+   "file": "ta.mp4",
+   "poster": "ta.jpg",
+   "clipping_mm": 0.0,
+   "stock": {
+    "ok": false,
+    "verdict": "closure: narrowest 0.20 cm2 at 4.2 cm behind the teeth, airway elsewhere 1.23 cm2; vowel: F 791/1226 Hz vs target 730/1090 (F2 +12%); the servos take 134 ms between them",
+    "headline": "Too slow for /ta/: the servos take 134 ms to open into the vowel, heard as a glide"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "closure: narrowest 0.02 cm2 at 1.4 cm behind the teeth, airway elsewhere 0.54 cm2; vowel: F 688/1118 Hz vs target 730/1090; the servos take 45 ms between them",
+    "headline": "A clean /ta/: sealed, released and into the vowel in 45 ms"
+   }
+  },
+  {
+   "group": "ka",
+   "task": "ka_train0",
+   "file": "ka.mp4",
+   "poster": "ka.jpg",
+   "clipping_mm": 0.0,
+   "stock": {
+    "ok": false,
+    "verdict": "closure: narrowest 0.20 cm2 at 9.8 cm behind the teeth, airway elsewhere 1.22 cm2; vowel: F 680/1189 Hz vs target 730/1090; the servos take 37 ms between them",
+    "headline": "Not /ka/ yet: the closure or the vowel misses"
+   },
+   "final": {
+    "ok": true,
+    "verdict": "closure: narrowest 0.01 cm2 at 8.0 cm behind the teeth, airway elsewhere 0.65 cm2; vowel: F 674/1137 Hz vs target 730/1090; the servos take 43 ms between them",
+    "headline": "A clean /ka/: sealed, released and into the vowel in 43 ms"
+   }
+  }
+ ]
+}
