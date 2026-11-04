@@ -306,7 +306,12 @@ def screen(world: World, cand: Body, body: Body, manifest: dict[str, Any], spent
            tried: dict[str, str]) -> tuple[list[str], ResourceReport]:
     """What refuses ``cand`` before its trial: the world's build rules and laws, the resources, and the record."""
     errs = world.check(cand)
-    res = check(cand, world.bom(cand), body, world.bom(body), manifest, spent)
+    try:
+        bom = world.bom(cand)
+    except (ValueError, KeyError, TypeError, IndexError) as exc:  # a refused body may not even build: never the run's end
+        why = errs or [f"it cannot be priced: {str(exc)[:300]}"]
+        return why, ResourceReport(ok=False, lines=[], errors=why)
+    res = check(cand, bom, body, world.bom(body), manifest, spent)
     if cand.key() == body.key():
         errs = ["the edit leaves the body unchanged", *errs]
     elif cand.key() in tried:

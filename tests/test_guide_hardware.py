@@ -126,3 +126,26 @@ def test_research_comes_first_in_a_runs_first_iteration(tmp_path):
     with pytest.raises(ToolError):  # notes from other runs are read, but this run still reads for itself
         other._research_first()
     Server(ctx.model_copy(update={"iteration": 1, "run": "someone else"}), tmp_path / "c3.jsonl", w)._research_first()
+
+
+def test_a_body_that_cannot_be_priced_is_refused_and_does_not_end_the_run():
+    from sea.evolve.loop import screen
+
+    class Broken(Measured):
+        def __init__(self, laws):
+            super().__init__()
+            self.laws = laws
+
+        def check(self, body):
+            return self.laws
+
+        def bom(self, body):
+            if body.id == "bad":
+                raise ValueError("repeated name 'x' in geom")
+            return super().bom(body)
+
+    for laws, want in ((["the mechanism does not compile"], "does not compile"), ([], "cannot be priced")):
+        w = Broken(laws)
+        body = w.stock()
+        errs, _ = screen(w, body.model_copy(update={"id": "bad"}), body, w.manifest(), _ctx(w).spent, {})
+        assert any(want in e for e in errs)
