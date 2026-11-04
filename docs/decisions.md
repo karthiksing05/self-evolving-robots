@@ -2866,3 +2866,35 @@ LLM-written requirement lists leave most needs out (Massoudi and Fuge 2025 measu
 - **Guard tests** (`tests/test_research.py`): 9 planted course queries and URLs refused (including `me2110`, `ME-2110`, the course's title, the brief's terms), and 5 engineering queries passed (including "how to sort coins by size mechanism": the guard blocks the course, not the engineering). The budget stops the next call.
 - **Notebook tests:** a note citing an unread page is refused. The same finding from a later run is recorded once. A kept proposal citing a note's id credits it, and another run's prompt shows the note.
 - **A known limit:** a hook cannot edit what a search returned, so an innocent query can still surface course pages in its results. The post hook counts these as `leaks` in each iteration's record, and F9 reports the count.
+
+## D-091 Concepts are developed before they are judged: a set with allowances, functions before form, computed comparisons, failure modes predicted (judge: the answer's contract, a module's `self`; policy: concepts, loop, prompt, tools; F4 of the general framework)
+
+**Why.** In `gripper_c1c`, System 2 wrote the long slide about ten times, each a fresh, undeveloped concept judged against a tuned hinged jaw. It needed three developments at once and lost to whichever was missing, and no seed developed one concept across iterations. BesiegeField observed the same failure in LLM mechanism design: agents stuck editing their first idea or abandoning it. The classical practices (docs/design-process.md) answer this:
+- **Set-based design** (Sobek, Ward and Liker): keep several concepts, give each a development budget, and narrow on evidence.
+- **Function before form** (Pahl and Beitz): state the functions, then the options for each (a morphological chart).
+- **Computed comparison** (Pugh, without its guessed ratings): every candidate against the incumbent on the requirement metrics.
+- **Parallel drafts** (Dow et al., a controlled experiment): several drafts before any feedback beat serial iteration.
+- **FMEA:** predict failure modes before the test, and score them after.
+
+**Change** (`RunConfig.concepts`, off by default).
+- **The concept set** (`evolve/concepts.py`).
+  - A new structure (a built mechanism, or a swapped part type, so the worlds without modules have concepts too) that reaches a trial or is refused for a law becomes a concept, with its id, its body and its lineage. A bad patch or a refusal for money or a repeat opens nothing.
+  - Up to 3 are alive at once. Each has an allowance of 4 trials and 6 refusals.
+  - System 2 develops one with `base` set to its id; a mechanism's module `self` means the base body's own graph, so a patch continues the last development.
+- **Narrowing, always on computed evidence.** The harness drops a concept when:
+  - its allowance is spent without gaining a group or improving a requirement row by more than 1% (with progress, the allowance renews);
+  - after 2 developments, another live concept is as good on every requirement row, better on one, and holds every group it gained (a Pareto test);
+  - it has sat undeveloped for 5 iterations. This third ground is added to the plan's two: without it, a set of concepts nobody develops would lock out new ones.
+
+  The protection before dominance is the point of the set: a first draft measured against a developed concept loses, and that is how the slide lost. A dropped concept's reason stays in the record, and the same structure may open again as a new concept: nothing is outlawed. The ratchet still decides what is kept.
+- **Functions.** `ProposalBatch.functions` is System 2's function structure: each function with the options it considers, and a proposal's `options` says which it takes. The harness marks the options that are neither in the catalogue nor the modules, and those no concept has tried.
+- **Comparison.** The prompt shows each live concept against the incumbent on every requirement, marked +, 0 or −; a `compare` tool does this for up to 3 drafts.
+- **Parallel drafts.** `simulate` on a draft that opens a new concept is refused until two distinct drafts have been checked or measured this iteration.
+- **Failure modes.** A proposal may list `failure_modes` (mode, cause, effect, and a signature: a phrase its failure would show as, in the words of a law or a diagnosis). After its trial or refusal the harness scores whether the signature showed, rates detection from where it showed (the laws, or only the trial) and severity from the held groups lost. System 2's calibration section reports modes predicted and failures not predicted. This is never a gate.
+
+**Prediction** (before the code):
+- with the switch off, a scripted run's trials reproduce exactly (the answer's schema does grow, as it did for D-089, so a live System 2 sees the new optional fields);
+- on a toy world: a refused or trialled mechanism enters the set; `self` continues its graph; a fourth concept is refused while three live; allowance, dominance and idleness each drop a concept with the reason recorded; a dropped concept cannot be built on; the matrix's signs follow the requirement's sense; the parallel-draft rule refuses and then allows; predicted modes are scored.
+- no claim on groups until F9.
+
+**Result (tests).** The prediction held on the toy world (`tests/test_concepts.py`, 14 tests). The full suite: 777 passed, 1 xfailed, 2 skipped, 1 failed. The failure is `test_real_embedders_shapes`, a slow nightly test that downloads models: it hung in a socket connect until its 300 s timeout, twice, and `memory/embed.py` is untouched by this work. It passed at F0. This was the first full run since F0, and it found a break of my own: D-088 renamed `_built_rods` to `_rod_numbers` and left `tests/mech/test_guide.py` importing the old name, so the suite could not collect from `5dbae24` until the repair here. The subsets I ran for D-088 to D-090 did not include that file. No claim on groups until F9.

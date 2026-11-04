@@ -29,13 +29,15 @@ from typing import IO, Any
 
 from pydantic import BaseModel, ConfigDict, ValidationError
 
+from sea.evolve.concepts import ConceptSet
 from sea.evolve.core import Body, Proposal, Requirement, World
 from sea.evolve.resources import Spent
 
-NAMES = ("check", "measure", "read", "sweep", "sensitivity", "facts", "module", "simulate", "note")
+NAMES = ("check", "measure", "read", "sweep", "sensitivity", "compare", "facts", "module", "simulate", "note")
 CALLS, SIMS = 40, 3  # per iteration
 SWEEP_VALUES, SWEEP_READINGS = 12, 6
 SENSITIVITY_PARAMS = 12
+COMPARE_DRAFTS, DRAFTS_BEFORE_SIMULATE = 3, 2
 
 
 class Context(BaseModel):
@@ -58,6 +60,7 @@ class Context(BaseModel):
     notebook: str = ""  # the engineering notebook (D-090), with this run's research log and name
     research_log: str = ""
     run: str = ""
+    concepts: ConceptSet | None = None  # the concept set (D-091), when the run keeps one
 
 
 class ToolError(Exception):
@@ -102,17 +105,22 @@ def specs() -> list[dict[str, Any]]:
         tool("sensitivity", "How each of your requirements moves when each parameter of the drafted body's parts "
              "moves a tenth of its range up and down, and which parameters help one requirement while hurting "
              "another (a coupling).", draft, ["proposal"]),
+        tool("compare", f"Up to {COMPARE_DRAFTS} drafts against the current body and each other on every requirement, "
+             "each reading marked + better, 0 the same or - worse than the current body.",
+             {"proposals": {"type": "array", "items": prop}}, ["proposals"]),
         tool("facts", "A train task's numbers by name (an object's size and mass, a route's features, a target).",
              {"task": {"type": "string"}}, ["task"]),
         tool("note", "Record a finding from your research in the engineering notebook, with the page you read it "
              "on: it outlives this run, and a kept change that cites its id credits it.  Returns its id.",
              {k: v for k, v in _note_schema().items()}, ["claim", "source_url"]),
-        tool("module", "A module's graph at the given parameters (lengths in metres), to write a patch against.",
+        tool("module", "A module's graph at the given parameters (lengths in metres), or a concept's own graph by its "
+             "id, to write a patch against.",
              {"name": {"type": "string"}, "params": {"type": "object", "additionalProperties": {"type": "number"}}},
              ["name"]),
         tool("simulate", "One train task solved by the body this proposal makes: whether it succeeded, the failure "
              "mechanism and the diagnosis.  One task is not a trial: nothing it finds is kept, and the budget is "
-             "small.", {**draft, "task": {"type": "string", "description": "a train task id"}}, ["proposal", "task"]),
+             "small.  A draft that opens a new concept may simulate once two distinct new drafts have been checked "
+             "or measured this iteration.", {**draft, "task": {"type": "string", "description": "a train task id"}}, ["proposal", "task"]),
     ]
 
 
@@ -120,6 +128,7 @@ class Server:
     def __init__(self, ctx: Context, log: Path | None, world: World | None = None):
         self.ctx, self.log = ctx, log
         self._world = world
+        self.drafts: list[str] = []  # the new concepts' drafts this call looked at
 
     @property
     def world(self) -> World:
@@ -157,11 +166,20 @@ class Server:
         with self.log.open("a") as f:
             f.write(json.dumps({"iteration": self.ctx.iteration, "tool": tool, "args": args, "result": result[:2000],
                                 "error": error, "seconds": round(seconds, 2), "sim_s": round(sim_s, 1),
-                                "counted": counted}) + "\n")
+                                "counted": counted, **({"drafts": self.drafts} if self.drafts else {})}) + "\n")
+
+    def _drafted(self) -> set[str]:
+        """The new concepts' drafts looked at this iteration, by body, simulations aside."""
+        if self.log is None or not self.log.exists():
+            return set()
+        rows = [json.loads(line) for line in self.log.read_text().splitlines()]
+        return {k for r in rows if r.get("iteration") == self.ctx.iteration and r["tool"] != "simulate"
+                for k in r.get("drafts", [])}
 
     def call(self, tool: str, args: dict[str, Any]) -> tuple[str, bool]:
         """The answer's text, and whether it is an error."""
         t0 = time.time()
+        self.drafts = []
         n, s = self._used()
         if tool not in NAMES:
             return f"no tool {tool!r}; the tools are {list(NAMES)}", True
@@ -191,10 +209,25 @@ class Server:
             raise ToolError(f"not a valid proposal: {str(exc)[:600]}") from exc
         if recorded_only(self.world, prop):
             raise ToolError("this idea has no mechanism, so the loop records it and builds nothing to check")
+        conc = self.ctx.concepts
         try:
-            return prop, candidate(self.world, self.ctx.body, self.ctx.bases, prop, self.catalogue, new_id="draft")
+            gone = conc.base_refusal(prop.base) if conc is not None else ""
+            if gone:
+                raise ValueError(gone)
+            cand = candidate(self.world, self.ctx.body, self.ctx.bases, prop, self.catalogue, new_id="draft")
+            if conc is not None and self._opens(prop, cand):
+                full = conc.full_refusal()
+                if full:
+                    raise ValueError(full)
+                self.drafts.append(cand.key())
         except ValueError as exc:
             raise ToolError(f"refused before trial: {exc}") from exc
+        return prop, cand
+
+    def _opens(self, prop: Proposal, cand: Body) -> bool:
+        from sea.evolve.loop import opens_concept
+
+        return opens_concept(self.world, self.ctx.concepts, self.ctx.body, self.ctx.bases, prop, cand)
 
     def _check(self, args: dict[str, Any]) -> str:
         from sea.evolve.loop import screen
@@ -268,6 +301,30 @@ class Server:
             rows.append(f"{slot}.{k} = {v0:g}: " + ("; ".join(cells) or "moves no requirement"))
         return "\n".join(rows + (["couplings: " + "; ".join(coupled)] if coupled else ["no coupling found"]))
 
+    def _compare(self, args: dict[str, Any]) -> str:
+        from sea.evolve import concepts as C
+        from sea.evolve import requirements as R
+
+        reqs = self.ctx.requirements
+        if not reqs:
+            raise ToolError("there are no requirements yet: write them in your answer's `requirements`")
+        train = [self.tasks[i] for i in self.ctx.train]
+
+        def rows(b: Body) -> list[R.Row]:
+            return R.measure(self.world, b, reqs, train, self.ctx.body, self.ctx.manifest, self.ctx.spent)
+
+        columns, out = [], []
+        for n, raw in enumerate(list(args.get("proposals") or [])[:COMPARE_DRAFTS]):
+            try:
+                _, cand = self._draft({"proposal": raw})
+            except ToolError as exc:
+                out.append(f"draft {n + 1}: {exc}")
+                continue
+            columns.append((f"draft {n + 1}", rows(cand)))
+        if not columns and not out:
+            raise ToolError("give the drafts to compare")
+        return "\n".join([C.matrix(reqs, rows(self.ctx.body), columns), *out] if columns else out)
+
     def _reading(self, body: Body, r: dict[str, Any]) -> float:
         from sea.evolve import instruments as I
 
@@ -339,6 +396,8 @@ class Server:
     def _module(self, args: dict[str, Any]) -> str:
         if not hasattr(self.world, "modules_text"):
             raise ToolError("this world has no modules")
+        if args.get("name") in self.ctx.bases and hasattr(self.world, "mechanism_text"):  # a concept's own graph (D-091)
+            return self.world.mechanism_text(self.ctx.bases[args["name"]]) or f"{args['name']} has no built mechanism"
         from sea.worlds import gripper as W
 
         name, params = args.get("name", ""), dict(args.get("params") or {})
@@ -359,6 +418,9 @@ class Server:
         from sea.evolve.loop import screen
 
         _, cand = self._draft(args)
+        if self.drafts and len(self._drafted()) < DRAFTS_BEFORE_SIMULATE:
+            raise ToolError(f"this draft opens a new concept: check or measure {DRAFTS_BEFORE_SIMULATE} distinct new "
+                            "drafts this iteration before simulating one")
         errs, _ = screen(self.world, cand, self.ctx.body, self.ctx.manifest, self.ctx.spent, {})
         if errs:
             raise ToolError("the loop would not build this body to trial it: " + "; ".join(errs))

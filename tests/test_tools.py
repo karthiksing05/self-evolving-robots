@@ -90,7 +90,7 @@ def test_the_server_speaks_mcp_over_stdio(tmp_path):
     assert set(got) == {"probe", 0, 1, 2, 3}  # the notification is not answered
     assert got["probe"]["error"]["code"] == -32601
     assert got[0]["result"]["protocolVersion"] == "2025-11-25"
-    assert [t["name"] for t in got[1]["result"]["tools"]] == ["check", "measure", "read", "sweep", "sensitivity",
+    assert [t["name"] for t in got[1]["result"]["tools"]] == ["check", "measure", "read", "sweep", "sensitivity", "compare",
                                                               "facts", "note", "module", "simulate"]
     assert all("$defs" in t["inputSchema"] for t in got[1]["result"]["tools"])
     assert not got[2]["result"]["isError"] and '"name":"parallelogram(60)"' in got[2]["result"]["content"][0]["text"]
@@ -120,7 +120,7 @@ def test_plan_claude_runs_the_tools_only_when_given_them(tmp_path):
     f = p.flags()
     assert "--safe-mode" not in f and f[f.index("--tools") + 1] == "" and "--strict-mcp-config" in f
     assert f[f.index("--allowedTools") + 1] == ",".join(f"mcp__sea__{n}" for n in ("check", "measure", "read", "sweep",
-                                                                                 "sensitivity", "facts", "module",
+                                                                                 "sensitivity", "compare", "facts", "module",
                                                                                  "simulate", "note"))
     cfg = json.loads((tmp_path / "iter00.mcp.json").read_text())["mcpServers"]
     assert list(cfg) == ["sea"] and cfg["sea"]["command"] == sys.executable and str(ctx.resolve()) in cfg["sea"]["args"]

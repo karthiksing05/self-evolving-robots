@@ -11,6 +11,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import Any
 
+from sea.evolve.concepts import calibration as failure_calibration
 from sea.evolve.core import Body, BomLine, Outcome, PartType, Task, World
 from sea.evolve.resources import Spent, check, idea_text, is_fab, totals
 
@@ -85,7 +86,7 @@ def build(world: World, body: Body, tasks: Sequence[Task], outcomes: dict[str, O
           history: Sequence[dict[str, Any]], ideas: Sequence[dict[str, Any]], spent: Spent, manifest: dict[str, Any],
           iteration: int, iterations: int, max_proposals: int = 3, frontier: Sequence[dict[str, Any]] = (),
           tune_trials: int = 0, tools: dict[str, int] | None = None, requirements: str | None = None,
-          notebook: str | None = None) -> str:
+          notebook: str | None = None, concepts: str | None = None) -> str:
     by_id = {t.id: t for t in tasks}
     groups = sorted({t.group for t in tasks})
     failing = [t for t in tasks if not outcomes[t.id].success]
@@ -118,8 +119,9 @@ def build(world: World, body: Body, tasks: Sequence[Task], outcomes: dict[str, O
                         f"\n    result: {h['result']}")
         sec.append("# Record of past proposals (most recent last)\n" + "\n".join(rows))
         cal = _calibration(history)
-        if cal:
-            sec.append(f"# Your predictions against the trials\n{cal}")
+        modes = failure_calibration(history)
+        if cal or modes:
+            sec.append("# Your predictions against the trials\n" + "\n".join(x for x in (cal, modes) if x))
         tried = _exhaustion(history)
         if tried:
             sec.append("# What parameter moves have not fixed\n" + tried)
@@ -132,6 +134,8 @@ def build(world: World, body: Body, tasks: Sequence[Task], outcomes: dict[str, O
     if ideas:
         sec.append("# Ideas recorded so far without a mechanism (untested)\n" +
                    "\n".join(f"- {i['name']} (iteration {i['iteration'] + 1}): {idea_text(i['cost'])}" for i in ideas[-6:]))
+    if concepts is not None:
+        sec.append(f"# Concepts (D-091)\n{concepts}")
     if notebook is not None:
         from sea.evolve.research import BUDGET
 

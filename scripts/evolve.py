@@ -36,6 +36,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--tools", action="store_true", help="System 2 may question the harness while it proposes (D-086)")
     ap.add_argument("--requirements", action="store_true", help="System 2 keeps a measured requirements list (D-089)")
     ap.add_argument("--research", action="store_true", help="System 2 researches the web and keeps the notebook (D-090)")
+    ap.add_argument("--concepts", action="store_true", help="the concept set, functions, comparison, failure modes (D-091)")
     ap.add_argument("--out", type=Path, default=None)
     args = ap.parse_args(argv)
     out = args.out or ROOT / "runs" / "evolve" / f"{args.world}_{args.arm}_s{args.seed}"
@@ -43,7 +44,7 @@ def main(argv: list[str] | None = None) -> int:
         ap.error(f"{out} exists: choose another --out")
     cfg = RunConfig(world=args.world, arm=args.arm, iterations=args.iterations, seed=args.seed, workers=args.workers,
                     tune_trials=args.tune_trials, model=args.model, effort=args.effort, tools=args.tools,
-                    requirements=args.requirements, research=args.research)
+                    requirements=args.requirements, research=args.research, concepts=args.concepts)
     summary = run(cfg, out, log=lambda m: print(m, flush=True))
     keep = {k: summary[k] for k in ("world", "arm", "final_held_train", "test", "spent", "llm", "wall_s", "sim_s")}
     print(json.dumps(keep, indent=1))

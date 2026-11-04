@@ -29,12 +29,14 @@ import json
 import time
 from collections.abc import Callable, Sequence
 from concurrent.futures import ProcessPoolExecutor
+from functools import partial
 from pathlib import Path
 from typing import Any, Literal
 
 import numpy as np
 from pydantic import BaseModel, ConfigDict
 
+from sea.evolve import concepts as C
 from sea.evolve import requirements as R
 from sea.evolve import research as RS
 from sea.evolve.core import Body, Edit, Outcome, Proposal, ProposalBatch, Task, World, apply, edit_rung
@@ -64,6 +66,7 @@ class RunConfig(BaseModel):
     requirements: bool = False  # System 2 keeps a requirements list the harness measures (D-089)
     research: bool = False  # System 2 searches and reads the web and keeps the notebook; needs the tools (D-090)
     notebook: str = "library/notebook.jsonl"  # shared across runs and worlds
+    concepts: bool = False  # the concept set, functions, computed comparison and failure modes (D-091)
 
 
 # ---------------------------------------------------------------- parallel evaluation
@@ -242,6 +245,15 @@ def candidate(world: World, body: Body, bases: dict[str, Body], prop: Proposal, 
     return apply(cand, prop.edits, catalogue, new_id=cand.id) if prop.edits else cand
 
 
+def opens_concept(world: World, concepts: C.ConceptSet, body: Body, bases: dict[str, Body], prop: Proposal,
+                  cand: Body) -> bool:
+    """Whether this proposal starts a new structure rather than developing one (D-091)."""
+    built = builds(world, prop)
+    base = bases.get(prop.base, body) if prop.base is not None else body
+    return C.opens(built, prop.idea.mechanism.module if built else None, edit_rung(base, _diff(base, cand)), prop.base,
+                   [c.id for c in concepts.live()])
+
+
 def built_text(prop: Proposal) -> str:
     mech = prop.idea.mechanism
     return "; ".join([f"{prop.idea.slot or 'mechanism'}: built {prop.idea.name!r} ({mech.module} + "
@@ -295,12 +307,18 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
     history: list[dict[str, Any]] = []
     reqs: list[Any] = []  # System 2's requirements list (D-089)
     notebook = Path(cfg.notebook)
+    concepts = C.ConceptSet()  # new structures, developed before they are judged (D-091)
+    functions: list[Any] = []  # System 2's function list
     cur_rows: list[Any] = []  # the list measured on the current body
     ideas: list[dict[str, Any]] = []
     curve: list[dict[str, Any]] = []
     tried: dict[str, str] = {}  # body key -> what its trial found: a body is never paid for twice
     frontier: dict[str, dict[str, Any]] = {}  # promising bodies not kept: they gained more groups than they lost
     t_start = time.time()
+
+    def bases() -> dict[str, Body]:
+        """The bodies a proposal may build on by id: the promising ones, and the live concepts (D-091)."""
+        return {**{i: f["body"] for i, f in frontier.items()}, **concepts.bases()}
 
     def trial(cand: Body, entry: dict[str, Any], full_always: bool) -> tuple[float, ...] | None:
         """Screen ``cand`` against the current body and, if admitted, solve it, filling ``entry``.  Returns its
@@ -311,6 +329,8 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
             entry["requirements"] = R.moved(cur_rows, R.measure(world, cand, reqs, train, body, manifest, spent))
         if errs:
             entry.update(result="refused before trial: " + "; ".join(errs), tried=False)
+            if cfg.concepts:  # a law's refusal leaves a structure to develop; money or a repeat does not
+                entry["laws"] = world.check(cand)
             return None
         held_tasks = [t for t in train if t.group in held]
         cand_out = ev.solve(cand, held_tasks)
@@ -406,20 +426,27 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
             if isinstance(proposer, RandomProposer):
                 proposer.body = body
             front = sorted(frontier.values(), key=lambda f: (-(len(f["gained"]) - len(f["lost"])), f["iteration"]))
-            budget, req_text, notes_text = None, None, None
+            budget, req_text, notes_text, concept_text = None, None, None, None
             if cfg.research:
                 notes_text = RS.text(RS.load(notebook))
             groups = sorted({t.group for t in train})
             if cfg.requirements:
                 cur_rows = R.measure(world, body, reqs, train, body, manifest, spent)
                 req_text = R.text(reqs, cur_rows, held, groups)
+            if cfg.concepts:
+                concepts.refresh(reqs, partial(R.measure, world, reqs=reqs, tasks=train, base=body, manifest=manifest,
+                                               spent=spent))
+                concept_text = C.text(concepts, reqs, R.measure(world, body, reqs, train, body, manifest, spent), functions,
+                                      {*catalogue, *(world.module_names() if hasattr(world, "module_names") else [])},
+                                      getattr(world, "mechanism_text", None))
             if cfg.tools or cfg.research:  # what System 2's tools check a draft against: this iteration's body and record (D-086)
                 from sea.evolve import tools as T
 
                 ctx = out / "tools" / f"iter{it:02d}.json"
                 ctx.parent.mkdir(exist_ok=True)
                 ctx.write_text(T.Context(world=cfg.world, iteration=it, body=body, tried=tried, manifest=manifest,
-                                         bases={i: f["body"] for i, f in frontier.items()}, spent=spent,
+                                         bases=bases(), spent=spent,
+                                         concepts=concepts if cfg.concepts else None,
                                          train=[t.id for t in train], requirements=reqs,
                                          held=sorted(held), notebook=str(notebook.resolve()) if cfg.research else "",
                                          research_log=str((out / "research.jsonl").resolve()),
@@ -436,7 +463,7 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                     proposer.research = hooks
             prompt = build(world, body, train, outcomes, held, history, ideas, spent, manifest, it, cfg.iterations,
                            cfg.max_proposals, frontier=front[:5], tune_trials=cfg.tune_trials, tools=budget,
-                           requirements=req_text, notebook=notes_text)
+                           requirements=req_text, notebook=notes_text, concepts=concept_text)
             try:
                 batch = proposer.propose(SYSTEM, prompt, tag=f"iter{it:02d}")
             except (PlanLimitReached, PlanBillingError):
@@ -458,6 +485,9 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
             if cfg.requirements:
                 rec["requirement_rows"] = [r.model_dump() for r in cur_rows]
                 rec["uncovered"] = R.coverage(reqs, groups)
+            if cfg.concepts and batch.functions:
+                functions = list(batch.functions)
+                rec["functions"] = [f.model_dump() for f in functions]
             trials = []
             swaps: list[tuple[Body, dict[str, Any]]] = []
             eligible: list[tuple[tuple[float, ...], Body, dict[str, Any]]] = []
@@ -475,11 +505,19 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                     trials.append(entry)
                     history.append(entry)
                     continue
+                opening = False
                 try:
-                    cand = candidate(world, body, {i: f["body"] for i, f in frontier.items()}, prop, catalogue,
-                                     new_id=f"b{it:02d}{k}")
+                    gone = concepts.base_refusal(prop.base) if cfg.concepts else ""
+                    if gone:
+                        raise ValueError(gone)
+                    cand = candidate(world, body, bases(), prop, catalogue, new_id=f"b{it:02d}{k}")
                     if built:
                         entry["edit"] = built_text(prop)
+                    if cfg.concepts:
+                        opening = opens_concept(world, concepts, body, bases(), prop, cand)
+                        full = concepts.full_refusal() if opening else ""
+                        if full:
+                            raise ValueError(full)
                 except ValueError as exc:
                     entry.update(result=f"refused before trial: {exc}", tried=False)
                     trials.append(entry)
@@ -493,6 +531,13 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                     entry["prediction"] = _score_prediction(prop.gains, entry["gained"], entry["lost"])
                     if entry["move"] == "swap":
                         swaps.append((cand, entry))
+                if cfg.concepts:
+                    entry["failure_modes"], entry["unpredicted_failures"] = C.rate(prop.failure_modes, entry,
+                                                                                   {t.id: t.group for t in train})
+                    name = prop.idea.name if prop.idea is not None else entry["edit"]
+                    cid = concepts.record(prop.base, opening, name, cand, entry, it, dict(prop.options))
+                    if cid is not None:
+                        entry["concept"] = cid
                 if score is not None:
                     eligible.append((score, cand, entry))
                     if best is None or score > best[0]:
@@ -521,6 +566,8 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                 cand, entry = max(promising, key=lambda ce: (len(ce[1]["gained"]) - len(ce[1]["lost"]),
                                                               len(ce[1]["gained"]), ce[1]["new_tasks"]))
                 for score, tcand, tentry in tune(cand, entry, np.random.default_rng([cfg.seed, it])):
+                    if "concept" in entry:
+                        tentry["concept"] = entry["concept"]
                     trials.append(tentry)
                     history.append(tentry)
                     log(f"    tune {tentry['k']} of {cand.id}: {tentry['edit']}: {tentry['result'][:160]}")
@@ -535,9 +582,17 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                 accepted = cand.id
                 if cfg.research:  # the notes the kept change cites earn their credit
                     entry["credited"] = RS.credit(notebook, json.dumps(entry.get("proposal", {})))
+                if cfg.concepts:
+                    concepts.keep([entry.get("concept", ""), *entry.get("merged", [])])
             for e in trials:
                 if e.get("result", "").startswith("kept-eligible"):
                     e["result"] = e["result"].replace("kept-eligible", "not kept (another proposal gained more)")
+            if cfg.concepts:  # narrow on this iteration's evidence, measured against the body it ends with
+                concepts.refresh(reqs, partial(R.measure, world, reqs=reqs, tasks=train, base=body, manifest=manifest,
+                                               spent=spent))
+                rec["concepts_dropped"] = concepts.narrow(it, reqs)
+                rec["concepts"] = C.summary(concepts)
+                (out / "concepts.json").write_text(concepts.model_dump_json(indent=1))
             rec.update(trials=[{k: v for k, v in e.items() if k != "outcomes"} | {"outcomes": e.get("outcomes", {})}
                                for e in trials], accepted=accepted, spent=spent.model_dump(),
                        seconds=round(time.time() - t0, 1))
@@ -566,6 +621,8 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
     }
     if cfg.research:
         summary["research"] = RS.summary(out / "research.jsonl")
+    if cfg.concepts:
+        summary["concepts"] = C.summary(concepts)
     if cfg.tools or cfg.research:
         from sea.evolve.tools import summary as tool_summary
 
