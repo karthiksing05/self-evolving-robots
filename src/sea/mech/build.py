@@ -25,6 +25,7 @@ from sea.mech.graph import (
     Gear,
     Graph,
     Link,
+    PadMount,
     RackTeeth,
     Web,
 )
@@ -142,7 +143,7 @@ def _add_part(spec: mujoco.MjSpec, body, p, pose: tuple[np.ndarray, np.ndarray])
         body.add_geom(name=p.name, type=_GEOM.mjGEOM_BOX, size=((hi - lo) / 2).tolist(), pos=((lo + hi) / 2).tolist(),
                       rgba=PRINTED, group=2, mass=0.0)
         return part_kg(p)
-    if isinstance(p, Bought):
+    if isinstance(p, Bought | PadMount):
         return part_kg(p)
     raise TypeError(p)
 
@@ -157,7 +158,7 @@ def solid_names(p) -> tuple[str, ...]:
         from sea.sim import jaws
 
         return ("jaw_blade_drawn", *(f"jaw_moving_{k}" for k in range(len(jaws.blade_parts()))))
-    if isinstance(p, Bought):
+    if isinstance(p, Bought | PadMount):
         return ()
     return (p.name,)
 

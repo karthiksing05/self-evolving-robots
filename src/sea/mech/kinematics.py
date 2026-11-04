@@ -20,7 +20,7 @@ from functools import lru_cache
 import mujoco
 import numpy as np
 
-from sea.mech.graph import Blade, Graph
+from sea.mech.graph import Blade, Graph, PadMount
 
 GUIDE_JOINTS = ("jaw_rod_dy", "jaw_rod_dz", "jaw_rod_yaw", "jaw_rod_pitch")  # a guide's bending: zero when posed
 STEPS = 61  # servo angles over the range at which the closure is solved
@@ -125,8 +125,12 @@ def closes(g: Graph) -> tuple[float, float]:
 
 
 def finger_body(g: Graph) -> tuple[str, np.ndarray]:
-    """The body that carries the finger's blade, and the blade's offset in it (where the jaw's frame at q = 0
-    sits in the finger body's frame)."""
+    """The finger: the body the pads ride on (a ``PadMount``'s, D-081, else the blade's), and the offset in it
+    (where the jaw's frame at q = 0 sits in the finger body's frame)."""
+    for b in g.bodies:
+        for p in b.parts:
+            if isinstance(p, PadMount):
+                return b.name, np.asarray(p.offset)
     for b in g.bodies:
         for p in b.parts:
             if isinstance(p, Blade):

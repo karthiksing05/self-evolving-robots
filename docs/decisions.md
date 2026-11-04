@@ -2541,3 +2541,37 @@ Against the prediction:
 - **The trial's rods apply the assembled beam** (checked in the y plane, where the teeth add nothing): `RodSprings` forces equal −K·u to 1e-9.
 - **A built guide is refused before the laws** if its bushings overlap, if it carries the wrong number of LM3UU, or if no clamp part holds a declared far end.
 - **Full suite:** 731 passed, 2 skipped, 1 xfailed (726 before, plus 5 new tests).
+
+## D-081 Pads can mount on any body of a mechanism (world: physics; judge: built jaws only)
+
+**Why.** Ten of System 2's D-076 ideas asked for a moving pad that stays parallel to the fixed one. The most concrete was the "levelled moving pad": a pad carrier pinned at the stock fingertip, with a levelling link to the gripper that makes a parallelogram. Pads could sit only on the body carrying the blade, so a graph could build the carrier but could not put the pad on it.
+
+**Change.**
+- **A `PadMount` part** marks the body the pads ride on, with the same offset convention as the blade (where the jaw's frame at q = 0 sits in the body's frame). It has no solid and no mass.
+- **The finger is the body the pads ride on:** the mount's body if there is one, otherwise the blade's.
+  - Its motion is measured as before (`kinematics.finger_motion`).
+  - The grasp skills, facts and pad placement follow it.
+- **Refused before the laws:**
+  - a mount whose body is not axis-aligned with the jaw at q = 0 (the pads are drawn in the jaw's axes);
+  - a body with a mount and no pads.
+- **A graph that keeps the stock jaw's blade** (no `remove_stock_mesh` of the jaw) has a finger. Before this, an edit of the empty revolute module was refused as "no finger".
+
+**Prediction** (written before the code):
+- catalogue jaws are unchanged (no graph has a mount);
+- a levelling parallelogram built from the revolute module keeps the mount's body within 0.1° of its closed orientation across the servo's range, while the stock jaw turns 100° or more, and its pads ride on the carrier;
+- that fixture is likely refused by the interference law, because its pads sit on the blade's face while the blade turns away. That is a real fault the design would have to answer, not a bug.
+
+**Measured** (`tests/mech/test_pad_mount.py`). The levelling parallelogram built from the revolute module (a 60 mm link from a pin on the gripper, offset as the parallelogram's follower is, to a carrier pinned on the stock jaw):
+- **Kinematics, as predicted:**
+  - it closes to 8e-13 over the servo's whole range (-0.17 to 1.75 rad), while the stock jaw turns 110°;
+  - the carrier keeps its orientation to 0.000°;
+  - the pads are placed on the carrier.
+- **Refused by the laws, as predicted, but for a different fault than predicted:**
+  - the carrier's hub and the levelling link pass through the stock jaw's mesh (12 × 8 × 12 mm and 24 mm of shared material);
+  - the link's body sits 0.6 mm off the pin that should carry it.
+
+  These are the faults a real version would have to design around. The laws read the graph and do not trust the simulator's contact exclusions.
+- **Refused before the laws:**
+  - the same body with no pads;
+  - a carrier turned 30° from the jaw's axes.
+- **Full suite:** 733 passed, 2 skipped, 1 xfailed (731 before, plus 2 new tests).

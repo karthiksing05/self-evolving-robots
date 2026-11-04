@@ -354,6 +354,9 @@ class GripperWorld:
 
         if body.parts["jaw"].type == "built":
             errs = _built_errors(body.parts["jaw"].mechanism)
+            if not errs and '"pad_mount"' in body.parts["jaw"].mechanism and body.parts["pads"].type == "none":
+                errs = ["the mechanism mounts pads on a body but the body has none: choose a pads part, or the "
+                        "stock blade grips and the mount carries nothing"]
             if errs:
                 return errs
         try:
@@ -384,7 +387,7 @@ class GripperWorld:
         from sea.mech.patch import __doc__ as patch_doc
 
         kinds = []
-        for cls in (G.Box, G.Cylinder, G.Link, G.Web, G.Gear, G.RackTeeth, G.Blade, G.Bracket, G.Bought, G.Body,
+        for cls in (G.Box, G.Cylinder, G.Link, G.Web, G.Gear, G.RackTeeth, G.Blade, G.PadMount, G.Bracket, G.Bought, G.Body,
                     G.Joint, G.Inertial, G.Loop, G.Mesh, G.Guide):
             fields = ", ".join(f"{n}" + ("" if f.is_required() else f"={f.default!r}")
                                for n, f in cls.model_fields.items() if n != "kind")
@@ -395,8 +398,9 @@ class GripperWorld:
                "'gripper' (the fixed jaw: x closes the jaws, z up; stock) and 'moving_jaw_so101_v1' (the servo's "
                "horn body: its own hinge joint 'gripper' is the servo; x toward the fixed jaw at q = 0, z along the "
                f"hinge; origin on the hinge at gripper {[round(float(v), 4) for v in J.HINGE]}).  New bodies hang from "
-               "either with their own joints; loops and meshes tie them to the servo.  The body carrying the blade is "
-               "the finger: pads mount on it.  A guide's rods bend as beams: clamped at clamp_end, and at far_end too when a "
+               "either with their own joints; loops and meshes tie them to the servo.  The finger is the body with "
+               "a pad_mount (else the blade's): the pads ride on it.  A guide's rods bend as beams: clamped at "
+               "clamp_end, and at far_end too when a "
                "clamp part holds them there; the carriage rides two LM3UU per bushing offset.",
                "Part kinds, then a body's, joint's and constraint's fields:", *kinds, (patch_doc or "").strip(), "Modules (a patch applies to the module's graph):"]
         for name, (_, params) in MODULES.items():
@@ -581,7 +585,7 @@ def _built_errors(mechanism: str) -> list[str]:
 
     from sea.control.frames import STOCK_MJCF
     from sea.mech import build
-    from sea.mech.graph import Blade, Graph
+    from sea.mech.graph import Blade, Graph, PadMount
     from sea.mech.kinematics import CLOSE_TOL, closes, finger_body
 
     g = Graph.model_validate_json(mechanism)
@@ -591,8 +595,20 @@ def _built_errors(mechanism: str) -> list[str]:
         spec.compile()
     except Exception as exc:  # MuJoCo names the element
         return [f"the mechanism does not compile: {str(exc)[:300]}"]
-    if not any(isinstance(p, Blade) for b in g.bodies for p in b.parts):
+    if J.JAW_MESH in g.remove_stock_mesh and not any(isinstance(p, Blade) for b in g.bodies for p in b.parts):
         return ["the mechanism carries no finger: put the blade on the body that should hold the object"]
+    mounts = [b.name for b in g.bodies if any(isinstance(p, PadMount) for p in b.parts)]
+    if len(mounts) > 1:
+        return [f"pads mount on one body; {mounts} each carry a pad mount"]
+    if mounts:  # the pads are drawn in the jaw's axes: their body must turn with nothing at q = 0
+        m = spec.compile()
+        d = mj.MjData(m)
+        mj.mj_kinematics(m, d)
+        rel = d.xmat[m.body(J.JAW_MESH).id].reshape(3, 3).T @ d.xmat[m.body(mounts[0]).id].reshape(3, 3)
+        off = math.degrees(math.acos(max(-1.0, min(1.0, (np.trace(rel) - 1) / 2))))
+        if off > 0.01:
+            return [f"the pad mount's body {mounts[0]} is turned {off:.1f} deg from the jaw's axes at q = 0; pads are "
+                    "drawn in the jaw's axes, so give it the jaw's orientation there"]
     for gd in g.guides:
         errs = _guide_errors(g, gd)
         if errs:

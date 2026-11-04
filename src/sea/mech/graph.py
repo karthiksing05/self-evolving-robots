@@ -117,6 +117,14 @@ class Blade(_M):
     offset: Vec = (0.0, 0.0, 0.0)
 
 
+class PadMount(_M):
+    """Where the pads ride (D-081): this body carries them, placed as on the stock jaw at q = 0 and offset (body
+    frame) as a blade is.  No solid of its own; the body's axes must be the jaw's at q = 0."""
+
+    kind: Literal["pad_mount"] = "pad_mount"
+    offset: Vec = (0.0, 0.0, 0.0)
+
+
 class Bracket(_M):
     """A printed bracket from y = ``y_from`` toward +y until it meets the frame mesh over its footprint (x, z),
     seated ``FIT`` into the frame's face; ``fallback_y`` where no frame lies behind it (it then mounts on
@@ -140,7 +148,8 @@ class Bought(_M):
     kg: float
 
 
-Part = Annotated[Box | Cylinder | Link | Web | Gear | RackTeeth | Blade | Bracket | Bought, Field(discriminator="kind")]
+Part = Annotated[Box | Cylinder | Link | Web | Gear | RackTeeth | Blade | PadMount | Bracket | Bought,
+                 Field(discriminator="kind")]
 
 
 # ---------------------------------------------------------------- bodies and joints
