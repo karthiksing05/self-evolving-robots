@@ -528,6 +528,40 @@ class ME2110World:
                     f"{MM.XF:g} in; pole faces 2 in from its centre; mounds at ({MM.MOUNDS['gold'][0]:g}, ±15) in")
         return "\n".join(rows)
 
+    # instruments (D-088; F6 rebuilds this world from kit primitives)
+    def instruments(self) -> list:
+        from sea.evolve.core import Instrument as I
+
+        return [
+            I(name="folded_l_in", unit="in", doc="the folded robot's length before the start"),
+            I(name="folded_w_in", unit="in", doc="the folded robot's width before the start"),
+            I(name="folded_h_in", unit="in", doc="the folded robot's height before the start"),
+            I(name="fits_box", unit="", doc=f"1 if it fits the {BOX[0]:g} x {BOX[1]:g} x {BOX[2]:g} in box folded"),
+            I(name="kit_used", unit="", doc="kit actuators used, of each kind",
+              args={"kind": f"one of {sorted(KIT)}"}),
+            I(name="kit_left", unit="", doc="kit actuators of a kind still free", args={"kind": f"one of {sorted(KIT)}"}),
+            I(name="spend_usd", unit="$", doc=f"what the robot costs against the ${BUDGET:g} budget"),
+            I(name="print_g", unit="g", doc="printed plastic in the robot"),
+        ]
+
+    def read(self, body: Body, name: str, args: dict[str, Any], task: Task | None = None) -> float:
+        if name.startswith("folded_") or name == "fits_box":
+            env = envelope(body)
+            if name == "fits_box":
+                return float(fits_box(env))
+            return float(env["lwh".index(name[7])])
+        if name in ("kit_used", "kit_left"):
+            kind = str(args.get("kind", ""))
+            if kind not in KIT:
+                raise ValueError(f"no kit kind {kind!r}; the kinds are {sorted(KIT)}")
+            used = _uses(body)[kind]
+            return float(used if name == "kit_used" else KIT[kind] - used)
+        if name == "spend_usd":
+            return float(self._cost(body))
+        if name == "print_g":
+            return float(sum(_print_g(body).values()))
+        raise ValueError(f"no instrument {name!r}")
+
     def principles(self) -> list[str]:
         return [
             "Every part must fit the 12 x 24 x 18 in box folded; anything larger must unfold after the start, by an "

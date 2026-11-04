@@ -616,6 +616,61 @@ class MobileWorld:
                      f"it touches each obstacle, at most {BUMP_V:.2f} m/s, and backs off ({BACKOFF_S:.0f} s each)"))
         return "\n".join(rows)
 
+    # instruments (D-088)
+    def instruments(self) -> list:
+        from sea.evolve.core import Instrument as I
+
+        surf = {"surface": f"one of {sorted(SURF)}"}
+        return [
+            I(name="mass_kg", unit="kg", doc="the robot's mass"),
+            I(name="width_cm", unit="cm", doc="overall width"), I(name="length_cm", unit="cm", doc="chassis length"),
+            I(name="height_cm", unit="cm", doc="overall height"), I(name="belly_cm", unit="cm", doc="belly clearance"),
+            I(name="wheel_r_cm", unit="cm", doc="wheel radius, or the tracks' sprocket radius"),
+            I(name="stall_force_n", unit="N", doc="total push at the ground at stall and full duty"),
+            I(name="no_load_m_s", unit="m/s", doc="speed at full duty with no load"),
+            I(name="edge_climb_cm", unit="cm", doc="the highest edge it climbs from a run-up at full duty, driven in "
+              "the simulator", args=surf),
+            I(name="traction_deg", unit="deg", doc="the steepest slope its traction holds", args=surf),
+            I(name="stall_slope_deg", unit="deg", doc="the steepest slope its stall force alone climbs", args=surf),
+            I(name="ground_kpa", unit="kPa", doc="its ground pressure on soft ground"),
+            I(name="sink_cm", unit="cm", doc="how far it sinks where this pressure sinks 1 cm",
+              args={"kmod": "kPa that sinks 1 cm"}),
+            I(name="energy_j_m", unit="J/m", doc="energy per metre at full speed", args=surf),
+            I(name="usable_wh", unit="Wh", doc="the pack's usable energy"),
+            I(name="steer_sigma_cm", unit="cm", doc="lateral steering error at full speed"),
+            I(name="sense_m", unit="m", doc="how far ahead it senses in the dark"),
+            I(name="safe_m_s", unit="m/s", doc="the speed from which it stops in time among obstacles in the dark"),
+        ]
+
+    def read(self, body: Body, name: str, args: dict[str, Any], task: Task | None = None) -> float:
+        s = _spec(body)
+        surf = str(args.get("surface", "wood"))
+        if "surface" in args and surf not in SURF:
+            raise ValueError(f"no surface {surf!r}; the surfaces are {sorted(SURF)}")
+        plain = {"mass_kg": s.m, "width_cm": s.width, "length_cm": s.length, "height_cm": s.height,
+                 "belly_cm": s.belly, "wheel_r_cm": s.r, "stall_force_n": s.f_stall, "no_load_m_s": s.v_nl,
+                 "usable_wh": s.usable_j / 3600, "steer_sigma_cm": s.drift, "sense_m": s.sense}
+        if name in plain:
+            return float(plain[name])
+        if name == "edge_climb_cm":
+            return float(_climb(s, surf))
+        c, mu = _crr(s, surf), _mu(s, surf)
+        if name == "traction_deg":
+            return float(math.degrees(math.atan(max(0.0, mu - c))))
+        if name == "stall_slope_deg":
+            arg = 0.95 * s.f_stall / (s.m * G * math.sqrt(1 + c * c))
+            return 90.0 if arg >= 1 else float(max(0.0, math.degrees(math.asin(arg) - math.atan(c))))
+        p = s.m * G / (s.area * 1e-4) / 1000
+        if name == "ground_kpa":
+            return float(p)
+        if name == "sink_cm":
+            return float(p / float(args.get("kmod", 1.0)))
+        if name == "energy_j_m":
+            return float(c * s.m * G / s.eta + s.p_w / max(_speed(s, 1.0, c * s.m * G), 1e-3))
+        if name == "safe_m_s":
+            return float(_vsafe(s, _mu(s, "wood"))[0])
+        raise ValueError(f"no instrument {name!r}")
+
     def principles(self) -> list[str]:
         return [
             "A driven wheel climbs an edge by friction at the contact: alone it climbs h = r(1 - 1/sqrt(1+mu^2)); "

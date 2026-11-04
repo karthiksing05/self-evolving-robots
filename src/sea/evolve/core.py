@@ -94,6 +94,16 @@ class Task(_Model):
     data: dict[str, Any] = {}
 
 
+class Instrument(_Model):
+    """A quantity a world can measure on a body, or on a body facing a task (D-088): a reading, never advice."""
+
+    name: str
+    unit: str
+    doc: str
+    args: dict[str, str] = {}  # argument -> what it is, with its range
+    task: bool = False  # it reads the body facing one task
+
+
 class Outcome(_Model):
     """One task solved (or not) by one body.  ``mechanism`` is the world's label for *why*, read from the
     simulator after the attempt (a twin's analysis, not the robot's senses); the verdict is ``success``."""
@@ -228,3 +238,6 @@ class World(Protocol):
 
     # Optional: ``part_facts(body, part_type) -> list[str]``, computed facts about a part type fitted to this
     # body (its reach, force, range at the ends of its parameters), shown in the catalogue.  Facts, not advice.
+    # Optional (D-088): ``instruments() -> list[Instrument]`` and ``read(body, name, args, task) -> float``, the
+    # quantities System 2 can measure on any draft; ``task_facts(task) -> dict[str, float]``, a task's numbers
+    # by name (else every number in ``Task.data``).

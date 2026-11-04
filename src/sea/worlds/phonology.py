@@ -813,6 +813,61 @@ class PhonologyWorld:
                          f"{', '.join(seal) or 'none'}; smallest area sampled there {smallest}")
         return "\n".join(lines)
 
+    # instruments (D-088): measured on System 1's map of the body (its sampled postures)
+    def instruments(self) -> list:
+        from sea.evolve.core import Instrument as I
+
+        hz = {"f1": "Hz", "f2": "Hz", "f3": "Hz (optional)"}
+        return [
+            I(name="tract_cm", unit="cm", doc="the cast tube, glottis to teeth"),
+            I(name="servos", unit="", doc=f"servos used, of {CHANNELS} controller channels"),
+            I(name="f1_lo", unit="Hz", doc="the lowest F1 among sampled vowel postures"),
+            I(name="f1_hi", unit="Hz", doc="the highest F1 among sampled vowel postures"),
+            I(name="f2_lo", unit="Hz", doc="the lowest F2 among sampled vowel postures"),
+            I(name="f2_hi", unit="Hz", doc="the highest F2 among sampled vowel postures"),
+            I(name="f3_lo", unit="Hz", doc="the lowest F3 among sampled vowel postures"),
+            I(name="formant_gap_hz", unit="Hz", doc="how far the nearest sampled vowel posture is from these formants "
+              "(Euclidean over the ones given)", args=hz),
+            I(name="closure_cm2", unit="cm2", doc="the smallest area sampled at a place of closure",
+              args={"place": f"one of {sorted(PLACES)}"}),
+            I(name="fricative_postures", unit="", doc="sampled postures that make a fricative channel with the "
+              "airway open elsewhere"),
+            I(name="hiss_lo_hz", unit="Hz", doc="the lowest frication peak among those postures (0: none)"),
+            I(name="hiss_hi_hz", unit="Hz", doc="the highest frication peak among those postures (0: none)"),
+        ]
+
+    def read(self, body: Body, name: str, args: dict[str, Any], task: Task | None = None) -> float:
+        r, bab = rig(body), self.babble(body)
+        f = bab.f[~np.isnan(bab.f).any(1) & (bab.clo[:, 0] >= A_VOWEL)]
+        if name == "tract_cm":
+            return float(r.length)
+        if name == "servos":
+            return float(r.servos)
+        if name in ("f1_lo", "f1_hi", "f2_lo", "f2_hi", "f3_lo"):
+            col = int(name[1]) - 1
+            return float(f[:, col].min() if name.endswith("lo") else f[:, col].max()) if len(f) else float("nan")
+        if name == "formant_gap_hz":
+            want = [(k, float(args[k])) for k in ("f1", "f2", "f3") if k in args]
+            if not want or not len(f):
+                raise ValueError("give at least f1, and the body must sample a vowel")
+            cols = [int(k[1]) - 1 for k, _ in want]
+            return float(np.min(np.linalg.norm(f[:, cols] - [v for _, v in want], axis=1)))
+        if name == "closure_cm2":
+            place = str(args.get("place", ""))
+            if place not in PLACES:
+                raise ValueError(f"no place {place!r}; the places are {sorted(PLACES)}")
+            lo, hi = PLACES[place]
+            m = (bab.clo[:, 1] >= lo) & (bab.clo[:, 1] <= hi)
+            return float(bab.clo[m, 0].min()) if m.any() else float("inf")
+        ch = (bab.clo[:, 0] >= A_CLOSE) & (bab.clo[:, 0] < A_VOWEL) & (bab.clo[:, 2] > A_OPEN) & (bab.clash <= CLASH)
+        if name == "fricative_postures":
+            return float(ch.sum())
+        if name in ("hiss_lo_hz", "hiss_hi_hz"):
+            if not ch.any():
+                return 0.0
+            return float(np.nanmin(bab.peak[ch]) if name == "hiss_lo_hz" else np.nanmax(bab.peak[ch]))
+        raise ValueError(f"no instrument {name!r}")
+
     def principles(self) -> list[str]:
         return [
             "A tube closed at the glottis and open at the lips resonates near (2n-1)c/4L: every formant scales "

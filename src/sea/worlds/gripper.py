@@ -122,6 +122,25 @@ def roll_range(fingers: FingerSpec) -> tuple[float, float]:
     return max(j_lo, lo - ROLL_MARGIN), min(j_hi, hi + ROLL_MARGIN)
 
 
+@lru_cache(maxsize=256)
+def roll_needed(fingers: FingerSpec) -> dict[str, tuple[float, float]]:
+    """Each task's wrist roll, least and greatest, at the poses its grasp commands (above the object, at the grip,
+    lifted), from the IK started at home, as ``roll_range`` takes them (D-085)."""
+    from sea.control.executor import HOME_Q, stock_ik
+    from sea.control.motor import grasp_poses
+
+    ik = stock_ik()
+    out = {}
+    for t, (spec, contact, down, roll) in zip(GripperWorld().tasks(), _grasp_scenes(), strict=True):
+        target, above, _, _, _ = grasp_poses(spec, fingers, contact, down, roll)
+        q, qs = HOME_Q.copy(), []
+        for p in (above, target, target - down * 0.05):
+            q, _, _ = ik.track(p, down, q, roll_axis=roll)
+            qs.append(float(q[4]))
+        out[t.id] = (min(qs), max(qs))
+    return out
+
+
 @lru_cache(maxsize=1)
 def _stock_joint_ranges() -> dict[str, tuple[float, float]]:
     from sea.control.frames import STOCK_MJCF
@@ -548,6 +567,100 @@ class GripperWorld:
                        f"{F.fingertips(f, hi)[0] * 1000:.0f} mm apart; " + "; ".join(cells))
         return out
 
+    # instruments (D-088): what System 2 can measure on any draft
+    def instruments(self) -> list:
+        from sea.evolve.core import Instrument as I
+
+        w = {"width_mm": "the object's width across the jaws, mm (17..widest)"}
+        return [
+            I(name="servo_lo", unit="rad", doc="the gripper servo's closed end"),
+            I(name="servo_hi", unit="rad", doc="the gripper servo's open end"),
+            I(name="widest_mm", unit="mm", doc="how far apart the fingertips get at the open end"),
+            I(name="servo_at", unit="rad", doc="the servo angle that puts the fingertips this far apart", args=w),
+            I(name="face_tilt_deg", unit="deg", doc="the moving face's angle off parallel to the fixed one at this "
+              "opening (+: its bottom swung out)", args=w),
+            I(name="tip_rise_mm", unit="mm", doc="the moving fingertip's height above the fixed one at this opening",
+              args=w),
+            I(name="squeeze_n", unit="N", doc="the jaws' squeeze at this opening at the servo's stall torque", args=w),
+            I(name="rack_lift_mm", unit="mm", doc="how far the squeeze lifts a slide's rack off its gear at this "
+              "opening (0 for a jaw without rods)", args=w),
+            I(name="tooth_skip_mm", unit="mm", doc="the rack lift at which a slide's teeth skip (0 without rods)"),
+            I(name="bushing_load_n", unit="N", doc="the most loaded linear bushing at this opening (0 without rods)",
+              args=w),
+            I(name="bushing_rated_n", unit="N", doc="a linear bushing's rated load"),
+            I(name="pad_mm", unit="mm", doc="the pad thickness on each face (0: bare faces)"),
+            I(name="face_mu", unit="", doc="the faces' friction against the objects"),
+            I(name="lift_stall_nm", unit="N*m", doc="the arm's lifting joints' stall torque"),
+            I(name="shoulder_hold_nm", unit="N*m", doc="the shoulder-lift torque holding the arm over the table "
+              "centre with this load in the jaws", args={"mass_g": "the load, g"}),
+            I(name="wrist_roll_lo", unit="rad", doc="the least wrist roll the simulator allows this body"),
+            I(name="wrist_roll_hi", unit="rad", doc="the greatest wrist roll the simulator allows this body"),
+            I(name="roll_needed_lo", unit="rad", doc="the least wrist roll this task's grasp needs", task=True),
+            I(name="roll_needed_hi", unit="rad", doc="the greatest wrist roll this task's grasp needs", task=True),
+            I(name="loops_open_mm", unit="mm", doc="how far a built mechanism's loops are from closing at worst"),
+        ]
+
+    def read(self, body: Body, name: str, args: dict[str, Any], task: Task | None = None) -> float:
+        f = to_design(body).fingers
+        lo, hi = F.q_range(f)
+        if name in ("servo_at", "face_tilt_deg", "tip_rise_mm", "squeeze_n", "rack_lift_mm", "bushing_load_n"):
+            width = float(args.get("width_mm", 0.0))
+            q = F.tip_opening(f, width / 1000)
+            if q is None:
+                raise ValueError(f"{width:g} mm is beyond this body's widest opening "
+                                 f"({F.fingertips(f, hi)[0] * 1000:.0f} mm)")
+            if name == "servo_at":
+                return float(q)
+            if name == "face_tilt_deg":
+                return float(F.finger_tilt_deg(f, q) - f.pad_angle_deg if f.jaw in ("revolute", "built")
+                             else -f.pad_angle_deg)
+            if name == "tip_rise_mm":
+                return float(F.fingertips(f, q)[1] * 1000)
+            if name == "squeeze_n":
+                return float(F.squeeze_n(f, q, GRIP_TORQUE_NM))
+            r = _rod_numbers(f, q, hi)
+            return 0.0 if r is None else float(r["lift_mm" if name == "rack_lift_mm" else "bushing_n"])
+        if name in ("tooth_skip_mm", "bushing_rated_n"):
+            r = _rod_numbers(f, 0.0, hi)
+            return 0.0 if r is None else float(r["skip_mm" if name == "tooth_skip_mm" else "rated_n"])
+        if name == "servo_lo":
+            return float(lo)
+        if name == "servo_hi":
+            return float(hi)
+        if name == "widest_mm":
+            return float(F.fingertips(f, hi)[0] * 1000)
+        if name == "pad_mm":
+            return float(F.thickness(f) * 1000) if F.has_pads(f) else 0.0
+        if name == "face_mu":
+            return 0.9 if F.has_pads(f) and f.pad_tpu_mm > 0 else 0.45
+        if name == "lift_stall_nm":
+            return 2.94 if body.parts["arm_servos"].type == "servos_12v" else 1.62
+        if name == "shoulder_hold_nm":
+            base, per100 = _shoulder_load()
+            return float(base + per100 * float(args.get("mass_g", 0.0)) / 100)
+        if name in ("wrist_roll_lo", "wrist_roll_hi"):
+            return float(roll_range(f)[name == "wrist_roll_hi"])
+        if name in ("roll_needed_lo", "roll_needed_hi"):
+            need = roll_needed(f)
+            if task.id not in need:
+                raise ValueError(f"no grasp scene for task {task.id!r}")
+            return float(need[task.id][name == "roll_needed_hi"])
+        if name == "loops_open_mm":
+            if body.parts["jaw"].type != "built":
+                return 0.0
+            from sea.mech.graph import Graph
+            from sea.mech.kinematics import closes
+
+            return float(closes(Graph.model_validate_json(body.parts["jaw"].mechanism))[0] * 1000)
+        raise ValueError(f"no instrument {name!r}")
+
+    def task_facts(self, task: Task) -> dict[str, float]:
+        from sea.sim.objects import catalog
+
+        o = catalog()[task.group]
+        return {"width_mm": float(o["width_mm"]), "depth_mm": float(o["depth_mm"]), "height_mm": float(o["height_mm"]),
+                "mass_g": float(o["mass_g"]), "friction": float(o["friction"]), "round": float(bool(o["round"]))}
+
     def principles(self) -> list[str]:
         return [
             "Two contacts hold an object when their normals are horizontal and opposed (antipodal).  A contact whose "
@@ -765,35 +878,43 @@ def _built_bom(mechanism: str) -> list[BomLine]:
 
 def _rods(f, q: float, q_hi: float) -> str:
     """A slide's rods at this opening: their overhang, and how far the squeeze lifts the rack off its gear (D-076)."""
-    from sea.sim import jaws
-
-    if f.jaw == "built":
-        return _built_rods(f, q)
-    if f.jaw != "prismatic":
+    r = _rod_numbers(f, q, q_hi)
+    if r is None:
         return ""
-    a, lift, bushing = jaws.rack_lift_mm(f.drive_mm_per_rad / 1000, f.sector, q, q_hi, GRIP_TORQUE_NM)
-    m = jaws.module_for(f.drive_mm_per_rad / 1000)[1] * 1000
-    return (f"; rods {a:.0f} mm out from their clamp: the squeeze lifts the rack up to {lift:.1f} mm off the gear "
-            f"(teeth skip past {jaws.TOOTH_SKIP * m:.1f}) and loads each bushing {bushing:.0f} N (rated "
-            f"{jaws.BUSHING_RATED_N:g})")
+    if f.jaw != "built":
+        return (f"; rods {r['overhang_mm']:.0f} mm out from their clamp: the squeeze lifts the rack up to "
+                f"{r['lift_mm']:.1f} mm off the gear (teeth skip past {r['skip_mm']:.1f}) and loads each bushing "
+                f"{r['bushing_n']:.0f} N (rated {r['rated_n']:g})")
+    held = "held at both ends" if r["both_ends"] else f"{r['overhang_mm']:.0f} mm out from their clamp"
+    return (f"; rods {held}, {r['bushings']} bushing(s) per rod: the squeeze lifts the rack up to "
+            f"{r['lift_mm']:.1f} mm off the gear (teeth skip past {r['skip_mm']:.1f}) and loads "
+            f"the worst bushing {r['bushing_n']:.0f} N (rated {r['rated_n']:g})")
 
 
-def _built_rods(f, q: float) -> str:
-    """A built guide's rods at this opening (D-080): the nearest bushing's overhang, the rack's lift off its gear
-    and the most loaded bushing, statically at the grip's torque, as the trial's rods load them."""
+def _rod_numbers(f, q: float, q_hi: float) -> dict[str, float] | None:
+    """A slide's rods at this opening, statically at the grip's torque as the trial's rods load them (D-076,
+    D-080): the nearest bushing's overhang, the rack's lift off its gear, the lift at which teeth skip, and the
+    most loaded bushing against its rating.  None for a jaw without rods."""
     import math
 
     from sea.mech.graph import Cylinder, Graph
     from sea.sim import jaws
 
+    if f.jaw == "prismatic":
+        a, lift, bushing = jaws.rack_lift_mm(f.drive_mm_per_rad / 1000, f.sector, q, q_hi, GRIP_TORQUE_NM)
+        m = jaws.module_for(f.drive_mm_per_rad / 1000)[1] * 1000
+        return {"overhang_mm": a, "lift_mm": lift, "skip_mm": jaws.TOOTH_SKIP * m, "bushing_n": bushing,
+                "rated_n": jaws.BUSHING_RATED_N, "both_ends": False, "bushings": 1}
+    if f.jaw != "built":
+        return None
     g = Graph.model_validate_json(f.mechanism)
     if not g.guides:
-        return ""
+        return None
     gd = g.guides[0]
     ratio = next((abs(m.ratio) for m in g.meshes if m.follower == gd.slide), None)
     rods = [p for b in g.bodies if b.name == "gripper" for p in b.parts if isinstance(p, Cylinder) and p.role == "rod"]
     if not ratio or not rods:
-        return ""
+        return None
     s = ratio * q
     teeth = GRIP_TORQUE_NM / ratio
     squeeze = F.squeeze_n(f, q, GRIP_TORQUE_NM)
@@ -802,10 +923,9 @@ def _built_rods(f, q: float) -> str:
     a, lift, load = jaws.guide_static(gd.clamp_end, gd.centre, gd.bushings, gd.far_end, s,
                                       teeth * math.tan(jaws.PRESSURE_ANGLE), gd.mesh_x - (gd.centre + s),
                                       squeeze * (tip[2] - rod_z), squeeze * (tip[1] - rod_y))
-    held = "held at both ends" if gd.far_end is not None else f"{a * 1000:.0f} mm out from their clamp"
-    return (f"; rods {held}, {len(gd.bushings)} bushing(s) per rod: the squeeze lifts the rack up to "
-            f"{lift * 1000:.1f} mm off the gear (teeth skip past {jaws.TOOTH_SKIP * gd.module * 1000:.1f}) and loads "
-            f"the worst bushing {load:.0f} N (rated {jaws.BUSHING_RATED_N:g})")
+    return {"overhang_mm": a * 1000, "lift_mm": lift * 1000, "skip_mm": jaws.TOOTH_SKIP * gd.module * 1000,
+            "bushing_n": load, "rated_n": jaws.BUSHING_RATED_N, "both_ends": gd.far_end is not None,
+            "bushings": len(gd.bushings)}
 
 
 def _flat(params: dict[str, dict[str, float]]) -> dict[str, float]:
