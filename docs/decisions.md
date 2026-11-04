@@ -3000,3 +3000,10 @@ LLM-written requirement lists leave most needs out (Massoudi and Fuge 2025 measu
 Beyond the prediction: a promoted mechanism reaches a graph as patch operations (`LB.expand`), so a world needs no library code beyond calling `compose` for the seeds. The store is locked for runs in parallel. A kept element is entered like anything else, so a seed can also appear under its own signature once it has been kept in two contexts; that duplication is left in, and F9 can show whether it matters.
 
 **Not yet shown.** No real System 2 call has used the library. Whether it uses the elements at all, and whether they help, are F9 measurements.
+
+**Rechecking the C1 campaign against today's judge (2026-11-04, after D-096).** While putting `gripper_c1c_s{0,1,2}` on the results page, each kept gain was re-solved once on the current code, with the run's seed:
+- seed 2's tuna can reproduces: the kept body holds it and the body it started from does not;
+- seed 1's tuna can does not: the recorded controls fail on replay, and a fresh search of 9 attempts fails;
+- seed 0's potted-meat can does not: a fresh search of 2 attempts stops at the force limit, as the body it started from does.
+
+The cause is not established. D-085's wrist-roll limit is one candidate, a single re-solve's search luck is another. So D-084's 19, 18 and 18 are results under the judge of that time. F9's gripper arm measures on today's judge. Two long-slide failures do replay as recorded (apple: a bushing at 119 N against 52.9 N; banana: stuck).
