@@ -18,11 +18,11 @@ from pydantic import BaseModel, ConfigDict, Field
 
 Vec = tuple[float, float, float]
 Quat = tuple[float, float, float, float]
-Material = Literal["pla", "steel", "stock"]
+Material = Literal["pla", "steel", "plywood", "stock"]
 # what a part is to the laws: carried structure, a pin or rod others ride on, a clamp holding rods, a bracket
 # fastened to the frame, the finger that meets the object
 Role = Literal["structure", "pin", "rod", "clamp", "bracket", "finger"]
-DENSITY = {"pla": 1240.0, "steel": 7850.0}  # kg/m^3: PLA as printed solid, ground steel rod
+DENSITY = {"pla": 1240.0, "steel": 7850.0, "plywood": 600.0}  # kg/m^3: PLA printed solid, ground steel rod, birch ply
 
 
 class _M(BaseModel):
@@ -148,15 +148,34 @@ class Bought(_M):
     kg: float
 
 
-Part = Annotated[Box | Cylinder | Link | Web | Gear | RackTeeth | Blade | PadMount | Bracket | Bought,
+class Wheel(_M):
+    """A wheel: a cylinder about its local z that rolls on what it touches, with its tread's friction there
+    (D-087).  It turns on its body's hinge."""
+
+    kind: Literal["wheel"] = "wheel"
+    name: str
+    pos: Vec
+    radius: float
+    half_width: float
+    quat: Quat = (1.0, 0.0, 0.0, 0.0)
+    mu: float = 0.9
+    material: Material = "pla"
+    role: Role = "structure"
+    piece: str = ""
+    massive: bool = True
+
+
+Part = Annotated[Box | Cylinder | Link | Web | Gear | RackTeeth | Blade | PadMount | Bracket | Bought | Wheel,
                  Field(discriminator="kind")]
 
 
 # ---------------------------------------------------------------- bodies and joints
 class Joint(_M):
+    """A joint of a body to its parent.  ``free``: the body moves in every way (a chassis on the floor)."""
+
     name: str
-    type: Literal["hinge", "slide"]
-    axis: Vec
+    type: Literal["hinge", "slide", "free"]
+    axis: Vec = (0.0, 0.0, 1.0)
     pos: Vec = (0.0, 0.0, 0.0)
     range: tuple[float, float] | None = None
     armature: float = 0.0
@@ -227,6 +246,121 @@ class Guide(_M):
     far_end: float | None = None
 
 
+# ---------------------------------------------------------------- actuators, springs, latches and sensors (D-087)
+# Each takes its numbers from its part's datasheet, which the world's catalogue gives as data.  ``mech.runtime``
+# applies the ones whose force depends on the state; a servo and a band are the simulator's own.
+class Servo(_M):
+    """A position servo on ``joint``: it drives toward its command with gain ``kp`` and at most ``stall_nm``; its
+    gearbox damps the joint by ``kv`` and adds ``armature`` (its rotor's inertia seen through the gears)."""
+
+    kind: Literal["servo"] = "servo"
+    name: str
+    joint: str
+    stall_nm: float
+    kp: float = 20.0
+    kv: float = 0.3
+    armature: float = 0.002
+
+
+class Gearmotor(_M):
+    """A DC gearmotor on ``joint``: its torque falls linearly from ``stall_nm`` at rest to zero at
+    ``no_load_rad_s``, scaled by its duty (-1..1)."""
+
+    kind: Literal["gearmotor"] = "gearmotor"
+    name: str
+    joint: str
+    stall_nm: float
+    no_load_rad_s: float
+
+
+class Piston(_M):
+    """A pneumatic cylinder on slide ``joint``: its valve applies the supply's ``pressure_pa`` over the bore's
+    area to extend or retract, and a needle valve limits its speed to about ``valve_m_s`` (a damper P A / v on the
+    joint, which the simulator integrates implicitly: as an actuator force it would be unstable).
+    ``end_hold_n`` keeps the rod seated at an end of its stroke while the valve is closed."""
+
+    kind: Literal["piston"] = "piston"
+    name: str
+    joint: str
+    bore_m: float
+    pressure_pa: float
+    valve_m_s: float
+    end_hold_n: float = 5.0
+
+
+class TorsionSpring(_M):
+    """A wound torsion spring on hinge ``joint`` (a mousetrap): its torque falls linearly from ``torque_nm[0]``
+    with the joint at ``set_rad`` to ``torque_nm[1]`` after it has swung ``span_rad`` in direction ``sign``."""
+
+    kind: Literal["torsion_spring"] = "torsion_spring"
+    name: str
+    joint: str
+    torque_nm: tuple[float, float]
+    span_rad: float
+    set_rad: float = 0.0
+    sign: Literal[1, -1] = 1
+
+
+class Band(_M):
+    """An elastic band from ``a_point`` on body ``a`` to ``b_point`` on body ``b``: it pulls ``k_n_m`` per metre
+    past ``rest_m``, never pushes, and breaks past ``max_stretch`` times its rest length (a law)."""
+
+    kind: Literal["band"] = "band"
+    name: str
+    a: str
+    a_point: Vec
+    b: str
+    b_point: Vec
+    k_n_m: float
+    rest_m: float
+    max_stretch: float = 3.0
+
+
+Actuator = Annotated[Servo | Gearmotor | Piston | TorsionSpring | Band, Field(discriminator="kind")]
+
+
+class Latch(_M):
+    """Holds ``joint`` at ``at`` until it is released (a trigger, a pin pulled, a solenoid)."""
+
+    kind: Literal["latch"] = "latch"
+    name: str
+    joint: str
+    at: float = 0.0
+
+
+class LimitSwitch(_M):
+    """A switch that closes when anything presses its box (``pos``, ``half``) on ``body``."""
+
+    kind: Literal["limit_switch"] = "limit_switch"
+    name: str
+    body: str
+    pos: Vec
+    half: Vec = (0.004, 0.004, 0.002)
+
+
+class RangeFinder(_M):
+    """An IR or ultrasonic range sensor on ``body`` at ``pos``, looking along its local z (``quat``): the distance
+    to the first surface, out to ``max_m``."""
+
+    kind: Literal["range"] = "range"
+    name: str
+    body: str
+    pos: Vec
+    quat: Quat = (1.0, 0.0, 0.0, 0.0)
+    max_m: float = 1.5
+
+
+class Encoder(_M):
+    """A joint's position, as a shaft encoder reads it."""
+
+    kind: Literal["encoder"] = "encoder"
+    name: str
+    joint: str
+
+
+Sensor = Annotated[LimitSwitch | RangeFinder | Encoder, Field(discriminator="kind")]
+
+
 class Graph(_M):
     """A mechanism: its bodies (in build order), what it removes from the stock robot, its constraints, the
     pairs that may touch where they are pinned, and the joints that move with the driving joint."""
@@ -239,6 +373,9 @@ class Graph(_M):
     guides: tuple[Guide, ...] = ()
     excludes: tuple[tuple[str, str], ...] = ()
     linked: tuple[tuple[str, float], ...] = ()  # (joint, units per radian of the driving joint)
+    actuators: tuple[Actuator, ...] = ()
+    latches: tuple[Latch, ...] = ()
+    sensors: tuple[Sensor, ...] = ()
 
     def new_bodies(self) -> tuple[str, ...]:
         return tuple(b.name for b in self.bodies if not b.stock)

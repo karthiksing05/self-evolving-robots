@@ -2733,3 +2733,51 @@ Against the prediction:
   - **Result:** it answered with three pad-reach moves bracketing the value it found. All three would be trialled, against none of the original three.
 
   One iteration is no evidence for the prediction, and it raises a question the campaign must answer: whether the tools make System 2 more conservative, choosing parameter moves it can verify over mechanisms.
+
+## D-087 The mechanism graph belongs to no robot: a base names the robot, and the graph gains the machine elements other worlds need (world: physics; F0 of the general framework)
+
+**Why.** The general framework (docs/design-process.md, plan of 2026-11-04) asks that every world's bodies be graphs of real parts, so one builder, one set of laws and one library serve them all. That covers the ME 2110 robot first, then the mobile explorer and the talking robot. The graph was written for the gripper:
+- its builder posed bodies up to a body named `gripper`;
+- its kinematics drove everything from a joint named `gripper`, on the SO-101's model, with the stock moving jaw as the default finger;
+- it had no wheels, motors, pistons, springs, bands, latches or sensors.
+
+**Change.**
+- **A `Base` names the robot a graph is added to:** its root body, its driving joint, its stock model and its default finger. The world passes it in; the graph stays plain data, so no recorded graph's JSON changes. `so101_gripper` is the gripper's base, and the default.
+- **New machine elements**, each general and none an assembly:
+  - **wheel:** a rolling cylinder, given its grip on the ground;
+  - **plywood:** a material for plates;
+  - **free root joint:** for a chassis;
+  - **actuators:**
+    - a position servo with its stall torque;
+    - a gearmotor, as a torque–speed line from stall torque and no-load speed;
+    - a piston, as pressure times bore area on a slide, with a needle valve's speed limit as a damper;
+    - a torsion spring, as a torque–angle line (a mousetrap);
+    - a band, as a linear spring between two points with its rest length and largest stretch;
+  - **latch:** holds a joint until released;
+  - **sensors:** a limit switch (touch), a range finder (IR or ultrasonic) and an encoder.
+
+  Each compiles to the simulator's own elements, with its numbers from the part's datasheet, which the world's catalogue supplies as data.
+
+**Prediction** (before the code):
+- the gripper's models, laws and verdicts are unchanged: the D-078 equivalence goldens, the law goldens and the gold and stock tests all pass untouched;
+- each new element compiles and behaves as its datasheet line says, within the simulator's discretisation (tests: stall torque at zero speed and no-load speed at zero torque; piston force P·A; spring torque at its two angles; a band's force k·stretch; a latch that holds until released; a range reading against geometry);
+- no world uses the new elements yet (F6 does).
+
+**Measured.**
+- **The gripper is unchanged.** The D-078 equivalence goldens, the law goldens and the gold, stock and planted-fault tests pass untouched (753 passed, 2 skipped, 1 xfailed, with the fingerprint test re-run after the new modules joined the physics component).
+- **Every element behaves as its datasheet line says** (`tests/mech/test_elements.py`, on the empty `world` base):
+
+  | Element | Measured |
+  |---|---|
+  | Gearmotor | 1.2 N·m at rest; runs up to 16.8 rad/s within 1% |
+  | Piston | P·A = 196 N; settles at the valve's 0.3 m/s within 1% |
+  | Mousetrap spring | 0.45, 0.325 and 0.20 N·m at 0, 90° and 180° |
+  | Band | k·stretch while stretched, nothing when slack |
+  | Latch | holds a pendulum level, which falls once released |
+  | Limit switch | reads the weight resting on it within 5% |
+  | Range finder | reads the floor's distance exactly |
+  | Encoder | reads its joint |
+  | Servo | reaches its target |
+  | Two-wheeled cart on a free root | rolls at the wheels' speed times their radius, within 10% |
+
+- **One finding about stability.** Speed-dependent forces are joint damping, which the simulator integrates implicitly, because as explicit actuator forces they were unstable: the motor's back-EMF on a 56 g wheel, and the needle valve on a light rod. This is how `me2110_model` already treats the valve. A servo's gearbox likewise puts damping and reflected inertia on its joint.

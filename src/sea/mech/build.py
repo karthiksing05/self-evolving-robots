@@ -14,20 +14,30 @@ import math
 import mujoco
 import numpy as np
 
+from sea.mech.base import Base
+from sea.mech.base import base as _base
 from sea.mech.graph import (
     DENSITY,
+    Band,
     Blade,
     Body,
     Bought,
     Box,
     Bracket,
     Cylinder,
+    Encoder,
     Gear,
+    Gearmotor,
     Graph,
+    LimitSwitch,
     Link,
     PadMount,
+    Piston,
     RackTeeth,
+    Servo,
+    TorsionSpring,
     Web,
+    Wheel,
 )
 
 PRINTED = [0.93, 0.91, 0.86, 1.0]
@@ -81,6 +91,8 @@ def part_kg(p) -> float:
         return DENSITY["pla"] * float(np.prod(hi - lo))
     if isinstance(p, Bought):
         return p.kg
+    if isinstance(p, Wheel):
+        return DENSITY[p.material] * math.pi * p.radius**2 * 2 * p.half_width if p.massive else 0.0
     return 0.0  # a rack's teeth: drawn
 
 
@@ -143,6 +155,11 @@ def _add_part(spec: mujoco.MjSpec, body, p, pose: tuple[np.ndarray, np.ndarray])
         body.add_geom(name=p.name, type=_GEOM.mjGEOM_BOX, size=((hi - lo) / 2).tolist(), pos=((lo + hi) / 2).tolist(),
                       rgba=PRINTED, group=2, mass=0.0)
         return part_kg(p)
+    if isinstance(p, Wheel):  # it rolls: torsional and rolling friction are small (D-087)
+        body.add_geom(name=p.name, type=_GEOM.mjGEOM_CYLINDER, size=[p.radius, p.half_width], pos=list(p.pos),
+                      quat=list(p.quat), rgba=_rgba(p.material), group=2, mass=0.0, condim=3,
+                      friction=[p.mu, 0.005, 0.0001])
+        return part_kg(p)
     if isinstance(p, Bought | PadMount):
         return part_kg(p)
     raise TypeError(p)
@@ -186,11 +203,11 @@ def _inertial(sb, b: Body, mass: float) -> None:
         sb.inertia = [mass * i.size] * 3
 
 
-def _pose(spec: mujoco.MjSpec, name: str) -> tuple[np.ndarray, np.ndarray]:
-    """A body's position and rotation in the gripper's frame (its parent chain up to the gripper)."""
+def _pose(spec: mujoco.MjSpec, name: str, root: str = "gripper") -> tuple[np.ndarray, np.ndarray]:
+    """A body's position and rotation in the base's root frame (its parent chain up to the root)."""
     pos, rot = np.zeros(3), np.eye(3)
     b = spec.body(name)
-    while b.name != "gripper":
+    while b.name != root:
         r = np.zeros(9)
         mujoco.mju_quat2Mat(r, np.asarray(b.quat, float))
         r = r.reshape(3, 3)
@@ -199,12 +216,12 @@ def _pose(spec: mujoco.MjSpec, name: str) -> tuple[np.ndarray, np.ndarray]:
     return pos, rot
 
 
-def rod_end(g: Graph) -> float:
-    """Where the guide's rods end, toward the carriage's travel (gripper x): the nearest free end of the rods on
-    the gripper."""
+def rod_end(g: Graph, root: str = "gripper") -> float:
+    """Where the guide's rods end, toward the carriage's travel (root x): the nearest free end of the rods on
+    the root."""
     ends = []
     for b in g.bodies:
-        if b.name != "gripper":
+        if b.name != root:
             continue
         for p in b.parts:
             if isinstance(p, Cylinder) and p.role == "rod":
@@ -215,11 +232,13 @@ def rod_end(g: Graph) -> float:
     return min(ends) if ends else math.inf
 
 
-def compile(spec: mujoco.MjSpec, g: Graph) -> list[tuple[str, float]]:
-    """Add the mechanism ``g`` to ``spec``; returns the joints that move with the driving joint, with their units
-    per radian of it (``Sim.set_arm_q``)."""
+def compile(spec: mujoco.MjSpec, g: Graph, base: str | Base | None = None) -> list[tuple[str, float]]:
+    """Add the mechanism ``g`` to ``spec`` (the robot ``base`` names, the gripper by default); returns the joints
+    that move with the driving joint, with their units per radian of it (``Sim.set_arm_q``)."""
     from sea.sim import jaws
     from sea.sim.build_model import TIMESTEP
+
+    root = _base(base).root
 
     for name in g.remove_stock_mesh:
         for geom in [x for x in spec.geoms if x.parent.name == name and x.meshname == name]:
@@ -230,10 +249,21 @@ def compile(spec: mujoco.MjSpec, g: Graph) -> list[tuple[str, float]]:
         else:
             sb = spec.body(b.parent).add_body(name=b.name, pos=list(b.pos), quat=list(b.quat))
         for j in b.joints:
+            if j.type == "free":
+                sb.add_freejoint(name=j.name)
+                continue
             kw = {"range": list(j.range)} if j.range is not None else {}
             sb.add_joint(name=j.name, type=_JOINT[j.type], axis=list(j.axis), pos=list(j.pos), armature=j.armature,
                          damping=[j.damping, 0.0, 0.0], **kw)
-        pose = _pose(spec, b.name) if any(isinstance(p, RackTeeth) for p in b.parts) else (np.zeros(3), np.eye(3))
+        pose = _pose(spec, b.name, root) if any(isinstance(p, RackTeeth) for p in b.parts) else (np.zeros(3), np.eye(3))
+        if b.joints and b.inertial is None and not b.stock:  # a moving body: its inertia from its solids (D-087)
+            for p in b.parts:
+                n0 = len(sb.geoms)
+                kg = _add_part(spec, sb, p, pose)
+                new = [x for x in sb.geoms[n0:] if x.contype or x.conaffinity] or list(sb.geoms[n0:])
+                for x in new:
+                    x.mass = kg / len(new)
+            continue
         kg = sum(_add_part(spec, sb, p, pose) for p in b.parts)
         if b.inertial is not None:
             _inertial(sb, b, kg)
@@ -251,11 +281,66 @@ def compile(spec: mujoco.MjSpec, g: Graph) -> list[tuple[str, float]]:
                           damping=[2 * k * TIMESTEP, 0.0, 0.0])
         spec.add_numeric(name="jaw_rods", data=[gd.clamp_end, gd.centre, gd.module, gd.mesh_x])
         if gd.bushings != (0.0,) or gd.far_end is not None:  # the rods as beams through every bushing (D-080)
-            spec.add_numeric(name="jaw_guide", data=[math.nan if gd.far_end is None else gd.far_end, rod_end(g),
+            spec.add_numeric(name="jaw_guide", data=[math.nan if gd.far_end is None else gd.far_end, rod_end(g, root),
                                                      *sorted(gd.bushings)])
     for ms in g.meshes:
         spec.add_equality(type=mujoco.mjtEq.mjEQ_JOINT, name1=ms.follower, name2=ms.driver,
                           data=[0.0, ms.ratio, 0.0, 0.0, 0.0] + [0.0] * 7, solimp=TEETH_IMP, **STIFF)
     for a, b in g.excludes:
         spec.add_exclude(bodyname1=a, bodyname2=b)
+    _elements(spec, g)
     return list(g.linked)
+
+
+def _elements(spec: mujoco.MjSpec, g: Graph) -> None:
+    """The graph's actuators, latches and sensors as the simulator's own elements (D-087).  A force that
+    depends on the joint's angle is an affine actuator (force = gain * command + bias0 + bias1 * q); one that
+    depends on its speed (a motor's back-EMF, a needle valve) is the joint's damping, which the simulator
+    integrates implicitly."""
+    trn = mujoco.mjtTrn.mjTRN_JOINT
+    for a in g.actuators:
+        if isinstance(a, Band):
+            for end, (body, point) in (("a", (a.a, a.a_point)), ("b", (a.b, a.b_point))):
+                spec.body(body).add_site(name=f"{a.name}_{end}", pos=list(point), size=[0.002, 0.0, 0.0])
+            t = spec.add_tendon(name=a.name, stiffness=a.k_n_m, springlength=[0.0, a.rest_m], width=0.002)
+            t.wrap_site(f"{a.name}_a")
+            t.wrap_site(f"{a.name}_b")
+            continue
+        act = spec.add_actuator(name=a.name, target=a.joint, trntype=trn)
+        act.gaintype, act.biastype = mujoco.mjtGain.mjGAIN_FIXED, mujoco.mjtBias.mjBIAS_AFFINE
+        gain, bias = 0.0, [0.0, 0.0, 0.0]
+        if isinstance(a, Servo):  # its gearbox's damping and reflected inertia sit on the joint
+            gain, bias = a.kp, [0.0, -a.kp, 0.0]
+            act.forcelimited, act.forcerange = True, [-a.stall_nm, a.stall_nm]
+            j = spec.joint(a.joint)
+            j.damping[0] += a.kv
+            j.armature += a.armature
+        elif isinstance(a, Gearmotor):  # the DC motor's line: stall torque at rest, none at no-load speed; its
+            gain = a.stall_nm             # back-EMF is a damper on the joint (implicit: stable on a light wheel)
+            spec.joint(a.joint).damping[0] += a.stall_nm / a.no_load_rad_s
+            act.ctrllimited, act.ctrlrange = True, [-1.0, 1.0]
+        elif isinstance(a, Piston):  # P A on the valve's command; the needle valve as a damper P A / v
+            pa = a.pressure_pa * math.pi * (a.bore_m / 2) ** 2
+            gain = pa
+            spec.joint(a.joint).damping[0] += pa / a.valve_m_s
+            act.ctrllimited, act.ctrlrange = True, [-1.0, 1.0]
+        elif isinstance(a, TorsionSpring):  # torque linear in the joint's angle over the span
+            slope = (a.torque_nm[1] - a.torque_nm[0]) / a.span_rad
+            bias = [a.sign * a.torque_nm[0] - slope * a.set_rad, slope, 0.0]
+        act.gainprm = [gain] + [0.0] * 9
+        act.biasprm = bias + [0.0] * 7
+    for lt in g.latches:
+        spec.add_equality(type=mujoco.mjtEq.mjEQ_JOINT, name=lt.name, name1=lt.joint,
+                          data=[lt.at, 0.0, 0.0, 0.0, 0.0] + [0.0] * 7, **STIFF)
+    for sn in g.sensors:
+        if isinstance(sn, Encoder):
+            spec.add_sensor(name=sn.name, type=mujoco.mjtSensor.mjSENS_JOINTPOS, objtype=mujoco.mjtObj.mjOBJ_JOINT,
+                            objname=sn.joint)
+            continue
+        box = isinstance(sn, LimitSwitch)
+        spec.body(sn.body).add_site(name=sn.name, pos=list(sn.pos), quat=[1.0, 0.0, 0.0, 0.0] if box else list(sn.quat),
+                                    type=_GEOM.mjGEOM_BOX if box else _GEOM.mjGEOM_SPHERE,
+                                    size=list(sn.half) if box else [0.003, 0.0, 0.0])
+        spec.add_sensor(name=sn.name, type=mujoco.mjtSensor.mjSENS_TOUCH if box else mujoco.mjtSensor.mjSENS_RANGEFINDER,
+                        objtype=mujoco.mjtObj.mjOBJ_SITE, objname=sn.name, cutoff=0.0 if box else sn.max_m,
+                        intprm=[0, 0, 0] if box else [1, 0, 0])  # a range finder reports its distance

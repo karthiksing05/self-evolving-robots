@@ -20,6 +20,7 @@ from functools import lru_cache
 import mujoco
 import numpy as np
 
+from sea.mech.base import GRIPPER, base
 from sea.mech.graph import Blade, Graph, PadMount
 
 GUIDE_JOINTS = ("jaw_rod_dy", "jaw_rod_dz", "jaw_rod_yaw", "jaw_rod_pitch")  # a guide's bending: zero when posed
@@ -59,9 +60,10 @@ def _residual(model: mujoco.MjModel, data: mujoco.MjData) -> np.ndarray:
     return data.efc_pos[: data.nefc][rows].copy()
 
 
-def closure(model: mujoco.MjModel, g: Graph, steps: int = STEPS) -> tuple[list[tuple[str, Follow]], float, float]:
-    """Each of the mechanism's own joints as a ``Follow`` of the servo, and the worst constraint left open over
-    the range with the servo angle where it is.  Joints already given in ``g.linked`` keep their ratios."""
+def closure(model: mujoco.MjModel, g: Graph, steps: int = STEPS,
+            driver: str = "gripper") -> tuple[list[tuple[str, Follow]], float, float]:
+    """Each of the mechanism's own joints as a ``Follow`` of the driving joint, and the worst constraint left open
+    over its range with the angle where it is.  Joints already given in ``g.linked`` keep their ratios."""
     from scipy.optimize import least_squares
 
     given = {n for n, _ in g.linked}
@@ -69,10 +71,10 @@ def closure(model: mujoco.MjModel, g: Graph, steps: int = STEPS) -> tuple[list[t
     if not jids:
         return [], 0.0, 0.0
     d = mujoco.MjData(model)
-    servo = model.jnt_qposadr[model.joint("gripper").id]
+    servo = model.jnt_qposadr[model.joint(driver).id]
     linked = [(int(model.jnt_qposadr[model.joint(n).id]), r) for n, r in g.linked]
     adr = np.array([model.jnt_qposadr[j] for j in jids])
-    lo, hi = model.jnt_range[model.joint("gripper").id]
+    lo, hi = model.jnt_range[model.joint(driver).id]
     qs = grid(lo, hi, steps)
     sol = np.zeros((len(qs), len(jids)))
     worst, at = 0.0, 0.0
@@ -99,32 +101,32 @@ def closure(model: mujoco.MjModel, g: Graph, steps: int = STEPS) -> tuple[list[t
 
 
 @lru_cache(maxsize=64)
-def _tables(graph_json: str) -> tuple[tuple[tuple[str, Follow], ...], float, float]:
-    from sea.control.frames import STOCK_MJCF
+def _tables(graph_json: str, base_name: str = GRIPPER.name) -> tuple[tuple[tuple[str, Follow], ...], float, float]:
     from sea.mech import build
 
+    bs = base(base_name)
     g = Graph.model_validate_json(graph_json)
-    spec = mujoco.MjSpec.from_file(str(STOCK_MJCF))
-    build.compile(spec, g)
-    tables, worst, at = closure(spec.compile(), g)
+    spec = bs.model()
+    build.compile(spec, g, bs)
+    tables, worst, at = closure(spec.compile(), g, driver=bs.driver)
     return tuple(tables), worst, at
 
 
-def closure_tables(g: Graph) -> list[tuple[str, Follow]]:
-    """``closure`` on the stock robot with the mechanism, cached: the joints the graph does not link by ratio."""
+def closure_tables(g: Graph, base_name: str = GRIPPER.name) -> list[tuple[str, Follow]]:
+    """``closure`` on the base robot with the mechanism, cached: the joints the graph does not link by ratio."""
     if not g.new_bodies():
         return []
-    return list(_tables(graph_key(g))[0])
+    return list(_tables(graph_key(g), base_name)[0])
 
 
-def closes(g: Graph) -> tuple[float, float]:
-    """The worst constraint left open over the servo's range, and where (m or rad, rad)."""
+def closes(g: Graph, base_name: str = GRIPPER.name) -> tuple[float, float]:
+    """The worst constraint left open over the driving joint's range, and where (m or rad, rad)."""
     if not g.new_bodies():
         return 0.0, 0.0
-    return _tables(graph_key(g))[1:]
+    return _tables(graph_key(g), base_name)[1:]
 
 
-def finger_body(g: Graph) -> tuple[str, np.ndarray]:
+def finger_body(g: Graph, base_name: str = GRIPPER.name) -> tuple[str, np.ndarray]:
     """The finger: the body the pads ride on (a ``PadMount``'s, D-081, else the blade's), and the offset in it
     (where the jaw's frame at q = 0 sits in the finger body's frame)."""
     for b in g.bodies:
@@ -135,28 +137,29 @@ def finger_body(g: Graph) -> tuple[str, np.ndarray]:
         for p in b.parts:
             if isinstance(p, Blade):
                 return b.name, np.asarray(p.offset)
-    return "moving_jaw_so101_v1", np.zeros(3)
+    return base(base_name).finger, np.zeros(3)
 
 
 @lru_cache(maxsize=64)
-def finger_motion(graph_json: str) -> tuple[np.ndarray, np.ndarray, np.ndarray, str, np.ndarray]:
-    """The finger through the servo's range: servo angles, and at each the rotation and translation that carry a
-    point fixed on the finger from where it is at q = 0 to where it is (gripper frame); the finger's body and
-    the blade's offset in it."""
-    from sea.control.frames import STOCK_MJCF
+def finger_motion(graph_json: str, base_name: str = GRIPPER.name) -> tuple[np.ndarray, np.ndarray, np.ndarray, str,
+                                                                          np.ndarray]:
+    """The finger through the driving joint's range: its angles, and at each the rotation and translation that
+    carry a point fixed on the finger from where it is at q = 0 to where it is (root frame); the finger's body
+    and the blade's offset in it."""
     from sea.mech import build
 
+    bs = base(base_name)
     g = Graph.model_validate_json(graph_json)
-    spec = mujoco.MjSpec.from_file(str(STOCK_MJCF))
-    build.compile(spec, g)
+    spec = bs.model()
+    build.compile(spec, g, bs)
     model = spec.compile()
-    tables, _, _ = closure(model, g)
+    tables, _, _ = closure(model, g, driver=bs.driver)
     linked = [(int(model.jnt_qposadr[model.joint(n).id]), r) for n, r in [*g.linked, *tables]]
     d = mujoco.MjData(model)
-    servo = model.jnt_qposadr[model.joint("gripper").id]
-    body, offset = finger_body(g)
-    bid, gid = model.body(body).id, model.body("gripper").id
-    lo, hi = model.jnt_range[model.joint("gripper").id]
+    servo = model.jnt_qposadr[model.joint(bs.driver).id]
+    body, offset = finger_body(g, base_name)
+    bid, gid = model.body(body).id, model.body(bs.root).id
+    lo, hi = model.jnt_range[model.joint(bs.driver).id]
     qs = grid(lo, hi)
     rots, trans = [], []
     poses = []
