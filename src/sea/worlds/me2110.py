@@ -528,6 +528,11 @@ class ME2110World:
                     f"{MM.XF:g} in; pole faces 2 in from its centre; mounds at ({MM.MOUNDS['gold'][0]:g}, ±15) in")
         return "\n".join(rows)
 
+    # this world is a benchmark of the harness: its course and its brief stay out of System 2's research (D-090)
+    research_blocked = [r"\bme\s*-?\s*2110\b", r"creative decisions and design", r"pirates? of the caribbean",
+                        r"davy jones", r"gold and jewels", r"merpeople", r"\bgatech\b.*\brobot\b.*\bcompetition\b",
+                        r"georgia tech.*(robot|design).*(competition|final project)"]
+
     # instruments (D-088; F6 rebuilds this world from kit primitives)
     def instruments(self) -> list:
         from sea.evolve.core import Instrument as I
