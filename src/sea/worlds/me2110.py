@@ -339,17 +339,25 @@ def _space(body: Body, task: str) -> tuple[dict[str, tuple[float, float]], dict[
     return sp, {k: st[k] for k in sp}
 
 
-def _label(task: str, body: Body, r: MM.Result) -> str:
-    P = body.parts
-    slot = {"flag": "flag", "cannon": "cannon", "heart": "heart", "treasure": "treasure"}.get(task)
-    if slot and P[slot].type == f"no_{slot}":
-        return f"no_{task}_mechanism"
+def law_label(r: MM.Result) -> str:
+    """The first rule a match broke, as a mechanism's label; "" if it broke none."""
     for law in r.laws:
         for key, lab in (("still moving", "robot_moving_at_40s"), ("pistons not retracted", "piston_extended_at_40s"),
                          ("quadrant", "left_quadrant"), ("unsupported", "projectile_too_far"),
                          ("rose", "projectile_launched_upward"), ("diverged", "simulation_diverged")):
             if key in law:
                 return lab
+    return ""
+
+
+def _label(task: str, body: Body, r: MM.Result) -> str:
+    P = body.parts
+    slot = {"flag": "flag", "cannon": "cannon", "heart": "heart", "treasure": "treasure"}.get(task)
+    if slot and P[slot].type == f"no_{slot}":
+        return f"no_{task}_mechanism"
+    broke = law_label(r)
+    if broke:
+        return broke
     n = r.notes.get(task, "")
     if task == "activate":
         return "never_left_dock"
@@ -383,6 +391,11 @@ def _label(task: str, body: Body, r: MM.Result) -> str:
 def _attempt(body: Body, rb: MM.Robot, v: MM.Variant, task: str, ctl: dict[str, float], seed: int) -> Outcome:
     t0 = time.perf_counter()
     r = MM.Match(rb, v, ctl, seed=seed, horizon=HORIZON[task]).run()
+    return judged(task, r, lambda t, res: _label(t, body, res), t0)
+
+
+def judged(task: str, r: MM.Result, label: Any, t0: float) -> Outcome:
+    """A match's result, as an outcome of ``task``: its points, its score for the search, why it fell short."""
     if task == "match":
         total, top = sum(r.points[k] for k in TASKS), sum(MM.MAX_POINTS.values())
         ok = total >= MATCH_POINTS and not r.laws
@@ -398,7 +411,7 @@ def _attempt(body: Body, rb: MM.Robot, v: MM.Variant, task: str, ctl: dict[str, 
         score = (0.6 * min(1.0, pts / MM.MAX_POINTS[task]) + 0.4 * r.progress.get(task, 0.0)) * \
             (0.5 if r.laws else 1.0) + (0.2 if ok else 0.0)
         detail = f"{pts:.0f} of {MM.MAX_POINTS[task]} points: {r.notes[task]}"
-        mech = "" if ok else _label(task, body, r)
+        mech = "" if ok else label(task, r)
     if r.laws:
         detail += "; broke: " + "; ".join(r.laws[:3])
     states = {**{f"points.{k}": float(v) for k, v in r.points.items()},
@@ -411,7 +424,7 @@ def _attempt(body: Body, rb: MM.Robot, v: MM.Variant, task: str, ctl: dict[str, 
 class ME2110World:
     name = "me2110"
     objective = "points"  # one match, as the brief scores it (D-093)
-    points_noise = 5.0  # the smallest partial score in the brief; a judgement until repeated matches measure it
+    points_noise = 9.0  # one ball: what a 0.1 in change in the start moves a match by (measured, D-094)
     sprint_bars = (60.0, 150.0, 215.0)
     max_points = float(sum(MM.MAX_POINTS.values()))
     description = ("The ME 2110 'Pirates of the Caribbean' robot: one machine, started inside a 12 x 24 x 18 in box "

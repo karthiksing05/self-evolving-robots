@@ -698,20 +698,9 @@ def _treasure(bd: Build, rb: Robot, p: dict[str, float]) -> str:
 
 
 # ---------------------------------------------------------------- the scene
-def scene(rb: Robot, v: Variant, y0: float) -> tuple[str, Build]:
-    """The match's MJCF: arena plus robot, the robot's centre at (-L/2 - 0.25, y0) in the dock."""
-    bd = build_robot(rb)
-    tree, extra = bd.xml  # type: ignore[misc]
-    x0 = -(rb.L / 2 + 0.25)
-    extra = extra.replace("{X}", "").replace("{Y}", "")
-    # items that start on the robot are placed in world coordinates: shift them by the robot's start
-    items = []
-    for chunk in extra.split('<body name="ball')[1:]:
-        head, rest = chunk.split('pos="', 1)
-        xyz, tail = rest.split('"', 1)
-        x, y, z = (float(t) for t in xyz.split())
-        items.append(f'<body name="ball{head}pos="{_v(x + x0 * IN, y + y0 * IN, z)}"{tail}')
-    xml = f"""<mujoco model="me2110">
+def arena_xml(v: Variant, robot: str = "", items: str = "", eqs: str = "", acts: str = "") -> str:
+    """The match's MJCF: the arena on this track, with whatever robot and items are given."""
+    return f"""<mujoco model="me2110">
 <compiler angle="radian" autolimits="true"/>
 <option timestep="{DT}" cone="elliptic" integrator="implicitfast" noslip_iterations="0"/>
 <size memory="64M"/>
@@ -730,13 +719,30 @@ def scene(rb: Robot, v: Variant, y0: float) -> tuple[str, Build]:
   <light pos="1 0 3" dir="0 0 -1" directional="true"/>
   <geom name="floor" type="plane" size="3 3 0.1" rgba="0.86 0.84 0.8 1" class="arena" friction="{v.mu} 0.005 0.0001"/>
   {_fortress(v)}{_figures()}{_merfolk()}{_chest()}{_mounds()}{_walls()}
-  <body name="robot" pos="{_v(x0 * IN, y0 * IN, 0)}"><freejoint name="root"/>{tree}</body>
-  {''.join(items)}
+  {robot}
+  {items}
 </worldbody>
 <contact><exclude body1="world" body2="fortress"/></contact>
-<equality><joint name="prop" joint1="lid" polycoef="{_f(LID_OPEN)} 0 0 0 0"/>{''.join(bd.eqs)}</equality>
-<actuator><velocity name="spin" joint="spin" kv="400" ctrlrange="-2 2" ctrllimited="true"/>{''.join(bd.acts)}</actuator>
+<equality><joint name="prop" joint1="lid" polycoef="{_f(LID_OPEN)} 0 0 0 0"/>{eqs}</equality>
+<actuator><velocity name="spin" joint="spin" kv="400" ctrlrange="-2 2" ctrllimited="true"/>{acts}</actuator>
 </mujoco>"""
+
+
+def scene(rb: Robot, v: Variant, y0: float) -> tuple[str, Build]:
+    """The match's MJCF: arena plus robot, the robot's centre at (-L/2 - 0.25, y0) in the dock."""
+    bd = build_robot(rb)
+    tree, extra = bd.xml  # type: ignore[misc]
+    x0 = -(rb.L / 2 + 0.25)
+    extra = extra.replace("{X}", "").replace("{Y}", "")
+    # items that start on the robot are placed in world coordinates: shift them by the robot's start
+    items = []
+    for chunk in extra.split('<body name="ball')[1:]:
+        head, rest = chunk.split('pos="', 1)
+        xyz, tail = rest.split('"', 1)
+        x, y, z = (float(t) for t in xyz.split())
+        items.append(f'<body name="ball{head}pos="{_v(x + x0 * IN, y + y0 * IN, z)}"{tail}')
+    xml = arena_xml(v, f'<body name="robot" pos="{_v(x0 * IN, y0 * IN, 0)}"><freejoint name="root"/>{tree}</body>',
+                    "".join(items), "".join(bd.eqs), "".join(bd.acts))
     if bd.flag:
         xml = _add_flag(xml)
     return xml, bd
@@ -866,14 +872,16 @@ class Match:
 
     def __init__(self, rb: Robot, v: Variant, ctl: dict[str, float], seed: int = 0, horizon: float = 40.0,
                  tasks: frozenset[str] | None = None, trace: bool = False) -> None:
+        xml, bd = scene(rb, v, ctl.get("y0", 0.0))
+        self._setup(rb, v, ctl, seed, horizon, tasks, trace, mujoco.MjModel.from_xml_string(xml), xml, bd)
+
+    def _setup(self, rb: Robot, v: Variant, ctl: dict[str, float], seed: int, horizon: float, tasks: frozenset[str] | None,
+               trace: bool, m: mujoco.MjModel, xml: str, bd: Build) -> None:
         self.rb, self.v, self.ctl, self.horizon, self.want_trace = rb, v, ctl, horizon, trace
         self.rng = np.random.default_rng(seed)
         self.tasks = tasks
-        xml, self.bd = scene(rb, v, ctl.get("y0", 0.0))
-        self.m = mujoco.MjModel.from_xml_string(xml)
+        self.bd, self.m, self.xml = bd, m, xml
         self.d = mujoco.MjData(self.m)
-        self.xml = xml
-        m = self.m
         self.jid = {m.joint(i).name: i for i in range(m.njnt)}
         self.bid = {m.body(i).name: i for i in range(m.nbody)}
         self.eid = {m.eq(i).name: i for i in range(m.neq)}

@@ -2924,7 +2924,7 @@ LLM-written requirement lists leave most needs out (Massoudi and Fuge 2025 measu
 **Change.**
 - **The objective is generic.** `World.objective = "points"` (other worlds keep groups). An outcome may carry `points`; the loop keeps a change that raises the mean points over the tasks that carry them, unless one of the parts in that total (`points.*`) drops by more than `World.points_noise`. Groups are still computed and shown, and a change that raises the total while losing a part goes on the frontier.
 - **The score.** A `match` outcome's points are its total, or 0 if it broke any rule, as a disqualification would. Each iteration and the summary report the mean over the variants, on train and on held-out, against the brief's sprint bars 60, 150 and 215.
-- **Noise is set to 5 points,** the smallest partial score in the brief (a merfolk moved off its mark). It is a judgement, not a measurement, and F9 should measure the spread of repeated matches.
+- **Noise was first set to 5 points,** the smallest partial score in the brief; D-094 measured it and set 9.
 - **The kit.** 4 mousetraps, the later text of the brief's own contradiction (pp. 17 and 21 say 2; p. 23's revision and p. 26's inspection list say 4). A lone robot's flag scores as the highest flag, which is what the model already gives.
 - **Tracks.** `Task.data` carries each track's numbers, and held-out tracks now cover all four port colours (6, 7, 8 and 8.75 in), fortress speeds from 2 to 5 rpm and floor friction from 0.4 to 0.6. The first two keep their numbers.
 
@@ -2934,3 +2934,39 @@ LLM-written requirement lists leave most needs out (Massoudi and Fuge 2025 measu
 - D-075's best body, re-scored on the held-out tracks, will score below its 35 train points, since those tracks were not searched and include speeds it has never met. This is the baseline F9 is compared with.
 
 **Result (tests, D-093).** The toy-world predictions held (`tests/test_points.py`), and ME 2110's world tests pass with 35 tasks. The re-scoring of D-075's best body on the held-out tracks costs several matches per track, so it runs in F9 as the baseline, and its prediction stays open until then.
+
+## D-094 ME 2110 from the kit: a robot is one graph in the arena, operated by its program (world: me2110_kit; judge: its laws; skill: graph kinds; F6 of the general framework, second part)
+
+**Why.** The ME 2110 catalogue gives System 2 one task-specific mechanism per slot, each with its hand-written controls: the design is largely done before System 2 starts, and the D-075 score of 35 measures that catalogue as much as the process. The user asked for the world stripped to what a student is given and rebuilt from kit primitives.
+
+**Change.** A new world, `me2110_kit`, beside the old one, which stays as the baseline for F9.
+- **Same arena, scoring and tracks.** `sim/me2110_model.Match` is split so its arena, events and scoring run with any robot; `sim/kit_match.KitMatch` compiles a graph into that arena and plays `mech.program` on it, with the tank's pressure falling at each stroke as before.
+- **The body is one part:** `robot`, a graph whose root is a free body. The only starting point is a plain plate chassis with the controller on it. It has no drive and scores nothing, as a student starts from a kit and no robot. Machine elements come in F8.
+- **New graph kinds:** capsule, sphere, a joint's own spring and friction, and `carried` (an item that starts on the robot: the balls, the flag on its clip). Patches may add actuators, latches, sensors and carried items.
+- **Laws, all general:** a free root; kit counts (the brief's p. 26 list, sensors included); the go/no-go box at the start pose; parts of a body must touch (nothing floats); a part's mass comes from its material's volume (the fixture alone may state it); parts may not pass through each other over every driven joint's range, with closed loops solved at each pose; the budget. An `exclude` waives a pair (a slot cut in a plate), and each one is counted, since it can hide a real collision.
+- **Kit mass** (motors, tank, valves, traps) is added to the root by what the graph uses.
+- **The equivalence fixture** (`tests/framework/`, never a seed). Each old catalogue robot is converted automatically from its compiled simulator model into a graph. Tests require the same bodies, joints, geoms, masses and constraints to 1e-6. They then replay the old controller's timeline through `Program` and compare each task's points.
+
+**Prediction** (before the code):
+- geometry and mass reproduce to 1e-6 on every fixture robot;
+- actuators are not the same code (the graph's piston damps its rod where the old one reflected the valve onto the boom, and a timeline has no encoder feedback), so points may differ; I predict each task's points within the 5-point noise on the bodies where the old controller scores, and I will report any that are not rather than loosen the test;
+- a simple kit robot written in the test (two gearmotors, wheels, a caster) leaves the dock and scores 11 from its program alone; the plain chassis scores 0; each law refuses a planted fault.
+
+**Measured while testing the fixture (D-093's noise, D-094's replay prediction).** The old model's own match is chaotic. On the cannon body, moving the start 0.1 in, the park 0.1 in or the duty by 0.01 moves the cannon score between 18 and 36, in steps of one ball (9 points), and two of the eight runs broke a rule. The graph robot's replay scored 18 against the old 27: inside that spread, so my prediction of "within 5 points on one match" asked for something the old model does not do with itself. I did not loosen it silently. The test now compares means over nearby starts, within one ball. Two consequences:
+- `points_noise` is 9 (one ball, the measured step), not the 5 I reasoned from the brief.
+- A kit world score is the mean of 3 matches at System 1's controls, each with the start jittered, so a lucky match cannot win a change. The old catalogue's D-075 score of 35 was a single match, so the F9 baseline has to be re-scored the same way before the two are compared.
+
+**Result (tests, D-094).** Bodies, joints, solids, masses and friction reproduce to 1e-6 on all four fixture robots. Matches with no loose items replay within a point (activate 11 and mermaids 24 both match), and the chaotic cannon replay agrees on the mean over six nearby starts, within one ball. The kit robot written for the test leaves the dock from its program alone and scores 11, the plain chassis scores 0, each law refuses its planted fault, and that robot goes through the whole loop: it opens a concept, is scored and is kept. Not shown: System 2 composing anything, or any score above 11 from the kit. Full suite: 809 passed, 2 skipped, 1 xfailed, with the model-download test deselected.
+
+## D-095 Every world is stripped to its brief: design knowledge comes from research or not at all (judge: each world's rules; policy: prompt, requirements; F7 of the general framework)
+
+**Why.** The user's direction: strip to the brief, then measure what the general process recovers. Each world's `principles()` is mostly engineering knowledge written by hand: gripper 7 of 7, mobile 8 of 8, talking robot about 8 of 10, ME 2110 about 7 of 11. It tells System 2 what a good answer looks like, which is teaching the test, and it is exactly what the notebook should now supply from sources.
+
+**Change** (`RunConfig.stripped`, off by default, so the current loop stays as the arm to compare with).
+- Each world gets `brief_rules()`: what a student or engineer is told about the task (rules, scoring, limits). The prompt then shows `# Rules of this world`, numbered, in place of `# Physics principles`. `principles()` stays for the comparison arm.
+- The split is by one test: would a rule change what counts as a success or what may be built? Gripper and mobile have none beyond their descriptions. The talking robot keeps the repeat-on-fresh-noise and 50 ms rules, which define when a sound counts. ME 2110 keeps the box, the kit, the 40 s state and the fortress rule.
+- Requirement coverage now traces rules as well as groups: a requirement citing `rule 2` in its source covers it, and uncovered rules are listed (the part D-089 left for this phase).
+
+**Prediction** (before the code):
+- no prompt with `stripped` contains any principle's text, in any world; the off arm's prompt is unchanged;
+- on campaigns, F9 only: stripped without research should do worse than the current loop, and research should recover part of the gap. If stripped with research does as well as the current loop, the hand-written principles were not needed.

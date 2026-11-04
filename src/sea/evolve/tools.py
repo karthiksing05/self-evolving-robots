@@ -398,6 +398,11 @@ class Server:
             raise ToolError("this world has no modules")
         if args.get("name") in self.ctx.bases and hasattr(self.world, "mechanism_text"):  # a concept's own graph (D-091)
             return self.world.mechanism_text(self.ctx.bases[args["name"]]) or f"{args['name']} has no built mechanism"
+        if hasattr(self.world, "module_text"):  # a world that keeps its own modules (D-094)
+            try:
+                return self.world.module_text(str(args.get("name", "")), dict(args.get("params") or {}))
+            except ValueError as exc:
+                raise ToolError(str(exc)) from exc
         from sea.worlds import gripper as W
 
         name, params = args.get("name", ""), dict(args.get("params") or {})

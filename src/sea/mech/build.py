@@ -24,6 +24,7 @@ from sea.mech.graph import (
     Bought,
     Box,
     Bracket,
+    Capsule,
     Cylinder,
     Encoder,
     Gear,
@@ -35,6 +36,7 @@ from sea.mech.graph import (
     Piston,
     RackTeeth,
     Servo,
+    Sphere,
     TorsionSpring,
     Web,
     Wheel,
@@ -70,11 +72,18 @@ def part_kg(p) -> float:
     """A part's mass: its volume times its material's density, or a bought part's own."""
     from sea.sim import jaws
 
+    if getattr(p, "kg", None) is not None and not isinstance(p, Bought):
+        return p.kg
     if isinstance(p, Box):
         return DENSITY[p.material] * 8 * float(np.prod(p.half)) if p.massive and p.material != "stock" else 0.0
     if isinstance(p, Cylinder):
         return (DENSITY[p.material] * math.pi * p.radius**2 * 2 * p.half_length
                 if p.massive and p.material != "stock" else 0.0)
+    if isinstance(p, Capsule):
+        return (DENSITY[p.material] * math.pi * p.radius**2 * (2 * p.half_length + 4 * p.radius / 3)
+                if p.massive and p.material != "stock" else 0.0)
+    if isinstance(p, Sphere):
+        return DENSITY[p.material] * 4 * math.pi * p.radius**3 / 3 if p.massive and p.material != "stock" else 0.0
     if isinstance(p, Link):
         hz = (p.z[1] - p.z[0]) / 2
         vol = 2 * p.half_width * p.length * 2 * hz + 2 * math.pi * p.boss_r**2 * 2 * hz / 2  # half of each round end
@@ -107,6 +116,14 @@ def _add_part(spec: mujoco.MjSpec, body, p, pose: tuple[np.ndarray, np.ndarray])
     if isinstance(p, Cylinder):
         body.add_geom(name=p.name, type=_GEOM.mjGEOM_CYLINDER, size=[p.radius, p.half_length], pos=list(p.pos),
                       quat=list(p.quat), rgba=_rgba(p.material), group=2, mass=0.0)
+        return part_kg(p)
+    if isinstance(p, Capsule):
+        body.add_geom(name=p.name, type=_GEOM.mjGEOM_CAPSULE, size=[p.radius, p.half_length], pos=list(p.pos),
+                      quat=list(p.quat), rgba=_rgba(p.material), group=2, mass=0.0)
+        return part_kg(p)
+    if isinstance(p, Sphere):
+        body.add_geom(name=p.name, type=_GEOM.mjGEOM_SPHERE, size=[p.radius, 0.0, 0.0], pos=list(p.pos),
+                      rgba=_rgba(p.material), group=2, mass=0.0)
         return part_kg(p)
     if isinstance(p, Link):
         zc, hz = (p.z[0] + p.z[1]) / 2, (p.z[1] - p.z[0]) / 2
@@ -157,7 +174,7 @@ def _add_part(spec: mujoco.MjSpec, body, p, pose: tuple[np.ndarray, np.ndarray])
         return part_kg(p)
     if isinstance(p, Wheel):  # it rolls: torsional and rolling friction are small (D-087)
         body.add_geom(name=p.name, type=_GEOM.mjGEOM_CYLINDER, size=[p.radius, p.half_width], pos=list(p.pos),
-                      quat=list(p.quat), rgba=_rgba(p.material), group=2, mass=0.0, condim=3,
+                      quat=list(p.quat), rgba=_rgba(p.material), group=2, mass=0.0, condim=p.condim,
                       friction=[p.mu, 0.005, 0.0001])
         return part_kg(p)
     if isinstance(p, Bought | PadMount):
@@ -238,7 +255,9 @@ def compile(spec: mujoco.MjSpec, g: Graph, base: str | Base | None = None) -> li
     from sea.sim import jaws
     from sea.sim.build_model import TIMESTEP
 
-    root = _base(base).root
+    bs = _base(base)
+    root = bs.root
+    whole = bs.driver == ""  # a robot built whole from the graph: every body's mass comes from its parts
 
     for name in g.remove_stock_mesh:
         for geom in [x for x in spec.geoms if x.parent.name == name and x.meshname == name]:
@@ -254,15 +273,18 @@ def compile(spec: mujoco.MjSpec, g: Graph, base: str | Base | None = None) -> li
                 continue
             kw = {"range": list(j.range)} if j.range is not None else {}
             sb.add_joint(name=j.name, type=_JOINT[j.type], axis=list(j.axis), pos=list(j.pos), armature=j.armature,
-                         damping=[j.damping, 0.0, 0.0], **kw)
+                         damping=[j.damping, 0.0, 0.0], stiffness=[j.stiffness, 0.0, 0.0], springref=j.springref,
+                         frictionloss=j.frictionloss, **kw)
         pose = _pose(spec, b.name, root) if any(isinstance(p, RackTeeth) for p in b.parts) else (np.zeros(3), np.eye(3))
-        if b.joints and b.inertial is None and not b.stock:  # a moving body: its inertia from its solids (D-087)
+        if (b.joints or whole) and b.inertial is None and not b.stock:  # its inertia from its solids (D-087)
             for p in b.parts:
                 n0 = len(sb.geoms)
                 kg = _add_part(spec, sb, p, pose)
                 new = [x for x in sb.geoms[n0:] if x.contype or x.conaffinity] or list(sb.geoms[n0:])
                 for x in new:
                     x.mass = kg / len(new)
+                    if getattr(p, "mu", None) is not None and not isinstance(p, Wheel):
+                        x.friction = [p.mu, 0.005, 0.0001]
             continue
         kg = sum(_add_part(spec, sb, p, pose) for p in b.parts)
         if b.inertial is not None:

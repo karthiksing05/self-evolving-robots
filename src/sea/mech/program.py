@@ -1,7 +1,7 @@
 """What operates a composed mechanism (D-092): the controls a graph exposes, and playing them on a ``Machine``.
 
 Every actuator, latch and sensor in a graph has typed controls, so anything System 2 composes can be operated
-without code that names its parts: a servo's ``at`` and ``target``, a motor's ``at``, ``run`` and ``duty``, a
+without code that names its parts: a servo's ``at`` and ``target``, a motor's ``at``, ``run``, ``duty`` and a reverse ``back_at`` and ``back_run``, a
 piston's ``at`` and ``hold`` (its valve extends for that long, then retracts), a latch's ``at``, a sensor's
 ``threshold``.  An actuator with a trigger counts its times from the moment that sensor fires.
 """
@@ -14,6 +14,7 @@ from sea.mech.graph import Encoder, Gearmotor, Graph, LimitSwitch, Piston, Range
 from sea.mech.runtime import Machine
 
 SWITCH_N = (0.0, 20.0, 0.5)  # a switch's force threshold: lo, hi, start
+RAMP_S = 0.4  # the motor driver ramps its duty: a step pops a wheelie
 
 
 def _joint_range(g: Graph, name: str) -> tuple[float, float]:
@@ -33,7 +34,8 @@ def controls(g: Graph, horizon: float) -> dict[str, tuple[float, float, float]]:
             out.update({f"{a.name}.at": (0.0, horizon, 0.0), f"{a.name}.target": (lo, hi, (lo + hi) / 2)})
         elif isinstance(a, Gearmotor):
             out.update({f"{a.name}.at": (0.0, horizon, 0.0), f"{a.name}.run": (0.0, horizon, horizon / 2),
-                        f"{a.name}.duty": (-1.0, 1.0, 0.5)})
+                        f"{a.name}.duty": (-1.0, 1.0, 0.5), f"{a.name}.back_at": (0.0, horizon, horizon),
+                        f"{a.name}.back_run": (0.0, horizon, 0.0)})
         elif isinstance(a, Piston):
             out.update({f"{a.name}.at": (0.0, horizon, 0.0), f"{a.name}.hold": (0.0, horizon, horizon / 2)})
     out.update({f"{lt.name}.at": (0.0, horizon, horizon / 2) for lt in g.latches})
@@ -85,7 +87,11 @@ class Program:
             if isinstance(a, Servo):
                 m.command(a.name, c[f"{a.name}.target"])
             elif isinstance(a, Gearmotor):
-                m.command(a.name, c[f"{a.name}.duty"] if into < c[f"{a.name}.run"] else 0.0)
+                duty, back = c[f"{a.name}.duty"], now - c[f"{a.name}.back_at"]
+                if 0.0 <= back < c[f"{a.name}.back_run"]:
+                    m.command(a.name, -duty * min(1.0, back / RAMP_S))
+                else:
+                    m.command(a.name, duty * min(1.0, into / RAMP_S) if into < c[f"{a.name}.run"] else 0.0)
             else:
                 m.command(a.name, 1.0 if into < c[f"{a.name}.hold"] else -1.0)
         for lt in self.g.latches:

@@ -8,7 +8,9 @@ A patch is a list of operations on a module's graph, each addressed by names, ne
 - ``bodies/<body>/parts/<part>/<field>``: one field of a part (``set``);
 - ``guides/<carriage>/<field>``, ``meshes/<follower>/<field>``, ``loops/<a>/<field>``: a guide's, a mesh's or
   a loop's field (``set``; a loop is named by its first body);
-- ``loops``, ``guides``, ``meshes``, ``excludes``: append one (``add``);
+- ``loops``, ``guides``, ``meshes``, ``excludes``, ``actuators``, ``latches``, ``sensors``, ``carried``: append one
+  (``add``);
+- ``actuators/<name>``, ``latches/<name>``, ``sensors/<name>``: replace or remove one (``set``, ``remove``);
 - ``linked``: replace the joints that follow the servo by ratio (``set``).
 
 A part's name is its ``name``, or for a blade ``blade`` and for a bought part its ``item``.
@@ -30,7 +32,7 @@ class Op(BaseModel):
     op: Literal["add", "set", "remove"]
     path: str = Field(description="what to change, by names: bodies/<body>[/parts/<part>][/<field>], "
                       "guides/<carriage>/<field>, meshes/<follower>/<field>, loops/<a>/<field>, loops, guides, "
-                      "meshes, excludes, linked")
+                      "meshes, excludes, linked, actuators[/<name>], latches[/<name>], sensors[/<name>], carried")
     value: Any = None
 
 
@@ -52,7 +54,14 @@ def apply_patch(g: Graph, ops: list[Op]) -> Graph:
     for k, o in enumerate(ops):
         seg = [s for s in o.path.split("/") if s]
         try:
-            if seg[0] in ("loops", "guides", "meshes", "excludes") and len(seg) == 1:
+            if seg[0] in ("actuators", "latches", "sensors") and len(seg) == 2:
+                i = _find(d[seg[0]], seg[1], lambda x: x["name"], seg[0][:-1])
+                if o.op == "remove":
+                    d[seg[0]].pop(i)
+                else:
+                    d[seg[0]][i] = o.value
+            elif seg[0] in ("loops", "guides", "meshes", "excludes", "actuators", "latches", "sensors", "carried") \
+                    and len(seg) == 1:
                 if o.op != "add":
                     raise ValueError("only add to a list")
                 d[seg[0]] = [*d[seg[0]], o.value]

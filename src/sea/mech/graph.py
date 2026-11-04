@@ -42,6 +42,8 @@ class Box(_M):
     role: Role = "structure"
     piece: str = ""  # parts with the same piece are one printed part (a clamp and its bracket)
     massive: bool = True  # counts toward the body's mass
+    kg: float | None = None  # a stated mass instead of its volume's (a world's laws may refuse it)
+    mu: float | None = None  # its surface's friction, where it is not the world's default
 
 
 class Cylinder(_M):
@@ -57,6 +59,40 @@ class Cylinder(_M):
     role: Role = "structure"
     piece: str = ""
     massive: bool = True
+    kg: float | None = None
+    mu: float | None = None
+
+
+class Capsule(_M):
+    """A rounded bar along its local z: a boom, a dowel, a piston's cylinder or rod."""
+
+    kind: Literal["capsule"] = "capsule"
+    name: str
+    pos: Vec
+    radius: float
+    half_length: float
+    quat: Quat = (1.0, 0.0, 0.0, 0.0)
+    material: Material = "pla"
+    role: Role = "structure"
+    piece: str = ""
+    massive: bool = True
+    kg: float | None = None
+    mu: float | None = None
+
+
+class Sphere(_M):
+    """A ball: a caster, a knob."""
+
+    kind: Literal["sphere"] = "sphere"
+    name: str
+    pos: Vec
+    radius: float
+    material: Material = "steel"
+    role: Role = "structure"
+    piece: str = ""
+    massive: bool = True
+    kg: float | None = None
+    mu: float | None = None
 
 
 class Link(_M):
@@ -159,13 +195,16 @@ class Wheel(_M):
     half_width: float
     quat: Quat = (1.0, 0.0, 0.0, 0.0)
     mu: float = 0.9
+    condim: int = 3
     material: Material = "pla"
     role: Role = "structure"
     piece: str = ""
     massive: bool = True
+    kg: float | None = None
 
 
-Part = Annotated[Box | Cylinder | Link | Web | Gear | RackTeeth | Blade | PadMount | Bracket | Bought | Wheel,
+Part = Annotated[Box | Cylinder | Capsule | Sphere | Link | Web | Gear | RackTeeth | Blade | PadMount | Bracket | Bought
+                 | Wheel,
                  Field(discriminator="kind")]
 
 
@@ -180,6 +219,9 @@ class Joint(_M):
     range: tuple[float, float] | None = None
     armature: float = 0.0
     damping: float = 0.0
+    stiffness: float = 0.0  # a spring on the joint itself, toward ``springref``
+    springref: float = 0.0
+    frictionloss: float = 0.0
 
 
 class Inertial(_M):
@@ -361,6 +403,16 @@ class Encoder(_M):
 Sensor = Annotated[LimitSwitch | RangeFinder | Encoder, Field(discriminator="kind")]
 
 
+class Carry(_M):
+    """An item of the world that starts on the robot (a ball on a chute, a flag on its clip), at ``pos`` and ``quat`` in
+    ``body``'s frame.  The world says what each item is and how it is held."""
+
+    item: str
+    body: str
+    pos: Vec = (0.0, 0.0, 0.0)
+    quat: Quat = (1.0, 0.0, 0.0, 0.0)
+
+
 class Graph(_M):
     """A mechanism: its bodies (in build order), what it removes from the stock robot, its constraints, the
     pairs that may touch where they are pinned, and the joints that move with the driving joint."""
@@ -376,6 +428,7 @@ class Graph(_M):
     actuators: tuple[Actuator, ...] = ()
     latches: tuple[Latch, ...] = ()
     sensors: tuple[Sensor, ...] = ()
+    carried: tuple[Carry, ...] = ()
 
     def new_bodies(self) -> tuple[str, ...]:
         return tuple(b.name for b in self.bodies if not b.stock)

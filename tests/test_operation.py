@@ -57,7 +57,7 @@ def test_a_graph_s_controls_are_derived_from_its_elements():
                          Piston(name="p", joint="c_q", bore_m=0.02, pressure_pa=5e5, valve_m_s=0.3)),
               latches=(Latch(name="l", joint="a_q"),), sensors=(Encoder(name="e", joint="a_q"),))
     c = controls(g, 10.0)
-    assert set(c) == {"s.at", "s.target", "m.at", "m.run", "m.duty", "p.at", "p.hold", "l.at", "e.threshold"}
+    assert set(c) == {"s.at", "s.target", "m.at", "m.run", "m.duty", "m.back_at", "m.back_run", "p.at", "p.hold", "l.at", "e.threshold"}
     assert c["s.target"] == (-1.0, 1.0, 0.0) and c["m.duty"][:2] == (-1.0, 1.0) and c["e.threshold"][:2] == (-1.0, 1.0)
 
 
@@ -66,7 +66,7 @@ def test_a_program_plays_a_motor_s_window_and_a_piston_s_stroke():
               actuators=(Gearmotor(name="m", joint="b_q", stall_nm=1.0, no_load_rad_s=10.0),
                          Piston(name="p", joint="c_q", bore_m=0.02, pressure_pa=5e5, valve_m_s=0.3)))
     rows, _, _ = _play(g, {"m.at": 0.2, "m.run": 0.3, "m.duty": 0.5, "p.at": 0.4, "p.hold": 0.3}, 1.0)
-    assert _at(rows, 0.1)[1][0] == 0.0 and _at(rows, 0.3)[1][0] == 0.5 and _at(rows, 0.6)[1][0] == 0.0
+    assert _at(rows, 0.1)[1][0] == 0.0 and 0 < _at(rows, 0.3)[1][0] < 0.5 and _at(rows, 0.6)[1][0] == 0.0
     assert _at(rows, 0.3)[1][1] == 0.0 and _at(rows, 0.5)[1][1] == 1.0 and _at(rows, 0.8)[1][1] == -1.0
 
 
@@ -79,7 +79,7 @@ def test_a_latch_releases_on_time_and_a_sensor_starts_an_actuator_s_clock():
     assert abs(_at(rows, 0.15)[2][0]) < 1e-3 and not mc.held("trigger")
     fired = prog.fired["e"]  # the arm falls once released, passes 0.05 rad, and only then the motor's clock runs
     assert fired > 0.2
-    assert _at(rows, fired + 0.05)[1][0] == 0.0 and _at(rows, fired + 0.15)[1][0] == 1.0
+    assert _at(rows, fired + 0.05)[1][0] == 0.0 and 0 < _at(rows, fired + 0.15)[1][0] <= 1.0
 
 
 class Planned(Reach):
