@@ -170,9 +170,26 @@ class Proposal(_Model):
     risks: list[str] = Field(default_factory=list, description="held task groups this could break, and why")
 
 
+class Requirement(_Model):
+    """A need as System 2 states it (D-089): a metric over instruments and task facts, with its target."""
+
+    id: str = Field(description="a short id, kept across revisions (R1, R2, ...)")
+    statement: str = Field(description="the need in words")
+    metric: str = Field(description="arithmetic over instrument readings, written as calls (squeeze_n(width_mm=35)), "
+                        "and the task's facts by name (mass_g); see the instruments section")
+    sense: Literal[">=", "<="] = Field(description="the metric must be at least, or at most, the target")
+    marginal: float = Field(description="the value at which the need is just met")
+    ideal: float | None = Field(default=None, description="the value with the margin you want (a safety factor)")
+    tasks: list[str] = Field(default_factory=list, description="the task groups it is measured on, each task "
+                             "facing the body (its facts and per-task readings); empty: the body alone")
+    source: str = Field(description="where the need comes from: a task group, a rule of the brief, or a note id")
+
+
 class ProposalBatch(_Model):
     proposals: list[Proposal] = Field(min_length=1, max_length=3)
     notes: str = ""
+    requirements: list[Requirement] = Field(default_factory=list, description="the whole requirements list, "
+                                            "revised; empty: keep the last one (D-089)")
 
 
 def apply(body: Body, edits: Sequence[Edit], catalogue: dict[str, PartType], new_id: str) -> Body:
