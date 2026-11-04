@@ -2781,3 +2781,27 @@ Against the prediction:
   | Two-wheeled cart on a free root | rolls at the wheels' speed times their radius, within 10% |
 
 - **One finding about stability.** Speed-dependent forces are joint damping, which the simulator integrates implicitly, because as explicit actuator forces they were unstable: the motor's back-EMF on a 56 g wheel, and the needle valve on a light rod. This is how `me2110_model` already treats the valve. A servo's gearbox likewise puts damping and reflected inertia on its joint.
+
+## D-088 Every world declares instruments, and System 2 can read, sweep and look up facts on any draft (judge: world contracts, no verdict change; policy: tools, prompt; F1 of the general framework)
+
+**Why.** The general framework puts the data an engineer gathers on the harness's side, and the knowledge on System 2's. Until now each world's numbers about a body reached System 2 only as the brief's prose, and only for the current body (D-086's `measure` printed the brief of a draft). An engineer measures what the requirement needs, on the candidate in hand, and sees how it moves with a parameter.
+
+**Change.**
+- **An `Instrument` contract** (`evolve/core.py`): a named reading with a unit and its arguments, on a body or on a body facing one task. A world may declare `instruments()`, `read()` and `task_facts()`. `evolve/instruments.py` adds the readings every world has: cost, fabrication minutes, lead days, and the number of rules and laws that refuse the body. It also adds a task's numbers as facts, and a safe evaluator for arithmetic over readings and facts (System 2's requirement metrics, F2). Its sandbox allows arithmetic, named readings, facts and a few math functions, and nothing else.
+- **Each world's existing computations became instruments,** with no new physics.
+  - **Gripper (21):** servo range, widest opening, and by width: the servo angle, the face's tilt, the fingertip's rise, the squeeze, the rack's lift and the bushing load. Also tooth skip, bushing rating, pads and friction, the lifting stall, the shoulder hold for a load, the wrist roll allowed and the roll each task's grasp needs (D-085, now `gripper.roll_needed`), and the loop closure.
+  - **Mobile (18):** mass and dimensions, stall force, speed, the edge it climbs by surface (driven in MuJoCo), traction and stall slopes, ground pressure and sinkage, energy per metre, steering error and sensing.
+  - **Phonology (12):** read off System 1's map of sampled postures: tract length, servos, the F1–F3 ranges, the distance from given formants to the nearest sampled vowel, closure area by place, and fricative postures and their hiss range.
+  - **ME 2110 (8):** the folded envelope and box fit, kit actuators used and left, spend, and print mass. F6 rebuilds this world from kit primitives.
+- **Tools.** `sea` gains `read` (one instrument on a draft), `sweep` (up to 6 readings as one parameter takes up to 12 values) and `facts` (a train task's numbers). The prompt's tools section lists every instrument.
+
+**Prediction** (written after the instruments were written, before they were checked: an inversion of order, recorded):
+- every brief is unchanged byte for byte;
+- every instrument reads on every world's stock body;
+- verdicts and goldens are unchanged.
+
+**Measured.**
+- **Briefs:** the gripper's brief is byte-identical on the stock body, the long slide, the prismatic slide and a braced built guide (hashes compared against the previous commit). The rods' prose now formats numbers from `_rod_numbers`, which the instruments also read.
+- **Instruments:** every instrument reads on each stock body. Mobile takes 0.2 s for all of them, ME 2110 0.0 s and phonology 14 s (building its map of sampled postures).
+- **Task facts:** the gripper's come from the object catalogue (width, depth, height, mass, friction, round). The others are flattened from `Task.data`; ME 2110's carry only a variant index until F6.
+- **Tests:** `tests/test_tools.py` covers reading, refusals, the evaluator's sandbox, and the read, sweep and facts tools on a toy world.

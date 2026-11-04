@@ -32,8 +32,9 @@ from pydantic import BaseModel, ConfigDict, ValidationError
 from sea.evolve.core import Body, Proposal, World
 from sea.evolve.resources import Spent
 
-NAMES = ("check", "measure", "module", "simulate")
+NAMES = ("check", "measure", "read", "sweep", "facts", "module", "simulate")
 CALLS, SIMS = 40, 3  # per iteration
+SWEEP_VALUES, SWEEP_READINGS = 12, 6
 
 
 class Context(BaseModel):
@@ -81,6 +82,19 @@ def specs() -> list[dict[str, Any]]:
              "loads), its cost, and for the gripper the wrist roll each task's grasp needs and the range the "
              "simulator holds the wrist to; for a built mechanism, how far its loops are from closing.", draft,
              ["proposal"]),
+        tool("read", "One instrument read on the body this proposal makes (the instruments section lists them; "
+             "a per-task one needs a train task id).", {**draft, "instrument": {"type": "string"},
+                                                       "args": {"type": "object"}, "task": {"type": "string"}},
+             ["proposal", "instrument"]),
+        tool("sweep", "Instruments read as one parameter of one slot of the body this proposal makes takes each of "
+             f"up to {SWEEP_VALUES} values ({SWEEP_READINGS} readings at most): how the readings depend on it.",
+             {**draft, "slot": {"type": "string"}, "param": {"type": "string"},
+              "values": {"type": "array", "items": {"type": "number"}},
+              "readings": {"type": "array", "items": {"type": "object", "properties": {
+                  "instrument": {"type": "string"}, "args": {"type": "object"}, "task": {"type": "string"}},
+                  "required": ["instrument"]}}}, ["proposal", "slot", "param", "values", "readings"]),
+        tool("facts", "A train task's numbers by name (an object's size and mass, a route's features, a target).",
+             {"task": {"type": "string"}}, ["task"]),
         tool("module", "A module's graph at the given parameters (lengths in metres), to write a patch against.",
              {"name": {"type": "string"}, "params": {"type": "object", "additionalProperties": {"type": "number"}}},
              ["name"]),
@@ -197,6 +211,61 @@ class Server:
             out += extra(cand, train)
         return "\n".join(out)
 
+    def _reading(self, body: Body, r: dict[str, Any]) -> float:
+        from sea.evolve import instruments as I
+
+        task = r.get("task")
+        if task is not None and task not in self.ctx.train:
+            raise ToolError(f"{task!r} is not a train task")
+        try:
+            return I.read(self.world, body, str(r.get("instrument", "")), dict(r.get("args") or {}),
+                          self.tasks[task] if task else None, base=self.ctx.body, manifest=self.ctx.manifest,
+                          spent=self.ctx.spent)
+        except (ValueError, KeyError, ZeroDivisionError) as exc:
+            raise ToolError(f"cannot read {r.get('instrument')!r}: {exc}") from exc
+
+    def _read(self, args: dict[str, Any]) -> str:
+        from sea.evolve import instruments as I
+
+        _, cand = self._draft(args)
+        v = self._reading(cand, args)
+        unit = next((i.unit for i in I.instruments(self.world) if i.name == args.get("instrument")), "")
+        return f"{args.get('instrument')}{_argtext(args)} = {v:.4g} {unit}".rstrip()
+
+    def _sweep(self, args: dict[str, Any]) -> str:
+        from sea.evolve.core import Edit, apply
+
+        _, cand = self._draft(args)
+        values = list(args.get("values") or [])[:SWEEP_VALUES]
+        readings = list(args.get("readings") or [])[:SWEEP_READINGS]
+        slot, param = str(args.get("slot", "")), str(args.get("param", ""))
+        if not values or not readings:
+            raise ToolError("give the values and the readings to take at each")
+        rows = []
+        for v in values:
+            try:
+                b = apply(cand, [Edit(slot=slot, params={param: float(v)})], self.catalogue, new_id="sweep")
+            except ValueError as exc:
+                rows.append(f"{param} = {v:g}: {exc}")
+                continue
+            cells = []
+            for r in readings:
+                try:
+                    cells.append(f"{r['instrument']}{_argtext(r)} {self._reading(b, r):.4g}")
+                except ToolError as exc:
+                    cells.append(str(exc))
+            rows.append(f"{param} = {v:g}: " + "; ".join(cells))
+        return f"{slot}.{param} swept on the drafted body:\n" + "\n".join(rows)
+
+    def _facts(self, args: dict[str, Any]) -> str:
+        from sea.evolve import instruments as I
+
+        task = str(args.get("task", ""))
+        if task not in self.ctx.train:
+            raise ToolError(f"{task!r} is not a train task")
+        t = self.tasks[task]
+        return f"{task} ({t.group}): {t.facts}\n" + ", ".join(f"{k} = {v:g}" for k, v in I.facts(self.world, t).items())
+
     def _module(self, args: dict[str, Any]) -> str:
         if not hasattr(self.world, "modules_text"):
             raise ToolError("this world has no modules")
@@ -264,6 +333,12 @@ class Server:
                 tx.flush()
 
 
+def _argtext(r: dict[str, Any]) -> str:
+    a = dict(r.get("args") or {})
+    inner = ", ".join(f"{k}={v}" for k, v in a.items())
+    return f"({inner})" + (f" on {r['task']}" if r.get("task") else "")
+
+
 def summary(log: Path, iteration: int | None = None) -> dict[str, Any]:
     """The calls in ``log`` (one iteration's, if given): how many of each tool, refused for the budget, and the
     time and sim-seconds they took."""
@@ -282,25 +357,13 @@ def summary(log: Path, iteration: int | None = None) -> dict[str, Any]:
 def _gripper(body: Body, train: list[Any]) -> list[str]:
     """The wrist roll each train task's grasp needs, from the IK at the poses the grasp commands (D-085), and the
     range the simulator holds the wrist to; a built mechanism's worst open loop."""
-    from sea.control.executor import HOME_Q, stock_ik
-    from sea.control.motor import grasp_poses
     from sea.worlds import gripper as W
 
     f = W.to_design(body).fingers
     lo, hi = W.roll_range(f)
     j_lo, j_hi = W.ik_joint_range("wrist_roll")
-    ik = stock_ik()
     ids = {t.id for t in train}
-    need: dict[str, tuple[float, float]] = {}
-    for t, (spec, contact, down, roll) in zip(W.GripperWorld().tasks(), W._grasp_scenes(), strict=True):
-        if t.id not in ids:
-            continue
-        target, above, _, _, _ = grasp_poses(spec, f, contact, down, roll)
-        q, qs = HOME_Q.copy(), []
-        for p in (above, target, target - down * 0.05):
-            q, _, _ = ik.track(p, down, q, roll_axis=roll)
-            qs.append(float(q[4]))
-        need[t.id] = (min(qs), max(qs))
+    need = {k: v for k, v in W.roll_needed(f).items() if k in ids}
     if not need:
         return []
     a, b = min(need, key=lambda k: need[k][0]), max(need, key=lambda k: need[k][1])

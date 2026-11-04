@@ -132,13 +132,17 @@ def build(world: World, body: Body, tasks: Sequence[Task], outcomes: dict[str, O
         sec.append("# Ideas recorded so far without a mechanism (untested)\n" +
                    "\n".join(f"- {i['name']} (iteration {i['iteration'] + 1}): {idea_text(i['cost'])}" for i in ideas[-6:]))
     if tools:
+        from sea.evolve.instruments import table
+
         sec.append(f"# Questions to the harness (D-086)\nBefore you answer you may ask the harness about draft "
                    "proposals, written as you would answer them, through the `sea` tools: `check` (would the loop "
                    "trial it, or every reason it would refuse it), `measure` (the drafted body's computed facts), "
-                   "`module` (a module's graph at given parameters) and `simulate` (one train task solved by the "
-                   f"drafted body).  This iteration allows {tools['calls']} calls, of which {tools['sims']} may "
-                   "simulate.  A check or a measurement is the harness's own computation; a simulation is one task, "
-                   "not a trial; only the trial of your answer can keep a body.")
+                   "`read` (one instrument on the drafted body), `sweep` (instruments as one parameter varies), "
+                   "`facts` (a train task's numbers), `module` (a module's graph at given parameters) and `simulate` "
+                   f"(one train task solved by the drafted body).  This iteration allows {tools['calls']} calls, of "
+                   f"which {tools['sims']} may simulate.  A check, a reading or a measurement is the harness's own "
+                   "computation; a simulation is one task, not a trial; only the trial of your answer can keep a "
+                   f"body.\n\nInstruments (D-088):\n{table(world)}")
     close = (f"Propose 1 to {max_proposals} body changes for the failing groups.  Each proposal is tried on "
              "its own and kept only if it gains a group and loses none; proposals that are each kept-eligible and "
              "change different slots are also tried together.")

@@ -90,7 +90,8 @@ def test_the_server_speaks_mcp_over_stdio(tmp_path):
     assert set(got) == {"probe", 0, 1, 2, 3}  # the notification is not answered
     assert got["probe"]["error"]["code"] == -32601
     assert got[0]["result"]["protocolVersion"] == "2025-11-25"
-    assert [t["name"] for t in got[1]["result"]["tools"]] == ["check", "measure", "module", "simulate"]
+    assert [t["name"] for t in got[1]["result"]["tools"]] == ["check", "measure", "read", "sweep", "facts", "module",
+                                                              "simulate"]
     assert all("$defs" in t["inputSchema"] for t in got[1]["result"]["tools"])
     assert not got[2]["result"]["isError"] and '"name":"parallelogram(60)"' in got[2]["result"]["content"][0]["text"]
     assert got[3]["result"]["isError"] and "outside 50..90" in got[3]["result"]["content"][0]["text"]
@@ -118,7 +119,8 @@ def test_plan_claude_runs_the_tools_only_when_given_them(tmp_path):
     p.tools = (ctx, tmp_path / "tool_calls.jsonl")
     f = p.flags()
     assert "--safe-mode" not in f and f[f.index("--tools") + 1] == "" and "--strict-mcp-config" in f
-    assert f[f.index("--allowedTools") + 1] == "mcp__sea__check,mcp__sea__measure,mcp__sea__module,mcp__sea__simulate"
+    assert f[f.index("--allowedTools") + 1] == ",".join(f"mcp__sea__{n}" for n in ("check", "measure", "read", "sweep",
+                                                                                 "facts", "module", "simulate"))
     cfg = json.loads((tmp_path / "iter00.mcp.json").read_text())["mcpServers"]
     assert list(cfg) == ["sea"] and cfg["sea"]["command"] == sys.executable and str(ctx.resolve()) in cfg["sea"]["args"]
 
@@ -145,3 +147,67 @@ def test_the_loop_writes_each_iteration_s_context_and_counts_its_calls(tmp_path)
     plain = Scripted([ProposalBatch(proposals=[PROPS[0]])])
     run(RunConfig(world="toy", iterations=1), off, proposer=plain, world=w, log=lambda m: None)
     assert "# Questions to the harness" not in plain.prompts[0] and not (off / "tools").exists()
+
+
+class Measured(Builds):
+    """The toy world with instruments (D-088): its stick's reach, and how far short of a task's target it falls."""
+
+    def instruments(self):
+        from sea.evolve.core import Instrument
+
+        return [Instrument(name="reach_m", unit="m", doc="the stick's reach"),
+                Instrument(name="short_m", unit="m", doc="how far short of this task's target", task=True),
+                Instrument(name="tip_m", unit="m", doc="the tip's height at an angle", args={"deg": "angle"})]
+
+    def read(self, body, name, args, task=None):
+        import math
+
+        reach = body.parts["stick"].params["length"]
+        if name == "reach_m":
+            return reach
+        if name == "short_m":
+            return max(0.0, task.data["d"] - reach)
+        return reach * math.sin(math.radians(args["deg"]))
+
+
+def test_instruments_read_any_body_and_metrics_are_arithmetic_over_them():
+    from sea.evolve import instruments as I
+
+    w = Measured()
+    b = w.stock()
+    t = next(x for x in w.tasks() if x.id == "d0.45_train0")
+    assert [i.name for i in I.instruments(w)][:4] == ["cost_usd", "fab_minutes", "lead_days", "refusals"]
+    assert I.read(w, b, "reach_m") == 0.2 and I.read(w, b, "short_m", task=t) == 0.25
+    assert I.facts(w, t) == {"d": 0.45}
+    for bad, msg in [("nope", "no instrument"), ("short_m", "give its task id")]:
+        try:
+            I.read(w, b, bad)
+        except ValueError as exc:
+            assert msg in str(exc)
+        else:
+            raise AssertionError(bad)
+    got = I.evaluate("2 * reach_m() - d + tip_m(deg=90) / sqrt(4)", lambda n, a: I.read(w, b, n, a, t),
+                     lambda n: I.facts(w, t)[n])
+    assert abs(got - (0.4 - 0.45 + 0.1)) < 1e-12
+    for evil in ("__import__('os')", "reach_m().real", "[1, 2]"):
+        try:
+            I.evaluate(evil, lambda n, a: 0.0, lambda n: 0.0)
+        except (ValueError, KeyError):
+            pass
+        else:
+            raise AssertionError(evil)
+
+
+def test_read_sweep_and_facts_tools_measure_drafts():
+    w = Measured()
+    s = Server(_ctx(w), None, w)
+    draft = _p("params", [Edit(slot="stick", params={"length": 0.3})]).model_dump()
+    assert s.call("read", {"proposal": draft, "instrument": "reach_m"}) == ("reach_m() = 0.3 m", False)
+    text, err = s.call("read", {"proposal": draft, "instrument": "short_m", "task": "d0.45_train0"})
+    assert not err and text == "short_m() on d0.45_train0 = 0.15 m"
+    assert s.call("read", {"proposal": draft, "instrument": "short_m", "task": "d0.45_test0"})[1]  # test unseen
+    text, err = s.call("sweep", {"proposal": draft, "slot": "stick", "param": "length", "values": [0.1, 0.3, 0.9],
+                                 "readings": [{"instrument": "reach_m"}, {"instrument": "cost_usd"}]})
+    assert not err and "length = 0.1: reach_m() 0.1" in text and "outside its range" in text
+    text, err = s.call("facts", {"task": "d0.15_train0"})
+    assert not err and "d = 0.15" in text
