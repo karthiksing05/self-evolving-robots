@@ -36,6 +36,7 @@ import numpy as np
 from pydantic import BaseModel, ConfigDict
 
 from sea.evolve import requirements as R
+from sea.evolve import research as RS
 from sea.evolve.core import Body, Edit, Outcome, Proposal, ProposalBatch, Task, World, apply, edit_rung
 from sea.evolve.llm import Proposer
 from sea.evolve.prompt import SYSTEM, build
@@ -61,6 +62,8 @@ class RunConfig(BaseModel):
     effort: str = "high"
     tools: bool = False  # System 2 may query the harness through the ``sea`` tools while it proposes (D-086)
     requirements: bool = False  # System 2 keeps a requirements list the harness measures (D-089)
+    research: bool = False  # System 2 searches and reads the web and keeps the notebook; needs the tools (D-090)
+    notebook: str = "library/notebook.jsonl"  # shared across runs and worlds
 
 
 # ---------------------------------------------------------------- parallel evaluation
@@ -291,6 +294,7 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
     spent = start(world.bom(body))
     history: list[dict[str, Any]] = []
     reqs: list[Any] = []  # System 2's requirements list (D-089)
+    notebook = Path(cfg.notebook)
     cur_rows: list[Any] = []  # the list measured on the current body
     ideas: list[dict[str, Any]] = []
     curve: list[dict[str, Any]] = []
@@ -402,12 +406,14 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
             if isinstance(proposer, RandomProposer):
                 proposer.body = body
             front = sorted(frontier.values(), key=lambda f: (-(len(f["gained"]) - len(f["lost"])), f["iteration"]))
-            budget, req_text = None, None
+            budget, req_text, notes_text = None, None, None
+            if cfg.research:
+                notes_text = RS.text(RS.load(notebook))
             groups = sorted({t.group for t in train})
             if cfg.requirements:
                 cur_rows = R.measure(world, body, reqs, train, body, manifest, spent)
                 req_text = R.text(reqs, cur_rows, held, groups)
-            if cfg.tools:  # what System 2's tools check a draft against: this iteration's body and record (D-086)
+            if cfg.tools or cfg.research:  # what System 2's tools check a draft against: this iteration's body and record (D-086)
                 from sea.evolve import tools as T
 
                 ctx = out / "tools" / f"iter{it:02d}.json"
@@ -415,13 +421,22 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                 ctx.write_text(T.Context(world=cfg.world, iteration=it, body=body, tried=tried, manifest=manifest,
                                          bases={i: f["body"] for i, f in frontier.items()}, spent=spent,
                                          train=[t.id for t in train], requirements=reqs,
-                                         held=sorted(held)).model_dump_json())
+                                         held=sorted(held), notebook=str(notebook.resolve()) if cfg.research else "",
+                                         research_log=str((out / "research.jsonl").resolve()),
+                                         run=out.name).model_dump_json())
                 budget = {"calls": T.CALLS, "sims": T.SIMS}
                 if hasattr(proposer, "tools"):
                     proposer.tools = (ctx, out / "tool_calls.jsonl")
+                if cfg.research and hasattr(proposer, "research"):  # the guard on this iteration's research
+                    guard = ctx.with_suffix(".research.json")
+                    guard.write_text(RS.Config(blocked=list(getattr(world, "research_blocked", [])),
+                                               log=str((out / "research.jsonl").resolve()), iteration=it).model_dump_json())
+                    hooks = ctx.with_suffix(".settings.json")
+                    hooks.write_text(json.dumps(RS.settings(guard)))
+                    proposer.research = hooks
             prompt = build(world, body, train, outcomes, held, history, ideas, spent, manifest, it, cfg.iterations,
                            cfg.max_proposals, frontier=front[:5], tune_trials=cfg.tune_trials, tools=budget,
-                           requirements=req_text)
+                           requirements=req_text, notebook=notes_text)
             try:
                 batch = proposer.propose(SYSTEM, prompt, tag=f"iter{it:02d}")
             except (PlanLimitReached, PlanBillingError):
@@ -430,8 +445,10 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                 log(f"  iter {it}: System 2 gave no proposals: {exc}")
                 batch = ProposalBatch.model_construct(proposals=[], notes=f"System 2 gave no proposals: {exc}")
             rec["llm"] = proposer.calls[-1] if getattr(proposer, "calls", None) else {}
-            if cfg.tools:
+            if cfg.tools or cfg.research:
                 rec["tools"] = T.summary(out / "tool_calls.jsonl", it)
+            if cfg.research:
+                rec["research"] = RS.summary(out / "research.jsonl", it)
             rec["notes"] = batch.notes
             if cfg.requirements and batch.requirements:  # System 2 revised its list: measure the new one
                 reqs = list(batch.requirements)
@@ -516,6 +533,8 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                 entry["result"] = entry["result"].replace("kept-eligible", "KEPT")
                 body = cand
                 accepted = cand.id
+                if cfg.research:  # the notes the kept change cites earn their credit
+                    entry["credited"] = RS.credit(notebook, json.dumps(entry.get("proposal", {})))
             for e in trials:
                 if e.get("result", "").startswith("kept-eligible"):
                     e["result"] = e["result"].replace("kept-eligible", "not kept (another proposal gained more)")
@@ -545,7 +564,9 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                 "tokens_out": sum(c.get("tokens_out", 0) for c in getattr(proposer, "calls", []) or []),
                 "usd_list_price": round(sum(c.get("usd_list_price", 0.0) for c in getattr(proposer, "calls", []) or []), 3)},
     }
-    if cfg.tools:
+    if cfg.research:
+        summary["research"] = RS.summary(out / "research.jsonl")
+    if cfg.tools or cfg.research:
         from sea.evolve.tools import summary as tool_summary
 
         summary["tools"] = tool_summary(out / "tool_calls.jsonl")

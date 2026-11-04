@@ -64,6 +64,7 @@ class PlanClaude:
         self._checked = False
         self.calls: list[dict[str, Any]] = []
         self.tools: tuple[Path, Path] | None = None  # the loop sets (context, log) each iteration when tools are on
+        self.research: Path | None = None  # the loop sets the guard's settings file when research is on (D-090)
 
     def flags(self) -> list[str]:
         """The CLI's flags: no tools at all, or the ``sea`` tool server over this iteration's context."""
@@ -78,7 +79,15 @@ class PlanClaude:
         cfg.write_text(json.dumps({"mcpServers": {"sea": {
             "command": sys.executable, "args": ["-m", "sea.evolve.tools", "--context", str(ctx.resolve()),
                                                 "--log", str(log.resolve())]}}}))
-        return [*TOOL_FLAGS, "--mcp-config", str(cfg.resolve()), "--allowedTools", ",".join(f"mcp__sea__{n}" for n in NAMES)]
+        allowed = [f"mcp__sea__{n}" for n in NAMES]
+        flags = [*TOOL_FLAGS, "--mcp-config", str(cfg.resolve())]
+        if self.research is not None:  # search and fetch, each passing the guard's hooks (D-090)
+            from sea.evolve.research import TOOLS
+
+            allowed += TOOLS
+            flags[flags.index("--tools") + 1] = ",".join(TOOLS)
+            flags += ["--settings", str(self.research.resolve())]
+        return [*flags, "--allowedTools", ",".join(allowed)]
 
     def _exec(self, args: list[str], stdin: str | None = None) -> subprocess.CompletedProcess:
         binary = find_claude()

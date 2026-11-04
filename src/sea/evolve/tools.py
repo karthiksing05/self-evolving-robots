@@ -32,7 +32,7 @@ from pydantic import BaseModel, ConfigDict, ValidationError
 from sea.evolve.core import Body, Proposal, Requirement, World
 from sea.evolve.resources import Spent
 
-NAMES = ("check", "measure", "read", "sweep", "sensitivity", "facts", "module", "simulate")
+NAMES = ("check", "measure", "read", "sweep", "sensitivity", "facts", "module", "simulate", "note")
 CALLS, SIMS = 40, 3  # per iteration
 SWEEP_VALUES, SWEEP_READINGS = 12, 6
 SENSITIVITY_PARAMS = 12
@@ -55,6 +55,9 @@ class Context(BaseModel):
     sims: int = SIMS
     requirements: list[Requirement] = []  # System 2's list (D-089)
     held: list[str] = []
+    notebook: str = ""  # the engineering notebook (D-090), with this run's research log and name
+    research_log: str = ""
+    run: str = ""
 
 
 class ToolError(Exception):
@@ -101,6 +104,9 @@ def specs() -> list[dict[str, Any]]:
              "another (a coupling).", draft, ["proposal"]),
         tool("facts", "A train task's numbers by name (an object's size and mass, a route's features, a target).",
              {"task": {"type": "string"}}, ["task"]),
+        tool("note", "Record a finding from your research in the engineering notebook, with the page you read it "
+             "on: it outlives this run, and a kept change that cites its id credits it.  Returns its id.",
+             {k: v for k, v in _note_schema().items()}, ["claim", "source_url"]),
         tool("module", "A module's graph at the given parameters (lengths in metres), to write a patch against.",
              {"name": {"type": "string"}, "params": {"type": "object", "additionalProperties": {"type": "number"}}},
              ["name"]),
@@ -317,6 +323,19 @@ class Server:
         t = self.tasks[task]
         return f"{task} ({t.group}): {t.facts}\n" + ", ".join(f"{k} = {v:g}" for k, v in I.facts(self.world, t).items())
 
+    def _note(self, args: dict[str, Any]) -> str:
+        from sea.evolve import research as RS
+
+        if not self.ctx.notebook:
+            raise ToolError("research is off in this run: there is no notebook")
+        try:
+            note = RS.Note.model_validate({k: v for k, v in args.items() if k in _note_schema()})
+            kept = RS.add(Path(self.ctx.notebook), note, RS.read_urls(Path(self.ctx.research_log)), self.ctx.world,
+                          self.ctx.run, self.ctx.iteration)
+        except ValueError as exc:
+            raise ToolError(f"not recorded: {str(exc)[:400]}") from exc
+        return f"recorded as {kept.id}"
+
     def _module(self, args: dict[str, Any]) -> str:
         if not hasattr(self.world, "modules_text"):
             raise ToolError("this world has no modules")
@@ -382,6 +401,13 @@ class Server:
             if out is not None:
                 tx.write(json.dumps(out) + "\n")
                 tx.flush()
+
+
+def _note_schema() -> dict[str, Any]:
+    from sea.evolve.research import Note
+
+    props = Note.model_json_schema()["properties"]
+    return {k: v for k, v in props.items() if k in ("claim", "source_url", "quote", "numbers", "validity", "applies_to")}
 
 
 def _argtext(r: dict[str, Any]) -> str:

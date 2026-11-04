@@ -2834,3 +2834,35 @@ LLM-written requirement lists leave most needs out (Massoudi and Fuge 2025 measu
 - **In the loop,** with the switch on, the first prompt shows the empty list's line and the second the measured list. A trial records the rows it moved (R1 −0.25 → −0.15), and the list is written to `requirements.json`. With the switch off, the prompt has no section.
 - **Sensitivity** finds the planted coupling: lengthening the stick helps reach and hurts "the tip stays low", and shortening it does the reverse. `measure` shows the draft's value beside the current body's.
 - **Tests:** 33 passed across the tools, requirements, loop and fingerprint tests.
+
+## D-090 System 2 researches what it needs and keeps an engineering notebook (judge: a world's blocked topics; policy: research, tools, loop, prompt; F3 of the general framework)
+
+**Why.** The general framework gives System 2 the knowledge side of design, so the harness must give it a way to *acquire* knowledge as an engineer does: read handbooks, datasheets and papers, then write down what it found and where. The world must never carry that knowledge in its place (the user, 2026-11-04: "part of our harness should encode conducting appropriate research"). ME 2110 is a benchmark of the harness, so pages about that course or this brief must stay out of reach. Otherwise the score would measure retrieval of past teams' solutions.
+
+**Change.**
+- **Search and fetch.** With `RunConfig.research` on, System 2's call also has the CLI's `WebSearch` and `WebFetch`.
+- **A guard on every search and fetch** (`evolve/research.py`). A `PreToolUse` hook passed through `--settings`:
+  - refuses a query, URL or fetch prompt that matches the world's `research_blocked` patterns (ME 2110 declares the course, its title and the brief's distinctive terms; other worlds declare none);
+  - refuses calls beyond this iteration's research budget;
+  - logs every call, allowed or refused, to `research.jsonl`.
+
+  A `PostToolUse` hook records the URLs each call returned or read.
+- **The notebook.** A `note` tool on the `sea` server records a finding in a persistent notebook (`library/notebook.jsonl` by default): its claim, its source URL, a quote, its numbers, the range where it holds, and what it applies to.
+  - A note must cite a URL this run actually searched or fetched; a citation it never read is refused.
+  - Each note keeps its provenance: world, run and iteration. Notes carry over to later runs and other worlds.
+- **Credit.** The prompt shows the notebook, most credited first. A kept change whose proposal cites a note's id credits that note.
+
+**Prediction** (before the code):
+- with research off, every run reproduces exactly;
+- the guard refuses planted course queries and URLs, and passes ordinary engineering ones;
+- the budget stops the next call;
+- a note citing an unread URL is refused;
+- the notebook persists across runs, and a kept citation earns credit;
+- a live smoke test with the real CLI confirms the hook blocks, and that WebSearch works under the plan login.
+
+**Measured.**
+- **The first live smoke test failed, and that was the finding.** The blocked search ran. A malformed test config had crashed the hook, and the CLI blocks a call only on exit code 2, so the guard failed open. It now fails closed: any failure in the pre hook refuses the call (tested by running it with a missing config).
+- **Live, with the real CLI on the plan login:** "ME 2110 Georgia Tech final project" was refused and the model saw the reason; "LM3UU linear bushing dynamic load rating" ran, and its 10 URLs were logged for citation. `--settings` hooks do run under `--setting-sources ""`.
+- **Guard tests** (`tests/test_research.py`): 9 planted course queries and URLs refused (including `me2110`, `ME-2110`, the course's title, the brief's terms), and 5 engineering queries passed (including "how to sort coins by size mechanism": the guard blocks the course, not the engineering). The budget stops the next call.
+- **Notebook tests:** a note citing an unread page is refused. The same finding from a later run is recorded once. A kept proposal citing a note's id credits it, and another run's prompt shows the note.
+- **A known limit:** a hook cannot edit what a search returned, so an innocent query can still surface course pages in its results. The post hook counts these as `leaks` in each iteration's record, and F9 reports the count.
