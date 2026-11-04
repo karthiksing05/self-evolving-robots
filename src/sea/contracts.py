@@ -156,6 +156,7 @@ class ArmSpec(_Model):
     riser_m: float = 0.0
     base_pitch_rad: float = 0.0
     servo_voltage: dict[str, Literal[7.4, 12.0]] = {j: 7.4 for j in ARM_JOINTS}
+    wrist_roll_range: tuple[float, float] | None = None  # rad: the roll joint limited to what the grasps need (D-085)
 
 
 class BuildEstimate(_Model):

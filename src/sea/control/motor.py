@@ -511,18 +511,13 @@ def pick_depth(spec, past_equator: float = 5 * MM) -> float:
     return min(17 * MM, hgt - STOCK_TIP_EXT - PICK_TABLE_CLEAR)
 
 
-def grasp(ep: Episode, cid: str, depth: float | None = None, side: float = PICK_SIDE, close: float = GRIP_CLOSED,
-          close_s: float = 0.6, lift: float = 0.05, hold_s: float = 1.2, speed: float = 0.03) -> Gen:
-    """Pick a free object from above with the stock jaws: open, descend beside it with the fixed jaw
-    ``side`` clear, close toward ``close`` (the servo stalls on the object first), lift by ``lift`` and
-    hold for ``hold_s``.  ``depth`` is how far below the object's top the tool point goes.  Returns
-    False if the descent lands on something (the opening does not fit) or a tool is mounted."""
-    h = ep.sim.controls[cid]
-    if h.spec.cls != "grasp" or ep.sim.mounted is not None:
-        return False
-    w, hgt = h.spec.size_mm[0] * MM, h.spec.size_mm[1] * MM
-    depth = pick_depth(h.spec) if depth is None else depth
-    fing = ep.sim.design.fingers
+def grasp_poses(spec, fing, contact: np.ndarray, down: np.ndarray, roll: np.ndarray, depth: float | None = None,
+                side: float = PICK_SIDE) -> tuple[np.ndarray, np.ndarray, float, float, float]:
+    """Where ``grasp`` takes the tool point for an object ``spec`` at ``contact``, approached along ``down`` with
+    the jaws closing along ``roll``: the grip, the point above it the jaws come down from, the opening, the depth
+    below the top and how far the jaws reach below the tool point (D-085: the world reads the roll these need)."""
+    w, hgt = spec.size_mm[0] * MM, spec.size_mm[1] * MM
+    depth = pick_depth(spec) if depth is None else depth
     if fingers.is_stock(fing):
         depth = min(depth, hgt - STOCK_TIP_EXT - PICK_TABLE_CLEAR)
         face, opening, below = 0.0, PICK_OPEN, STOCK_TIP_EXT
@@ -533,13 +528,27 @@ def grasp(ep: Episode, cid: str, depth: float | None = None, side: float = PICK_
         q_open = fingers.opening_for(fing, w + 2 * side + PICK_CLEAR)
         opening = max(PICK_OPEN, q_open if q_open is not None else fingers.q_range(fing)[1])
         below = fingers.below_tool(fing, opening)
+    target = contact + roll * (w / 2 + side + face) + down * depth
+    above = target - down * max(0.04, depth + below + PICK_CLEAR)  # the lowest jaw part comes down from over the top (D-065)
+    return target, above, opening, depth, below
+
+
+def grasp(ep: Episode, cid: str, depth: float | None = None, side: float = PICK_SIDE, close: float = GRIP_CLOSED,
+          close_s: float = 0.6, lift: float = 0.05, hold_s: float = 1.2, speed: float = 0.03) -> Gen:
+    """Pick a free object from above with the stock jaws: open, descend beside it with the fixed jaw
+    ``side`` clear, close toward ``close`` (the servo stalls on the object first), lift by ``lift`` and
+    hold for ``hold_s``.  ``depth`` is how far below the object's top the tool point goes.  Returns
+    False if the descent lands on something (the opening does not fit) or a tool is mounted."""
+    h = ep.sim.controls[cid]
+    if h.spec.cls != "grasp" or ep.sim.mounted is not None:
+        return False
     down = ep.approach_dir(cid)
     roll = ep.sim.ctl_dir_world(cid, h.geo.roll_ctl)
-    target = ep.contact_point(cid) + roll * (w / 2 + side + face) + down * depth
+    target, above, opening, depth, below = grasp_poses(h.spec, ep.sim.design.fingers, ep.contact_point(cid), down,
+                                                       roll, depth, side)
     v = min(speed, ep.cfg.limits.max_tip_speed_mps)
     ep.axis_ref, ep.roll_ref = down, roll  # type: ignore[attr-defined]
     yield from ep.set_gripper(opening, 0.3)
-    above = target - down * max(0.04, depth + below + PICK_CLEAR)  # the lowest jaw part comes down from over the top (D-065)
     clip = float((ep.tip_cmd - ep.contact_point(cid)) @ down) + below + PICK_CLEAR
     if clip > 0:  # the jaws would pass lower than the object's top: rise to the approach height first
         yield from ep.move_to(ep.tip_cmd - down * max(0.0, float((ep.tip_cmd - above) @ down)), down, None, roll)

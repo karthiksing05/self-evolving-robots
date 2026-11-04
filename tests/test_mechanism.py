@@ -163,13 +163,25 @@ def test_the_slide_follows_its_pinion_and_carries_the_finger_and_pads():
         assert at == pytest.approx(F.moving_to_gripper(q, tip, spec), abs=1e-6)  # the facts' finger is the simulated one
 
 
-def test_the_mechanism_laws_refuse_what_cannot_be_assembled_and_pass_what_can():
+def _whole_roll(monkeypatch, request):
+    """The wrist's whole joint range, as before D-085; geometry swept over it is dropped when the test ends."""
+    from sea.mechanism import gripper as MG
+    from sea.worlds import gripper as W
+
+    monkeypatch.setattr(W, "roll_range", lambda fingers: None)
+    MG._CACHE.clear()
+    request.addfinalizer(MG._CACHE.clear)
+
+
+def test_the_mechanism_laws_refuse_what_cannot_be_assembled_and_pass_what_can(monkeypatch, request):
     """D-059: GripperWorld.check refuses a body whose jaw breaks a mechanism law, naming the parts and the
     numbers; each refusal has a twin that passes."""
     world = GripperWorld()
+    assert world.check(_jaw(world, "prismatic", pinion_teeth=44)) == []  # D-085: clear over the roll grasps need
     assert world.check(world.stock()) == []
     assert world.check(_jaw(world, "parallelogram", link_mm=89.136)) == []
     assert world.check(_jaw(world, "prismatic", pinion_teeth=40)) == []
+    _whole_roll(monkeypatch, request)
     wrist = world.check(_jaw(world, "prismatic", pinion_teeth=44))  # a pinion 46 mm across reaches the rolled wrist
     assert len(wrist) == 1 and "the wrist and the pinion share material" in wrist[0] and "wrist rolled" in wrist[0]
     b021 = "\n".join(world.check(_jaw(world, "prismatic", pinion_teeth=112)))
@@ -178,9 +190,10 @@ def test_the_mechanism_laws_refuse_what_cannot_be_assembled_and_pass_what_can():
     assert "mechanism law (carried): the carriage" in b021
 
 
-def test_the_long_slide_passes_the_laws_up_to_the_wrist_and_opens_past_the_mustard_bottle():
+def test_the_long_slide_passes_the_laws_up_to_the_wrist_and_opens_past_the_mustard_bottle(monkeypatch, request):
     """D-064: a gear sector clears what a whole pinion of its size hits.  At 47 mm it passes every law and
-    opens 98 mm with the fingertip level; at 50 mm the sector meets the rolled wrist, named with its numbers."""
+    opens 98 mm with the fingertip level; at 50 mm the sector meets the wrist rolled past -2.13 rad, which no grasp
+    needs (D-085): it passes within the roll the grasps need, and is named with its numbers over the whole range."""
     from sea.design import fingers as F
     from sea.worlds.gripper import to_design
 
@@ -192,6 +205,8 @@ def test_the_long_slide_passes_the_laws_up_to_the_wrist_and_opens_past_the_musta
     hi = F.Q_RANGES["prismatic"][1]
     assert F.fingertips(f, hi)[0] * 1000 == pytest.approx(98, abs=1.5)
     assert abs(F.fingertips(f, hi)[1] * 1000) < 3  # neither turns nor rises
+    assert world.check(_jaw(world, "long_slide", sector_radius_mm=50)) == []
+    _whole_roll(monkeypatch, request)
     wrist = world.check(_jaw(world, "long_slide", sector_radius_mm=50))
     assert len(wrist) == 1 and "the wrist and the pinion share material" in wrist[0] and "wrist rolled" in wrist[0]
     assert {"steel_rod_3x150", "lm3uu_bearing"} <= {b.item for b in world.bom(long47)}

@@ -562,6 +562,8 @@ def build_model(design: Design, panel: PanelSpec | None = None, tools: list | No
     ``contact, parts, mass_g, tip`` (and optional ``friction, solref, solimp``), one per rack slot.
     ``table_z`` adds a table whose top is at that height under the workspace."""
     spec = mujoco.MjSpec.from_file(str(mjcf_path))
+    if design.arm.wrist_roll_range is not None:  # the servo's limits, set to what the body's grasps need (D-085)
+        spec.joint("wrist_roll").range = list(design.arm.wrist_roll_range)
     spec.option.timestep = TIMESTEP
     spec.option.integrator = mujoco.mjtIntegrator.mjINT_IMPLICITFAST
     spec.option.cone = mujoco.mjtCone.mjCONE_ELLIPTIC

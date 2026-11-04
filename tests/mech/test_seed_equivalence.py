@@ -5,10 +5,13 @@ from __future__ import annotations
 
 import json
 import sys
+from functools import lru_cache
 from pathlib import Path
 
 import numpy as np
 import pytest
+
+pytestmark = pytest.mark.usefixtures("full_roll")  # D-085: the builders knew no roll limit
 
 sys.path.insert(0, str(Path(__file__).parent))
 from capture_jaws import OUT, capture  # noqa: E402
@@ -38,8 +41,10 @@ def _close(a, b, path: str, errs: list[str], tol: float = 1e-6) -> None:
 @pytest.mark.parametrize("key", sorted(GOLD))
 def test_the_graph_compiles_the_jaw_the_builders_made(key):
     errs: list[str] = []
-    _close(GOLD[key], json.loads(json.dumps(_NOW[key])), key, errs)
+    _close(GOLD[key], json.loads(json.dumps(_now()[key])), key, errs)
     assert not errs, "\n".join(errs[:20])
 
 
-_NOW = capture()
+@lru_cache(maxsize=1)
+def _now() -> dict:
+    return capture()  # inside a test, so under ``full_roll``

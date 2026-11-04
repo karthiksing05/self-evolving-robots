@@ -8,6 +8,8 @@ from pathlib import Path
 
 import pytest
 
+pytestmark = pytest.mark.usefixtures("full_roll")  # D-085: the builders knew no roll limit
+
 sys.path.insert(0, str(Path(__file__).parent))
 from capture_laws import OUT, bodies  # noqa: E402
 

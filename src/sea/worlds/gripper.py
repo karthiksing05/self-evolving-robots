@@ -70,8 +70,68 @@ def to_design(body: Body) -> Design:
     if pads.type == "pads":
         kw.update({k: float(v) for k, v in pads.params.items()})
     volts = {j: (12.0 if servos.type == "servos_12v" and j in LIFT_JOINTS else 7.4) for j in ARM_JOINTS}
-    return Design(id=body.key(), fingers=FingerSpec(**kw), arm=ArmSpec(servo_voltage=volts),  # type: ignore[arg-type]
+    fingers = FingerSpec(**kw)  # type: ignore[arg-type]
+    return Design(id=body.key(), fingers=fingers, arm=ArmSpec(servo_voltage=volts, wrist_roll_range=roll_range(fingers)),
                   sensors=SensorSuite(jaw_pads=True))
+
+
+ROLL_MARGIN = 0.2  # rad beyond the rolls the grasp poses need: the arm tracks between them (measured 0.02 over)
+
+
+@lru_cache(maxsize=1)
+def _grasp_scenes() -> tuple:
+    """Every task's object as the grasp sees it: its spec, the contact point, the approach and the direction the
+    jaws close along (world frame).  The scene does not depend on the body."""
+    from sea.compose.library import Library
+    from sea.contracts import StepTrace
+    from sea.control.executor import Episode
+    from sea.design.build import build
+    from sea.sim.env import PanelRunner, SuiteConfig
+
+    w = GripperWorld()
+    built = build(Design(id="scene"), _limits())
+    cfg = SuiteConfig(design=built.design, tools=built.tools, library=Library.seed(), limits=_limits(), seed=0)
+    out = []
+    for t in w.tasks():
+        panel = PanelSpec.model_validate(t.data["panel"])
+        ctl = panel.controls[0]
+        r = PanelRunner(panel, cfg, 0)
+        ep = Episode(r.sim, ctl.id, r.config(ctl), StepTrace(panel_id=panel.id, control_id=ctl.id, program_id="", attempt=0))
+        h = r.sim.controls[ctl.id]
+        out.append((h.spec, ep.contact_point(ctl.id), ep.approach_dir(ctl.id), r.sim.ctl_dir_world(ctl.id, h.geo.roll_ctl)))
+    return tuple(out)
+
+
+@lru_cache(maxsize=256)
+def roll_range(fingers: FingerSpec) -> tuple[float, float]:
+    """The wrist roll this body's grasps need (D-085): over every task, the IK's roll at the poses ``motor.grasp``
+    commands (above the object, at the grip, lifted), from the home pose (roll 0), widened by ``ROLL_MARGIN`` and
+    kept inside the joint's limits."""
+    from sea.control.executor import HOME_Q, stock_ik
+    from sea.control.motor import grasp_poses
+
+    ik = stock_ik()
+    lo, hi = 0.0, 0.0
+    for spec, contact, down, roll in _grasp_scenes():
+        target, above, _, _, _ = grasp_poses(spec, fingers, contact, down, roll)
+        q = HOME_Q.copy()
+        for p in (above, target, target - down * 0.05):
+            q, _, _ = ik.track(p, down, q, roll_axis=roll)
+            lo, hi = min(lo, float(q[4])), max(hi, float(q[4]))
+    j_lo, j_hi = ik_joint_range("wrist_roll")
+    return max(j_lo, lo - ROLL_MARGIN), min(j_hi, hi + ROLL_MARGIN)
+
+
+@lru_cache(maxsize=1)
+def _stock_joint_ranges() -> dict[str, tuple[float, float]]:
+    from sea.control.frames import STOCK_MJCF
+
+    m = mujoco.MjModel.from_xml_path(str(STOCK_MJCF))
+    return {n: tuple(float(x) for x in m.jnt_range[m.joint(n).id]) for n in ARM_JOINTS}
+
+
+def ik_joint_range(name: str) -> tuple[float, float]:
+    return _stock_joint_ranges()[name]
 
 
 # ---------------------------------------------------------------- mechanism diagnosis

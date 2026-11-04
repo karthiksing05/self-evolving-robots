@@ -2675,3 +2675,16 @@ Against the prediction:
 - golden verdicts are unchanged, since no pick rolls outside the range;
 - the law's output changes only where a part met the wrist beyond the range: the catalogue's 50 mm long slide no longer meets the rolled wrist (the D-078 law equivalence test is re-recorded for that body, and the change is listed);
 - the trimmed and full 50 mm sectors System 2 wrote in `gripper_c1c` pass the interference law, unless something else stops them.
+
+**Measured.**
+- **The stock body's range is −2.13 to +0.20 rad**, as predicted. Each body's range comes from its own grasp poses: a 33° pad with 12 mm reach gives −2.16. The scenes take 6 s to build once per process, then 0.14 s per body.
+- **The simulator's wrist joint takes that range**, and the interference law's sweep follows it, because it reads the model's joint range.
+- **Of the D-078 law goldens, two change, both as predicted:** the catalogue's 50 mm long slide and its 60-tooth pinion jaw no longer meet the rolled wrist. Both met it only at −2.74 rad. The D-078 gates (graph against the deleted builders) now run at the joint's whole range, under a fixture, so their goldens stand unchanged and they still test what they were for. `tests/mech/test_roll_range.py` tests the limit.
+- **The five `gripper_c1c` mechanisms refused for the wrist, re-checked:**
+  - 2 now pass;
+  - 1 is refused by another fault (its clamp bracket and the pinion share 7 mm);
+  - 2 still meet the wrist inside their range (0.7 × 0.3 × 0.2 mm at −2.13 rad, and 3.1 × 3.4 × 1.5 mm at −2.15 rad, within the margin), so they stay refused.
+
+  The prediction "pass unless something else stops them" holds for 3 of 5. The other two meet the wrist within what the grasps need plus the margin.
+- **`motor.grasp`'s poses are now one function** (`grasp_poses`), used by the grasp and by the range.
+- **Full suite:** 741 passed, 2 skipped, 1 xfailed. Two D-059/D-064 tests that asserted the wrist refusal now check both sides: the body passes within the roll the grasps need, and is refused over the joint's whole range.
