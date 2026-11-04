@@ -236,6 +236,65 @@ def rod_stiffness(a: float) -> tuple[float, float]:
     return 2 * 12 * ROD_EI / a**3, 2 * 4 * ROD_EI / a
 
 
+def _beam(n: float) -> np.ndarray:
+    """A rod segment of length ``n`` as a beam element: (deflection, slope) at both of its ends."""
+    return ROD_EI / n**3 * np.array([[12, 6 * n, -12, 6 * n], [6 * n, 4 * n * n, -6 * n, 2 * n * n],
+                                     [-12, -6 * n, 12, -6 * n], [6 * n, 2 * n * n, -6 * n, 4 * n * n]])
+
+
+def guide_beam(xs: tuple[float, ...], bs: tuple[float, ...], span: float | None) -> tuple[np.ndarray, np.ndarray]:
+    """Two rods clamped at x = 0 (and at ``span`` if held there too), each sleeved by bushings at ``xs`` from the
+    clamp (sorted, apart), the bushings ``bs`` along the rods from the carriage's middle (D-080).  The rigid
+    carriage sets every bushing's deflection and slope from its own (v, t) at its middle.  Returns the
+    carriage's stiffness (2 x 2, both rods) and the map from (v, t) to each bushing's force and couple on one rod
+    (2n x 2).  One bushing on cantilevers gives D-076's 2 EI / a^3 [[12, -6a], [-6a, 4a^2]]."""
+    pts = [0.0, *xs, *([span] if span is not None else [])]
+    n = len(pts)
+    k = np.zeros((2 * n, 2 * n))
+    for i in range(n - 1):
+        idx = np.arange(2 * i, 2 * i + 4)
+        k[np.ix_(idx, idx)] += _beam(pts[i + 1] - pts[i])
+    free = slice(2, 2 * (len(xs) + 1))
+    k = k[free, free]
+    b = np.zeros((2 * len(xs), 2))
+    for i, off in enumerate(bs):
+        b[2 * i], b[2 * i + 1] = (1.0, off), (0.0, 1.0)
+    return 2 * b.T @ k @ b, k @ b
+
+
+def bushing_overhangs(centre: float, s: float, clamp: float, bs: tuple[float, ...],
+                      far: float | None) -> tuple[float, ...]:
+    """Each bushing's distance from the clamp at slide travel ``s``, kept a half bushing clear of each clamp and a
+    bushing apart (where a carriage would meet them, the interference law sees it)."""
+    out: list[float] = []
+    for off in sorted(bs):
+        a = max(centre + s + off - BUSHING_LEN / 2 - clamp, BUSHING_LEN / 2, (out[-1] + BUSHING_LEN) if out else 0.0)
+        out.append(a)
+    if far is not None:
+        span = far - clamp
+        out = [min(a, span - BUSHING_LEN / 2 - (len(out) - 1 - i) * BUSHING_LEN) for i, a in enumerate(out)]
+    return tuple(out)
+
+
+def guide_static(clamp: float, centre: float, bs: tuple[float, ...], far: float | None, s: float, sep: float,
+                 dx: float, pitch: float, yaw: float) -> tuple[float, float, float]:
+    """A guide loaded statically at travel ``s``: the teeth's separating force ``sep`` at ``dx`` from the
+    carriage's middle and the squeeze's couples about y (``pitch``) and z (``yaw``), worst sign.  Returns the
+    nearest bushing's overhang (m), the rack's lift off the gear (m) and the most loaded bushing's load (N)."""
+    xs = bushing_overhangs(centre, s, clamp, bs, far)
+    kc, kb = guide_beam(xs, tuple(sorted(bs)), None if far is None else far - clamp)
+    lift, worst = 0.0, 0.0
+    for sign in (-1.0, 1.0):
+        u = np.linalg.solve(kc, [-sep, -sep * dx + sign * pitch])
+        w = np.linalg.solve(kc, [0.0, yaw])
+        lift = max(lift, -(u[0] + u[1] * dx))
+        fz, fy = kb @ u, kb @ w
+        for i in range(len(xs)):
+            worst = max(worst, math.hypot(abs(fz[2 * i]) + abs(fz[2 * i + 1]) / BUSHING_LEN,
+                                          abs(fy[2 * i]) + abs(fy[2 * i + 1]) / BUSHING_LEN))
+    return xs[0], lift, worst
+
+
 def rack_lift_mm(r_pitch: float, sector: bool, q: float, q_hi: float, torque: float) -> tuple[float, float, float]:
     """A slide at jaw angle ``q`` with the servo at ``torque``, statically, as ``RodSprings`` loads it in the
     simulator (D-076): the rods' overhang (mm), how far the rack lifts off the gear (mm) under the teeth's
@@ -275,6 +334,12 @@ class RodSprings:
 
     def __init__(self, model: mujoco.MjModel):
         self.clamp, self.centre, self.module, self.mesh_x = (float(x) for x in model.numeric("jaw_rods").data)
+        # a built guide's rods held at both ends or several bushings (D-080): far end (nan: cantilevered), the
+        # rods' free end, then each bushing's offset from the carriage's middle
+        self.beam = None
+        if any(model.numeric(i).name == "jaw_guide" for i in range(model.nnumeric)):
+            far, end, *bs = (float(x) for x in model.numeric("jaw_guide").data)
+            self.beam = (None if math.isnan(far) else far, end, tuple(sorted(bs)))
         self.q = [int(model.jnt_qposadr[model.joint(n).id]) for n in self.JOINTS]
         self.v = [int(model.jnt_dofadr[model.joint(n).id]) for n in self.JOINTS]
         self.slide = int(model.jnt_qposadr[model.joint("jaw_slide").id])
@@ -287,6 +352,7 @@ class RodSprings:
         self.lift_mm = 0.0
         self.bushing_n = 0.0
         self.at_mm = 0.0
+        self.off_end_mm = 0.0  # how far a bushing ran past the rods' free end
         self._recent: list[tuple[float, float, float]] = []  # (lift mm, bushing N, overhang mm) per step
 
     def overhang(self, s: float) -> float:
@@ -295,13 +361,28 @@ class RodSprings:
     def apply(self, d: mujoco.MjData) -> None:
         s = float(d.qpos[self.slide])
         a = self.overhang(s)
-        c = 2 * ROD_EI / a**3
         load = []
-        for k in (0, 2):  # (dy, yaw), then (dz, pitch)
-            v, t = float(d.qpos[self.q[k]]), float(d.qpos[self.q[k + 1]])
-            f, m = c * (12 * v - 6 * a * t), c * (-6 * a * v + 4 * a * a * t)
-            d.qfrc_applied[self.v[k]], d.qfrc_applied[self.v[k + 1]] = -f, -m
-            load.append(abs(f) / 2 + abs(m) / 2 / BUSHING_LEN)  # per rod: its share, and the couple across a bushing
+        if self.beam is None:
+            c = 2 * ROD_EI / a**3
+            for k in (0, 2):  # (dy, yaw), then (dz, pitch)
+                v, t = float(d.qpos[self.q[k]]), float(d.qpos[self.q[k + 1]])
+                f, m = c * (12 * v - 6 * a * t), c * (-6 * a * v + 4 * a * a * t)
+                d.qfrc_applied[self.v[k]], d.qfrc_applied[self.v[k + 1]] = -f, -m
+                load.append(abs(f) / 2 + abs(m) / 2 / BUSHING_LEN)  # per rod: its share, and the couple across a bushing
+        else:  # the rods as beams through every bushing (D-080)
+            far, end, bs = self.beam
+            xs = bushing_overhangs(self.centre, s, self.clamp, bs, far)
+            a = xs[0]
+            kc, kb = guide_beam(xs, bs, None if far is None else far - self.clamp)
+            per = []
+            for k in (0, 2):
+                u = np.array([float(d.qpos[self.q[k]]), float(d.qpos[self.q[k + 1]])])
+                f, m = kc @ u
+                d.qfrc_applied[self.v[k]], d.qfrc_applied[self.v[k + 1]] = -f, -m
+                per.append(kb @ u)
+            load = [max(math.hypot(abs(per[0][2 * i]) + abs(per[0][2 * i + 1]) / BUSHING_LEN,
+                                   abs(per[1][2 * i]) + abs(per[1][2 * i + 1]) / BUSHING_LEN) for i in range(len(xs))), 0.0]
+            self.off_end_mm = max(self.off_end_mm, (self.centre + s + bs[-1] + BUSHING_LEN / 2 - end) * 1000)
         rows = (d.efc_type[: d.nefc] == mujoco.mjtConstraint.mjCNSTR_EQUALITY) & (d.efc_id[: d.nefc] == self.eq)
         f_t = float(np.abs(d.efc_force[: d.nefc][rows]).sum()) if d.nefc else 0.0
         dx = self.mesh_x - (self.centre + s)  # the mesh, from the carriage's centre (pitch turns about it)
@@ -317,6 +398,9 @@ class RodSprings:
             self.bushing_n = max(self.bushing_n, min(r[1] for r in self._recent))
 
     def broken(self) -> str:
+        if self.off_end_mm > 0:
+            return (f"unphysical: a bushing ran {self.off_end_mm:.0f} mm past the rods' free end; the carriage "
+                    "leaves its rods")
         if self.lift_mm > TOOTH_SKIP * self.module * 1000:
             return (f"unphysical: the rods let the rack lift {self.lift_mm:.1f} mm off the gear ({self.at_mm:.0f} mm "
                     f"out from the clamp); past {TOOTH_SKIP * self.module * 1000:.1f} mm the teeth skip")

@@ -396,7 +396,8 @@ class GripperWorld:
                "horn body: its own hinge joint 'gripper' is the servo; x toward the fixed jaw at q = 0, z along the "
                f"hinge; origin on the hinge at gripper {[round(float(v), 4) for v in J.HINGE]}).  New bodies hang from "
                "either with their own joints; loops and meshes tie them to the servo.  The body carrying the blade is "
-               "the finger: pads mount on it.  Guides hold one bushing per rod, at the carriage's middle.",
+               "the finger: pads mount on it.  A guide's rods bend as beams: clamped at clamp_end, and at far_end too when a "
+               "clamp part holds them there; the carriage rides two LM3UU per bushing offset.",
                "Part kinds, then a body's, joint's and constraint's fields:", *kinds, (patch_doc or "").strip(), "Modules (a patch applies to the module's graph):"]
         for name, (_, params) in MODULES.items():
             mid = {k: (lo + hi) / 2 for k, (lo, hi) in params.items()}
@@ -592,11 +593,51 @@ def _built_errors(mechanism: str) -> list[str]:
         return [f"the mechanism does not compile: {str(exc)[:300]}"]
     if not any(isinstance(p, Blade) for b in g.bodies for p in b.parts):
         return ["the mechanism carries no finger: put the blade on the body that should hold the object"]
+    for gd in g.guides:
+        errs = _guide_errors(g, gd)
+        if errs:
+            return errs
     worst, at = closes(g)
     if worst > CLOSE_TOL:
         return [f"the mechanism's loops do not close: {worst * 1000:.2f} mm (or mrad) apart at servo {at:.2f} rad; "
                 f"the linkage jams before the servo's range ends ({finger_body(g)[0]} carries the finger)"]
     return []
+
+
+def _guide_errors(g, gd) -> list[str]:
+    """A built guide must be buildable as drawn (D-080): bushings a bushing's length apart, two LM3UU on the
+    carriage per bushing offset, and rods held at a far end only by a clamp there."""
+    from sea.mech.graph import Bought, Box, Bracket, Cylinder
+    from sea.sim import jaws
+
+    out = []
+    bs = sorted(gd.bushings)
+    if any(b1 - b0 < jaws.BUSHING_LEN - 1e-9 for b0, b1 in zip(bs, bs[1:], strict=False)):
+        out.append(f"the guide's bushings at {[round(b * 1000, 1) for b in bs]} mm overlap: an LM3UU is "
+                   f"{jaws.BUSHING_LEN * 1000:g} mm long")
+    car = next((b for b in g.bodies if b.name == gd.carriage), None)
+    n = sum(isinstance(p, Bought) and p.item == "lm3uu" for p in (car.parts if car else ()))
+    if n != 2 * len(bs):
+        out.append(f"the carriage carries {n} LM3UU bushings; {len(bs)} offset(s) on two rods need {2 * len(bs)}")
+    if gd.far_end is not None:
+        if gd.far_end <= gd.clamp_end + 2 * jaws.BUSHING_LEN:
+            out.append(f"the guide's far end ({gd.far_end * 1000:.1f} mm) must lie beyond its clamp "
+                       f"({gd.clamp_end * 1000:.1f} mm) by at least two bushings")
+        grip = next((b for b in g.bodies if b.name == "gripper"), None)
+
+        def spans(p) -> bool:
+            if isinstance(p, Box) and p.role == "clamp":
+                return p.pos[0] - p.half[0] - 1e-3 <= gd.far_end <= p.pos[0] + p.half[0] + 1e-3
+            if isinstance(p, Cylinder) and p.role == "clamp":
+                return abs(p.pos[0] - gd.far_end) <= p.radius + 1e-3
+            if isinstance(p, Bracket) and p.role == "clamp":
+                return p.x[0] - 1e-3 <= gd.far_end <= p.x[1] + 1e-3
+            return False
+
+        if not any(spans(p) for p in (grip.parts if grip else ())):
+            out.append(f"nothing holds the rods' far end at x = {gd.far_end * 1000:.1f} mm: a part with role "
+                       "'clamp' on the gripper must span it")
+    return out
 
 
 def _built_bom(mechanism: str) -> list[BomLine]:
@@ -638,6 +679,8 @@ def _rods(f, q: float, q_hi: float) -> str:
     """A slide's rods at this opening: their overhang, and how far the squeeze lifts the rack off its gear (D-076)."""
     from sea.sim import jaws
 
+    if f.jaw == "built":
+        return _built_rods(f, q)
     if f.jaw != "prismatic":
         return ""
     a, lift, bushing = jaws.rack_lift_mm(f.drive_mm_per_rad / 1000, f.sector, q, q_hi, GRIP_TORQUE_NM)
@@ -645,6 +688,36 @@ def _rods(f, q: float, q_hi: float) -> str:
     return (f"; rods {a:.0f} mm out from their clamp: the squeeze lifts the rack up to {lift:.1f} mm off the gear "
             f"(teeth skip past {jaws.TOOTH_SKIP * m:.1f}) and loads each bushing {bushing:.0f} N (rated "
             f"{jaws.BUSHING_RATED_N:g})")
+
+
+def _built_rods(f, q: float) -> str:
+    """A built guide's rods at this opening (D-080): the nearest bushing's overhang, the rack's lift off its gear
+    and the most loaded bushing, statically at the grip's torque, as the trial's rods load them."""
+    import math
+
+    from sea.mech.graph import Cylinder, Graph
+    from sea.sim import jaws
+
+    g = Graph.model_validate_json(f.mechanism)
+    if not g.guides:
+        return ""
+    gd = g.guides[0]
+    ratio = next((abs(m.ratio) for m in g.meshes if m.follower == gd.slide), None)
+    rods = [p for b in g.bodies if b.name == "gripper" for p in b.parts if isinstance(p, Cylinder) and p.role == "rod"]
+    if not ratio or not rods:
+        return ""
+    s = ratio * q
+    teeth = GRIP_TORQUE_NM / ratio
+    squeeze = F.squeeze_n(f, q, GRIP_TORQUE_NM)
+    tip = F.moving_to_gripper(q, np.array([*jaws.blade_tip(), 0.0]), f)
+    rod_y, rod_z = float(np.mean([p.pos[1] for p in rods])), float(np.mean([p.pos[2] for p in rods]))
+    a, lift, load = jaws.guide_static(gd.clamp_end, gd.centre, gd.bushings, gd.far_end, s,
+                                      teeth * math.tan(jaws.PRESSURE_ANGLE), gd.mesh_x - (gd.centre + s),
+                                      squeeze * (tip[2] - rod_z), squeeze * (tip[1] - rod_y))
+    held = "held at both ends" if gd.far_end is not None else f"{a * 1000:.0f} mm out from their clamp"
+    return (f"; rods {held}, {len(gd.bushings)} bushing(s) per rod: the squeeze lifts the rack up to "
+            f"{lift * 1000:.1f} mm off the gear (teeth skip past {jaws.TOOTH_SKIP * gd.module * 1000:.1f}) and loads "
+            f"the worst bushing {load:.0f} N (rated {jaws.BUSHING_RATED_N:g})")
 
 
 def _flat(params: dict[str, dict[str, float]]) -> dict[str, float]:

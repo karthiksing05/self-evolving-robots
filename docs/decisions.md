@@ -2490,3 +2490,54 @@ D-078 made every jaw a graph. This is the second step (C1): an idea can now carr
   Until they exist, the two ideas System 2 asked for most still cannot be written; the campaign waits for them.
 - **Catalogue jaws unchanged:** their briefs are kept byte-for-byte (a parallelogram's face still reads "-0 deg"), and the D-078 golden models and laws pass.
 - **Full suite:** 726 passed, 2 skipped, 1 xfailed (710 before, plus 16 new tests).
+
+## D-080 A guide's rods can be held at both ends, and its carriage can ride several bushings per rod (world: physics; judge: built jaws only)
+
+**Why.** Under D-076, System 2 asked three times for a "braced" or "bridged" long slide. Each time it named the same two changes:
+- a printed bridge that clamps the rods' far ends, so they stop overhanging 94 mm;
+- two bushings per rod, spaced to resist the squeeze's couple.
+
+The bushing law and the tooth-skip law bound on exactly those variables, and no graph could set them: a `Guide` held one bushing per rod and cantilevered its rods (`mech/build.py` refused anything else). Under principle 8, the variable a law binds on has to be exposed.
+
+**Change.**
+- **`Guide.far_end`** (gripper x where a second clamp holds the rods' far ends; none means cantilevered) and **`Guide.bushings`** (each bushing's offset along the rods from the carriage's middle).
+- **The rods as beams.** Each rod is a beam clamped at one end, or at both, with a node at every bushing. The rigid carriage imposes each bushing's deflection and slope. That is the D-076 model, in which a bushing's 10 mm length takes a couple, applied at every bushing.
+  - The carriage's stiffness and each bushing's load (its force plus its couple over its length) come from the assembled beam.
+  - With one bushing and cantilevered rods the matrices are D-076's, and the code keeps D-076's exact path, so catalogue slides are unchanged to the bit.
+- **Checks on a built guide, before the laws:**
+  - bushings at least a bushing's length apart;
+  - a far end beyond the clamp, held by a clamp part there;
+  - the carriage carrying two LM3UU per bushing position (so the price follows the physics);
+  - in trial, a bushing past the rods' end leaves them.
+
+**Prediction** (written before the code; static loads at the long slide's grip):
+- catalogue slides: golden models, laws and every D-076 number unchanged;
+- rods held at both ends, one bushing per rod: the rack's lift falls below the 0.5 mm tooth-skip limit across the travel, but each bushing still carries roughly D-076's 138 N, because the squeeze's couple across one 10 mm bushing dominates;
+- held at both ends with two bushings per rod at ±12 mm: per-bushing load about halves and stays above the 52.9 N rating;
+- about ±25 mm or wider is needed to get under the rating.
+
+So System 2's bridged slide is predicted to fix the teeth but need wide bushing spacing (or a lower squeeze) to pass the bushing law. The prediction is falsifiable in both directions.
+
+**Measured** (static, the long slide at sector radius 50 mm and the grip's torque, `tests/mech/test_guide.py`), as worst bushing load / rack lift at a servo of 0.6, 1.0 and 1.4 rad:
+
+| rods | 0.6 rad | 1.0 rad | 1.4 rad |
+|---|---|---|---|
+| cantilevered, one bushing per rod (as the trial loads it) | 146 N / 0.1 mm | 153 N / 0.9 mm | 161 N / 2.3 mm |
+| held at both ends, one bushing | 146 N / 0.2 mm | 153 N / 0.6 mm | 161 N / 1.2 mm |
+| held at both ends, bushings ±12 mm | 71 N / 0.1 mm | 84 N / 0.3 mm | 87 N / 0.7 mm |
+| held at both ends, bushings ±25 mm | 53 N / 0.0 mm | 64 N / 0.1 mm | 65 N / 0.4 mm |
+
+Against the prediction:
+- **Unchanged as predicted:**
+  - the catalogue slides emit no beam data and keep D-076's exact code path;
+  - with both ends held and one bushing per rod, each bushing still carries the couple across its own length (146–161 N against the 52.9 N rating);
+  - two bushings at ±12 mm roughly halve that and stay over the rating.
+- **Wrong in two places:**
+  - *Holding the far ends alone does not stop the teeth skipping.* The lift only halves (2.3 to 1.2 mm at 1.4 rad), because one bushing per rod gives the carriage little resistance to turning, and the teeth sit 20 mm or more from the carriage's middle. The teeth hold only with two bushings per rod as well (0.7 mm at ±12 mm, 0.4 mm at ±25 mm).
+  - *±25 mm is not wide enough.* At 53–65 N it is still over the rating, so a wider spacing or a lower squeeze is needed.
+  
+  So the bridged slide System 2 described (both ends held, about 30 mm between bushings) is predicted to keep its teeth, with its bushings near or over their rating. A trial will tell.
+- **The catalogue's static fact reads 8–14 % low** (138 N against 146–161 N): `rack_lift_mm` leaves out the teeth's separating force times its lever to the carriage's middle, which the trial's `RodSprings` includes. Facts for built guides use the full beam (`guide_static`). The catalogue's fact text is kept as it was, because changing it changes the prompt. This is a known understatement, to fix in its own change.
+- **The trial's rods apply the assembled beam** (checked in the y plane, where the teeth add nothing): `RodSprings` forces equal −K·u to 1e-9.
+- **A built guide is refused before the laws** if its bushings overlap, if it carries the wrong number of LM3UU, or if no clamp part holds a declared far end.
+- **Full suite:** 731 passed, 2 skipped, 1 xfailed (726 before, plus 5 new tests).

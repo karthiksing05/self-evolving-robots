@@ -198,6 +198,22 @@ def _pose(spec: mujoco.MjSpec, name: str) -> tuple[np.ndarray, np.ndarray]:
     return pos, rot
 
 
+def rod_end(g: Graph) -> float:
+    """Where the guide's rods end, toward the carriage's travel (gripper x): the nearest free end of the rods on
+    the gripper."""
+    ends = []
+    for b in g.bodies:
+        if b.name != "gripper":
+            continue
+        for p in b.parts:
+            if isinstance(p, Cylinder) and p.role == "rod":
+                axis = np.array([2 * (p.quat[1] * p.quat[3] + p.quat[0] * p.quat[2]),
+                                 2 * (p.quat[2] * p.quat[3] - p.quat[0] * p.quat[1]),
+                                 1 - 2 * (p.quat[1] ** 2 + p.quat[2] ** 2)])  # the quat's z axis
+                ends.append(p.pos[0] + abs(axis[0]) * p.half_length)
+    return min(ends) if ends else math.inf
+
+
 def compile(spec: mujoco.MjSpec, g: Graph) -> list[tuple[str, float]]:
     """Add the mechanism ``g`` to ``spec``; returns the joints that move with the driving joint, with their units
     per radian of it (``Sim.set_arm_q``)."""
@@ -226,8 +242,6 @@ def compile(spec: mujoco.MjSpec, g: Graph) -> list[tuple[str, float]]:
         spec.add_equality(type=mujoco.mjtEq.mjEQ_CONNECT, name1=lp.a, name2=lp.b, objtype=mujoco.mjtObj.mjOBJ_BODY,
                           data=list(lp.point) + [0.0] * 9, solimp=LOOP_IMP, **STIFF)
     for gd in g.guides:
-        if gd.bushings != (0.0,):
-            raise NotImplementedError("one bushing per rod, at the carriage's middle (D-076)")
         car = spec.body(gd.carriage)
         k_v, k_t = jaws.rod_stiffness(jaws.BUSHING_LEN)  # the stiffest the rods get: the armature keeps each mode stable
         for name, kind, axis, k in (("jaw_rod_dy", "slide", [0.0, 0.0, -1.0], k_v), ("jaw_rod_dz", "slide", [0.0, 1.0, 0.0], k_v),
@@ -235,6 +249,9 @@ def compile(spec: mujoco.MjSpec, g: Graph) -> list[tuple[str, float]]:
             car.add_joint(name=name, type=_JOINT[kind], axis=axis, pos=list(gd.at), armature=k * TIMESTEP**2,
                           damping=[2 * k * TIMESTEP, 0.0, 0.0])
         spec.add_numeric(name="jaw_rods", data=[gd.clamp_end, gd.centre, gd.module, gd.mesh_x])
+        if gd.bushings != (0.0,) or gd.far_end is not None:  # the rods as beams through every bushing (D-080)
+            spec.add_numeric(name="jaw_guide", data=[math.nan if gd.far_end is None else gd.far_end, rod_end(g),
+                                                     *sorted(gd.bushings)])
     for ms in g.meshes:
         spec.add_equality(type=mujoco.mjtEq.mjEQ_JOINT, name1=ms.follower, name2=ms.driver,
                           data=[0.0, ms.ratio, 0.0, 0.0, 0.0] + [0.0] * 7, solimp=TEETH_IMP, **STIFF)

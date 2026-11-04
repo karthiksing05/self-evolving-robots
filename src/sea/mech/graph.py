@@ -199,10 +199,12 @@ class Mesh(_M):
 
 
 class Guide(_M):
-    """A carriage on two rods clamped at one end (D-076): the carriage may move across the rods and turn as two
-    cantilevers let it, from ``at`` (carriage frame).  ``clamp_end`` is where the rods leave the clamp,
-    ``centre`` the carriage's middle at zero travel, ``mesh_x`` where its rack meets the gear (gripper x),
-    ``module`` the teeth's, ``bushings`` the bushings' offsets along the rods from the carriage's middle."""
+    """A carriage on two rods clamped at one end (D-076), or at both (D-080): the carriage may move across the
+    rods and turn as the bent rods let it, from ``at`` (carriage frame).  ``clamp_end`` is where the rods leave
+    the clamp, ``far_end`` where a second clamp holds their other ends (none: they overhang), ``centre`` the
+    carriage's middle at zero travel, ``mesh_x`` where its rack meets the gear (all gripper x), ``module`` the
+    teeth's, ``bushings`` each bushing's offset along the rods from the carriage's middle (one per rod at each:
+    a carriage carries two LM3UU per offset)."""
 
     kind: Literal["guide"] = "guide"
     carriage: str
@@ -213,6 +215,7 @@ class Guide(_M):
     module: float
     mesh_x: float
     bushings: tuple[float, ...] = (0.0,)
+    far_end: float | None = None
 
 
 class Graph(_M):
