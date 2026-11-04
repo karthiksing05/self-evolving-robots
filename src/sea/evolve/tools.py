@@ -60,6 +60,7 @@ class Context(BaseModel):
     notebook: str = ""  # the engineering notebook (D-090), with this run's research log and name
     research_log: str = ""
     run: str = ""
+    library: str = ""  # the skills library (D-096)
     concepts: ConceptSet | None = None  # the concept set (D-091), when the run keeps one
 
 
@@ -137,6 +138,10 @@ class Server:
             from sea.evolve.loop import make_world
 
             self._world = make_world(self.ctx.world)
+            if self.ctx.library:
+                from sea.evolve.library import promoted
+
+                self._world.promoted = promoted(Path(self.ctx.library))
         return self._world
 
     @property

@@ -310,6 +310,9 @@ def compile(spec: mujoco.MjSpec, g: Graph, base: str | Base | None = None) -> li
                           data=[0.0, ms.ratio, 0.0, 0.0, 0.0] + [0.0] * 7, solimp=TEETH_IMP, **STIFF)
     for a, b in g.excludes:
         spec.add_exclude(bodyname1=a, bodyname2=b)
+    for a, b in g.contacts:
+        spec.add_pair(geomname1=a, geomname2=b, condim=3, friction=[0.3, 0.3, 0.005, 0.0001, 0.0001],
+                      solref=[0.004, 1.0])  # hard parts in a named pair: the default lets a light part's load sink through a tooth
     _elements(spec, g)
     return list(g.linked)
 

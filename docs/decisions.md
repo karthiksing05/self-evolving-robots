@@ -2970,3 +2970,33 @@ LLM-written requirement lists leave most needs out (Massoudi and Fuge 2025 measu
 **Prediction** (before the code):
 - no prompt with `stripped` contains any principle's text, in any world; the off arm's prompt is unchanged;
 - on campaigns, F9 only: stripped without research should do worse than the current loop, and research should recover part of the gap. If stripped with research does as well as the current loop, the hand-written principles were not needed.
+
+## D-096 A library of mechanical-engineering skills, reused over time: machine elements to start from, and what earns its place (skill: mech elements; policy: library; F8 of the general framework)
+
+**Why.** The user asked for a library of mechanical-engineering skills reused over time, with the architecture kept compositional. With F6 and F7, System 2 starts from a plate and a parts list. A real engineer starts from machine elements, which is general knowledge valid in any world, and from what their own past work has proven.
+
+**Change** (`RunConfig.library`, off by default).
+- **Seeds are machine elements only** (`mech/elements.py`): lever, four-bar, slider-crank, rack and pinion, gear train, cam and follower, ratchet and pawl, latch, guide and carriage. Each is built from real parts, joints and transmission, and mounts on any body. A test drives each one and checks its textbook relation (a gear train's ratio, a four-bar's closure, a cam's lift, a ratchet's one way). No seed is task-specific.
+- **Composition.** A mechanism may list `uses`: elements, each with its parameters, the body it mounts `on`, where (`at`, `quat`) and a `prefix` for its names. A patch then connects them. To let contact-driven elements work, a graph may declare `contacts`, pairs of solids that touch each other.
+- **Three stores, each kept across runs in `library/`:**
+  - **Mechanisms** (`mechanisms.json`). When a body is kept, the bodies it added since its parent are entered under a structural signature (their tree, joints, part kinds and actuators, with lengths left out), with its provenance. It is promoted once seen in 2 or more (world, mount) contexts; numbers that differ between its contexts become its arguments. System 2's name for the concept names it.
+  - **Notes** (`notebook.jsonl`). As before, now also counting the rejected proposals that cited a note, so a note is checked against later trials and not only credited.
+  - **Methods** (`methods.json`). Each requirement metric System 2 wrote, kept with its worlds and runs. A metric used in more than one run is promoted and shown wherever its instruments exist.
+- **Pruning.** An unpromoted mechanism unseen for 10 runs is removed. A test asserts every stored mechanism has a provenance trial.
+
+**Prediction** (before the code):
+- every seed compiles on the kit's arena and on an empty world, passes its relation, and passes the world's laws;
+- a concept kept in two contexts is promoted with the varying lengths as arguments and can be instantiated at new values; one kept in one context is not offered; an unused entry is pruned;
+- with the switch off, nothing is read or written;
+- nothing about campaigns: whether the library is used at all is an F9 measurement.
+
+**Outcome.** The prediction held, once these were fixed along the way:
+- **The kit's fastening law had a hole, now closed (judge).** `_floating` looked only inside one body, so a bracket bolted to the robot with no joint could float 9 cm above the plate and pass, and a hinge could hang in mid-air. Bodies without a joint now count as one rigid piece with what they are bolted to, and a jointed body more than 1 cm from what it moves on is refused. No existing kit test or fixture robot depended on the hole. Earlier kit results were never campaign results, so nothing has to be re-scored.
+- **The ratchet.** It first failed in reverse at r = 0.02 m and looked broken at r = 0.08 m, for two different reasons. At 0.08 m the wheel was inside the test's own fixed frame, which was a test error. At 0.02 m a tooth sank 4.6 mm into the pawl because MuJoCo's default contact is soft relative to a light wheel. Named contact pairs now use `solref=[0.004, 1]`. It is tested across its whole declared range, r = 0.015 to 0.1 m, with 10 N at the teeth. That load is what is tested and what its docstring states; above it the pawl's stop can give.
+- **`mech/base.py`.** The empty world read joint ranges as degrees, a real D-087 bug that only the seeds' range tests exposed.
+- **The four-bar.** Its ground bracket lay in the links' plane, so the coupler passed through it. The bracket now sits behind that plane. Its crank and rocker share a plane and are excluded from colliding with each other, which remains the open `excludes` item for F9.
+- **The four-bar's solver** raised `ZeroDivisionError` when the crank's far pin landed on the rocker's pivot, which would have crashed a trial instead of refusing it. It now refuses with the reason.
+
+Beyond the prediction: a promoted mechanism reaches a graph as patch operations (`LB.expand`), so a world needs no library code beyond calling `compose` for the seeds. The store is locked for runs in parallel. A kept element is entered like anything else, so a seed can also appear under its own signature once it has been kept in two contexts; that duplication is left in, and F9 can show whether it matters.
+
+**Not yet shown.** No real System 2 call has used the library. Whether it uses the elements at all, and whether they help, are F9 measurements.

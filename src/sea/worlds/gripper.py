@@ -458,6 +458,7 @@ class GripperWorld:
     def build_idea(self, body: Body, idea: Any, new_id: str) -> Body:
         """``body`` with the jaw ``idea.mechanism`` describes: a catalogue module's graph, changed by its patch.
         Raises ``ValueError`` naming what does not apply."""
+        from sea.mech.elements import compose
         from sea.mech.graph import Graph
         from sea.mech.patch import Op, apply_patch
 
@@ -474,7 +475,7 @@ class GripperWorld:
             raise ValueError(f"no module {mech.module!r}; the modules are {sorted(MODULES)}")
         else:
             g = _module(mech.module, mech.params)
-        g = apply_patch(g, [Op.model_validate(o) for o in mech.patch]).model_copy(update={"name": idea.name})
+        g = apply_patch(compose(g, mech.uses), [Op.model_validate(o) for o in mech.patch]).model_copy(update={"name": idea.name})
         return Body(id=new_id, parent=body.id, parts={**body.parts, "jaw": Part(type="built",
                                                                                 mechanism=g.model_dump_json())})
 

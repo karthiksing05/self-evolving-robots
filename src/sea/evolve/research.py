@@ -138,6 +138,7 @@ class Note(BaseModel):
     run: str = ""
     iteration: int = -1
     credit: int = 0
+    against: int = 0  # rejected proposals that cited it (D-096)
 
 
 def load(path: Path) -> list[Note]:
@@ -150,6 +151,11 @@ def load(path: Path) -> list[Note]:
             if r["credit_for"] in notes:
                 n = notes[r["credit_for"]]
                 notes[n.id] = n.model_copy(update={"credit": n.credit + 1})
+            continue
+        if r.get("against"):  # a row against it
+            if r["against"] in notes:
+                n = notes[r["against"]]
+                notes[n.id] = n.model_copy(update={"against": n.against + 1})
             continue
         n = Note.model_validate(r)
         notes[n.id] = n
@@ -184,6 +190,17 @@ def credit(path: Path, text: str) -> list[str]:
     return ids
 
 
+def against(path: Path, text: str) -> list[str]:
+    """Count a rejected proposal against every note it cites; returns their ids."""
+    known = {n.id for n in load(path)}
+    ids = sorted(set(NOTE_ID.findall(text)) & known)
+    if ids:
+        with path.open("a") as f:
+            for i in ids:
+                f.write(json.dumps({"against": i}) + "\n")
+    return ids
+
+
 def text(notes: list[Note], limit: int = 40) -> str:
     """The notebook for the prompt: most credited first, then newest."""
     if not notes:
@@ -192,7 +209,7 @@ def text(notes: list[Note], limit: int = 40) -> str:
     rows = []
     for n in order:
         nums = ", ".join(f"{k} = {v:g}" for k, v in n.numbers.items())
-        rows.append(f"- {n.id}{f' (credited {n.credit})' if n.credit else ''} [{n.world}] {n.claim}"
+        rows.append(f"- {n.id}{f' (credited {n.credit})' if n.credit else ''}{f' (rejected {n.against})' if n.against else ''} [{n.world}] {n.claim}"
                     + (f" ({nums})" if nums else "") + (f"; holds {n.validity}" if n.validity else "")
                     + f"; source {n.source_url}")
     more = len(notes) - len(order)

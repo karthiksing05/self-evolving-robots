@@ -160,12 +160,24 @@ class Need(_Model):
     lead_days: float | None = Field(default=None, description="for an item the manifest does not list: your estimate")
 
 
+class Use(_Model):
+    """A machine element, or a mechanism the library has proven, mounted on a graph (D-096)."""
+
+    element: str = Field(description="the element's name, or a proven mechanism's id, as the library section lists them")
+    prefix: str = Field(description="begins the name of everything it adds, so its joints can be addressed")
+    on: str = Field(description="the body it mounts on")
+    at: tuple[float, float, float] = Field(default=(0.0, 0.0, 0.0), description="where, in that body's frame, in metres")
+    quat: tuple[float, float, float, float] = Field(default=(1.0, 0.0, 0.0, 0.0), description="its orientation there")
+    params: dict[str, float] = Field(default_factory=dict, description="its parameters; one left out takes its range's middle")
+
+
 class Mechanism(_Model):
     """A mechanism the catalogue lacks, written as a change to one of the world's modules (D-079)."""
 
     module: str = Field(description="the module it starts from, by name, as the mechanisms section lists them; "
                         "`self`: the base body's own mechanism, to continue developing it")
     params: dict[str, float] = Field(default_factory=dict, description="the module's parameters, within its ranges")
+    uses: list[Use] = Field(default_factory=list, description="machine elements to mount, before the patch (D-096)")
     patch: list[dict[str, Any]] = Field(default_factory=list, description="operations on the module's graph, each "
                                         "{op: add|set|remove, path, value}, addressed by names as the section says")
 

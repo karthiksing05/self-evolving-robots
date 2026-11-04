@@ -23,6 +23,7 @@ from sea.evolve.core import Body, BomLine, Instrument, Outcome, Part, PartType, 
 from sea.evolve.search import local_search, planned
 from sea.mech import graph as G
 from sea.mech.build import part_kg
+from sea.mech.elements import compose
 from sea.mech.patch import Op, apply_patch
 from sea.mech.patch import __doc__ as PATCH_DOC
 from sea.mech.program import controls
@@ -35,6 +36,7 @@ SLOT = "robot"
 ATTEMPTS = 24  # System 1's matches per body and track; a plan's ``search`` multiplies them
 SCORED_OVER = 3  # matches a score is the mean of, at System 1's best controls (D-094)
 TOUCH = 0.002  # m: two parts of one body closer than this are fastened
+PIN = 0.01  # m: a jointed body this far from what it moves on can still be pinned to it
 SWEEP = 5  # poses over each driven joint's range
 PASS_TOL = 0.1 * IN  # m: how far two parts may overlap where one is fastened to the other
 # the brief's p. 26 list; a limit switch, the IR and ultrasonic rangers, and the encoder and potentiometer
@@ -109,12 +111,22 @@ def _usage(g: G.Graph) -> dict[str, int]:
 
 # ---------------------------------------------------------------- the laws
 def _floating(g: G.Graph, m: mujoco.MjModel, d: mujoco.MjData) -> list[str]:
-    """A body's solids must touch: each is fastened to another or it is floating."""
+    """What is rigid must touch: each solid of a body, and of the bodies bolted to it without a joint, is fastened to
+    another or it is floating.  What moves must be near what it moves on: a joint needs a pin to hold it (D-096)."""
+    by_name = {b.name: b for b in g.bodies}
+
+    def rigid(b: G.Body) -> str:  # the body this one is bolted to, through every body without a joint
+        while not b.joints and b.parent in by_name:
+            b = by_name[b.parent]
+        return b.name
+
+    groups: dict[str, list[int]] = {}
+    for x in range(m.ngeom):
+        name = mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_BODY, m.geom_bodyid[x])
+        if m.geom_contype[x] == 2 and name in by_name:
+            groups.setdefault(rigid(by_name[name]), []).append(x)
     out = []
-    for b in g.bodies:
-        ids = [x for x in range(m.ngeom) if m.geom_bodyid[x] == m.body(b.name).id and m.geom_contype[x] == 2]
-        if len(ids) < 2:
-            continue
+    for name, ids in groups.items():
         reached, todo = {ids[0]}, [ids[0]]
         while todo:
             a = todo.pop()
@@ -124,7 +136,13 @@ def _floating(g: G.Graph, m: mujoco.MjModel, d: mujoco.MjData) -> list[str]:
                     todo.append(c)
         loose = sorted(m.geom(x).name for x in ids if x not in reached)
         if loose:
-            out.append(f"on body {b.name!r}, {', '.join(loose)} touch(es) nothing fastened to {m.geom(ids[0]).name}: floating")
+            out.append(f"on body {name!r}, {', '.join(loose)} touch(es) nothing fastened to {m.geom(ids[0]).name}: floating")
+    for b in g.bodies:
+        if not b.joints or b.parent not in by_name or b.name not in groups:
+            continue
+        on = rigid(by_name[b.parent])
+        if on in groups and min(mujoco.mj_geomDistance(m, d, x, y, PIN * 2, None) for x in groups[b.name] for y in groups[on]) > PIN:
+            out.append(f"body {b.name!r} comes nowhere near {on!r}, which its joint is on: nothing holds the joint")
     return out
 
 
@@ -254,7 +272,7 @@ class KitWorld:
             g = graph_of(body)
         else:
             g = _module(mech.module, mech.params)
-        g = apply_patch(g, [Op.model_validate(o) for o in mech.patch]).model_copy(update={"name": idea.name})
+        g = apply_patch(compose(g, mech.uses), [Op.model_validate(o) for o in mech.patch]).model_copy(update={"name": idea.name})
         return Body(id=new_id, parent=body.id, parts={SLOT: Part(type="built", mechanism=g.model_dump_json())})
 
     def module_names(self) -> list[str]:

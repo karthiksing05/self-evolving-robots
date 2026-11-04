@@ -95,7 +95,8 @@ def build(world: World, body: Body, tasks: Sequence[Task], outcomes: dict[str, O
           iteration: int, iterations: int, max_proposals: int = 3, frontier: Sequence[dict[str, Any]] = (),
           tune_trials: int = 0, tools: dict[str, int] | None = None, requirements: str | None = None,
           notebook: str | None = None, concepts: str | None = None, plans: str | None = None,
-          current_plan: Any = None, points: str | None = None, rules: Sequence[str] | None = None) -> str:
+          current_plan: Any = None, points: str | None = None, rules: Sequence[str] | None = None,
+          library: str | None = None) -> str:
     by_id = {t.id: t for t in tasks}
     groups = sorted({t.group for t in tasks})
     failing = [t for t in tasks if not outcomes[t.id].success]
@@ -148,6 +149,8 @@ def build(world: World, body: Body, tasks: Sequence[Task], outcomes: dict[str, O
     if plans is not None:
         now = f"\nThe current body's plan: {current_plan.model_dump_json()}" if current_plan is not None else ""
         sec.append(f"# Operating plans (D-092)\n{plans}{now}\n" + _operation(failing, outcomes, current_plan))
+    if library is not None:
+        sec.append(f"# Library (D-096)\n{library}")
     if notebook is not None:
         from sea.evolve.research import BUDGET
 

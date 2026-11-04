@@ -37,6 +37,7 @@ import numpy as np
 from pydantic import BaseModel, ConfigDict
 
 from sea.evolve import concepts as C
+from sea.evolve import library as LB
 from sea.evolve import operation as OP
 from sea.evolve import requirements as R
 from sea.evolve import research as RS
@@ -55,6 +56,7 @@ from sea.evolve.core import (
 from sea.evolve.llm import Proposer
 from sea.evolve.prompt import SYSTEM, build
 from sea.evolve.resources import ResourceReport, charge, check, cost_idea, idea_text, start
+from sea.mech.elements import ELEMENTS
 from sea.propose.llm import PlanBillingError, PlanLimitReached
 
 Arm = Literal["s2", "random", "s1"]
@@ -81,6 +83,8 @@ class RunConfig(BaseModel):
     concepts: bool = False  # the concept set, functions, computed comparison and failure modes (D-091)
     stripped: bool = False  # the world's brief alone, none of its hand-written design knowledge (D-095)
     plans: bool = False  # operating plans, and whether the operation or the body failed (D-092)
+    library: bool = False  # machine elements in the prompt, and what kept bodies prove, kept across runs (D-096)
+    library_dir: str = "library"
 
 
 # ---------------------------------------------------------------- parallel evaluation
@@ -279,7 +283,7 @@ def _built(world: World, base: Body, prop: Proposal, catalogue: dict[str, Any], 
     if slot and any(e.slot == slot for e in prop.edits):
         raise ValueError(f"the idea builds slot {slot!r}; an edit to it as well is ambiguous: "
                          "edit the other slots, or put the change in the mechanism")
-    cand = world.build_idea(base, prop.idea, new_id=new_id)
+    cand = world.build_idea(base, LB.expand(prop.idea, getattr(world, "promoted", {})), new_id=new_id)
     return apply(cand, prop.edits, catalogue, new_id=cand.id) if prop.edits else cand
 
 
@@ -357,6 +361,9 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
     history: list[dict[str, Any]] = []
     reqs: list[Any] = []  # System 2's requirements list (D-089)
     notebook = Path(cfg.notebook)
+    library = Path(cfg.library_dir)
+    if cfg.library:
+        world.promoted = LB.promoted(library)  # what past runs proved, as this run starts
     concepts = C.ConceptSet()  # new structures, developed before they are judged (D-091)
     functions: list[Any] = []  # System 2's function list
     cur_rows: list[Any] = []  # the list measured on the current body
@@ -510,7 +517,8 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                 concepts.refresh(reqs, partial(R.measure, world, reqs=reqs, tasks=train, base=body, manifest=manifest,
                                                spent=spent))
                 concept_text = C.text(concepts, reqs, R.measure(world, body, reqs, train, body, manifest, spent), functions,
-                                      {*catalogue, *(world.module_names() if hasattr(world, "module_names") else [])},
+                                      {*catalogue, *(world.module_names() if hasattr(world, "module_names") else []),
+                                       *(ELEMENTS if cfg.library else ()), *getattr(world, "promoted", {})},
                                       getattr(world, "mechanism_text", None))
             if cfg.tools or cfg.research:  # what System 2's tools check a draft against: this iteration's body and record (D-086)
                 from sea.evolve import tools as T
@@ -523,7 +531,7 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                                          train=[t.id for t in train], requirements=reqs,
                                          held=sorted(held), notebook=str(notebook.resolve()) if cfg.research else "",
                                          research_log=str((out / "research.jsonl").resolve()),
-                                         run=out.name).model_dump_json())
+                                         run=out.name, library=str(library.resolve()) if cfg.library else "").model_dump_json())
                 budget = {"calls": T.CALLS, "sims": T.SIMS}
                 if hasattr(proposer, "tools"):
                     proposer.tools = (ctx, out / "tool_calls.jsonl")
@@ -539,7 +547,8 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                            requirements=req_text, notebook=notes_text, concepts=concept_text,
                            points=points_line(world, points_of(train, outcomes)) if by_points else None, rules=rules,
                            plans=OP.text(sorted(world.control_names(body)) if hasattr(world, "control_names") else [])
-                           if cfg.plans else None, current_plan=body.plan if cfg.plans else None)
+                           if cfg.plans else None, current_plan=body.plan if cfg.plans else None,
+                           library=LB.text(library, world) if cfg.library else None)
             try:
                 batch = proposer.propose(SYSTEM, prompt, tag=f"iter{it:02d}")
             except (PlanLimitReached, PlanBillingError):
@@ -558,6 +567,8 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                 cur_rows = R.measure(world, body, reqs, train, body, manifest, spent)
                 rec["requirements"] = [r.model_dump() for r in reqs]
                 (out / "requirements.json").write_text(json.dumps(rec["requirements"], indent=1))
+                if cfg.library:
+                    LB.remember(library, reqs, cur_rows, cfg.world, out.name)
             if cfg.requirements:
                 rec["requirement_rows"] = [r.model_dump() for r in cur_rows]
                 rec["uncovered"] = R.coverage(reqs, groups)
@@ -664,6 +675,9 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                 _, cand, entry = best
                 spent = charge(spent, ResourceReport.model_validate(entry["resources"]))
                 entry["result"] = entry["result"].replace("kept-eligible", "KEPT")
+                if cfg.library:  # what this body proves, against the body it came from
+                    entry["library"] = LB.keep(library, world, bases().get(cand.parent, body), cand,
+                                               (entry.get("proposal", {}).get("idea") or {}).get("name", cand.id), out.name, it)
                 body = cand
                 accepted = cand.id
                 if cfg.research:  # the notes the kept change cites earn their credit
@@ -671,6 +685,8 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                 if cfg.concepts:
                     concepts.keep([entry.get("concept", ""), *entry.get("merged", [])])
             for e in trials:
+                if cfg.library and cfg.research and e.get("proposal") and not e.get("result", "").startswith(("KEPT", "kept-eligible")):
+                    e["against"] = RS.against(notebook, json.dumps(e["proposal"]))  # checked by later trials, not only credited
                 if e.get("result", "").startswith("kept-eligible"):
                     e["result"] = e["result"].replace("kept-eligible", "not kept (another proposal gained more)")
             if cfg.concepts:  # narrow on this iteration's evidence, measured against the body it ends with
@@ -689,6 +705,8 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
     finally:
         records.close()
         ev.close()
+    if cfg.library:
+        LB.finish_run(library)
     summary = {
         "world": cfg.world, "arm": cfg.arm, "seed": cfg.seed, "final_body": body.model_dump(), "curve": curve,
         "train_groups": len({t.group for t in train}), "final_held_train": sorted(held_groups(train, ev.solve(body, train))),

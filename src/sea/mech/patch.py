@@ -8,10 +8,10 @@ A patch is a list of operations on a module's graph, each addressed by names, ne
 - ``bodies/<body>/parts/<part>/<field>``: one field of a part (``set``);
 - ``guides/<carriage>/<field>``, ``meshes/<follower>/<field>``, ``loops/<a>/<field>``: a guide's, a mesh's or
   a loop's field (``set``; a loop is named by its first body);
-- ``loops``, ``guides``, ``meshes``, ``excludes``, ``actuators``, ``latches``, ``sensors``, ``carried``: append one
+- ``loops``, ``guides``, ``meshes``, ``excludes``, ``actuators``, ``latches``, ``sensors``, ``carried``, ``contacts``: append one
   (``add``);
 - ``actuators/<name>``, ``latches/<name>``, ``sensors/<name>``: replace or remove one (``set``, ``remove``);
-- ``linked``: replace the joints that follow the servo by ratio (``set``).
+- ``linked``: replace the joints that follow the servo by ratio (``set``), or append one (``add``).
 
 A part's name is its ``name``, or for a blade ``blade`` and for a bought part its ``item``.
 """
@@ -60,13 +60,14 @@ def apply_patch(g: Graph, ops: list[Op]) -> Graph:
                     d[seg[0]].pop(i)
                 else:
                     d[seg[0]][i] = o.value
-            elif seg[0] in ("loops", "guides", "meshes", "excludes", "actuators", "latches", "sensors", "carried") \
+            elif seg[0] in ("loops", "guides", "meshes", "excludes", "actuators", "latches", "sensors", "carried",
+                          "contacts") \
                     and len(seg) == 1:
                 if o.op != "add":
                     raise ValueError("only add to a list")
                 d[seg[0]] = [*d[seg[0]], o.value]
             elif seg == ["linked"]:
-                d["linked"] = o.value
+                d["linked"] = [*d["linked"], o.value] if o.op == "add" else o.value
             elif seg[0] in ("guides", "meshes", "loops") and len(seg) == 3:
                 key = {"guides": lambda x: x["carriage"], "meshes": lambda x: x["follower"], "loops": lambda x: x["a"]}[seg[0]]
                 d[seg[0]][_find(d[seg[0]], seg[1], key, seg[0][:-1])][seg[2]] = o.value

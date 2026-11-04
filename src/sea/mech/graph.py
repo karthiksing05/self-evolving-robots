@@ -429,6 +429,7 @@ class Graph(_M):
     latches: tuple[Latch, ...] = ()
     sensors: tuple[Sensor, ...] = ()
     carried: tuple[Carry, ...] = ()
+    contacts: tuple[tuple[str, str], ...] = ()  # pairs of solids that touch each other: a cam and its follower (D-096)
 
     def new_bodies(self) -> tuple[str, ...]:
         return tuple(b.name for b in self.bodies if not b.stock)

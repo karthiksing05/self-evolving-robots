@@ -31,6 +31,7 @@ def _so101() -> mujoco.MjSpec:
 def _empty() -> mujoco.MjSpec:
     """An empty world with a floor: for a robot built whole from a graph (a chassis on a free joint)."""
     spec = mujoco.MjSpec()
+    spec.compiler.degree = False  # a graph's joint ranges are radians, as the stock robot's model says of its own
     spec.worldbody.add_geom(name="floor", type=mujoco.mjtGeom.mjGEOM_PLANE, size=[5.0, 5.0, 0.1])
     return spec
 
