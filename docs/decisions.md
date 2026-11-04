@@ -3055,3 +3055,21 @@ The cause is not established. D-085's wrist-roll limit is one candidate, a singl
 **Change.** In a run's first iteration `simulate` is refused until the run has recorded 2 notes, or its searches are spent, in the same way as the parallel-draft rule. It says what to do, never what to find. The prompt asks for research first and again when a failure comes back. Coverage counts a group named in `tasks` or in `source`.
 
 **Prediction:** the next live run makes searches and records at least 2 notes in iteration 0; the uncovered list shrinks to groups no requirement mentions. Whether notes are cited in kept changes is a campaign measurement.
+
+**D-098 and D-099 measured.** The bare `long_slide` at a 50 mm sector, seed 0, on all 84 tasks (`results/evolve/recheck/d098_bare_slides.log`). No pad design, no tuning, no System 2:
+
+| rod | tasks | train groups | test groups |
+|---|---|---|---|
+| 3 mm | 0 | 0 | 0 |
+| 4 mm | 3 | 0 | 0 |
+| 5 mm | 70 | 17 | 16 |
+| 6 mm | 72 | 18 | 17 |
+| 8 mm | 72 | 18 | 17 |
+
+At 6 mm it holds mustard bottle and sugar box, which no hinged jaw has held under this physics, and it loses banana, potted-meat can and tomato soup can. So the law that refused slides was right and the fixed part behind it was what stopped them. D-098's numbers held. The prediction that other causes remain also held: what is left is the rack on the object's top, force limits and pads.
+
+The second live run (`gripper_f_smoke2`) met D-099's prediction: 4 searches, 3 notes, each cited in a requirement's source, and 16 groups uncovered where it was 21. System 2 chose 6 mm rods itself, and its pad-and-slide proposals lost apple and soup can.
+
+**The campaign** (`gripper_f_s{0,1,2}`): full framework, stripped to the brief, 14 iterations, then `recheck_bodies.py` under 3 seeds.
+
+**Prediction:** at least 1 seed ends on a slide body; verified groups (train and test, every seed) reach at least 19 on at least 1 seed; the group most likely to stay out is the potted-meat can (friction 0.35, squeezed out) and I do not predict 21 on this first campaign.
