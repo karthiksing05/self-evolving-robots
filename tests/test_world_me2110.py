@@ -28,7 +28,7 @@ def test_protocol_tasks_and_catalogue():
     assert isinstance(W, World)
     tasks = W.tasks()
     groups = {t.group for t in tasks}
-    assert groups == {*TASKS, "match"} and len(TRAIN) == 7 and len(tasks) == 21
+    assert groups == {*TASKS, "match"} and len(TRAIN) == 7 and len(tasks) == 35
     assert len({p.name for p in W.catalogue()}) == len(W.catalogue())  # the loop keys parts by name
     stock = W.stock()
     assert set(stock.parts) == {p.slot for p in W.catalogue()} and W.check(stock) == []

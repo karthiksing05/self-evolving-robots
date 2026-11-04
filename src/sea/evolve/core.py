@@ -139,6 +139,7 @@ class Outcome(_Model):
     attempts: int = 1
     sim_s: float = 0.0
     states: dict[str, float] = {}  # what the world read at the end of this attempt (D-092)
+    points: float | None = None  # what this task scores in a world judged on points (D-093), 0 if it broke a rule
     nominal: float | None = None  # the score of System 1's first attempt, from the plan where there is one
 
 
@@ -305,6 +306,8 @@ class World(Protocol):
 
     # Optional: ``part_facts(body, part_type) -> list[str]``, computed facts about a part type fitted to this
     # body (its reach, force, range at the ends of its parameters), shown in the catalogue.  Facts, not advice.
+    # Optional (D-093): ``objective = "points"``, ``points_noise`` and ``sprint_bars``: the loop keeps what raises the
+    # mean ``Outcome.points`` over the tasks that carry them, unless a part (``points.*`` in its states) drops past the noise.
     # Optional (D-092): ``control_names(body) -> dict[str, tuple[float, float]]``, what an operating plan may set here.
     # Optional (D-088): ``instruments() -> list[Instrument]`` and ``read(body, name, args, task) -> float``, the
     # quantities System 2 can measure on any draft; ``task_facts(task) -> dict[str, float]``, a task's numbers

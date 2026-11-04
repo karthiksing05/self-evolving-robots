@@ -87,7 +87,7 @@ def build(world: World, body: Body, tasks: Sequence[Task], outcomes: dict[str, O
           iteration: int, iterations: int, max_proposals: int = 3, frontier: Sequence[dict[str, Any]] = (),
           tune_trials: int = 0, tools: dict[str, int] | None = None, requirements: str | None = None,
           notebook: str | None = None, concepts: str | None = None, plans: str | None = None,
-          current_plan: Any = None) -> str:
+          current_plan: Any = None, points: str | None = None) -> str:
     by_id = {t.id: t for t in tasks}
     groups = sorted({t.group for t in tasks})
     failing = [t for t in tasks if not outcomes[t.id].success]
@@ -178,6 +178,10 @@ def build(world: World, body: Body, tasks: Sequence[Task], outcomes: dict[str, O
         close += (f"  A swap that gains a group but breaks a held one is not judged on your values alone: the loop "
                   f"spends up to {tune_trials} more trials fitting the parameters of the slots it changed, so judge a "
                   "part type by what it can do across its range.")
+    if points is not None:  # the world is judged on its score, not its groups (D-093)
+        close = (f"Propose 1 to {max_proposals} body changes.  {points}.  Each proposal is tried on its own and kept only "
+                 "if it raises that score and no part of it drops past the noise; proposals that change different slots "
+                 "are also tried together.")
     sec.append(close)
     return "\n\n".join(sec)
 

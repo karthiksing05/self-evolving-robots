@@ -197,6 +197,15 @@ def _score_prediction(predicted: Sequence[str], gained: Sequence[str], lost: Seq
             "precision": round(len(p & g) / len(p), 3) if p else None, "lost": sorted(lost)}
 
 
+def points_line(world: World, got: tuple[float, dict[str, float]]) -> str:
+    """The score against the brief's bars, for the prompt."""
+    total, parts = got
+    bars = ", ".join(f"{b:g}" for b in getattr(world, "sprint_bars", ()))
+    return (f"The current body scores {total:.1f} of {getattr(world, 'max_points', 0.0):g} points in a match"
+            + (f" (the brief's bars: {bars})" if bars else "") + ": "
+            + ", ".join(f"{k.split('.', 1)[1]} {v:.1f}" for k, v in sorted(parts.items())))
+
+
 def _proposal_stats(history: Sequence[dict[str, Any]]) -> dict[str, Any]:
     tried = [h for h in history if h.get("tried")]
     refused = [h for h in history if h.get("result", "").startswith("refused")]
@@ -301,9 +310,21 @@ def screen(world: World, cand: Body, body: Body, manifest: dict[str, Any], spent
 
 
 def _tune_key(entry: dict[str, Any]) -> tuple[float, ...]:
-    """Tuning's objective: kept-eligible first, then net groups, then tasks newly passed, then partial credit."""
-    return (float(bool(entry["gained"]) and not entry["lost"]), len(entry["gained"]) - len(entry["lost"]),
-            entry["new_tasks"], entry.get("score_sum", 0.0))
+    """Tuning's objective: kept-eligible first, then points where the world counts them, then net groups, then tasks
+    newly passed, then partial credit."""
+    return (float(entry["eligible"] if "eligible" in entry else bool(entry["gained"]) and not entry["lost"]),
+            entry.get("points_gain", 0.0), len(entry["gained"]) - len(entry["lost"]), entry["new_tasks"],
+            entry.get("score_sum", 0.0))
+
+
+def points_of(tasks: Sequence[Task], outcomes: dict[str, Outcome]) -> tuple[float, dict[str, float]]:
+    """The mean points over the tasks that carry them, and of each part of that total (D-093)."""
+    scored = [outcomes[t.id] for t in tasks if t.id in outcomes and outcomes[t.id].points is not None]
+    if not scored:
+        return 0.0, {}
+    parts = {k: sum(o.states.get(k, 0.0) for o in scored) / len(scored)
+             for o in scored for k in o.states if k.startswith("points.")}
+    return sum(o.points for o in scored) / len(scored), parts
 
 
 def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: World | None = None,
@@ -344,6 +365,9 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
     frontier: dict[str, dict[str, Any]] = {}  # promising bodies not kept: they gained more groups than they lost
     t_start = time.time()
 
+    by_points = getattr(world, "objective", "groups") == "points"
+    noise = float(getattr(world, "points_noise", 0.0))
+
     def bases() -> dict[str, Body]:
         """The bodies a proposal may build on by id: the promising ones, and the live concepts (D-091)."""
         return {**{i: f["body"] for i, f in frontier.items()}, **concepts.bases()}
@@ -363,7 +387,7 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
         held_tasks = [t for t in train if t.group in held]
         cand_out = ev.solve(cand, held_tasks)
         lost = sorted({t.group for t in held_tasks if not cand_out[t.id].success})
-        full = not lost or cfg.full_trials or full_always
+        full = not lost or cfg.full_trials or full_always or by_points
         if full:
             cand_out.update(ev.solve(cand, [t for t in train if t.group not in held]))
         cand_held = held_groups(train, cand_out) if full else held - set(lost)
@@ -378,7 +402,25 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                                                        for t in held_tasks if t.group in lost
                                                        and not cand_out[t.id].success)[:600] + ")") if lost else ""
         score = None
-        if lost:
+        if by_points:  # the score decides; the groups are what it shows (D-093)
+            now, now_parts = points_of(train, outcomes)
+            new, new_parts = points_of(train, cand_out)
+            drops = sorted(k for k, v in now_parts.items() if new_parts.get(k, 0.0) < v - noise)
+            entry.update(points=round(new, 2), points_gain=round(new - now, 2), points_lost=drops,
+                         eligible=new > now and not drops)
+            told = f"{now:.1f} -> {new:.1f} points"
+            if entry["eligible"]:
+                entry["result"] = (f"kept-eligible: {told}; costs ${res.usd:.2f}, {res.fab_minutes:.0f} machine min")
+                score = (new - now, n_new, -res.usd - res.fab_minutes / 60,
+                         -int(edit_rung(body, _diff(body, cand)) == "swap"))
+            elif new > now:
+                entry["result"] = f"rejected: {told}, but {', '.join(drops)} dropped more than {noise:g}"
+                frontier[cand.id] = {"id": cand.id, "body": cand, "gained": gained or [told], "lost": drops,
+                                     "why_lost": entry["result"], "iteration": it, "edit": entry["edit"]}
+                entry["result"] += f"; kept on the frontier as {cand.id}"
+            else:
+                entry["result"] = f"rejected: {told}; still failing: " + ", ".join(still[:6])
+        elif lost:
             entry["result"] = f"rejected: {why}" + (f"; it would gain {', '.join(gained)}" if gained else "")
             if len(gained) > len(lost):
                 frontier[cand.id] = {"id": cand.id, "body": cand, "gained": gained, "lost": lost,
@@ -440,7 +482,8 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
             held = held_groups(train, outcomes)
             n_ok = sum(o.success for o in outcomes.values())
             curve.append({"iteration": it, "body": body.id, "held_groups": len(held), "tasks_passed": n_ok,
-                          "sim_s": round(ev.sim_s, 1), "wall_s": round(time.time() - t_start, 1)})
+                          "sim_s": round(ev.sim_s, 1), "wall_s": round(time.time() - t_start, 1),
+                          **({"points": round(points_of(train, outcomes)[0], 2)} if by_points else {})})
             log(f"[{cfg.world}/{cfg.arm}] iteration {it}: {len(held)}/{len({t.group for t in train})} groups, "
                 f"{n_ok}/{len(train)} tasks, body {body.describe()}")
             rec: dict[str, Any] = {"iteration": it, "body": body.model_dump(), "held": sorted(held),
@@ -492,6 +535,7 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
             prompt = build(world, body, train, outcomes, held, history, ideas, spent, manifest, it, cfg.iterations,
                            cfg.max_proposals, frontier=front[:5], tune_trials=cfg.tune_trials, tools=budget,
                            requirements=req_text, notebook=notes_text, concepts=concept_text,
+                           points=points_line(world, points_of(train, outcomes)) if by_points else None,
                            plans=OP.text(sorted(world.control_names(body)) if hasattr(world, "control_names") else [])
                            if cfg.plans else None, current_plan=body.plan if cfg.plans else None)
             try:
@@ -595,10 +639,13 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                     if score is not None and (best is None or score > best[0]):
                         best = (score, mbody, entry)
             # worth tuning only if it already gains more groups than the best candidate this iteration keeps
-            promising = [(c, e) for c, e in swaps if e["gained"] and e["lost"]
-                         and (best is None or len(e["gained"]) > best[0][0])]
+            promising = ([(c, e) for c, e in swaps if e["points_gain"] > 0 and e["points_lost"]
+                          and (best is None or e["points_gain"] > best[0][0])] if by_points else
+                         [(c, e) for c, e in swaps if e["gained"] and e["lost"]
+                          and (best is None or len(e["gained"]) > best[0][0])])
             if promising and cfg.tune_trials > 0:
-                cand, entry = max(promising, key=lambda ce: (len(ce[1]["gained"]) - len(ce[1]["lost"]),
+                cand, entry = max(promising, key=lambda ce: (ce[1].get("points_gain", 0.0),
+                                                              len(ce[1]["gained"]) - len(ce[1]["lost"]),
                                                               len(ce[1]["gained"]), ce[1]["new_tasks"]))
                 for score, tcand, tentry in tune(cand, entry, np.random.default_rng([cfg.seed, it])):
                     if "concept" in entry:
@@ -654,6 +701,13 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                 "tokens_out": sum(c.get("tokens_out", 0) for c in getattr(proposer, "calls", []) or []),
                 "usd_list_price": round(sum(c.get("usd_list_price", 0.0) for c in getattr(proposer, "calls", []) or []), 3)},
     }
+    if by_points:
+        by_task = {t.id: ev.solve(body, [t])[t.id] for t in test} if test else {}
+        held_out = points_of(test, by_task)[0]
+        summary["points"] = {"train": round(points_of(train, ev.solve(body, train))[0], 2), "test": round(held_out, 2),
+                             "test_by_task": {t: o.points for t, o in by_task.items() if o.points is not None},
+                             "stock_test": round(points_of(test, stock_test)[0], 2),
+                             "bars_met_test": [b for b in getattr(world, "sprint_bars", ()) if held_out >= b]}
     if cfg.research:
         summary["research"] = RS.summary(out / "research.jsonl")
     if cfg.concepts:

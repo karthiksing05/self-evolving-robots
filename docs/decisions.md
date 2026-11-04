@@ -2916,3 +2916,21 @@ LLM-written requirement lists leave most needs out (Massoudi and Fuge 2025 measu
 - on a compiled graph, `Program` plays a motor's window, a piston's stroke, a latch's release and a sensor-triggered actuator at the commanded times, with no part named in the code;
 - on a toy world: System 1's first attempt uses the plan; a plan-only proposal is trialled; an unknown control is refused; the three labels come out as defined; a new concept's body searches twice as long;
 - no claim on groups until F9.
+
+## D-093 ME 2110 is scored as the brief scores it: points in one match, on held-out tracks; the kit as the brief lists it (judge: ME 2110's numbers, the loop's objective; F6 of the general framework, first part)
+
+**Why.** The user's goal for this world is the highest robot score, and D-074's `match` group is a fixed bar of 174 points the brief never states: a change from 35 to 60 points is invisible to the ratchet. Revision 1.1 (p. 23) and the inspection list (p. 26) allow 4 mousetraps, where D-073 read 2 from pp. 17 and 21. The held-out tracks cover two of the four port colours.
+
+**Change.**
+- **The objective is generic.** `World.objective = "points"` (other worlds keep groups). An outcome may carry `points`; the loop keeps a change that raises the mean points over the tasks that carry them, unless one of the parts in that total (`points.*`) drops by more than `World.points_noise`. Groups are still computed and shown, and a change that raises the total while losing a part goes on the frontier.
+- **The score.** A `match` outcome's points are its total, or 0 if it broke any rule, as a disqualification would. Each iteration and the summary report the mean over the variants, on train and on held-out, against the brief's sprint bars 60, 150 and 215.
+- **Noise is set to 5 points,** the smallest partial score in the brief (a merfolk moved off its mark). It is a judgement, not a measurement, and F9 should measure the spread of repeated matches.
+- **The kit.** 4 mousetraps, the later text of the brief's own contradiction (pp. 17 and 21 say 2; p. 23's revision and p. 26's inspection list say 4). A lone robot's flag scores as the highest flag, which is what the model already gives.
+- **Tracks.** `Task.data` carries each track's numbers, and held-out tracks now cover all four port colours (6, 7, 8 and 8.75 in), fortress speeds from 2 to 5 rpm and floor friction from 0.4 to 0.6. The first two keep their numbers.
+
+**Prediction** (before the code):
+- other worlds' scripted runs reproduce exactly;
+- a toy world with points keeps a rise, refuses a rise with a part lost beyond noise and puts it on the frontier, and refuses a rise within nothing gained; a broken rule scores 0;
+- D-075's best body, re-scored on the held-out tracks, will score below its 35 train points, since those tracks were not searched and include speeds it has never met. This is the baseline F9 is compared with.
+
+**Result (tests, D-093).** The toy-world predictions held (`tests/test_points.py`), and ME 2110's world tests pass with 35 tasks. The re-scoring of D-075's best body on the held-out tracks costs several matches per track, so it runs in F9 as the baseline, and its prediction stays open until then.

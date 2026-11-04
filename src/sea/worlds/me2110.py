@@ -9,7 +9,7 @@ inside a 12 x 24 x 18 in box, behind the start line, to score six tasks in 40 s:
 - topple the mermaid and merman (24);
 - bring Davy Jones' heart from the chest back to the dock (61).
 
-It may use only the kit's actuators (2 gearmotors, 2 pistons on one tank, 2 mousetraps, 5 rubber bands) and
+It may use only the kit's actuators (2 gearmotors, 2 pistons on one tank, 4 mousetraps, 5 rubber bands) and
 gravity, may carry no magnets, and the parts bought must cost under $120 (prints at $0.05 per gram).  At 40 s it
 must be static, its pistons retracted.  The match is simulated in MuJoCo (``sea.sim.me2110_model``).
 
@@ -36,7 +36,7 @@ from sea.evolve.search import local_search, planned
 from sea.sim import me2110_model as MM
 
 BOX = (12.0, 24.0, 18.0)  # in: the go/no-go box, length x width x height
-KIT = {"motors": 2, "pistons": 2, "mousetraps": 2, "bands": 5}  # the brief: two mousetraps, five #64 bands
+KIT = {"motors": 2, "pistons": 2, "mousetraps": 4, "bands": 5}  # four mousetraps: p. 23's revision and p. 26 (pp. 17, 21 say two; D-093)
 BUDGET = 120.0
 PRINT_USD = 0.05  # per gram
 THRESH = {k: v / 2 for k, v in MM.MAX_POINTS.items()}
@@ -275,7 +275,9 @@ def fits_box(env: tuple[float, float, float]) -> bool:
 # ---------------------------------------------------------------- tasks
 VARIANTS = {"train": [MM.Variant(barrier=7.0, rpm=3.0, mu=0.5, phase=0.4, others=(6.0, 8.0, 8.75))],
             "test": [MM.Variant(barrier=6.0, rpm=2.0, mu=0.45, phase=1.3, others=(7.0, 8.0, 8.75)),
-                     MM.Variant(barrier=8.75, rpm=4.5, mu=0.55, phase=2.2, others=(6.0, 7.0, 8.0))]}
+                     MM.Variant(barrier=8.75, rpm=4.5, mu=0.55, phase=2.2, others=(6.0, 7.0, 8.0)),
+                     MM.Variant(barrier=7.0, rpm=5.0, mu=0.4, phase=3.4, others=(6.0, 8.0, 8.75)),
+                     MM.Variant(barrier=8.0, rpm=3.5, mu=0.6, phase=4.6, others=(6.0, 7.0, 8.75))]}
 WHAT = {"activate": "activate and fully leave the dock (1 + 10 points)",
         "treasure": "sort the 10 gold coins (2.5 x 0.5 in) and 5 jewels (1.5 in) from the fortress top's rim onto "
                     "their mounds: 10 / 15 points each on the mound's top, 4 / 9 in its 1 in border (175 max)",
@@ -401,17 +403,22 @@ def _attempt(body: Body, rb: MM.Robot, v: MM.Variant, task: str, ctl: dict[str, 
         detail += "; broke: " + "; ".join(r.laws[:3])
     states = {**{f"points.{k}": float(v) for k, v in r.points.items()},
               **{f"progress.{k}": float(v) for k, v in r.progress.items()}}
-    return Outcome(task="", success=ok, score=score, mechanism=mech, detail=detail, states=states,
+    points = (0.0 if r.laws else float(sum(r.points[k] for k in TASKS))) if task == "match" else None
+    return Outcome(task="", success=ok, score=score, mechanism=mech, detail=detail, states=states, points=points,
                    sim_s=time.perf_counter() - t0)
 
 
 class ME2110World:
     name = "me2110"
+    objective = "points"  # one match, as the brief scores it (D-093)
+    points_noise = 5.0  # the smallest partial score in the brief; a judgement until repeated matches measure it
+    sprint_bars = (60.0, 150.0, 215.0)
+    max_points = float(sum(MM.MAX_POINTS.values()))
     description = ("The ME 2110 'Pirates of the Caribbean' robot: one machine, started inside a 12 x 24 x 18 in box "
                    "behind the start line, that in a 40 s match leaves the dock, sorts coins and jewels off a turning "
                    "fortress onto their mounds, runs a flag up a magnetic pole, drops cannonballs into its colour's "
                    "port, topples two merfolk and brings a heart back from a chest, using only the kit's two "
-                   "gearmotors, two pistons, two mousetraps and five rubber bands, for under $120.  System 1 places "
+                   "gearmotors, two pistons, four mousetraps and five rubber bands, for under $120.  System 1 places "
                    "it in the dock, chooses where it parks and how fast it drives, and times each mechanism.")
 
     def __init__(self) -> None:
@@ -424,7 +431,9 @@ class ME2110World:
                 for k, v in enumerate(vs):
                     out.append(Task(id=f"{g}_{split}{k}", split=split, group=g,  # type: ignore[arg-type]
                                     facts=f"{WHAT[g]}; {_variant_facts(v)}",
-                                    data={"task": g, "variant": k, "seed": k + (100 if split == "test" else 0)}))
+                                    data={"task": g, "variant": k, "seed": k + (100 if split == "test" else 0),
+                                          "barrier_in": v.barrier, "rpm": v.rpm, "mu": v.mu, "phase_rad": v.phase,
+                                          "other_barriers_in": list(v.others)}))
         return out
 
     def catalogue(self) -> list[PartType]:
@@ -476,7 +485,7 @@ class ME2110World:
         rows = [f"folded {env[0]:.1f} x {env[1]:.1f} x {env[2]:.1f} in (length x width x height); the box is "
                 f"{BOX[0]:g} x {BOX[1]:g} x {BOX[2]:g} in, either way round, height {BOX[2]:g} in",
                 f"kit actuators used: {u['motors']} of 2 gearmotors, {u['pistons']} of 2 pistons, {u['mousetraps']} of "
-                f"2 mousetraps, {u['bands']} of 5 rubber bands",
+                f"4 mousetraps, {u['bands']} of 5 rubber bands",
                 f"mass about {mass:.2f} kg; parts bought ${self._cost(body):.2f} of ${BUDGET:g}",
                 f"frame {rb.L:g} in long, {rb.W:g} in wide, deck at {rb.H:g} in; its front is at park_x + {rb.L / 2:g} in"]
         if rb.drive == "wheels2":
