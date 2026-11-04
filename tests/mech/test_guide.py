@@ -13,7 +13,7 @@ from sea.mech import build
 from sea.mech.graph import Bought, Box
 from sea.mech.patch import Op, apply_patch
 from sea.sim import jaws as J
-from sea.worlds.gripper import _built_rods, _guide_errors, _module
+from sea.worlds.gripper import _guide_errors, _module, _rod_numbers
 
 
 def _long_slide(bushings, far: bool):
@@ -42,15 +42,12 @@ def test_holding_both_ends_and_spreading_bushings_unload_them():
     """The long slide at full opening: holding the far ends halves the rack's lift, and two bushings per rod
     spread wider carry less each; with one bushing the squeeze's couple across its 10 mm sets its load."""
     q = 1.4
-    rows = {k: _built_rods(FingerSpec(jaw="built", mechanism=_long_slide(bs, far).model_dump_json()), q)
+    rows = {k: _rod_numbers(FingerSpec(jaw="built", mechanism=_long_slide(bs, far).model_dump_json()), q, q)
             for k, (bs, far) in {"cant": ((0.0,), False), "both": ((0.0,), True), "12": ((-0.012, 0.012), True),
                                  "25": ((-0.025, 0.025), True)}.items()}
 
-    def num(text, before):
-        return float(text.split(before)[0].split()[-1])
-
-    lift = {k: num(v, " mm off the gear") for k, v in rows.items()}
-    load = {k: num(v, " N (rated") for k, v in rows.items()}
+    lift = {k: v["lift_mm"] for k, v in rows.items()}
+    load = {k: v["bushing_n"] for k, v in rows.items()}
     assert lift["both"] < 0.6 * lift["cant"] and lift["25"] < lift["12"] < lift["both"]
     assert load["both"] == pytest.approx(load["cant"], rel=0.02)
     assert load["25"] < load["12"] < 0.6 * load["both"]
