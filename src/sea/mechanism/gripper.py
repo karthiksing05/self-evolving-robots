@@ -315,16 +315,19 @@ def _label(name: str, body: str) -> str:
     return "the " + part.rstrip("0123456789").replace("_", " ").strip()
 
 
-def _stop(c: dict[str, Any], a: str, b: str, qs: list[float]) -> bool:
-    """The jaw closing on its other finger: a moving finger part meets a fixed one only over the closed end of
-    the range (the first jaw positions, without a gap).  The jaw stops there; the simulator holds the fingers
-    apart with contact pairs (D-060)."""
+def _fingers(a: str, b: str) -> bool:
+    """A moving finger part and a fixed one."""
     fingers = {a.startswith(FIXED_FINGER), b.startswith(FIXED_FINGER)}, {a.startswith(MOVING_FINGER),
                                                                            b.startswith(MOVING_FINGER)}
-    if fingers != ({True, False}, {True, False}) or a.startswith(FIXED_FINGER) == b.startswith(FIXED_FINGER):
-        return False
-    at = sorted(set(c["at_q"]))
-    return at == qs[:len(at)]
+    return fingers == ({True, False}, {True, False}) and a.startswith(FIXED_FINGER) != b.startswith(FIXED_FINGER)
+
+
+def _stop(a: str, b: str) -> bool:
+    """A moving finger part on a fixed one: the jaw closing on its other finger.  The simulator gives every finger
+    pair that can meet a contact pair (D-060), so in a trial the jaw stops where its fingers first meet, as a real
+    one does; the poses past that, where the sweep finds them sharing material, are never reached.  Where the jaw
+    stops is the trial's to measure, not interference (D-082)."""
+    return _fingers(a, b)
 
 
 def _seat(c: dict[str, Any], a: str, b: str) -> bool:
@@ -335,12 +338,11 @@ def _seat(c: dict[str, Any], a: str, b: str) -> bool:
 def laws(body) -> list[str]:
     """The mechanism laws this body's jaw breaks, each with its parts and numbers (empty: none)."""
     geo = geometry(body)
-    qs = geo["samples"]
     out = []
     shared: dict[tuple[str, str], dict[str, Any]] = {}  # per pair of named parts: the worst region, where
     for pair, c in geo["clashes"].items():
         a, b = pair.split(" / ")
-        if _seat(c, a, b) or _stop(c, a, b, qs) or min(c["region_mm"]) < TOUCH_MM:
+        if _seat(c, a, b) or _stop(a, b) or min(c["region_mm"]) < TOUCH_MM:
             continue
         g = shared.setdefault((_label(a, c["bodies"][0]), _label(b, c["bodies"][1])),
                               {"region": [0.0, 0.0, 0.0], "q": set(), "pose": []})
