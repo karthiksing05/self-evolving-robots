@@ -57,7 +57,7 @@ COMPONENTS: dict[str, tuple[str, tuple[str, ...]]] = {
     # is and whether the bench can build it; the loop, prompt and backends decide how boldly it searches
     "evolve": ("judge", ("src/sea/evolve/core.py", "src/sea/evolve/resources.py")),
     "evolve_loop": ("policy", ("src/sea/evolve/loop.py", "src/sea/evolve/prompt.py", "src/sea/evolve/llm.py",
-                               "src/sea/evolve/search.py")),
+                               "src/sea/evolve/search.py", "src/sea/evolve/tools.py")),
     # each world's tasks, physics and parts catalogue: the ruler for runs in that world (D-042)
     "world_gripper": ("judge", ("src/sea/worlds/gripper.py",)),
     "world_mobile": ("judge", ("src/sea/worlds/mobile.py", "src/sea/sim/mobile_model.py")),

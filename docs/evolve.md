@@ -122,6 +122,18 @@ It has the same sections in every world (`prompt.py`):
 10. A per-slot summary of what parameter-only trials have not fixed.
 11. System 2's calibration: its predicted gains and named risks against what the trials found.
 12. The frontier, and the ideas recorded so far with their costing.
+13. With `tools` on (D-086), the tools System 2 may question the harness with and their budget.
+
+**Questions to the harness (D-086).** With `RunConfig.tools`, System 2's call runs with the `sea`
+MCP server (`evolve/tools.py`). It is read-only. Each draft proposal is answered from the loop's own
+code (`candidate`, `screen`), within a budget of 40 calls per iteration, 3 of them simulations:
+- `check`: would the loop trial the draft, or why it would refuse it;
+- `measure`: the drafted body's brief and cost, and, in the gripper, its wrist roll and loop closure;
+- `module`: a module's graph;
+- `simulate`: one train task.
+
+The loop writes each iteration's context to `tools/iterNN.json`, and every call goes to
+`tool_calls.jsonl`. Only the trial of the answer keeps a body.
 
 That summary and the brief are what make a redesign arise rather than be ordered. When parameter
 moves on a slot keep failing on one mechanism, and the brief shows the part cannot reach what the
@@ -139,6 +151,8 @@ task needs, the cheapest move left is a swap.
 - `iterations.jsonl` has every failing outcome and every proposal with its screen, resources, trial
   outcomes and decision;
 - `llm/` has every prompt and answer, with tokens and list-price cost;
+- with tools on, `tools/` has each iteration's context, and `tool_calls.jsonl` has every question
+  and answer;
 - `summary.json` has the curve, the final body, train and test groups for the final and stock
   bodies, spending, ideas and LLM usage.
 

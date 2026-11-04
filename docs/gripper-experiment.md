@@ -279,6 +279,14 @@ per plan call and per sim-hour?) is one of the V4 measurements.
    (verb, target, contact type) resolves to library programs through the same lookup as
    `programs_for`, plus memory retrieval.
 
+**Built so far (D-086): the analyze intent, over the sim.** During its one call per iteration, the evolution loop's System 2 can question the harness through a read-only server, `sea` (`evolve/tools.py`):
+- `check`: the loop's own screen of a draft proposal;
+- `measure`: the brief, the cost, the wrist roll the grasps need and a built mechanism's loop closure;
+- `module`: a module's graph;
+- `simulate`: one train task, not a trial.
+
+It works within a per-iteration budget held in the loop's context, and every call is logged to `tool_calls.jsonl`. It is switched by `RunConfig.tools`. The sense, act and design intents, and the real-arm backend, are still to build.
+
 The router starts as a rule table (tool name → intent). A learned classifier comes later, and
 only for free-form program arguments. The router never decides success.
 

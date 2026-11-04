@@ -84,7 +84,7 @@ def _outcome_line(task: Task, o: Outcome) -> str:
 def build(world: World, body: Body, tasks: Sequence[Task], outcomes: dict[str, Outcome], held: set[str],
           history: Sequence[dict[str, Any]], ideas: Sequence[dict[str, Any]], spent: Spent, manifest: dict[str, Any],
           iteration: int, iterations: int, max_proposals: int = 3, frontier: Sequence[dict[str, Any]] = (),
-          tune_trials: int = 0) -> str:
+          tune_trials: int = 0, tools: dict[str, int] | None = None) -> str:
     by_id = {t.id: t for t in tasks}
     groups = sorted({t.group for t in tasks})
     failing = [t for t in tasks if not outcomes[t.id].success]
@@ -131,6 +131,14 @@ def build(world: World, body: Body, tasks: Sequence[Task], outcomes: dict[str, O
     if ideas:
         sec.append("# Ideas recorded so far without a mechanism (untested)\n" +
                    "\n".join(f"- {i['name']} (iteration {i['iteration'] + 1}): {idea_text(i['cost'])}" for i in ideas[-6:]))
+    if tools:
+        sec.append(f"# Questions to the harness (D-086)\nBefore you answer you may ask the harness about draft "
+                   "proposals, written as you would answer them, through the `sea` tools: `check` (would the loop "
+                   "trial it, or every reason it would refuse it), `measure` (the drafted body's computed facts), "
+                   "`module` (a module's graph at given parameters) and `simulate` (one train task solved by the "
+                   f"drafted body).  This iteration allows {tools['calls']} calls, of which {tools['sims']} may "
+                   "simulate.  A check or a measurement is the harness's own computation; a simulation is one task, "
+                   "not a trial; only the trial of your answer can keep a body.")
     close = (f"Propose 1 to {max_proposals} body changes for the failing groups.  Each proposal is tried on "
              "its own and kept only if it gains a group and loses none; proposals that are each kept-eligible and "
              "change different slots are also tried together.")

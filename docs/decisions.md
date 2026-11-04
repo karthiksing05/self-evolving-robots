@@ -2688,3 +2688,41 @@ Against the prediction:
   The prediction "pass unless something else stops them" holds for 3 of 5. The other two meet the wrist within what the grasps need plus the margin.
 - **`motor.grasp`'s poses are now one function** (`grasp_poses`), used by the grasp and by the range.
 - **Full suite:** 741 passed, 2 skipped, 1 xfailed. Two D-059/D-064 tests that asserted the wrist refusal now check both sides: the body passes within the roll the grasps need, and is refused over the joint's whole range.
+
+## D-086 System 2 can question the harness while it proposes (policy: loop, prompt, backends)
+
+**Why.** In `gripper_c1c`, 32 of System 2's 94 proposals (34%) were refused before any trial: an overloaded bushing, a sector meeting the wrist, a bracket against a pinion, a pad sunk into the frame. Each refusal reached System 2 one iteration later, at the cost of one of its three proposal slots. Only 0.75 of its mechanisms per call reached a trial. The wrist question (D-085) was the plainest case: nothing let it ask what roll a body's grasps need before it drew a sector. The user's decision: give System 2 tools to question the harness mid-iteration, so that questions like this are part of how it designs.
+
+**Change.**
+- **A read-only MCP server**, `sea` (`evolve/tools.py`), speaks the subset of the protocol `claude -p` uses: newline-delimited JSON-RPC over stdio. It adds no dependency. Its four tools each take a draft written as a `Proposal`:
+
+  | Tool | What it returns |
+  |---|---|
+  | `check` | the loop's own screen, word for word: "would trial" with the cost, or every refusal |
+  | `measure` | the world's brief of the drafted body and its cost. For the gripper, also the wrist roll each train task's grasp needs, the range the simulator holds the wrist to, and how far a built mechanism's loops are from closing |
+  | `module` | a module's graph at given parameters |
+  | `simulate` | one train task on the drafted body (test tasks are refused); one task is not a trial |
+
+- **One path from proposal to trial.** The tools answer from the same code the loop runs: `loop.candidate` (the base, `build_idea`, edits, the ambiguous-slot refusal) and `loop.screen` (the laws, the resources, the record), both lifted out of the loop unchanged.
+- **The budget is in the context, not in the arguments.** The loop writes each iteration's context (`tools/iterNN.json`: the body, the promising bodies, the record of trialled bodies, the resources, the train task ids). The server enforces 40 calls per iteration, of which 3 may simulate, counted from the call log, so a retried CLI call does not reset it. Every call goes to `tool_calls.jsonl`; each iteration's record and the summary count them.
+- **Flags.** `--safe-mode` drops every MCP server, ours included (a smoke test: the server was never started). With tools, the CLI therefore gets the isolation flags themselves: `--tools ""`, `--setting-sources ""`, `--disable-slash-commands`, `--strict-mcp-config`, and `--allowedTools` limited to the four `mcp__sea__` tools. In the smoke test the model saw no CLAUDE.md, memory or skill. Without tools, the command is unchanged, flag for flag.
+- **The ablation switch** is `RunConfig.tools`, off by default, so earlier runs reproduce. When it is on, the prompt lists the tools and their budget, and says that only the trial of the answer keeps a body.
+- **The judge key is unchanged** (ce7cf7da9f79): the tools change what System 2 can learn before it answers, not what is accepted.
+
+**Prediction** (written before any campaign, against `gripper_c1c`'s 34% refused and 0.75 mechanisms trialled per call, its median call 480 s and 47k output tokens):
+- with tools on, fewer proposals are refused before trial: under 20%;
+- more mechanisms reach a trial per call: over 1.0;
+- calls take longer and write more tokens; the time is measured, not bounded;
+- no claim on groups.
+
+**Measured** (the build):
+- **The server answers on the gripper.** `check` takes 10–30 s, since it runs the interference sweep: a pad edit is refused for its known 2.4 mm overlap with the frame, and the 40 mm long slide would be trialled. `measure` takes 7 s. `simulate` takes 14 s per task; on the long slide it reports the rack lifting 1.0 mm off the gear on the gelatin box.
+- **`tests/test_tools.py`:**
+  - each draft's check equals the loop's refusal text;
+  - the budget holds across a new server process, and arguments cannot raise it;
+  - test tasks are refused;
+  - the stdio protocol (with the client's `server/discover` probe answered as an unknown method);
+  - a built jaw's wrist range (−2.13..+0.20 rad on the stock body);
+  - the flags with and without tools;
+  - the loop's per-iteration context and counts.
+- **Full suite:** 747 passed, 2 skipped, 1 xfailed.

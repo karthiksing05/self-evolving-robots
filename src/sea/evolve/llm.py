@@ -31,6 +31,12 @@ from sea.propose.llm import (
     find_claude,
 )
 
+# With System 2's tools (D-086): ``--safe-mode`` would drop every MCP server, the ``sea`` one too, so its parts are
+# named instead: no built-in tools, no settings files (so no hooks or plugins), no skills or commands, and no MCP
+# server but ``sea``.  A smoke test showed no CLAUDE.md, memory or skill in the context (2026-11-04).
+TOOL_FLAGS = ("-p", "--output-format", "json", "--tools", "", "--setting-sources", "", "--disable-slash-commands",
+              "--strict-mcp-config", "--no-session-persistence")
+
 UNREACHABLE = ("can't reach the api server", "enotfound", "econnreset", "econnrefused", "etimedout", "overloaded")
 
 
@@ -57,6 +63,22 @@ class PlanClaude:
         self._cwd = tempfile.mkdtemp(prefix="sea-evolve-")
         self._checked = False
         self.calls: list[dict[str, Any]] = []
+        self.tools: tuple[Path, Path] | None = None  # the loop sets (context, log) each iteration when tools are on
+
+    def flags(self) -> list[str]:
+        """The CLI's flags: no tools at all, or the ``sea`` tool server over this iteration's context."""
+        if self.tools is None:
+            return list(CLAUDE_FLAGS)
+        import sys
+
+        from sea.evolve.tools import NAMES
+
+        ctx, log = self.tools
+        cfg = ctx.with_suffix(".mcp.json")
+        cfg.write_text(json.dumps({"mcpServers": {"sea": {
+            "command": sys.executable, "args": ["-m", "sea.evolve.tools", "--context", str(ctx.resolve()),
+                                                "--log", str(log.resolve())]}}}))
+        return [*TOOL_FLAGS, "--mcp-config", str(cfg.resolve()), "--allowedTools", ",".join(f"mcp__sea__{n}" for n in NAMES)]
 
     def _exec(self, args: list[str], stdin: str | None = None) -> subprocess.CompletedProcess:
         binary = find_claude()
@@ -79,7 +101,7 @@ class PlanClaude:
         if not self._checked:
             self.check_plan()
         schema = json.dumps(cli_schema(ProposalBatch.model_json_schema()), sort_keys=True)
-        args = [*CLAUDE_FLAGS, "--model", self.model, "--effort", self.effort, "--system-prompt", system,
+        args = [*self.flags(), "--model", self.model, "--effort", self.effort, "--system-prompt", system,
                 "--json-schema", schema]
         text, error, batch = prompt, "", None
         t0 = time.time()
@@ -129,6 +151,8 @@ class PlanClaude:
         call = {"tag": tag, "model": self.model, "effort": self.effort, "seconds": round(time.time() - t0, 1),
                 "tokens_in": tokens_in, "tokens_out": tokens_out, "usd_list_price": round(usd, 4), "billing": "plan",
                 "error": error}
+        if self.tools is not None:
+            call["turns"] = int(result.get("num_turns") or 0)
         self.calls.append(call)
         if self.log_dir is not None:
             self.log_dir.mkdir(parents=True, exist_ok=True)

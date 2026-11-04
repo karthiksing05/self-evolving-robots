@@ -58,6 +58,7 @@ class RunConfig(BaseModel):
     budget: dict[str, float] = {}  # overrides the manifest's budget
     model: str = "claude-opus-5-5"
     effort: str = "high"
+    tools: bool = False  # System 2 may query the harness through the ``sea`` tools while it proposes (D-086)
 
 
 # ---------------------------------------------------------------- parallel evaluation
@@ -208,6 +209,52 @@ def _merge(body: Body, ranked: Sequence[Body], it: int) -> tuple[Body, list[str]
     return Body(id=f"b{it:02d}m", parent=body.id, parts=parts), ids
 
 
+# ---------------------------------------------------------------- one path from proposal to trial, shared with System 2's tools (D-086)
+def builds(world: World, prop: Proposal) -> bool:
+    """An idea that carries a mechanism is built, with any edits to its other slots (D-083)."""
+    return prop.idea is not None and prop.idea.mechanism is not None and hasattr(world, "build_idea")
+
+
+def recorded_only(world: World, prop: Proposal) -> bool:
+    """An idea the loop records with what it would need, and does not try."""
+    return (prop.move == "idea" or prop.idea is not None and not prop.edits) and not builds(world, prop)
+
+
+def candidate(world: World, body: Body, bases: dict[str, Body], prop: Proposal, catalogue: dict[str, Any],
+              new_id: str) -> Body:
+    """The body ``prop`` describes, on the current body or a promising one in ``bases``.  Raises ``ValueError``
+    naming what does not apply."""
+    if prop.base is not None and prop.base not in bases:
+        raise ValueError(f"no promising body {prop.base!r} in the record; ids: {sorted(bases)}")
+    base = body if prop.base is None else bases[prop.base]
+    if not builds(world, prop):
+        return apply(base, prop.edits, catalogue, new_id=new_id)
+    slot = prop.idea.slot  # a mechanism the catalogue lacks, built from the world's modules (D-079)
+    if slot and any(e.slot == slot for e in prop.edits):
+        raise ValueError(f"the idea builds slot {slot!r}; an edit to it as well is ambiguous: "
+                         "edit the other slots, or put the change in the mechanism")
+    cand = world.build_idea(base, prop.idea, new_id=new_id)
+    return apply(cand, prop.edits, catalogue, new_id=cand.id) if prop.edits else cand
+
+
+def built_text(prop: Proposal) -> str:
+    mech = prop.idea.mechanism
+    return "; ".join([f"{prop.idea.slot or 'mechanism'}: built {prop.idea.name!r} ({mech.module} + "
+                      f"{len(mech.patch)} changes)", *([_edit_text(prop.edits)] if prop.edits else [])])
+
+
+def screen(world: World, cand: Body, body: Body, manifest: dict[str, Any], spent: Any,
+           tried: dict[str, str]) -> tuple[list[str], ResourceReport]:
+    """What refuses ``cand`` before its trial: the world's build rules and laws, the resources, and the record."""
+    errs = world.check(cand)
+    res = check(cand, world.bom(cand), body, world.bom(body), manifest, spent)
+    if cand.key() == body.key():
+        errs = ["the edit leaves the body unchanged", *errs]
+    elif cand.key() in tried:
+        errs = [f"this exact body was already trialled: {tried[cand.key()]}", *errs]
+    return [*errs, *res.errors] if errs or not res.ok else [], res
+
+
 def _tune_key(entry: dict[str, Any]) -> tuple[float, ...]:
     """Tuning's objective: kept-eligible first, then net groups, then tasks newly passed, then partial credit."""
     return (float(bool(entry["gained"]) and not entry["lost"]), len(entry["gained"]) - len(entry["lost"]),
@@ -250,15 +297,10 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
     def trial(cand: Body, entry: dict[str, Any], full_always: bool) -> tuple[float, ...] | None:
         """Screen ``cand`` against the current body and, if admitted, solve it, filling ``entry``.  Returns its
         acceptance score if it gains a group and loses none."""
-        errs = world.check(cand)
-        res = check(cand, world.bom(cand), body, world.bom(body), manifest, spent)
+        errs, res = screen(world, cand, body, manifest, spent, tried)
         entry["resources"] = res.model_dump()
-        if cand.key() == body.key():
-            errs = ["the edit leaves the body unchanged", *errs]
-        elif cand.key() in tried:
-            errs = [f"this exact body was already trialled: {tried[cand.key()]}", *errs]
-        if errs or not res.ok:
-            entry.update(result="refused before trial: " + "; ".join([*errs, *res.errors]), tried=False)
+        if errs:
+            entry.update(result="refused before trial: " + "; ".join(errs), tried=False)
             return None
         held_tasks = [t for t in train if t.group in held]
         cand_out = ev.solve(cand, held_tasks)
@@ -354,8 +396,20 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
             if isinstance(proposer, RandomProposer):
                 proposer.body = body
             front = sorted(frontier.values(), key=lambda f: (-(len(f["gained"]) - len(f["lost"])), f["iteration"]))
+            budget = None
+            if cfg.tools:  # what System 2's tools check a draft against: this iteration's body and record (D-086)
+                from sea.evolve import tools as T
+
+                ctx = out / "tools" / f"iter{it:02d}.json"
+                ctx.parent.mkdir(exist_ok=True)
+                ctx.write_text(T.Context(world=cfg.world, iteration=it, body=body, tried=tried, manifest=manifest,
+                                         bases={i: f["body"] for i, f in frontier.items()}, spent=spent,
+                                         train=[t.id for t in train]).model_dump_json())
+                budget = {"calls": T.CALLS, "sims": T.SIMS}
+                if hasattr(proposer, "tools"):
+                    proposer.tools = (ctx, out / "tool_calls.jsonl")
             prompt = build(world, body, train, outcomes, held, history, ideas, spent, manifest, it, cfg.iterations,
-                           cfg.max_proposals, frontier=front[:5], tune_trials=cfg.tune_trials)
+                           cfg.max_proposals, frontier=front[:5], tune_trials=cfg.tune_trials, tools=budget)
             try:
                 batch = proposer.propose(SYSTEM, prompt, tag=f"iter{it:02d}")
             except (PlanLimitReached, PlanBillingError):
@@ -364,6 +418,8 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                 log(f"  iter {it}: System 2 gave no proposals: {exc}")
                 batch = ProposalBatch.model_construct(proposals=[], notes=f"System 2 gave no proposals: {exc}")
             rec["llm"] = proposer.calls[-1] if getattr(proposer, "calls", None) else {}
+            if cfg.tools:
+                rec["tools"] = T.summary(out / "tool_calls.jsonl", it)
             rec["notes"] = batch.notes
             trials = []
             swaps: list[tuple[Body, dict[str, Any]]] = []
@@ -372,9 +428,8 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
             for k, prop in enumerate(batch.proposals[: cfg.max_proposals]):
                 entry: dict[str, Any] = {"k": k, "proposal": prop.model_dump(), "iteration": it, "move": prop.move,
                                          "hypothesis": prop.hypothesis, "edit": _edit_text(prop.edits)}
-                # an idea that carries a mechanism is built, with any edits to its other slots (D-083)
-                builds = prop.idea is not None and prop.idea.mechanism is not None and hasattr(world, "build_idea")
-                if (prop.move == "idea" or prop.idea is not None and not prop.edits) and not builds:
+                built = builds(world, prop)
+                if recorded_only(world, prop):
                     idea = prop.idea.model_dump() if prop.idea else {"name": "?", "needs": []}
                     cost = cost_idea(prop.idea.needs if prop.idea else [], manifest, spent)
                     ideas.append({**idea, "iteration": it, "cost": cost})
@@ -384,30 +439,17 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                     history.append(entry)
                     continue
                 try:
-                    if prop.base is not None and prop.base not in frontier:
-                        raise ValueError(f"no promising body {prop.base!r} in the record; ids: {sorted(frontier)}")
-                    base = body if prop.base is None else frontier[prop.base]["body"]
-                    if builds:  # a mechanism the catalogue lacks, built from the world's modules (D-079)
-                        slot = prop.idea.slot
-                        if slot and any(e.slot == slot for e in prop.edits):
-                            raise ValueError(f"the idea builds slot {slot!r}; an edit to it as well is ambiguous: "
-                                             "edit the other slots, or put the change in the mechanism")
-                        cand = world.build_idea(base, prop.idea, new_id=f"b{it:02d}{k}")
-                        if prop.edits:
-                            cand = apply(cand, prop.edits, catalogue, new_id=cand.id)
-                        mech = prop.idea.mechanism
-                        entry["edit"] = "; ".join([f"{slot or 'mechanism'}: built {prop.idea.name!r} ({mech.module} + "
-                                                   f"{len(mech.patch)} changes)", *([_edit_text(prop.edits)]
-                                                                                   if prop.edits else [])])
-                    else:
-                        cand = apply(base, prop.edits, catalogue, new_id=f"b{it:02d}{k}")
+                    cand = candidate(world, body, {i: f["body"] for i, f in frontier.items()}, prop, catalogue,
+                                     new_id=f"b{it:02d}{k}")
+                    if built:
+                        entry["edit"] = built_text(prop)
                 except ValueError as exc:
                     entry.update(result=f"refused before trial: {exc}", tried=False)
                     trials.append(entry)
                     history.append(entry)
                     continue
                 change = _diff(body, cand)  # against the current body, also when the proposal builds on another
-                entry["move"] = "idea" if builds else edit_rung(body, change)
+                entry["move"] = "idea" if built else edit_rung(body, change)
                 entry["slots"] = sorted({e.slot for e in change})
                 score = trial(cand, entry, full_always=entry["move"] in ("swap", "idea"))  # a redesign is scored whole
                 if entry.get("tried"):
@@ -483,5 +525,9 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                 "tokens_out": sum(c.get("tokens_out", 0) for c in getattr(proposer, "calls", []) or []),
                 "usd_list_price": round(sum(c.get("usd_list_price", 0.0) for c in getattr(proposer, "calls", []) or []), 3)},
     }
+    if cfg.tools:
+        from sea.evolve.tools import summary as tool_summary
+
+        summary["tools"] = tool_summary(out / "tool_calls.jsonl")
     (out / "summary.json").write_text(json.dumps(summary, indent=1))
     return summary
