@@ -38,6 +38,7 @@ CALLS, SIMS = 40, 3  # per iteration
 SWEEP_VALUES, SWEEP_READINGS = 12, 6
 SENSITIVITY_PARAMS = 12
 COMPARE_DRAFTS, DRAFTS_BEFORE_SIMULATE = 3, 2
+NOTES_BEFORE_SIMULATE = 2  # in a run's first iteration: an engineer reads before building (D-099)
 
 
 class Context(BaseModel):
@@ -421,12 +422,25 @@ class Server:
         params = {k: params.get(k, (lo + hi) / 2) for k, (lo, hi) in ranges.items()}
         return f"{name} at {params or 'its only setting'}:\n" + W._compact(W._module(name, params))
 
+    def _research_first(self) -> None:
+        """Refuse a first iteration's simulation until the run has written down what it read, or spent its searches."""
+        from sea.evolve import research as RS
+
+        if not self.ctx.notebook or self.ctx.iteration != 0:
+            return
+        ours = [n for n in RS.load(Path(self.ctx.notebook)) if n.run == self.ctx.run]
+        spent = RS.summary(Path(self.ctx.research_log), 0)["calls"] >= RS.BUDGET
+        if len(ours) < NOTES_BEFORE_SIMULATE and not spent:
+            raise ToolError(f"research first: this run has recorded {len(ours)} of {NOTES_BEFORE_SIMULATE} notes.  Search "
+                            "and read what the failures need you to know, and record each finding with `note`")
+
     def _simulate(self, args: dict[str, Any]) -> str:
         task = str(args.get("task", ""))
         if task not in self.ctx.train:
             raise ToolError(f"{task!r} is not a train task; the train tasks are {self.ctx.train}")
         from sea.evolve.loop import screen
 
+        self._research_first()
         _, cand = self._draft(args)
         if self.drafts and len(self._drafted()) < DRAFTS_BEFORE_SIMULATE:
             raise ToolError(f"this draft opens a new concept: check or measure {DRAFTS_BEFORE_SIMULATE} distinct new "

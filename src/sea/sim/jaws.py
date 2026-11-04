@@ -12,6 +12,7 @@ transmission angle stays above 35 degrees over the jaw's range (it reaches toggl
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass
 from functools import lru_cache
 
 import mujoco
@@ -226,23 +227,62 @@ BUSHING_LEN = 10.0 * MM
 # The bushing's rated load: no LM3UU datasheet gives one; the 3 mm miniature LMS3UU is rated 37.4-52.9 N static
 # and 48.9-56.1 N dynamic (motion.com, sku 08943031).  Above its static rating the balls dent the rod.
 BUSHING_RATED_N = 52.9
+
+
+@dataclass(frozen=True)
+class Bushing:
+    """A linear ball bushing and the steel rod it runs on (D-098).  Above its static rating the balls dent the rod."""
+
+    item: str
+    rod_r: float
+    od: float
+    length: float
+    kg: float
+    rated_n: float
+
+    @property
+    def ei(self) -> float:
+        return 200e9 * math.pi * self.rod_r**4 / 4
+
+
+# Static ratings, the lowest listed where sources differ: LM4 and LM5 from THK's LM table (catalogue excerpt; RS lists
+# 210 N for LM4, so 127 N is the safe one), LM6 from THK, BKL and HC (all 265 N), LM8 from Misumi C-LM8UU (Samick 400,
+# BKL 392, THK 402).  Sizes and masses are the same tables' (bore x outside x length).
+BUSHINGS: dict[str, Bushing] = {b.item: b for b in (
+    Bushing("lm3uu", ROD_R, 7.0 * MM, BUSHING_LEN, BUSHING_KG, BUSHING_RATED_N),
+    Bushing("lm4uu", 2.0 * MM, 8.0 * MM, 12.0 * MM, 0.0019, 127.0),
+    Bushing("lm5uu", 2.5 * MM, 10.0 * MM, 15.0 * MM, 0.004, 206.0),
+    Bushing("lm6uu", 3.0 * MM, 12.0 * MM, 19.0 * MM, 0.0085, 265.0),
+    Bushing("lm8uu", 4.0 * MM, 15.0 * MM, 24.0 * MM, 0.017, 380.0))}
+LM3 = BUSHINGS["lm3uu"]
+
+
+def bushing_for(rod_mm: float) -> Bushing:
+    """The bushing of a rod this thick; a size the catalogue lacks is refused, naming those it has."""
+    for b in BUSHINGS.values():
+        if abs(2000 * b.rod_r - rod_mm) < 1e-6:
+            return b
+    raise ValueError(f"no bushing for a {rod_mm:g} mm rod; the sizes are {[round(2000 * b.rod_r) for b in BUSHINGS.values()]} mm")
+
+
 PRESSURE_ANGLE = math.radians(20.0)  # the teeth's: the mesh pushes the rack off the gear with tan(20) of its load
 TOOTH_SKIP = 0.5  # of a module: a rack pushed this far off the gear has lost most of its working depth (2 m)
 HOLD_STEPS = 10  # a lift or load counts once it lasts 20 ms, as the force limit's does: not an impact's spike
 
 
-def rod_stiffness(a: float) -> tuple[float, float]:
+def rod_stiffness(a: float, ei: float = ROD_EI) -> tuple[float, float]:
     """The two rods' stiffness at overhang ``a`` (m), each mode held still: across them (N/m) and turning (N m/rad)."""
-    return 2 * 12 * ROD_EI / a**3, 2 * 4 * ROD_EI / a
+    return 2 * 12 * ei / a**3, 2 * 4 * ei / a
 
 
-def _beam(n: float) -> np.ndarray:
+def _beam(n: float, ei: float = ROD_EI) -> np.ndarray:
     """A rod segment of length ``n`` as a beam element: (deflection, slope) at both of its ends."""
-    return ROD_EI / n**3 * np.array([[12, 6 * n, -12, 6 * n], [6 * n, 4 * n * n, -6 * n, 2 * n * n],
+    return ei / n**3 * np.array([[12, 6 * n, -12, 6 * n], [6 * n, 4 * n * n, -6 * n, 2 * n * n],
                                      [-12, -6 * n, 12, -6 * n], [6 * n, 2 * n * n, -6 * n, 4 * n * n]])
 
 
-def guide_beam(xs: tuple[float, ...], bs: tuple[float, ...], span: float | None) -> tuple[np.ndarray, np.ndarray]:
+def guide_beam(xs: tuple[float, ...], bs: tuple[float, ...], span: float | None,
+               ei: float = ROD_EI) -> tuple[np.ndarray, np.ndarray]:
     """Two rods clamped at x = 0 (and at ``span`` if held there too), each sleeved by bushings at ``xs`` from the
     clamp (sorted, apart), the bushings ``bs`` along the rods from the carriage's middle (D-080).  The rigid
     carriage sets every bushing's deflection and slope from its own (v, t) at its middle.  Returns the
@@ -253,7 +293,7 @@ def guide_beam(xs: tuple[float, ...], bs: tuple[float, ...], span: float | None)
     k = np.zeros((2 * n, 2 * n))
     for i in range(n - 1):
         idx = np.arange(2 * i, 2 * i + 4)
-        k[np.ix_(idx, idx)] += _beam(pts[i + 1] - pts[i])
+        k[np.ix_(idx, idx)] += _beam(pts[i + 1] - pts[i], ei)
     free = slice(2, 2 * (len(xs) + 1))
     k = k[free, free]
     b = np.zeros((2 * len(xs), 2))
@@ -263,26 +303,26 @@ def guide_beam(xs: tuple[float, ...], bs: tuple[float, ...], span: float | None)
 
 
 def bushing_overhangs(centre: float, s: float, clamp: float, bs: tuple[float, ...],
-                      far: float | None) -> tuple[float, ...]:
+                      far: float | None, length: float = BUSHING_LEN) -> tuple[float, ...]:
     """Each bushing's distance from the clamp at slide travel ``s``, kept a half bushing clear of each clamp and a
     bushing apart (where a carriage would meet them, the interference law sees it)."""
     out: list[float] = []
     for off in sorted(bs):
-        a = max(centre + s + off - BUSHING_LEN / 2 - clamp, BUSHING_LEN / 2, (out[-1] + BUSHING_LEN) if out else 0.0)
+        a = max(centre + s + off - length / 2 - clamp, length / 2, (out[-1] + length) if out else 0.0)
         out.append(a)
     if far is not None:
         span = far - clamp
-        out = [min(a, span - BUSHING_LEN / 2 - (len(out) - 1 - i) * BUSHING_LEN) for i, a in enumerate(out)]
+        out = [min(a, span - length / 2 - (len(out) - 1 - i) * length) for i, a in enumerate(out)]
     return tuple(out)
 
 
 def guide_static(clamp: float, centre: float, bs: tuple[float, ...], far: float | None, s: float, sep: float,
-                 dx: float, pitch: float, yaw: float) -> tuple[float, float, float]:
+                 dx: float, pitch: float, yaw: float, hw: Bushing = LM3) -> tuple[float, float, float]:
     """A guide loaded statically at travel ``s``: the teeth's separating force ``sep`` at ``dx`` from the
     carriage's middle and the squeeze's couples about y (``pitch``) and z (``yaw``), worst sign.  Returns the
     nearest bushing's overhang (m), the rack's lift off the gear (m) and the most loaded bushing's load (N)."""
-    xs = bushing_overhangs(centre, s, clamp, bs, far)
-    kc, kb = guide_beam(xs, tuple(sorted(bs)), None if far is None else far - clamp)
+    xs = bushing_overhangs(centre, s, clamp, bs, far, hw.length)
+    kc, kb = guide_beam(xs, tuple(sorted(bs)), None if far is None else far - clamp, hw.ei)
     lift, worst = 0.0, 0.0
     for sign in (-1.0, 1.0):
         u = np.linalg.solve(kc, [-sep, -sep * dx + sign * pitch])
@@ -290,8 +330,8 @@ def guide_static(clamp: float, centre: float, bs: tuple[float, ...], far: float 
         lift = max(lift, -(u[0] + u[1] * dx))
         fz, fy = kb @ u, kb @ w
         for i in range(len(xs)):
-            worst = max(worst, math.hypot(abs(fz[2 * i]) + abs(fz[2 * i + 1]) / BUSHING_LEN,
-                                          abs(fy[2 * i]) + abs(fy[2 * i + 1]) / BUSHING_LEN))
+            worst = max(worst, math.hypot(abs(fz[2 * i]) + abs(fz[2 * i + 1]) / hw.length,
+                                          abs(fy[2 * i]) + abs(fy[2 * i + 1]) / hw.length))
     return xs[0], lift, worst
 
 
@@ -340,6 +380,9 @@ class RodSprings:
         if any(model.numeric(i).name == "jaw_guide" for i in range(model.nnumeric)):
             far, end, *bs = (float(x) for x in model.numeric("jaw_guide").data)
             self.beam = (None if math.isnan(far) else far, end, tuple(sorted(bs)))
+        self.ei, self.length, self.rated = ROD_EI, BUSHING_LEN, BUSHING_RATED_N  # a guide on other parts says so (D-098)
+        if any(model.numeric(i).name == "jaw_bushing" for i in range(model.nnumeric)):
+            self.ei, self.length, self.rated = (float(x) for x in model.numeric("jaw_bushing").data)
         self.q = [int(model.jnt_qposadr[model.joint(n).id]) for n in self.JOINTS]
         self.v = [int(model.jnt_dofadr[model.joint(n).id]) for n in self.JOINTS]
         self.slide = int(model.jnt_qposadr[model.joint("jaw_slide").id])
@@ -356,33 +399,33 @@ class RodSprings:
         self._recent: list[tuple[float, float, float]] = []  # (lift mm, bushing N, overhang mm) per step
 
     def overhang(self, s: float) -> float:
-        return max(self.centre + s - BUSHING_LEN / 2 - self.clamp, BUSHING_LEN / 2)
+        return max(self.centre + s - self.length / 2 - self.clamp, self.length / 2)
 
     def apply(self, d: mujoco.MjData) -> None:
         s = float(d.qpos[self.slide])
         a = self.overhang(s)
         load = []
         if self.beam is None:
-            c = 2 * ROD_EI / a**3
+            c = 2 * self.ei / a**3
             for k in (0, 2):  # (dy, yaw), then (dz, pitch)
                 v, t = float(d.qpos[self.q[k]]), float(d.qpos[self.q[k + 1]])
                 f, m = c * (12 * v - 6 * a * t), c * (-6 * a * v + 4 * a * a * t)
                 d.qfrc_applied[self.v[k]], d.qfrc_applied[self.v[k + 1]] = -f, -m
-                load.append(abs(f) / 2 + abs(m) / 2 / BUSHING_LEN)  # per rod: its share, and the couple across a bushing
+                load.append(abs(f) / 2 + abs(m) / 2 / self.length)  # per rod: its share, and the couple across a bushing
         else:  # the rods as beams through every bushing (D-080)
             far, end, bs = self.beam
-            xs = bushing_overhangs(self.centre, s, self.clamp, bs, far)
+            xs = bushing_overhangs(self.centre, s, self.clamp, bs, far, self.length)
             a = xs[0]
-            kc, kb = guide_beam(xs, bs, None if far is None else far - self.clamp)
+            kc, kb = guide_beam(xs, bs, None if far is None else far - self.clamp, self.ei)
             per = []
             for k in (0, 2):
                 u = np.array([float(d.qpos[self.q[k]]), float(d.qpos[self.q[k + 1]])])
                 f, m = kc @ u
                 d.qfrc_applied[self.v[k]], d.qfrc_applied[self.v[k + 1]] = -f, -m
                 per.append(kb @ u)
-            load = [max(math.hypot(abs(per[0][2 * i]) + abs(per[0][2 * i + 1]) / BUSHING_LEN,
-                                   abs(per[1][2 * i]) + abs(per[1][2 * i + 1]) / BUSHING_LEN) for i in range(len(xs))), 0.0]
-            self.off_end_mm = max(self.off_end_mm, (self.centre + s + bs[-1] + BUSHING_LEN / 2 - end) * 1000)
+            load = [max(math.hypot(abs(per[0][2 * i]) + abs(per[0][2 * i + 1]) / self.length,
+                                   abs(per[1][2 * i]) + abs(per[1][2 * i + 1]) / self.length) for i in range(len(xs))), 0.0]
+            self.off_end_mm = max(self.off_end_mm, (self.centre + s + bs[-1] + self.length / 2 - end) * 1000)
         rows = (d.efc_type[: d.nefc] == mujoco.mjtConstraint.mjCNSTR_EQUALITY) & (d.efc_id[: d.nefc] == self.eq)
         f_t = float(np.abs(d.efc_force[: d.nefc][rows]).sum()) if d.nefc else 0.0
         dx = self.mesh_x - (self.centre + s)  # the mesh, from the carriage's centre (pitch turns about it)
@@ -404,8 +447,8 @@ class RodSprings:
         if self.lift_mm > TOOTH_SKIP * self.module * 1000:
             return (f"unphysical: the rods let the rack lift {self.lift_mm:.1f} mm off the gear ({self.at_mm:.0f} mm "
                     f"out from the clamp); past {TOOTH_SKIP * self.module * 1000:.1f} mm the teeth skip")
-        if self.bushing_n > BUSHING_RATED_N:
-            return (f"unphysical: a bushing carried {self.bushing_n:.0f} N; it is rated {BUSHING_RATED_N:g} N, past "
+        if self.bushing_n > self.rated:
+            return (f"unphysical: a bushing carried {self.bushing_n:.0f} N; it is rated {self.rated:g} N, past "
                     "which it dents the rod")
         return ""
 

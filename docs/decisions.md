@@ -3007,3 +3007,51 @@ Beyond the prediction: a promoted mechanism reaches a graph as patch operations 
 - seed 0's potted-meat can does not: a fresh search of 2 attempts stops at the force limit, as the body it started from does.
 
 The cause is not established. D-085's wrist-roll limit is one candidate, a single re-solve's search luck is another. So D-084's 19, 18 and 18 are results under the judge of that time. F9's gripper arm measures on today's judge. Two long-slide failures do replay as recorded (apple: a bushing at 119 N against 52.9 N; banana: stuck).
+
+## D-097 Verify the gripper on today's judge, then iterate with the full framework until it holds 21 of 21 (evaluation; F9 for the gripper)
+
+**Why.** The user's direction: keep iterating until the gripper is thoroughly verified with the new harness, aiming for all 21 groups. Every gripper score on record predates a judge or physics change, and 1 of 3 rechecked gains reproduced, so there is no baseline to improve on. How much a verdict depends on the search seed has also never been measured.
+
+**Change.** `scripts/recheck_bodies.py` re-solves a run's final body on every task, under several seeds, on today's code. No verdict or law changes. A score counts as verified only when the final body holds its groups under every seed of a recheck on the judge of that moment, on both train and held-out tasks. Redesigns come only from System 2, and no law is loosened to reach the target. If a law looks wrong it is examined on physical evidence and recorded on its own, never as a means to a score.
+
+**Prediction** (before the run):
+- stock holds 15 to 17 of 21 train groups under each seed, as recorded before;
+- the rods-run and C1 best bodies each hold fewer groups than their records under at least one seed, by 1 to 3 groups: the records took a single seed's verdict and today's judge differs;
+- at least 1 group flips between seeds on every body, so a one-seed score overstates what a body can do;
+- for the campaign, the full framework reaches 19 or more verified on at least one seed. I do not predict 21: no body has reached it under the D-076 physics, and the last two groups have been the hardest throughout.
+
+**Baseline measured (D-097's recheck, `results/evolve/recheck/d097_baseline.json`; 3 seeds, 42 train and 42 test tasks).**
+
+| body | train groups, seeds 0/1/2 | test groups | held on train and test under every seed |
+|---|---|---|---|
+| stock | 16, 16, 16 | 15, 16, 15 | 13 |
+| `gripper_s2rods_s0` | 19, 18, 18 | 18, 19, 19 | **18** |
+| `gripper_c1c_s0` | 19, 19, 19 | 18, 19, 18 | **18** |
+| `gripper_c1c_s1` | 17, 18, 17 | 17, 16, 16 | 16 |
+| `gripper_c1c_s2` | 17, 18, 18 | 17, 17, 17 | 17 |
+
+- Prediction on stock (15 to 17 train): held. Prediction that bodies fall below their records: wrong for `c1c_s0`, right for `s2rods_s0` on two seeds. Groups do flip between seeds, as predicted.
+- This corrects the earlier single-task recheck, which overstated the doubt: at body level the C1 scores largely stand.
+- **The verified best is 18 of 21.** Both best bodies never hold the same three groups: mustard bottle, potted-meat can, sugar box.
+- **The live run** (`gripper_f_smoke`) ran the full framework end to end, and showed three process gaps: no web research at all though it was on; coverage calling every group uncovered, since System 2 named groups in `source` and not in `tasks`; 1.75M tokens in and 16 minutes for one System 2 call.
+
+## D-098 A guide's rods and bushings are a choice of real parts (judge: mechanism; world: physics, gripper)
+
+**Why.** Every long slide that reached a trial passed 0 of its 42 picks, mostly on bushing load and tooth skip. Both are set by the 3 mm rod and the LM3UU, which are global constants. A graph could draw a thicker rod and the physics would still bend a 3 mm one. This breaks the standing rule that a binding law must expose the variable it binds on: the slide family has never been fairly tried. Nothing here is a design hint; it adds parts a shop can buy, with their datasheet numbers.
+
+**Change.** `Guide.bushing` names one of LM3UU, LM4UU, LM5UU, LM6UU, LM8UU (`jaws.BUSHINGS`). The rod's bending stiffness, the bushing's length and rating, and the mass follow it. Where sources differ the lowest rating listed is used, so a slide is never flattered. The rating is checked in the simulator, the part facts and the instruments alike. Laws: a built guide's rods must have that bushing's bore, carriage must carry that bushing, the carriage must have material around each bushing's outside (1 mm wall at least), rods far enough apart for two bushings. Modules `prismatic` and `long_slide` gain `rod_mm`, default 3.
+
+**Prediction** (before the code):
+- every existing golden is unchanged: 3 mm stays numerically identical;
+- rod stiffness goes as d^4 (6 mm is 16 times 3 mm), a hand-checked number in a test;
+- a long slide on 6 mm rods has static bushing load under its 265 N rating and rack lift under the skip limit, where 3 mm has neither at wide openings;
+- it gets heavier by about 100 g, which is the cost the wrist and shoulder laws then judge;
+- whether any slide then passes picks is not predicted. The rack pressing on objects and the sector's sweep are other causes, untouched here.
+
+## D-099 System 2 researches before it simulates, and a group named as a requirement's source is covered (policy: tools, prompt, requirements)
+
+**Why.** With research switched on, the live run made no search in 35 turns, so the framework's source of engineering knowledge was never used. "You may search" leaves out what the user asked the harness to encode: conducting appropriate research. Coverage called all 21 groups uncovered because System 2 traces needs through `source` ("reg_sugar_box simulation..."), and only `tasks` was counted.
+
+**Change.** In a run's first iteration `simulate` is refused until the run has recorded 2 notes, or its searches are spent, in the same way as the parallel-draft rule. It says what to do, never what to find. The prompt asks for research first and again when a failure comes back. Coverage counts a group named in `tasks` or in `source`.
+
+**Prediction:** the next live run makes searches and records at least 2 notes in iteration 0; the uncovered list shrinks to groups no requirement mentions. Whether notes are cited in kept changes is a campaign measurement.

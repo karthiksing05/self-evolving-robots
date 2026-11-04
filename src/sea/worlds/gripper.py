@@ -430,6 +430,18 @@ class GripperWorld:
                 "steel_rod_3x100": {"on_hand": 0, "usd": 1.5, "lead_days": 2, "doc": "3 mm ground steel rod"},
                 "steel_rod_3x150": {"on_hand": 0, "usd": 2.0, "lead_days": 2, "doc": "3 mm ground steel rod"},
                 "lm3uu_bearing": {"on_hand": 0, "usd": 1.2, "lead_days": 3, "doc": "3 mm linear bushing"},
+                "lm4uu_bearing": {"on_hand": 0, "usd": 1.3, "lead_days": 3, "doc": "4 mm linear bushing"},
+                "lm5uu_bearing": {"on_hand": 0, "usd": 1.5, "lead_days": 3, "doc": "5 mm linear bushing"},
+                "lm6uu_bearing": {"on_hand": 0, "usd": 1.5, "lead_days": 3, "doc": "6 mm linear bushing"},
+                "lm8uu_bearing": {"on_hand": 0, "usd": 2.0, "lead_days": 3, "doc": "8 mm linear bushing"},
+                "steel_rod_4x100": {"on_hand": 0, "usd": 1.8, "lead_days": 2, "doc": "4 mm ground steel rod"},
+                "steel_rod_4x150": {"on_hand": 0, "usd": 2.4, "lead_days": 2, "doc": "4 mm ground steel rod"},
+                "steel_rod_5x100": {"on_hand": 0, "usd": 2.2, "lead_days": 2, "doc": "5 mm ground steel rod"},
+                "steel_rod_5x150": {"on_hand": 0, "usd": 3.0, "lead_days": 2, "doc": "5 mm ground steel rod"},
+                "steel_rod_6x100": {"on_hand": 0, "usd": 2.6, "lead_days": 2, "doc": "6 mm ground steel rod"},
+                "steel_rod_6x150": {"on_hand": 0, "usd": 3.6, "lead_days": 2, "doc": "6 mm ground steel rod"},
+                "steel_rod_8x100": {"on_hand": 0, "usd": 3.2, "lead_days": 2, "doc": "8 mm ground steel rod"},
+                "steel_rod_8x150": {"on_hand": 0, "usd": 4.4, "lead_days": 2, "doc": "8 mm ground steel rod"},
                 "mr63_bearing": {"on_hand": 0, "usd": 0.9, "lead_days": 3, "doc": "3 mm pivot bearing"},
                 "mgn7_rail": {"on_hand": 0, "doc": "miniature linear rail (none on the bench)"},
             },
@@ -509,10 +521,13 @@ class GripperWorld:
                "either with their own joints; loops and meshes tie them to the servo.  The finger is the body with "
                "a pad_mount (else the blade's): the pads ride on it.  A guide's rods bend as beams: clamped at "
                "clamp_end, and at far_end too when a "
-               "clamp part holds them there; the carriage rides two LM3UU per bushing offset.",
+               "clamp part holds them there; the carriage rides two bushings per offset.  A guide's `bushing` picks the "
+               "part, and its rod's diameter sets how the rods bend: " + "; ".join(
+                   f"{b.item} ({2000 * b.rod_r:g} mm rod, {b.od * 1000:g} mm outside, {b.length * 1000:g} mm long, {b.kg * 1000:g} g, "
+                   f"rated {b.rated_n:g} N)" for b in J.BUSHINGS.values()) + ".  A module's rod_mm is one of those rods.",
                "Part kinds, then a body's, joint's and constraint's fields:", *kinds, (patch_doc or "").strip(), "Modules (a patch applies to the module's graph):"]
         for name, (_, params) in MODULES.items():
-            mid = {k: (lo + hi) / 2 for k, (lo, hi) in params.items()}
+            mid = {k: MODULE_DEFAULTS.get(k, (lo + hi) / 2) for k, (lo, hi) in params.items()}
             ranges = ", ".join(f"{k} {lo:g}..{hi:g}" for k, (lo, hi) in params.items()) or "no parameters"
             out += [f"## {name} ({ranges}); at {mid or 'its only setting'}:", _compact(_module(name, mid))]
         return "\n".join(out)
@@ -739,8 +754,9 @@ class GripperWorld:
 
 MODULES: dict[str, tuple[str, dict[str, tuple[float, float]]]] = {
     "revolute": ("revolute", {}), "parallelogram": ("parallelogram", {"link_mm": (50.0, 90.0)}),
-    "prismatic": ("prismatic", {"pinion_teeth": (17.0, 60.0)}),
-    "long_slide": ("long_slide", {"sector_radius_mm": (30.0, 50.0)})}
+    "prismatic": ("prismatic", {"pinion_teeth": (17.0, 60.0), "rod_mm": (3.0, 8.0)}),
+    "long_slide": ("long_slide", {"sector_radius_mm": (30.0, 50.0), "rod_mm": (3.0, 8.0)})}
+MODULE_DEFAULTS = {"rod_mm": 3.0}  # the bench's own rods, not the range's middle (D-098)
 
 
 @lru_cache(maxsize=1)
@@ -759,16 +775,16 @@ def _module(name: str, params: dict[str, float]):
     bad = sorted(set(params) - set(ranges))
     if bad:
         raise ValueError(f"module {name} has no parameter {bad[0]!r}; it has {sorted(ranges)}")
-    p = {k: float(params.get(k, (lo + hi) / 2)) for k, (lo, hi) in ranges.items()}
+    p = {k: float(params.get(k, MODULE_DEFAULTS.get(k, (lo + hi) / 2))) for k, (lo, hi) in ranges.items()}
     for k, v in p.items():
         if not ranges[k][0] - 1e-9 <= v <= ranges[k][1] + 1e-9:
             raise ValueError(f"{name}.{k}={v:g} is outside {ranges[k][0]:g}..{ranges[k][1]:g}")
     if name == "parallelogram":
         return S.parallelogram(p["link_mm"], _site())
     if name == "prismatic":
-        return S.slide(round(p["pinion_teeth"]) / 2 * J.MM, False, _site())
+        return S.slide(round(p["pinion_teeth"]) / 2 * J.MM, False, _site(), J.bushing_for(p["rod_mm"]))
     if name == "long_slide":
-        return S.slide(round(2 * p["sector_radius_mm"]) / 2 * J.MM, True, _site())
+        return S.slide(round(2 * p["sector_radius_mm"]) / 2 * J.MM, True, _site(), J.bushing_for(p["rod_mm"]))
     return S.revolute()
 
 
@@ -835,15 +851,20 @@ def _guide_errors(g, gd) -> list[str]:
 
     out = []
     bs = sorted(gd.bushings)
-    if any(b1 - b0 < jaws.BUSHING_LEN - 1e-9 for b0, b1 in zip(bs, bs[1:], strict=False)):
-        out.append(f"the guide's bushings at {[round(b * 1000, 1) for b in bs]} mm overlap: an LM3UU is "
-                   f"{jaws.BUSHING_LEN * 1000:g} mm long")
+    hw = jaws.BUSHINGS.get(gd.bushing)
+    if hw is None:
+        return [f"no bushing {gd.bushing!r}; there are {sorted(jaws.BUSHINGS)}"]
+    name = hw.item.upper()
+    if any(b1 - b0 < hw.length - 1e-9 for b0, b1 in zip(bs, bs[1:], strict=False)):
+        out.append(f"the guide's bushings at {[round(b * 1000, 1) for b in bs]} mm overlap: an {name} is "
+                   f"{hw.length * 1000:g} mm long")
     car = next((b for b in g.bodies if b.name == gd.carriage), None)
-    n = sum(isinstance(p, Bought) and p.item == "lm3uu" for p in (car.parts if car else ()))
+    n = sum(isinstance(p, Bought) and p.item == hw.item for p in (car.parts if car else ()))
     if n != 2 * len(bs):
-        out.append(f"the carriage carries {n} LM3UU bushings; {len(bs)} offset(s) on two rods need {2 * len(bs)}")
+        out.append(f"the carriage carries {n} {name} bushings; {len(bs)} offset(s) on two rods need {2 * len(bs)}")
+    out += _bushing_seats(g, gd, hw, car)
     if gd.far_end is not None:
-        if gd.far_end <= gd.clamp_end + 2 * jaws.BUSHING_LEN:
+        if gd.far_end <= gd.clamp_end + 2 * hw.length:
             out.append(f"the guide's far end ({gd.far_end * 1000:.1f} mm) must lie beyond its clamp "
                        f"({gd.clamp_end * 1000:.1f} mm) by at least two bushings")
         grip = next((b for b in g.bodies if b.name == "gripper"), None)
@@ -863,6 +884,34 @@ def _guide_errors(g, gd) -> list[str]:
     return out
 
 
+def _bushing_seats(g, gd, hw, car) -> list[str]:
+    """A bushing is a real part with an outside: the rods must take its bore, sit far enough apart for two, and the
+    carriage must have material round each one (D-098).  A bushing's solid is not modelled, so this is what says it fits."""
+    from sea.mech.graph import Box, Cylinder
+
+    grip = next((b for b in g.bodies if b.name == "gripper"), None)
+    rods = [p for p in (grip.parts if grip else ()) if isinstance(p, Cylinder) and p.role == "rod"]
+    if not rods or car is None:
+        return []
+    out = []
+    if any(abs(p.radius - hw.rod_r) > 1e-6 for p in rods):
+        out.append(f"an {hw.item.upper()} runs on a {2000 * hw.rod_r:g} mm rod; the rods drawn are "
+                   f"{sorted({round(2000 * p.radius, 2) for p in rods})} mm")
+    centres = np.array([[p.pos[1], p.pos[2]] for p in rods])
+    if len(rods) > 1 and min(np.linalg.norm(a - b) for i, a in enumerate(centres) for b in centres[i + 1:]) < hw.od - 1e-6:
+        out.append(f"the rods sit too close for two {hw.item.upper()} side by side: they are {hw.od * 1000:g} mm across")
+    boxes = [p for p in car.parts if isinstance(p, Box)]
+    if boxes:
+        at = J._to_jaw(np.array([p.pos for p in rods]))  # the rods in the carriage's frame
+        along = int(np.argmax(np.abs(J._to_jaw(J.HINGE + np.array([1.0, 0.0, 0.0])))))  # the rods' own direction there
+        lo = np.min([np.array(p.pos) - np.array(p.half) for p in boxes], axis=0)
+        hi = np.max([np.array(p.pos) + np.array(p.half) for p in boxes], axis=0)
+        need = hw.od / 2 + 1e-3 - 1e-6
+        if any(at[:, k].min() - need < lo[k] or at[:, k].max() + need > hi[k] for k in range(3) if k != along):
+            out.append(f"the carriage has no room for an {hw.item.upper()}: it is {hw.od * 1000:g} mm outside and needs a 1 mm wall")
+    return out
+
+
 def _built_bom(mechanism: str) -> list[BomLine]:
     """A built mechanism's bill of materials, from its parts: printed PLA by volume, rods by length, bought parts,
     two MR63 bearings per pinned joint or loop, two M3 screws per clamp or bracket piece."""
@@ -871,25 +920,26 @@ def _built_bom(mechanism: str) -> list[BomLine]:
 
     g = Graph.model_validate_json(mechanism)
     pla, rods, bought, pieces, pins = 0.0, [], {}, set(), 0
+    guide_item = {f"lm{d}uu": f"lm{d}uu_bearing" for d in (3, 4, 5, 6, 8)}
     for b in g.bodies:
         pins += sum(j.type == "hinge" for j in b.joints) if not b.stock else 0
         for p in b.parts:
             if isinstance(p, (Blade, RackTeeth)):
                 continue
             if isinstance(p, Bought):
-                item = {"lm3uu": "lm3uu_bearing"}.get(p.item, p.item)
+                item = guide_item.get(p.item, p.item)
                 bought[item] = bought.get(item, 0) + 1
             elif isinstance(p, Cylinder) and p.role == "rod":
-                rods.append(2 * p.half_length)
+                rods.append((round(2000 * p.radius), 2 * p.half_length))
             elif getattr(p, "material", "pla") == "pla":
                 pla += part_kg(p) * 1000
             if getattr(p, "role", "") in ("clamp", "bracket"):
                 pieces.add(getattr(p, "piece", "") or p.name)
     pins += len(g.loops)
     out = [BomLine(item="print:PLA", qty=round(pla, 1), slot="jaw", note=f"{g.name}: printed parts")]
-    for length in rods:
+    for d, length in rods:
         mm = 100 if length <= 0.1001 else 150 if length <= 0.1501 else round(length * 1000)
-        out.append(BomLine(item=f"steel_rod_3x{mm}", qty=1, slot="jaw"))
+        out.append(BomLine(item=f"steel_rod_{d}x{mm}", qty=1, slot="jaw"))
     out += [BomLine(item=k, qty=n, slot="jaw") for k, n in sorted(bought.items())]
     if pins:
         out.append(BomLine(item="mr63_bearing", qty=2 * pins, slot="jaw"))
@@ -942,11 +992,12 @@ def _rod_numbers(f, q: float, q_hi: float) -> dict[str, float] | None:
     squeeze = F.squeeze_n(f, q, GRIP_TORQUE_NM)
     tip = F.moving_to_gripper(q, np.array([*jaws.blade_tip(), 0.0]), f)
     rod_y, rod_z = float(np.mean([p.pos[1] for p in rods])), float(np.mean([p.pos[2] for p in rods]))
+    hw = jaws.BUSHINGS.get(gd.bushing, jaws.LM3)
     a, lift, load = jaws.guide_static(gd.clamp_end, gd.centre, gd.bushings, gd.far_end, s,
                                       teeth * math.tan(jaws.PRESSURE_ANGLE), gd.mesh_x - (gd.centre + s),
-                                      squeeze * (tip[2] - rod_z), squeeze * (tip[1] - rod_y))
+                                      squeeze * (tip[2] - rod_z), squeeze * (tip[1] - rod_y), hw)
     return {"overhang_mm": a * 1000, "lift_mm": lift * 1000, "skip_mm": jaws.TOOTH_SKIP * gd.module * 1000,
-            "bushing_n": load, "rated_n": jaws.BUSHING_RATED_N, "both_ends": gd.far_end is not None,
+            "bushing_n": load, "rated_n": hw.rated_n, "both_ends": gd.far_end is not None,
             "bushings": len(gd.bushings)}
 
 

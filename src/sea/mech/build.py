@@ -296,12 +296,17 @@ def compile(spec: mujoco.MjSpec, g: Graph, base: str | Base | None = None) -> li
                           data=list(lp.point) + [0.0] * 9, solimp=LOOP_IMP, **STIFF)
     for gd in g.guides:
         car = spec.body(gd.carriage)
-        k_v, k_t = jaws.rod_stiffness(jaws.BUSHING_LEN)  # the stiffest the rods get: the armature keeps each mode stable
+        hw = jaws.BUSHINGS.get(gd.bushing)
+        if hw is None:
+            raise ValueError(f"no bushing {gd.bushing!r}; there are {sorted(jaws.BUSHINGS)}")
+        k_v, k_t = jaws.rod_stiffness(hw.length, hw.ei)  # the stiffest the rods get: the armature keeps each mode stable
         for name, kind, axis, k in (("jaw_rod_dy", "slide", [0.0, 0.0, -1.0], k_v), ("jaw_rod_dz", "slide", [0.0, 1.0, 0.0], k_v),
                                     ("jaw_rod_yaw", "hinge", [0.0, 1.0, 0.0], k_t), ("jaw_rod_pitch", "hinge", [0.0, 0.0, 1.0], k_t)):
             car.add_joint(name=name, type=_JOINT[kind], axis=axis, pos=list(gd.at), armature=k * TIMESTEP**2,
                           damping=[2 * k * TIMESTEP, 0.0, 0.0])
         spec.add_numeric(name="jaw_rods", data=[gd.clamp_end, gd.centre, gd.module, gd.mesh_x])
+        if hw is not jaws.LM3:
+            spec.add_numeric(name="jaw_bushing", data=[hw.ei, hw.length, hw.rated_n])
         if gd.bushings != (0.0,) or gd.far_end is not None:  # the rods as beams through every bushing (D-080)
             spec.add_numeric(name="jaw_guide", data=[math.nan if gd.far_end is None else gd.far_end, rod_end(g, root),
                                                      *sorted(gd.bushings)])

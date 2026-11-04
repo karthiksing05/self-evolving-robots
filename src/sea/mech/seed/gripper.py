@@ -120,11 +120,11 @@ def _grip_box(name: str, lo, hi, role: str = "structure", piece: str = "") -> Bo
                piece=piece)
 
 
-def slide(r_pitch: float, sector: bool, site: Site) -> Graph:
+def slide(r_pitch: float, sector: bool, site: Site, hw: J.Bushing = J.LM3) -> Graph:
     """A rack and pinion on two rods (D-058): the servo's hinge turns a pinion of pitch radius ``r_pitch`` on its
     horn; the rack's carriage runs on the rods ``r_pitch`` per radian and carries the stock finger's blade.
     ``sector``: the long slide (D-064), a gear sector with teeth only over the arc in mesh, on 150 mm rods
-    clamped beside the fixed finger."""
+    clamped beside the fixed finger.  ``hw``: the bushing and its rod (D-098), which size the carriage and clamp."""
     lo, hi = site.q_range
     s_lo, s_hi = lo * r_pitch, hi * r_pitch
     width = J.GEAR_Y[1] - J.GEAR_Y[0]
@@ -145,61 +145,66 @@ def slide(r_pitch: float, sector: bool, site: Site) -> Graph:
     car = [_jaw_box("jaw_rack", [rack_x[0], J.GEAR_Y[0], root - 5 * MM], [rack_x[1], J.GEAR_Y[1], root]),
            RackTeeth(name="jaw_rack_teeth", x=rack_x, x_mesh=float(J.HINGE[0]), z_pitch=float(z_pitch), width=width,
                      module=m, y_mid=sum(J.GEAR_Y) / 2)]
-    x0, x1 = J.CARRIAGE_X
+    x0, x1 = J.CARRIAGE_X[0], J.CARRIAGE_X[0] + max(J.CARRIAGE_X[1] - J.CARRIAGE_X[0], hw.length + 2 * MM)
+    bore = J.BORE if hw is J.LM3 else hw.rod_r + 0.1 * MM  # the rod's, with the same 0.1 mm clearance
+    wall = hw.od / 2 + 1 * MM  # material outside a bushing
+    gap = max(J.LONG_ROD_RISE[1] - J.LONG_ROD_RISE[0], hw.od + 2 * MM)  # two bushings side by side
+    grip_half = max(5 * MM, hw.rod_r + 3.5 * MM)  # the clamp round the rods
     if sector:
         # the block beside the gear plane, from under the rack to above the upper rod, a bore round each rod;
         # the arm under the rack carries the blade
         rod_y = J.LONG_ROD_Y
-        rods = [z_pitch + d for d in J.LONG_ROD_RISE]
-        y0, y1 = rod_y - 5 * MM, J.GEAR_Y[0]
-        bottom, top = root - 13 * MM, rods[1] + 6 * MM
-        for k, (z0, z1) in enumerate([(bottom, rods[0] - J.BORE), (rods[0] + J.BORE, rods[1] - J.BORE), (rods[1] + J.BORE, top)]):
+        rods = [z_pitch + J.LONG_ROD_RISE[0], z_pitch + J.LONG_ROD_RISE[0] + gap]
+        y0, y1 = rod_y - max(5 * MM, wall), J.GEAR_Y[0]
+        bottom, top = root - 13 * MM, rods[1] + max(6 * MM, wall)
+        for k, (z0, z1) in enumerate([(bottom, rods[0] - bore), (rods[0] + bore, rods[1] - bore), (rods[1] + bore, top)]):
             car.append(_jaw_box(f"jaw_carriage{k}", [x0, y0, z0], [x1, y1, z1]))
         for k, zr in enumerate(rods):
-            for side, (ya, yb) in (("out", (y0, rod_y - J.BORE)), ("in", (rod_y + J.BORE, y1))):
-                car.append(_jaw_box(f"jaw_carriage_bore{k}_{side}", [x0, ya, zr - J.BORE], [x1, yb, zr + J.BORE]))
+            for side, (ya, yb) in (("out", (y0, rod_y - bore)), ("in", (rod_y + bore, y1))):
+                car.append(_jaw_box(f"jaw_carriage_bore{k}_{side}", [x0, ya, zr - bore], [x1, yb, zr + bore]))
         car.append(_jaw_box("jaw_carriage_arm", [12 * MM, y1, bottom], [26 * MM, -6 * MM, root - 5 * MM]))
     else:
         # the carriage block under the rack, with a square bore for each rod's bushing
         rod_y = J.ROD_Y
-        rods = [z_pitch - d for d in J.ROD_DROP]
-        top, bottom = root - 5 * MM, rods[1] - 6 * MM
-        cy = J.CARRIAGE_Y
-        for k, (z0, z1) in enumerate([(rods[0] + J.BORE, top), (rods[1] + J.BORE, rods[0] - J.BORE), (bottom, rods[1] - J.BORE)]):
+        drop = max(J.ROD_DROP[0], wall + 5.5 * MM)  # under the rack, with the bushing's wall
+        rods = [z_pitch - drop, z_pitch - drop - max(J.ROD_DROP[1] - J.ROD_DROP[0], gap)]
+        top, bottom = root - 5 * MM, rods[1] - max(6 * MM, wall)
+        cy = (J.ROD_Y - max(J.ROD_Y - J.CARRIAGE_Y[0], wall), J.CARRIAGE_Y[1])
+        for k, (z0, z1) in enumerate([(rods[0] + bore, top), (rods[1] + bore, rods[0] - bore), (bottom, rods[1] - bore)]):
             car.append(_jaw_box(f"jaw_carriage{k}", [x0, cy[0], z0], [x1, cy[1], z1]))
         for k, zr in enumerate(rods):
-            for side, (ya, yb) in (("out", (cy[0], J.ROD_Y - J.BORE)), ("in", (J.ROD_Y + J.BORE, cy[1]))):
-                car.append(_jaw_box(f"jaw_carriage_bore{k}_{side}", [x0, ya, zr - J.BORE], [x1, yb, zr + J.BORE]))
+            for side, (ya, yb) in (("out", (cy[0], J.ROD_Y - bore)), ("in", (J.ROD_Y + bore, cy[1]))):
+                car.append(_jaw_box(f"jaw_carriage_bore{k}_{side}", [x0, ya, zr - bore], [x1, yb, zr + bore]))
         # the arm across to the blade, at a height where both are
         arm_z = min(max(z_pitch - 15 * MM, -95 * MM), -62 * MM)
         arm_x1 = 19 * MM if arm_z < -88 * MM else 26 * MM
         car.append(_jaw_box("jaw_carriage_arm", [12 * MM, cy[1], arm_z - 4 * MM], [arm_x1, -6 * MM, arm_z + 4 * MM]))
-    car += [Blade(), Bought(item="lm3uu", kg=J.BUSHING_KG), Bought(item="lm3uu", kg=J.BUSHING_KG)]
-    y_mid = (rod_y - 5 * MM + J.GEAR_Y[0]) / 2 if sector else -20 * MM
+    car += [Blade(), Bought(item=hw.item, kg=hw.kg), Bought(item=hw.item, kg=hw.kg)]
+    y_mid = (y0 + J.GEAR_Y[0]) / 2 if sector else -20 * MM
     carriage = Body(name="jaw_carriage", parent="gripper", pos=tuple(J.HINGE.tolist()), quat=site.jaw_quat,
                     joints=(_pin("jaw_slide", "slide", axis=(1.0, 0.0, 0.0), range=(s_lo, s_hi)),), parts=tuple(car),
-                    inertial=Inertial(pos=tuple(J._to_jaw(np.array([sum(J.CARRIAGE_X) / 2, y_mid, (top + bottom) / 2])).tolist()),
+                    inertial=Inertial(pos=tuple(J._to_jaw(np.array([(x0 + x1) / 2, y_mid, (top + bottom) / 2])).tolist()),
                                       kind="lumped", size=4e-4))
 
     # the rods, their clamp and its bracket to the frame, on the gripper; the rods end just past the carriage
     # fully open, so a long travel leaves the carriage off their back end when closed
-    front = J.CARRIAGE_X[1] + s_hi + 2 * MM
+    front = x1 + s_hi + 2 * MM
     rod_len = J.LONG_ROD if sector else J.ROD_LEN
-    fixed = [Cylinder(name=f"jaw_rod{k}", pos=(front - rod_len / 2, rod_y, zr), radius=J.ROD_R, half_length=rod_len / 2,
+    fixed = [Cylinder(name=f"jaw_rod{k}", pos=(front - rod_len / 2, rod_y, zr), radius=hw.rod_r, half_length=rod_len / 2,
                       quat=(math.sqrt(0.5), 0.0, math.sqrt(0.5), 0.0), material="steel", role="rod") for k, zr in enumerate(rods)]
     if sector:
         # the clamp grips both rods beside the fixed finger; its bracket runs in over the rack's teeth (1 mm clear)
         # and under the sector's sweep to the finger
         clamp_hi = J.CLAMP_X[1]
-        fixed.append(_grip_box("jaw_clamp", [J.CLAMP_X[0], rod_y - 5 * MM, rods[0] - 5 * MM],
-                               [J.CLAMP_X[1], rod_y + 5 * MM, rods[1] + 5 * MM], "clamp", "jaw_clamp"))
+        fixed.append(_grip_box("jaw_clamp", [J.CLAMP_X[0], rod_y - grip_half, rods[0] - grip_half],
+                               [J.CLAMP_X[1], rod_y + grip_half, rods[1] + grip_half], "clamp", "jaw_clamp"))
         fixed.append(Bracket(name="jaw_clamp_bracket", x=J.CLAMP_X, z=(z_pitch + m + 1 * MM, z_pitch + m + 8 * MM),
-                             y_from=rod_y + 5 * MM, fallback_y=rod_y + 6 * MM, piece="jaw_clamp"))
+                             y_from=rod_y + grip_half, fallback_y=rod_y + grip_half + 1 * MM, piece="jaw_clamp"))
     else:
         back = front - J.ROD_LEN
         clamp_hi = back + 8 * MM
         clamp_top = -31 * MM  # the bracket's top meets the frame's horn side (y = -28 mm, down to z = -37 mm)
-        fixed.append(_grip_box("jaw_clamp", [back, J.CARRIAGE_Y[0], rods[1] - 5 * MM], [back + 8 * MM, J.ROD_Y + 5 * MM, clamp_top],
+        fixed.append(_grip_box("jaw_clamp", [back, J.ROD_Y - max(J.ROD_Y - J.CARRIAGE_Y[0], grip_half), rods[1] - grip_half], [back + 8 * MM, J.ROD_Y + grip_half, clamp_top],
                                "clamp", "jaw_clamp"))
         # the bracket crosses the gear plane behind the pinion to reach the frame (x >= -19.5 mm there): a pinion
         # too large leaves it no room, and the clamp hangs from nothing
@@ -208,11 +213,11 @@ def slide(r_pitch: float, sector: bool, site: Site) -> Graph:
                              y_from=J.CARRIAGE_Y[0], fallback_y=J.CARRIAGE_Y[0] + 1 * MM, piece="jaw_clamp"))
     grip = Body(name="gripper", stock=True, parts=tuple(fixed))
 
-    c0 = J._to_jaw(np.array([sum(J.CARRIAGE_X) / 2, rod_y, sum(rods) / 2]))
+    c0 = J._to_jaw(np.array([(x0 + x1) / 2, rod_y, sum(rods) / 2]))
     return Graph(name=f"{'long_slide' if sector else 'prismatic'}({r_pitch * 1000:g} mm)", bodies=(jaw, carriage, grip),
                  remove_stock_mesh=(J.JAW_MESH,),
                  guides=(Guide(carriage="jaw_carriage", slide="jaw_slide", at=tuple(c0.tolist()), clamp_end=float(clamp_hi),
-                               centre=sum(J.CARRIAGE_X) / 2, module=m, mesh_x=float(J.HINGE[0])),),
+                               centre=(x0 + x1) / 2, module=m, mesh_x=float(J.HINGE[0]), bushing=hw.item),),
                  meshes=(Mesh(follower="jaw_slide", driver="gripper", ratio=r_pitch),),
                  excludes=((J.JAW_MESH, "jaw_carriage"),),  # the pinion meshes with the rack
                  linked=(("jaw_slide", r_pitch),))

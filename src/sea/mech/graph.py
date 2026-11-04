@@ -273,8 +273,8 @@ class Guide(_M):
     rods and turn as the bent rods let it, from ``at`` (carriage frame).  ``clamp_end`` is where the rods leave
     the clamp, ``far_end`` where a second clamp holds their other ends (none: they overhang), ``centre`` the
     carriage's middle at zero travel, ``mesh_x`` where its rack meets the gear (all gripper x), ``module`` the
-    teeth's, ``bushings`` each bushing's offset along the rods from the carriage's middle (one per rod at each:
-    a carriage carries two LM3UU per offset)."""
+    teeth's, ``bushings`` each bushing's offset along the rods from the carriage's middle (one per rod at each: a
+    carriage carries two per offset), ``bushing`` which bushing, whose rod, length and rating then hold (D-098)."""
 
     kind: Literal["guide"] = "guide"
     carriage: str
@@ -286,6 +286,7 @@ class Guide(_M):
     mesh_x: float
     bushings: tuple[float, ...] = (0.0,)
     far_end: float | None = None
+    bushing: str = "lm3uu"
 
 
 # ---------------------------------------------------------------- actuators, springs, latches and sensors (D-087)

@@ -89,8 +89,9 @@ def kind(r: Requirement, held: set[str]) -> str:
 
 
 def coverage(reqs: Sequence[Requirement], groups: Sequence[str]) -> list[str]:
-    """The train groups no requirement is measured on."""
+    """The train groups no requirement traces to: measured on it, or named as where the need comes from (D-099)."""
     named = {g for r in reqs for g in r.tasks}
+    named |= {g for g in groups if any(re.search(rf"(?<![a-z0-9]){re.escape(g)}(?![a-z0-9])", r.source) for r in reqs)}
     return sorted(set(groups) - named)
 
 
