@@ -2612,3 +2612,21 @@ Against the prediction:
   - varying its parameters one at a time showed the groove alone caused the loose screws.
 - **The failure text:** in the replay of the banana on the outboard-rack slide, `jaw_rack` is the only robot part on the object, for 40 samples, while the jaw holds at 1.36 rad; the detail now names it.
 - **Full suite:** 735 passed, 2 skipped, 1 xfailed; golden verdicts and the catalogue jaws' law outputs unchanged.
+
+## D-083 A mechanism is built together with the proposal's edits to other slots (policy: loop, prompt)
+
+**Why.** The restarted campaign's first seed (`runs/evolve/gripper_c1b_s0_unbuilt`) wrote a mechanism in 13 proposals over 7 iterations, every one a long slide with its rods held at both ends and its bushings spread. None was built. Each came with an edit to the pads, and the loop built an idea only when the proposal had no edits (D-079), so all 13 were recorded as untested ideas. The campaign was stopped.
+
+**Change.**
+- An idea that carries a mechanism is built, then the proposal's edits to other slots are applied, and the whole is trialled.
+- An edit to the slot the mechanism builds is refused as ambiguous.
+- The prompt's rule 3 says so.
+
+**Measured before this entry, so a check rather than a forecast.** Built now with their pad edits (no trial), the 13 meet the guide's checks and the laws instead of the record:
+- 8 carry 2 LM3UU where their two bushing offsets need 4;
+- 5 hit the wrist with the 50 mm sector's pinion (0.2 mm at the wrist rolled −2.74 rad, the same refusal the catalogue's 50 mm long slide gets);
+- none reaches a trial as written.
+
+**Prediction for the campaign:** seeing these refusals, System 2 adds the bushings or shrinks the sector, and on at least 2 of 3 seeds a mechanism it wrote reaches a trial.
+
+**Open question for the user (no change made):** the interference law sweeps the wrist's whole roll range (±2.74 rad). Whether the robot ever rolls that far while gripping, and whether a roll limit should be a variable System 2 can set, decides whether the 50 mm sector is outlawed.

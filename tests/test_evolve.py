@@ -436,3 +436,22 @@ def test_the_cli_asks_again_after_a_timeout(tmp_path):
 
     got = PlanClaude(run=fake, log_dir=tmp_path).propose("s", "p", tag="t")
     assert got.proposals[0].edits[0].params == {"length": 0.3} and len(calls) == 3
+
+
+def test_a_mechanism_is_built_with_edits_to_other_slots(tmp_path):
+    """D-083: a proposal that builds a mechanism and edits another slot is built and trialled whole; an edit to the
+    slot the mechanism builds is refused."""
+    from sea.evolve.core import Mechanism
+
+    rod = Idea(name="long rod", description="a 0.5 m rod", slot="stick", mechanism=Mechanism(module="rod",
+                                                                                          params={"length": 0.5}))
+    batches = [ProposalBatch(proposals=[
+        _p("idea", [Edit(slot="sensor", type="lidar")], idea=rod),
+        _p("idea", [Edit(slot="stick", params={"length": 0.2})], idea=rod),
+    ])]
+    run(RunConfig(world="toy", iterations=1), tmp_path, proposer=Scripted(batches), world=Builds(), log=lambda m: None)
+    trials = json.loads((tmp_path / "iterations.jsonl").read_text().splitlines()[0])["trials"]
+    assert trials[0]["move"] == "idea" and trials[0]["slots"] == ["sensor", "stick"]
+    assert trials[0]["edit"].startswith("stick: built 'long rod' (rod + 0 changes); sensor")
+    assert "cannot be bought" in trials[0]["result"]  # the lidar's price, judged with the built stick
+    assert "an edit to it as well is ambiguous" in trials[1]["result"]

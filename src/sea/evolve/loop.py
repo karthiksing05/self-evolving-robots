@@ -372,8 +372,8 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
             for k, prop in enumerate(batch.proposals[: cfg.max_proposals]):
                 entry: dict[str, Any] = {"k": k, "proposal": prop.model_dump(), "iteration": it, "move": prop.move,
                                          "hypothesis": prop.hypothesis, "edit": _edit_text(prop.edits)}
-                builds = (prop.idea is not None and prop.idea.mechanism is not None and hasattr(world, "build_idea")
-                          and not prop.edits)
+                # an idea that carries a mechanism is built, with any edits to its other slots (D-083)
+                builds = prop.idea is not None and prop.idea.mechanism is not None and hasattr(world, "build_idea")
                 if (prop.move == "idea" or prop.idea is not None and not prop.edits) and not builds:
                     idea = prop.idea.model_dump() if prop.idea else {"name": "?", "needs": []}
                     cost = cost_idea(prop.idea.needs if prop.idea else [], manifest, spent)
@@ -388,10 +388,17 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                         raise ValueError(f"no promising body {prop.base!r} in the record; ids: {sorted(frontier)}")
                     base = body if prop.base is None else frontier[prop.base]["body"]
                     if builds:  # a mechanism the catalogue lacks, built from the world's modules (D-079)
+                        slot = prop.idea.slot
+                        if slot and any(e.slot == slot for e in prop.edits):
+                            raise ValueError(f"the idea builds slot {slot!r}; an edit to it as well is ambiguous: "
+                                             "edit the other slots, or put the change in the mechanism")
                         cand = world.build_idea(base, prop.idea, new_id=f"b{it:02d}{k}")
+                        if prop.edits:
+                            cand = apply(cand, prop.edits, catalogue, new_id=cand.id)
                         mech = prop.idea.mechanism
-                        entry["edit"] = (f"{prop.idea.slot}: built {prop.idea.name!r} ({mech.module} + "
-                                         f"{len(mech.patch)} changes)")
+                        entry["edit"] = "; ".join([f"{slot or 'mechanism'}: built {prop.idea.name!r} ({mech.module} + "
+                                                   f"{len(mech.patch)} changes)", *([_edit_text(prop.edits)]
+                                                                                   if prop.edits else [])])
                     else:
                         cand = apply(base, prop.edits, catalogue, new_id=f"b{it:02d}{k}")
                 except ValueError as exc:

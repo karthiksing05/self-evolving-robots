@@ -27,7 +27,8 @@ cheapest.  A `swap` replaces a part with another type from the catalogue: a rede
 its cost when the brief or the history shows that no value in the current part's range fixes the \
 mechanism.  An `idea` is a part the catalogue lacks.  Where the world lists mechanisms, an idea with a \
 `mechanism` (a change to one of its modules) is built, checked against the same laws, and trialled like a \
-swap, priced by its own parts; an idea without one is recorded with its bill of materials and not tested.  \
+swap, priced by its own parts, together with the proposal's edits to other slots; an idea without one is \
+recorded with its bill of materials and not tested.  \
 Propose an idea when no catalogue part can address the mechanism.
 4. The robot's history comes first.  A change is kept only if every task group already held still \
 passes.  Say which held groups your change puts at risk and why they will survive.
