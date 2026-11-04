@@ -2726,3 +2726,10 @@ Against the prediction:
   - the flags with and without tools;
   - the loop's per-iteration context and counts.
 - **Full suite:** 747 passed, 2 skipped, 1 xfailed.
+- **One live call** (Opus, effort high) on `gripper_c1c_s0`'s iteration 8, where all three of System 2's proposals had been refused before trial. It took 525 s (the c1c median is 480 s), 15 turns, 41k output tokens and 377k input tokens, mostly cache reads.
+  - **Tool use:** 13 calls (5 `measure`, 2 `module`, 3 `simulate`, 3 `check`), 97 s of tool time, none over budget.
+  - **The simulations changed its explanation.** The potted meat can failed at reach 20 mm (106 N on its top) and succeeded at reach 8 mm. System 2 wrote that this "overturns my iteration 6 explanation", which had blamed face tilt.
+  - **It checked mechanisms before rejecting them.** It measured the catalogue parallelogram and the long slide, and read their graphs. It judged that neither fits without a bracket it had not designed or checked, and that the long slide's trials had overloaded its bushings.
+  - **Result:** it answered with three pad-reach moves bracketing the value it found. All three would be trialled, against none of the original three.
+
+  One iteration is no evidence for the prediction, and it raises a question the campaign must answer: whether the tools make System 2 more conservative, choosing parameter moves it can verify over mechanisms.
