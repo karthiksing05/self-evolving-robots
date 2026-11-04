@@ -458,17 +458,35 @@ class GripperWorld:
     def build_idea(self, body: Body, idea: Any, new_id: str) -> Body:
         """``body`` with the jaw ``idea.mechanism`` describes: a catalogue module's graph, changed by its patch.
         Raises ``ValueError`` naming what does not apply."""
+        from sea.mech.graph import Graph
         from sea.mech.patch import Op, apply_patch
 
         mech = idea.mechanism
         if idea.slot not in ("", "jaw"):
             raise ValueError(f"a mechanism here is a jaw: slot {idea.slot!r} takes catalogue parts")
-        if mech.module not in MODULES:
+        if mech.module == "self":  # continue this body's own mechanism (D-091)
+            if body.parts["jaw"].type != "built":
+                raise ValueError("module self continues a built mechanism, and this body's jaw is a catalogue part")
+            if mech.params:
+                raise ValueError("module self has no parameters: write the change in the patch")
+            g = Graph.model_validate_json(body.parts["jaw"].mechanism)
+        elif mech.module not in MODULES:
             raise ValueError(f"no module {mech.module!r}; the modules are {sorted(MODULES)}")
-        g = _module(mech.module, mech.params)
+        else:
+            g = _module(mech.module, mech.params)
         g = apply_patch(g, [Op.model_validate(o) for o in mech.patch]).model_copy(update={"name": idea.name})
         return Body(id=new_id, parent=body.id, parts={**body.parts, "jaw": Part(type="built",
                                                                                 mechanism=g.model_dump_json())})
+
+    def module_names(self) -> list[str]:
+        return sorted(MODULES)
+
+    def mechanism_text(self, body: Body) -> str:
+        """A body's built mechanism, to patch with module ``self`` (D-091); "" if its jaw is a catalogue part."""
+        from sea.mech.graph import Graph
+
+        jaw = body.parts["jaw"]
+        return _compact(Graph.model_validate_json(jaw.mechanism)) if jaw.mechanism else ""
 
     def modules_text(self) -> str:
         """The modules a mechanism may start from: each catalogue jaw's graph at its parameters' midpoints."""

@@ -138,7 +138,8 @@ class Need(_Model):
 class Mechanism(_Model):
     """A mechanism the catalogue lacks, written as a change to one of the world's modules (D-079)."""
 
-    module: str = Field(description="the module it starts from, by name, as the mechanisms section lists them")
+    module: str = Field(description="the module it starts from, by name, as the mechanisms section lists them; "
+                        "`self`: the base body's own mechanism, to continue developing it")
     params: dict[str, float] = Field(default_factory=dict, description="the module's parameters, within its ranges")
     patch: list[dict[str, Any]] = Field(default_factory=list, description="operations on the module's graph, each "
                                         "{op: add|set|remove, path, value}, addressed by names as the section says")
@@ -157,10 +158,28 @@ class Idea(_Model):
 Move = Literal["params", "swap", "idea"]
 
 
+class FailureMode(_Model):
+    """A way System 2 predicts a change could fail (D-091): the harness scores it, and it never decides anything."""
+
+    mode: str = Field(description="what fails")
+    cause: str = Field(description="why it would")
+    effect: str = Field(description="what that does to the tasks")
+    signature: str = Field(default="", description="a phrase its failure would show as, in the words of a law's "
+                           "refusal or a trial's diagnosis (a mechanism label): how the harness tells it occurred")
+
+
+class Function(_Model):
+    """A function the design must perform, and the options System 2 considers for it (D-091)."""
+
+    name: str = Field(description="the function, in a verb and a noun")
+    options: list[str] = Field(default_factory=list, description="ways to perform it: part types, modules, or "
+                               "anything you would have to build")
+
+
 class Proposal(_Model):
     move: Move
-    base: str | None = Field(default=None, description="build on a promising body from the record by its id; "
-                             "omit to change the current body")
+    base: str | None = Field(default=None, description="build on a promising body from the record, or a live "
+                             "concept, by its id; omit to change the current body")
     edits: list[Edit] = Field(default_factory=list)
     idea: Idea | None = None
     mechanism: str = Field(description="the failure mechanism this addresses, as the diagnosis names it")
@@ -168,6 +187,9 @@ class Proposal(_Model):
     hypothesis: str = Field(description="why this change, and why the cheaper moves will not do")
     gains: list[str] = Field(default_factory=list, description="task groups predicted to start passing")
     risks: list[str] = Field(default_factory=list, description="held task groups this could break, and why")
+    options: dict[str, str] = Field(default_factory=dict, description="function -> the option this takes, where the "
+                                    "functions section applies")
+    failure_modes: list[FailureMode] = Field(default_factory=list, description="how this could fail")
 
 
 class Requirement(_Model):
@@ -190,6 +212,8 @@ class ProposalBatch(_Model):
     notes: str = ""
     requirements: list[Requirement] = Field(default_factory=list, description="the whole requirements list, "
                                             "revised; empty: keep the last one (D-089)")
+    functions: list[Function] = Field(default_factory=list, description="the whole function list, revised; empty: "
+                                      "keep the last one (D-091)")
 
 
 def apply(body: Body, edits: Sequence[Edit], catalogue: dict[str, PartType], new_id: str) -> Body:
