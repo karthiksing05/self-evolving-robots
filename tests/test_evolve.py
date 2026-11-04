@@ -400,3 +400,39 @@ def test_an_idea_with_a_mechanism_is_built_and_trialled(tmp_path):
     assert "refused before trial: no module 'whip'" in trials[2]["result"]
     assert s["final_body"]["parts"]["stick"]["type"] == "built" and [i["name"] for i in s["ideas"]] == ["kite"]
     assert "# Mechanisms" in build(Builds(), Builds().stock(), [], {}, [], [], [], Spent(), {}, 1, 1, 3)
+
+
+def test_a_failed_system2_call_proposes_nothing_and_the_run_goes_on(tmp_path):
+    """A call that times out twice gives no proposals for that iteration; the run continues (D-082)."""
+
+    class Flaky(Scripted):
+        def propose(self, system, prompt, tag=""):
+            if tag == "iter01":
+                raise RuntimeError("System 2 gave no valid ProposalBatch twice: no answer within 1800 s")
+            return super().propose(system, prompt, tag)
+
+    batch = ProposalBatch(proposals=[_p("params", [Edit(slot="stick", params={"length": 0.3})])])
+    s = run(RunConfig(world="toy", iterations=3), tmp_path, proposer=Flaky([batch]), world=Reach(), log=lambda m: None)
+    recs = [json.loads(x) for x in (tmp_path / "iterations.jsonl").read_text().splitlines()]
+    assert any("System 2 gave no proposals" in (r.get("notes") or "") and not r["trials"] for r in recs)
+    assert s["final_body"]["parts"]["stick"]["params"]["length"] == 0.3
+
+
+def test_the_cli_asks_again_after_a_timeout(tmp_path):
+    import subprocess
+
+    from sea.evolve.llm import PlanClaude
+
+    batch = ProposalBatch(proposals=[_p("params", [Edit(slot="stick", params={"length": 0.3})])])
+    calls = []
+
+    def fake(cmd, **kw):
+        calls.append(cmd)
+        if cmd[1:3] == ["auth", "status"]:
+            return subprocess.CompletedProcess(cmd, 0, json.dumps({"loggedIn": True, "authMethod": "claude.ai"}), "")
+        if len(calls) == 2:
+            raise subprocess.TimeoutExpired(cmd, 1800)
+        return subprocess.CompletedProcess(cmd, 0, json.dumps({"structured_output": batch.model_dump()}), "")
+
+    got = PlanClaude(run=fake, log_dir=tmp_path).propose("s", "p", tag="t")
+    assert got.proposals[0].edits[0].params == {"length": 0.3} and len(calls) == 3

@@ -39,6 +39,7 @@ from sea.evolve.core import Body, Edit, Outcome, Proposal, ProposalBatch, Task, 
 from sea.evolve.llm import Proposer
 from sea.evolve.prompt import SYSTEM, build
 from sea.evolve.resources import ResourceReport, charge, check, cost_idea, idea_text, start
+from sea.propose.llm import PlanBillingError, PlanLimitReached
 
 Arm = Literal["s2", "random", "s1"]
 
@@ -355,7 +356,13 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
             front = sorted(frontier.values(), key=lambda f: (-(len(f["gained"]) - len(f["lost"])), f["iteration"]))
             prompt = build(world, body, train, outcomes, held, history, ideas, spent, manifest, it, cfg.iterations,
                            cfg.max_proposals, frontier=front[:5], tune_trials=cfg.tune_trials)
-            batch = proposer.propose(SYSTEM, prompt, tag=f"iter{it:02d}")
+            try:
+                batch = proposer.propose(SYSTEM, prompt, tag=f"iter{it:02d}")
+            except (PlanLimitReached, PlanBillingError):
+                raise  # out of plan, or not on the plan: stop rather than run on without System 2
+            except RuntimeError as exc:  # System 2 gave nothing usable: the iteration proposes nothing (D-082)
+                log(f"  iter {it}: System 2 gave no proposals: {exc}")
+                batch = ProposalBatch.model_construct(proposals=[], notes=f"System 2 gave no proposals: {exc}")
             rec["llm"] = proposer.calls[-1] if getattr(proposer, "calls", None) else {}
             rec["notes"] = batch.notes
             trials = []

@@ -45,7 +45,7 @@ class Proposer(Protocol):
 
 class PlanClaude:
     def __init__(self, model: str = "claude-opus-5-5", effort: str = "high", log_dir: Path | None = None,
-                 timeout_s: float = 900.0, run: Callable[..., subprocess.CompletedProcess] = subprocess.run,
+                 timeout_s: float = 1800.0, run: Callable[..., subprocess.CompletedProcess] = subprocess.run,
                  outage_s: float = 1800.0, sleep: Callable[[float], None] = time.sleep):
         import os
 
@@ -88,7 +88,12 @@ class PlanClaude:
         result: dict[str, Any] = {}
         attempts, waited, wait = 0, 0.0, 30.0
         while attempts < 2:
-            out = self._exec(args, stdin=text)
+            try:
+                out = self._exec(args, stdin=text)
+            except subprocess.TimeoutExpired:  # a long answer (a mechanism) is not an outage: ask once more (D-082)
+                attempts += 1
+                error = f"no answer within {self.timeout_s:.0f} s"
+                continue
             try:
                 result = json.loads(out.stdout)
             except json.JSONDecodeError as exc:

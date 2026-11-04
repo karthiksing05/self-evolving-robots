@@ -2575,3 +2575,40 @@ Against the prediction:
   - the same body with no pads;
   - a carrier turned 30° from the jaw's axes.
 - **Full suite:** 733 passed, 2 skipped, 1 xfailed (731 before, plus 2 new tests).
+
+## D-082 Two laws that refused pads the jaw could build, a failure text that hid the part that jammed, and a run that died on one slow answer (judge: mechanism; world: physics, gripper; policy: loop)
+
+**Why.** The first C1 campaign seed (`runs/evolve/gripper_c1_s0`) crashed at iteration 5. A System 2 answer that wrote a mechanism took more than the CLI's 900 s; the calls had grown from 300 to 625 s and from 30k to 60k output tokens. Reading that seed's record turned up three faults in the harness itself.
+- **The stop rule.** Under D-061, fingers that meet only over the closed end of the range are the jaw's stop, but only if they overlap from the very first sample at −0.17 rad. Thin pieces of a pad's shoe slide past each other in the swept geometry and stop overlapping by −0.17 rad, so they "start" at −0.16 rad. Their 0.3 mm overlaps, all below the angle where the fingers first meet (about −0.01 rad, where the jaw stops), were refused as interference.
+  - Counting refusals whose first law is this one: 2 of 33 proposals on D-076 seed 0, **16 of 28 on seed 1**, 5 of 27 on seed 2, and 3 of 9 in the crashed seed.
+  - These are proposals ruled out without evidence. The pad lever that carried D-076 was mostly closed on seed 1.
+- **Grooved shoes.** A V-grooved pad's shoe is built for contact as two convex halves, one each side of the groove. Neither half includes the middle of the shoe's back, so a wedge of the back is missing where the screws sit.
+  - Every grooved pad's two screws then "touch nothing" (2.2 mm off), and the mounted law refuses the pad.
+  - The shoe's mass is understated by that wedge too.
+- **The failure text.** The trialled built slide (the outboard-rack double-clamped slide) failed 8 tasks with "fixed jaw: no contact; moving jaw: no contact". A replay shows the rack on its carriage pressing the banana and jamming the jaw at 1.36 rad. A part other than the jaws on the object was counted but never named, so System 2 could not see what to move.
+
+**Change.**
+- *Judge (mechanism):* the jaw's stop is the most open angle at which a moving finger part meets a fixed finger part, over a range of overlap that runs from the closed end. A finger-on-finger overlap at angles no more open than that is unreachable, so it is the stop, not interference.
+- *World (physics):* each half of a grooved shoe includes the profile's points on the groove's midplane, so the back is whole.
+- *World (gripper):* a failure's detail names any other robot part pressing the object while the jaws close (`also on the object while closing: the rack 6 N`). The label is unchanged.
+- *Policy (loop):* the CLI waits 1800 s and asks once more after a timeout. A call that still gives nothing usable leaves that iteration with no proposals instead of ending the run. Plan limits and billing errors still stop it.
+
+**Prediction** (written before the two law changes; the loop and failure-text changes were already written and tested):
+- the stop rule passes the refused pads above (the 30° pad with 12 mm reach, 2 mm groove) and changes no law output on the 13 catalogue jaws without pads (`tests/mech/test_laws_equivalence.py`);
+- a real finger clash in mid-range is still refused;
+- the whole grooved shoe reaches its screws (no loose screws on grooved pads) and gains a few percent of mass;
+- golden verdicts are unchanged, since no golden body has a grooved pad (to check);
+- the next campaign trials more pad bodies than D-076 did.
+
+**Measured.**
+- **The refused pads, re-checked on the body each was proposed for**: 16 proposals from D-076 and the crashed seed whose first refusal was a finger-on-finger overlap.
+  - With the stop rule as first written (overlap below the stop angle is the stop): 9 pass, 6 are still refused and 1 no longer applies.
+  - All 6 overlap by millimetres up to an open angle of +0.08 rad.
+- **The prediction was wrong about the rule, so it was revised before any campaign.** A closing jaw stops at its fingers' first contact, the most open angle of any finger-on-finger overlap, so in a static sweep such an overlap is always past the stop. The simulator gives every finger pair that can meet a contact pair (D-060), so a trial stops the jaw where it would really stop. Where that is (a wide stop cannot grip a small object) is the trial's to measure.
+  - The rule is therefore: a moving finger part on a fixed one is the jaw's stop, wherever they meet. The prediction's "a real finger clash in mid-range is still refused" is withdrawn.
+  - Under this rule, **13 of the 16 pass**. 2 are refused by another law, the fixed pad sinking 2.4–2.5 mm into the gripper frame against its 2 mm seat (a pad cannot be printed into the finger it wraps; kept). 1 no longer applies. The 13 merged proposals refused the same way are not re-checked (no proposal record).
+- **The grooved shoe:**
+  - the 30° pad with 12 mm reach and a 2 mm groove now has no loose screw, and passes every law and the build check;
+  - varying its parameters one at a time showed the groove alone caused the loose screws.
+- **The failure text:** in the replay of the banana on the outboard-rack slide, `jaw_rack` is the only robot part on the object, for 40 samples, while the jaw holds at 1.36 rad; the detail now names it.
+- **Full suite:** 735 passed, 2 skipped, 1 xfailed; golden verdicts and the catalogue jaws' law outputs unchanged.
