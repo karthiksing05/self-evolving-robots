@@ -35,6 +35,7 @@ from typing import Any, Literal
 import numpy as np
 from pydantic import BaseModel, ConfigDict
 
+from sea.evolve import requirements as R
 from sea.evolve.core import Body, Edit, Outcome, Proposal, ProposalBatch, Task, World, apply, edit_rung
 from sea.evolve.llm import Proposer
 from sea.evolve.prompt import SYSTEM, build
@@ -59,6 +60,7 @@ class RunConfig(BaseModel):
     model: str = "claude-opus-5-5"
     effort: str = "high"
     tools: bool = False  # System 2 may query the harness through the ``sea`` tools while it proposes (D-086)
+    requirements: bool = False  # System 2 keeps a requirements list the harness measures (D-089)
 
 
 # ---------------------------------------------------------------- parallel evaluation
@@ -288,6 +290,8 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
     body = world.stock()
     spent = start(world.bom(body))
     history: list[dict[str, Any]] = []
+    reqs: list[Any] = []  # System 2's requirements list (D-089)
+    cur_rows: list[Any] = []  # the list measured on the current body
     ideas: list[dict[str, Any]] = []
     curve: list[dict[str, Any]] = []
     tried: dict[str, str] = {}  # body key -> what its trial found: a body is never paid for twice
@@ -299,6 +303,8 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
         acceptance score if it gains a group and loses none."""
         errs, res = screen(world, cand, body, manifest, spent, tried)
         entry["resources"] = res.model_dump()
+        if cfg.requirements and reqs:  # what the candidate does to each requirement, measured before any trial
+            entry["requirements"] = R.moved(cur_rows, R.measure(world, cand, reqs, train, body, manifest, spent))
         if errs:
             entry.update(result="refused before trial: " + "; ".join(errs), tried=False)
             return None
@@ -396,7 +402,11 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
             if isinstance(proposer, RandomProposer):
                 proposer.body = body
             front = sorted(frontier.values(), key=lambda f: (-(len(f["gained"]) - len(f["lost"])), f["iteration"]))
-            budget = None
+            budget, req_text = None, None
+            groups = sorted({t.group for t in train})
+            if cfg.requirements:
+                cur_rows = R.measure(world, body, reqs, train, body, manifest, spent)
+                req_text = R.text(reqs, cur_rows, held, groups)
             if cfg.tools:  # what System 2's tools check a draft against: this iteration's body and record (D-086)
                 from sea.evolve import tools as T
 
@@ -404,12 +414,14 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                 ctx.parent.mkdir(exist_ok=True)
                 ctx.write_text(T.Context(world=cfg.world, iteration=it, body=body, tried=tried, manifest=manifest,
                                          bases={i: f["body"] for i, f in frontier.items()}, spent=spent,
-                                         train=[t.id for t in train]).model_dump_json())
+                                         train=[t.id for t in train], requirements=reqs,
+                                         held=sorted(held)).model_dump_json())
                 budget = {"calls": T.CALLS, "sims": T.SIMS}
                 if hasattr(proposer, "tools"):
                     proposer.tools = (ctx, out / "tool_calls.jsonl")
             prompt = build(world, body, train, outcomes, held, history, ideas, spent, manifest, it, cfg.iterations,
-                           cfg.max_proposals, frontier=front[:5], tune_trials=cfg.tune_trials, tools=budget)
+                           cfg.max_proposals, frontier=front[:5], tune_trials=cfg.tune_trials, tools=budget,
+                           requirements=req_text)
             try:
                 batch = proposer.propose(SYSTEM, prompt, tag=f"iter{it:02d}")
             except (PlanLimitReached, PlanBillingError):
@@ -421,6 +433,14 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
             if cfg.tools:
                 rec["tools"] = T.summary(out / "tool_calls.jsonl", it)
             rec["notes"] = batch.notes
+            if cfg.requirements and batch.requirements:  # System 2 revised its list: measure the new one
+                reqs = list(batch.requirements)
+                cur_rows = R.measure(world, body, reqs, train, body, manifest, spent)
+                rec["requirements"] = [r.model_dump() for r in reqs]
+                (out / "requirements.json").write_text(json.dumps(rec["requirements"], indent=1))
+            if cfg.requirements:
+                rec["requirement_rows"] = [r.model_dump() for r in cur_rows]
+                rec["uncovered"] = R.coverage(reqs, groups)
             trials = []
             swaps: list[tuple[Body, dict[str, Any]]] = []
             eligible: list[tuple[tuple[float, ...], Body, dict[str, Any]]] = []

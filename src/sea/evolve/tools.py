@@ -29,12 +29,13 @@ from typing import IO, Any
 
 from pydantic import BaseModel, ConfigDict, ValidationError
 
-from sea.evolve.core import Body, Proposal, World
+from sea.evolve.core import Body, Proposal, Requirement, World
 from sea.evolve.resources import Spent
 
-NAMES = ("check", "measure", "read", "sweep", "facts", "module", "simulate")
+NAMES = ("check", "measure", "read", "sweep", "sensitivity", "facts", "module", "simulate")
 CALLS, SIMS = 40, 3  # per iteration
 SWEEP_VALUES, SWEEP_READINGS = 12, 6
+SENSITIVITY_PARAMS = 12
 
 
 class Context(BaseModel):
@@ -52,6 +53,8 @@ class Context(BaseModel):
     train: list[str]
     calls: int = CALLS
     sims: int = SIMS
+    requirements: list[Requirement] = []  # System 2's list (D-089)
+    held: list[str] = []
 
 
 class ToolError(Exception):
@@ -93,6 +96,9 @@ def specs() -> list[dict[str, Any]]:
               "readings": {"type": "array", "items": {"type": "object", "properties": {
                   "instrument": {"type": "string"}, "args": {"type": "object"}, "task": {"type": "string"}},
                   "required": ["instrument"]}}}, ["proposal", "slot", "param", "values", "readings"]),
+        tool("sensitivity", "How each of your requirements moves when each parameter of the drafted body's parts "
+             "moves a tenth of its range up and down, and which parameters help one requirement while hurting "
+             "another (a coupling).", draft, ["proposal"]),
         tool("facts", "A train task's numbers by name (an object's size and mass, a route's features, a target).",
              {"task": {"type": "string"}}, ["task"]),
         tool("module", "A module's graph at the given parameters (lengths in metres), to write a patch against.",
@@ -209,7 +215,52 @@ class Server:
         extra = EXTRA.get(self.ctx.world)
         if extra is not None:
             out += extra(cand, train)
+        if self.ctx.requirements:
+            from sea.evolve import requirements as R
+
+            reqs, held, groups = self.ctx.requirements, set(self.ctx.held), sorted({t.group for t in train})
+            cur = R.measure(self.world, self.ctx.body, reqs, train, self.ctx.body, self.ctx.manifest, self.ctx.spent)
+            new = R.measure(self.world, cand, reqs, train, self.ctx.body, self.ctx.manifest, self.ctx.spent)
+            out.append("requirements, now and on the draft:\n" + R.text(reqs, cur, held, groups, draft=new))
         return "\n".join(out)
+
+    def _sensitivity(self, args: dict[str, Any]) -> str:
+        from sea.evolve import requirements as R
+        from sea.evolve.core import Edit, apply
+
+        reqs = self.ctx.requirements
+        if not reqs:
+            raise ToolError("there are no requirements yet: write them in your answer's `requirements`")
+        _, cand = self._draft(args)
+        train = [self.tasks[i] for i in self.ctx.train]
+        here = R.measure(self.world, cand, reqs, train, self.ctx.body, self.ctx.manifest, self.ctx.spent)
+        space = [(slot, k, p) for slot, part in sorted(cand.parts.items()) if part.type in self.catalogue
+                 for k, p in sorted(self.catalogue[part.type].params.items())][:SENSITIVITY_PARAMS]
+        if not space:
+            return "the drafted body's parts have no parameters"
+        rows, coupled = [], []
+        for slot, k, p in space:
+            v0 = cand.parts[slot].params[k]
+            step = (p.hi - p.lo) / 10
+            cells = []
+            for sign in (1, -1):
+                v = min(max(v0 + sign * step, p.lo), p.hi)
+                if v == v0:
+                    continue
+                b = apply(cand, [Edit(slot=slot, params={k: v})], self.catalogue, new_id="sens")
+                moved = R.measure(self.world, b, reqs, train, self.ctx.body, self.ctx.manifest, self.ctx.spent)
+                helps, hurts = [], []
+                for r, a, m in zip(reqs, here, moved, strict=True):
+                    if a.value is None or m.value is None or abs(m.value - a.value) < 1e-9:
+                        continue
+                    better = (m.value > a.value) == (r.sense == ">=")
+                    (helps if better else hurts).append(r.id)
+                    cells.append(f"{k} {v:g}: {r.id} {a.value:.4g} -> {m.value:.4g} ({'better' if better else 'worse'})")
+                if helps and hurts:  # one move, two requirements pulled apart: a coupling
+                    coupled.append(f"{slot}.{k} {'up' if sign > 0 else 'down'} helps {', '.join(helps)} and hurts "
+                                   f"{', '.join(hurts)}")
+            rows.append(f"{slot}.{k} = {v0:g}: " + ("; ".join(cells) or "moves no requirement"))
+        return "\n".join(rows + (["couplings: " + "; ".join(coupled)] if coupled else ["no coupling found"]))
 
     def _reading(self, body: Body, r: dict[str, Any]) -> float:
         from sea.evolve import instruments as I

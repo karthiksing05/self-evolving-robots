@@ -2805,3 +2805,32 @@ Against the prediction:
 - **Instruments:** every instrument reads on each stock body. Mobile takes 0.2 s for all of them, ME 2110 0.0 s and phonology 14 s (building its map of sampled postures).
 - **Task facts:** the gripper's come from the object catalogue (width, depth, height, mass, friction, round). The others are flattened from `Task.data`; ME 2110's carry only a variant index until F6.
 - **Tests:** `tests/test_tools.py` covers reading, refusals, the evaluator's sandbox, and the read, sweep and facts tools on a toy world.
+
+## D-089 A requirements list System 2 writes and the harness measures, with coverage and sensitivity (judge: the answer's contract; policy: loop, prompt, tools; F2 of the general framework)
+
+**Why.** Designers begin from a requirements list (Pahl and Beitz; Ulrich and Eppinger): every need a metric with a target, a demand or a wish, traced to its source, and checked against every candidate. System 2 saw tasks only as pass/fail groups and failures one at a time. The general framework splits the work:
+- **System 2** decides what the needs are: it knows them from the tasks, the brief and its research;
+- **the harness** measures them, on the current body and on any draft, from the instruments of D-088.
+
+LLM-written requirement lists leave most needs out (Massoudi and Fuge 2025 measured coverage under 20%), so the harness reports the groups no requirement covers.
+
+**Change.**
+- **The answer's contract.** `ProposalBatch.requirements` is the whole list, revised in any answer; an empty list keeps the last one. Each `Requirement` has an id, a statement, a metric (arithmetic over instrument calls and task facts), a sense, a marginal value, an optional ideal value, the task groups it is measured on, and its source.
+- **Measuring** (`evolve/requirements.py`). For each requirement on a body, the harness takes its worst value over its groups' train tasks and says whether it meets the ideal, the marginal value, neither, or could not be measured, and why. A requirement is a **demand** if it guards a held group, else a **wish**. **Coverage** lists the train groups no requirement names.
+- **The loop** keeps the list, writes it to `requirements.json` each iteration, shows the table in the prompt, and records on every trial which rows the candidate moved.
+- **Tools.**
+  - `measure` adds the draft's values beside the current body's.
+  - A new `sensitivity` tool moves each parameter of the current parts by a tenth of its range, up and down. It reports how each requirement's metric moves, and names a parameter that helps one requirement while hurting another (a coupling, Suh; a contradiction, Altshuller).
+
+**Prediction** (before the code):
+- with the `requirements` switch off (the default), every run reproduces exactly; with it on and no list written yet, the prompt gains only the empty section's one line;
+- in a toy world a planted list is measured correctly (worst task, demand or wish), coverage lists the unnamed groups, and a trial records the rows it moved;
+- the sensitivity tool finds a planted coupling;
+- no claim on groups until F9's campaigns.
+
+**Measured** (`tests/test_requirements.py`, a toy world with instruments):
+- **A planted list is measured as written:** the reach requirement at its worst task (−0.25 m short at the 0.45 m target, "no"); the cost requirement at 0, which meets its marginal value. A requirement guarding a held group is a demand; one on the body alone is a wish.
+- **Coverage** names the groups a list leaves out. A metric that reads a missing instrument is "unknown", with the reason.
+- **In the loop,** with the switch on, the first prompt shows the empty list's line and the second the measured list. A trial records the rows it moved (R1 −0.25 → −0.15), and the list is written to `requirements.json`. With the switch off, the prompt has no section.
+- **Sensitivity** finds the planted coupling: lengthening the stick helps reach and hurts "the tip stays low", and shortening it does the reverse. `measure` shows the draft's value beside the current body's.
+- **Tests:** 33 passed across the tools, requirements, loop and fingerprint tests.
