@@ -198,6 +198,16 @@ def diagnose(rows: list[dict[str, Any]], note: str, fing: FingerSpec, height_m: 
     detail = (f"closed to {q:.2f} rad (fingertips {gap:.0f} mm apart), moving fingertip {rise:+.0f} mm vs the fixed one; "
               f"{jaw('fixed', fx, zfx, nfx, pfx)}; {jaw('moving', fm, zm, nm, pm)}; "
               f"rose {lifted * 1000:.0f} mm, ended {end * 1000:+.0f} mm; {mass_g:g} g")
+    others: dict[str, float] = {}  # any other robot part on the object while the jaws close: a rack, a carriage
+    for r in squeeze[:40]:
+        per: dict[str, float] = {}
+        for c in r["cons"]["arm"]:
+            per[_part(c[3])] = per.get(_part(c[3]), 0.0) + c[0]
+        for k, f in per.items():
+            others[k] = max(others.get(k, 0.0), f)
+    hit = sorted(((f, k) for k, f in others.items() if f >= 0.5), reverse=True)
+    if hit:
+        detail += "; also on the object while closing: " + ", ".join(f"{k} {f:.0f} N" for f, k in hit[:3])
     on_top = [name for name, f, n in (("moving", fm, nm), ("fixed", fx, nfx)) if f >= 0.2 and n < -0.8]
     if note == "load_limit":
         detail = "an arm joint stalled (load_limit reflex); " + detail

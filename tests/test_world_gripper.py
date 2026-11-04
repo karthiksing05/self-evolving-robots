@@ -80,6 +80,14 @@ def test_diagnose_names_the_mechanism():
     lifted = descent + [_row(1 + 0.1 * k, -0.17, 0.015 + 0.002 * k, side, side) for k in range(30)]
     assert diagnose(lifted, "load_limit", f, 0.03, 514)[0] == "arm_stall"
 
+    # a part other than the jaws on the object while they close is named: a mechanism's rack jams it (D-082)
+    rack = [_row(1 + 0.1 * k, -0.17, 0.015, [], []) for k in range(30)]
+    for r in rack:
+        r["cons"]["arm"] = [(6.0, -5.0, 0.0, "jaw_rack")]
+    mech, detail = diagnose(descent + rack, "", f, 0.03, 97)
+    assert mech == "fixed_jaw_missed" and detail.endswith("also on the object while closing: the rack 6 N")
+    assert "also on the object" not in diagnose(missed, "", f, 0.03, 97)[1]
+
     # a force limit that trips between two samples is named from the step that pressed hardest (D-068)
     quiet = descent + [_row(1 + 0.1 * k, -0.17, 0.015, [], []) for k in range(30)]
     assert "exceeded the force limit" in diagnose(quiet, "force_limit", f, 0.03, 97)[1]

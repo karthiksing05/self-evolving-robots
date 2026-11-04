@@ -198,10 +198,13 @@ def build(spec: FingerSpec, fr: PadFrame, host: trimesh.Trimesh) -> Shoe:
     profs = [profile(sec.t, sec.w, sec.g, r, xb) for xb, r in zip(sec.xb, sec.r, strict=True)]
     halves = ((lambda z: z >= -1e-9), (lambda z: z <= 1e-9)) if sec.g > 0 else ((lambda z: True),)
     pieces, loft = [], 0.0
+    # a V groove is concave across: one convex piece per side of it, each with the back's middle, which no
+    # profile point marks (D-082: without it a wedge of the back, where the screws sit, was missing)
+    mids = [[(xb, 0.0)] if sec.g > 0 else [] for xb in sec.xb]
     for k in range(len(sec.ys) - 1):
-        for keep in halves:  # a V groove is concave across: one convex piece per side of it
-            pa = [p for p in profs[k] if keep(p[1])]
-            pb = [p for p in profs[k + 1] if keep(p[1])]
+        for keep in halves:
+            pa = [p for p in profs[k] if keep(p[1])] + mids[k]
+            pb = [p for p in profs[k + 1] if keep(p[1])] + mids[k + 1]
             pieces.append(_piece(pa, sec.ys[k], pb, sec.ys[k + 1], sec.t - FRONT_MM))
             loft += trimesh.convex.convex_hull(np.array([(x, sec.ys[k], z) for x, z in pa]
                                                          + [(x, sec.ys[k + 1], z) for x, z in pb])).volume
