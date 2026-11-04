@@ -21,7 +21,7 @@ Quat = tuple[float, float, float, float]
 Material = Literal["pla", "steel", "plywood", "stock"]
 # what a part is to the laws: carried structure, a pin or rod others ride on, a clamp holding rods, a bracket
 # fastened to the frame, the finger that meets the object
-Role = Literal["structure", "pin", "rod", "clamp", "bracket", "finger"]
+Role = Literal["structure", "pin", "rod", "clamp", "bracket", "finger", "roller"]
 DENSITY = {"pla": 1240.0, "steel": 7850.0, "plywood": 600.0}  # kg/m^3: PLA printed solid, ground steel rod, birch ply
 
 

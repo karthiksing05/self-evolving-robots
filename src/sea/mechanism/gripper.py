@@ -13,7 +13,7 @@ What each part is comes from the jaw's mechanism graph (``sea.mech``, D-078): wh
 part's role (a rod, a clamp, a bracket) and the printed piece it belongs to, and the loops it closes.
 
 Each violation names the law, the parts and the numbers, for System 2's "refused before trial" channel.
-Tooth bending is not a law: no measured allowable stress exists for printed PLA teeth (D-059).
+Tooth bending and a rack's bending are judged in the trial, at the load the teeth carry (D-100, ``sim/jaws.RodSprings``).
 """
 
 from __future__ import annotations

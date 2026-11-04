@@ -3073,3 +3073,35 @@ The second live run (`gripper_f_smoke2`) met D-099's prediction: 4 searches, 3 n
 **The campaign** (`gripper_f_s{0,1,2}`): full framework, stripped to the brief, 14 iterations, then `recheck_bodies.py` under 3 seeds.
 
 **Prediction:** at least 1 seed ends on a slide body; verified groups (train and test, every seed) reach at least 19 on at least 1 seed; the group most likely to stay out is the potted-meat can (friction 0.35, squeezed out) and I do not predict 21 on this first campaign.
+
+**The first campaign seed, and why it does not count.** `gripper_f_s0` reached 21 of 21 train groups in 7 iterations, and on `recheck_bodies.py` it holds them on train under every seed, with test at 20 or 21. Its final body has a printed rack 1.5 x 2 mm in section and 2 mm-wide gear teeth, chosen to clear the objects. Printed parts are rigid in the simulator and nothing limits them. By hand, that rack sees over 500 MPa on PLA that fails near 48 MPa, and it buckles at about 7 N against 31 N; the earlier body's 5 x 6 mm rack deflects about 13 to 18 mm at 85 mm overhang under 11 N, against the 0.5 mm at which teeth skip. So this result, and the bare slides' 70 to 72 tasks above, measure a judge with a hole. The verified best remains the hinged jaw's 18. Seeds 1 and 2 were stopped.
+
+## D-100 A printed rack and its teeth carry real loads (judge: mechanism, physics; world: gripper)
+
+**Why.** D-059 left tooth bending and beam stress out because no measured allowable stress existed for printed PLA, and deferred them. System 2 has now exploited exactly that, as any optimiser would. Measured values exist: flat-printed PLA at 47.6 MPa flexural strength and 1808 MPa modulus (ISO 178, Prusa Mini; 90 deg builds reach 21.3 MPa). This does not rule out a slide: a deeper rack and a backing roller behind the mesh are how real long racks work, and both are exposed.
+
+**Change.** In a trial, per step, at the force the teeth actually carry (the same 20 ms hold as the rods):
+- **Teeth:** Lewis stress F / (b m Y), with Shigley's Y by tooth count, on the gear and the rack;
+- **Rack:** a beam from where it leaves the carriage to the mesh. Its bend under the separating force adds to the lift that makes teeth skip, and its bending stress counts. A box running along the rack and touching it counts in the section;
+- **Buckling:** when the mesh pushes the rack toward its support: Euler, K = 2 free, K = 1 with a roller;
+- **A roller** (`Cylinder` with role `roller`, on the gripper, behind the rack at the mesh) takes the separating force. It is a bought bearing and must be mounted like any fixed part.
+
+Allowable stress is 47.6 MPa over a 1.5 factor (31.7 MPa). Any stress or bend past its limit makes the attempt unphysical, as a bushing's load does. The same numbers are instruments, at stall.
+
+**Prediction** (before the code):
+- no hinged jaw changes, as they have no rack;
+- hand numbers hold in a test: the 5 x 6 mm rack's I, its bend at 85 mm, and Lewis on a module-1, 2 mm tooth at 31 N;
+- `gripper_f_s0`'s final body fails nearly every pick;
+- the bare module slide at 6 mm rods falls far from its 72 tasks, because its rack flexes;
+- a rack with a roller or a deep rib can pass.
+Whether System 2 finds such a design under the laws is the next campaign's question; I do not predict it reaches 21.
+
+**D-100 measured** (seed 0, all 84 tasks). `gripper_f_s0`'s thin rack: 0 tasks, every one unphysical, against 84 under the old judge. Bare 6 mm slide: 24 tasks, 6 train groups, against 72 and 18. The same slide with a roller placed behind the mesh, ignoring that two laws refuse that placing (clearance from the carriage, and a mount): 69 tasks, 17 train groups, with force limits as the main failure. So all three predictions held, and the slide is not ruled out; making that roller real is design work left to System 2.
+
+Mechanisms in `library/` entered under the old judge are archived (`mechanisms.pre-d100.json`). The notes stay, since they are sourced findings and not results of the judge.
+
+**The campaign** (`gripper_g_s{0,1,2}`): full framework, stripped, 20 iterations, then the recheck under 5 seeds. **Prediction:** at least 1 seed keeps a slide with a backed or deep rack; verified groups beat the hinged jaw's 18 on at least 1 seed; 21 is not predicted.
+
+**D-100's source, read directly.** Muraleedharan et al., *Effect of build orientation angle on mechanical properties and fracture behaviour of FDM 3D printed PLA*, Engineering for Rural Development, Jelgava, 2026 (https://erdev.lbtu.lv/sites/default/files/proceedings/2026/TF152.pdf): ISO 178 specimens (80 x 10 x 4 mm), Prusa PLA on a Prusa Mini, 0 deg 1808 +/- 45 MPa and 47.6 +/- 2.2 MPa; 90 deg 1567 +/- 42 MPa and 21.3 +/- 0.5 MPa. **The limit of this:** those are the best orientation's numbers, for roads along the bending stress. A rack can be printed that way, flat on its long side, but a tooth's root is loaded across its section in other ways, so the Lewis allowance may be generous. One study and one printer set both numbers. The 1.5 factor is judgement. A verified result is good in simulation under these numbers, not a promise about any particular print.
+
+**D-100's suite.** Full suite: 872 passed, 8 failed, all in `tests/mech/test_seed_equivalence.py`, each for the one new numeric `jaw_rack`. That record is what the judge reads of the rack, and the deleted builders never made it, so the comparison drops that key alone and `golden_jaws.json` is unchanged. All 13 configurations still match it at 1e-6.

@@ -233,6 +233,49 @@ def _pose(spec: mujoco.MjSpec, name: str, root: str = "gripper") -> tuple[np.nda
     return pos, rot
 
 
+def rack_beam(g: Graph, gd) -> jaws.RackBeam | None:  # noqa: F821
+    """A guide's printed rack as a beam (D-100), from its parts: the box longest along the teeth is the rack, boxes
+    touching it that run along most of it join its section, the others hold it, and a ``roller`` on the gripper behind
+    the rack at the mesh takes the teeth's separating force.  None without printed teeth."""
+    from sea.sim import jaws
+
+    car = next((b for b in g.bodies if b.name == gd.carriage), None)
+    teeth = next((p for p in (car.parts if car else ()) if isinstance(p, RackTeeth)), None)
+    boxes = [p for p in (car.parts if car else ()) if isinstance(p, Box)]
+    if teeth is None or not boxes:
+        return None
+
+    def span(p):  # gripper-frame extents: the carriage's frame is the jaw's at zero travel
+        c, h = jaws.HINGE + jaws.R0 @ np.array(p.pos), np.abs(jaws.R0) @ np.array(p.half)
+        return c - h, c + h
+
+    def touches(a, b, gap=0.5e-3):
+        return bool(np.all(a[0] <= b[1] + gap) and np.all(b[0] <= a[1] + gap))
+
+    rack = max(boxes, key=lambda p: span(p)[1][0] - span(p)[0][0])
+    lo, hi = span(rack)
+    section, holders = [rack], []
+    for p in boxes:
+        if p is not rack and touches(span(p), (lo, hi)):
+            (section if span(p)[1][0] - span(p)[0][0] >= 0.9 * (hi[0] - lo[0]) else holders).append(p)
+    hold = [span(p) for p in holders] or [(lo, hi)]
+    # width (y), height (z) and their middles, with the section's bending found by parallel axes
+    a = [(s[1][1] - s[0][1], s[1][2] - s[0][2], (s[1][1] + s[0][1]) / 2, (s[1][2] + s[0][2]) / 2) for s in map(span, section)]
+    area = sum(w * h for w, h, _, _ in a)
+    yc, zc = sum(w * h * y for w, h, y, _ in a) / area, sum(w * h * z for w, h, _, z in a) / area
+    i_sep = sum(w * h**3 / 12 + w * h * (z - zc) ** 2 for w, h, _, z in a)
+    i_lat = sum(h * w**3 / 12 + w * h * (y - yc) ** 2 for w, h, y, _ in a)
+    c = max(max(abs(z + h / 2 - zc), abs(z - h / 2 - zc)) for _, h, _, z in a)
+    gears = [p for b in g.bodies for p in b.parts if isinstance(p, Gear)]
+    width = min([teeth.width, *(p.width for p in gears)])
+    y = min([jaws.LEWIS_RACK, *(jaws.lewis_y(2 * p.r_pitch / gd.module) for p in gears)])
+    rollers = [p for b in g.bodies if b.name == "gripper" for p in b.parts if isinstance(p, Cylinder) and p.role == "roller"]
+    backed = any(abs(p.pos[0] - gd.mesh_x) <= p.radius + 5e-3 and abs(p.pos[2] + p.radius - lo[2]) <= 0.5e-3
+                 and lo[1] - 1e-3 <= p.pos[1] <= hi[1] + 1e-3 for p in rollers)
+    return jaws.RackBeam(float(min(h[0][0] for h in hold)), float(max(h[1][0] for h in hold)), jaws.PLA_E_PA * float(i_sep),
+                         float(c), jaws.PLA_E_PA * float(min(i_sep, i_lat)), 1.0 / (width * gd.module * y), backed)
+
+
 def rod_end(g: Graph, root: str = "gripper") -> float:
     """Where the guide's rods end, toward the carriage's travel (root x): the nearest free end of the rods on
     the root."""
@@ -307,6 +350,9 @@ def compile(spec: mujoco.MjSpec, g: Graph, base: str | Base | None = None) -> li
         spec.add_numeric(name="jaw_rods", data=[gd.clamp_end, gd.centre, gd.module, gd.mesh_x])
         if hw is not jaws.LM3:
             spec.add_numeric(name="jaw_bushing", data=[hw.ei, hw.length, hw.rated_n])
+        beam = rack_beam(g, gd)
+        if beam is not None:
+            spec.add_numeric(name="jaw_rack", data=beam.data())
         if gd.bushings != (0.0,) or gd.far_end is not None:  # the rods as beams through every bushing (D-080)
             spec.add_numeric(name="jaw_guide", data=[math.nan if gd.far_end is None else gd.far_end, rod_end(g, root),
                                                      *sorted(gd.bushings)])

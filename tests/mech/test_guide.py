@@ -46,7 +46,7 @@ def test_holding_both_ends_and_spreading_bushings_unload_them():
             for k, (bs, far) in {"cant": ((0.0,), False), "both": ((0.0,), True), "12": ((-0.012, 0.012), True),
                                  "25": ((-0.025, 0.025), True)}.items()}
 
-    lift = {k: v["lift_mm"] for k, v in rows.items()}
+    lift = {k: (v["lift_mm"] - v["bend_mm"]) for k, v in rows.items()}
     load = {k: v["bushing_n"] for k, v in rows.items()}
     assert lift["both"] < 0.6 * lift["cant"] and lift["25"] < lift["12"] < lift["both"]
     assert load["both"] == pytest.approx(load["cant"], rel=0.02)

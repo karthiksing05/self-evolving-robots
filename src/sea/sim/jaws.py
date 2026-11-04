@@ -270,6 +270,52 @@ TOOTH_SKIP = 0.5  # of a module: a rack pushed this far off the gear has lost mo
 HOLD_STEPS = 10  # a lift or load counts once it lasts 20 ms, as the force limit's does: not an impact's spike
 
 
+# Printed PLA (D-100): flat prints' measured flexural strength and modulus (ISO 178, Prusa Mini, 2026; a 90 degree
+# build reaches 21.3 MPa), over a 1.5 factor.  Lewis form factors for 20 degree teeth (Shigley, table 14-2).
+PLA_FLEX_PA, PLA_E_PA, PRINT_FACTOR = 47.6e6, 1.808e9, 1.5
+PLA_ALLOW_PA = PLA_FLEX_PA / PRINT_FACTOR
+_LEWIS = ((12, 0.245), (14, 0.277), (17, 0.302), (20, 0.322), (24, 0.337), (30, 0.359), (40, 0.389), (50, 0.408),
+          (75, 0.435), (100, 0.447), (150, 0.460), (300, 0.472))
+LEWIS_RACK = 0.485
+
+
+def lewis_y(teeth: float) -> float:
+    return float(np.interp(teeth, [n for n, _ in _LEWIS], [y for _, y in _LEWIS]))
+
+
+@dataclass(frozen=True)
+class RackBeam:
+    """A printed rack as a beam, with what its teeth can carry (D-100).  ``lo``..``hi`` is where the carriage holds it
+    (gripper x at zero travel); ``ei_sep`` and ``c_sep`` its bending against the teeth's separating force, ``ei_min`` its
+    weakest bending, ``tooth`` its stress per newton along the teeth (Pa/N), ``backed`` a roller behind the mesh."""
+
+    lo: float
+    hi: float
+    ei_sep: float
+    c_sep: float
+    ei_min: float
+    tooth: float
+    backed: bool
+
+    def data(self) -> list[float]:
+        return [self.lo, self.hi, self.ei_sep, self.c_sep, self.ei_min, self.tooth, float(self.backed)]
+
+    def overhang(self, x_mesh: float) -> float:
+        return max(self.lo - x_mesh, x_mesh - self.hi, 0.0)
+
+    def loads(self, x_mesh: float, teeth_n: float) -> dict[str, float]:
+        """At the point on the rack under the gear (``x_mesh``, zero-travel gripper x) with this force on its teeth: the
+        bend off the gear (m), the bending and tooth stress (Pa) and the load it buckles at (N, inf when in tension)."""
+        n = self.overhang(x_mesh)
+        sep = teeth_n * math.tan(PRESSURE_ANGLE)
+        bend = 0.0 if self.backed else sep * n**3 / (3 * self.ei_sep)
+        stress = 0.0 if self.backed else sep * n * self.c_sep * PLA_E_PA / self.ei_sep
+        k = 1.0 if self.backed else 2.0
+        # closing pulls the rack rearward: behind its support it is in tension, ahead of it in compression
+        buckle = math.pi**2 * self.ei_min / (k * n) ** 2 if x_mesh > self.hi and n > 0 else math.inf
+        return {"overhang": n, "bend": bend, "stress": stress, "tooth": teeth_n * self.tooth, "buckle": buckle}
+
+
 def rod_stiffness(a: float, ei: float = ROD_EI) -> tuple[float, float]:
     """The two rods' stiffness at overhang ``a`` (m), each mode held still: across them (N/m) and turning (N m/rad)."""
     return 2 * 12 * ei / a**3, 2 * 4 * ei / a
@@ -383,6 +429,10 @@ class RodSprings:
         self.ei, self.length, self.rated = ROD_EI, BUSHING_LEN, BUSHING_RATED_N  # a guide on other parts says so (D-098)
         if any(model.numeric(i).name == "jaw_bushing" for i in range(model.nnumeric)):
             self.ei, self.length, self.rated = (float(x) for x in model.numeric("jaw_bushing").data)
+        self.rack = None  # the printed rack as a beam (D-100)
+        if any(model.numeric(i).name == "jaw_rack" for i in range(model.nnumeric)):
+            lo, hi, ei_sep, c, ei_min, tooth, backed = (float(x) for x in model.numeric("jaw_rack").data)
+            self.rack = RackBeam(lo, hi, ei_sep, c, ei_min, tooth, bool(backed))
         self.q = [int(model.jnt_qposadr[model.joint(n).id]) for n in self.JOINTS]
         self.v = [int(model.jnt_dofadr[model.joint(n).id]) for n in self.JOINTS]
         self.slide = int(model.jnt_qposadr[model.joint("jaw_slide").id])
@@ -397,6 +447,11 @@ class RodSprings:
         self.at_mm = 0.0
         self.off_end_mm = 0.0  # how far a bushing ran past the rods' free end
         self._recent: list[tuple[float, float, float]] = []  # (lift mm, bushing N, overhang mm) per step
+        self.bend_mm = 0.0  # the printed rack's own bend, and its stresses and buckling, each as held 20 ms (D-100)
+        self.bend_mpa = 0.0
+        self.tooth_mpa = 0.0
+        self.buckled = (0.0, math.inf)
+        self._rack: list[tuple[float, float, float, float, float]] = []
 
     def overhang(self, s: float) -> float:
         return max(self.centre + s - self.length / 2 - self.clamp, self.length / 2)
@@ -433,6 +488,17 @@ class RodSprings:
         d.qfrc_applied[self.v[2]] -= sep  # down: the rack hangs below the gear
         d.qfrc_applied[self.v[3]] -= sep * dx
         lift = -(float(d.qpos[self.q[2]]) + float(d.qpos[self.q[3]]) * dx)
+        if self.rack is not None:  # the point on the rack under the gear: it moved with the carriage
+            r = self.rack.loads(self.mesh_x - s, f_t)
+            lift += r["bend"]
+            self._rack = [*self._rack[-(HOLD_STEPS - 1):], (r["bend"] * 1000, r["stress"] / 1e6, r["tooth"] / 1e6, f_t, r["buckle"])]
+            if len(self._rack) == HOLD_STEPS:
+                self.bend_mm = max(self.bend_mm, min(x[0] for x in self._rack))
+                self.bend_mpa = max(self.bend_mpa, min(x[1] for x in self._rack))
+                self.tooth_mpa = max(self.tooth_mpa, min(x[2] for x in self._rack))
+                held, at = min(x[3] for x in self._rack), self._rack[-1][4]
+                if held / at > self.buckled[0] / self.buckled[1]:
+                    self.buckled = (held, at)
         self._recent = [*self._recent[-(HOLD_STEPS - 1):], (lift * 1000, math.hypot(*load), a * 1000)]
         if len(self._recent) == HOLD_STEPS:  # what held over the last HOLD_STEPS steps
             held_lift = min(r[0] for r in self._recent)
@@ -445,8 +511,16 @@ class RodSprings:
             return (f"unphysical: a bushing ran {self.off_end_mm:.0f} mm past the rods' free end; the carriage "
                     "leaves its rods")
         if self.lift_mm > TOOTH_SKIP * self.module * 1000:
+            flex = f", {self.bend_mm:.1f} mm of it the rack's own flex" if self.bend_mm > 0.05 else ""
             return (f"unphysical: the rods let the rack lift {self.lift_mm:.1f} mm off the gear ({self.at_mm:.0f} mm "
-                    f"out from the clamp); past {TOOTH_SKIP * self.module * 1000:.1f} mm the teeth skip")
+                    f"out from the clamp{flex}); past {TOOTH_SKIP * self.module * 1000:.1f} mm the teeth skip")
+        allow = PLA_ALLOW_PA / 1e6
+        if self.tooth_mpa > allow:
+            return f"unphysical: the printed teeth carried {self.tooth_mpa:.0f} MPa at their root; printed PLA allows {allow:.0f} MPa"
+        if self.bend_mpa > allow:
+            return f"unphysical: the printed rack bent to {self.bend_mpa:.0f} MPa beyond the carriage; printed PLA allows {allow:.0f} MPa"
+        if self.buckled[0] > self.buckled[1]:
+            return f"unphysical: the rack buckled: {self.buckled[0]:.0f} N along it, past the {self.buckled[1]:.0f} N it can take at that length"
         if self.bushing_n > self.rated:
             return (f"unphysical: a bushing carried {self.bushing_n:.0f} N; it is rated {self.rated:g} N, past "
                     "which it dents the rod")

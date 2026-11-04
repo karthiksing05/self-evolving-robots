@@ -524,7 +524,11 @@ class GripperWorld:
                "clamp part holds them there; the carriage rides two bushings per offset.  A guide's `bushing` picks the "
                "part, and its rod's diameter sets how the rods bend: " + "; ".join(
                    f"{b.item} ({2000 * b.rod_r:g} mm rod, {b.od * 1000:g} mm outside, {b.length * 1000:g} mm long, {b.kg * 1000:g} g, "
-                   f"rated {b.rated_n:g} N)" for b in J.BUSHINGS.values()) + ".  A module's rod_mm is one of those rods.",
+                   f"rated {b.rated_n:g} N)" for b in J.BUSHINGS.values()) + ".  A module's rod_mm is one of those rods.  Printed parts "
+               f"are not rigid at a rack: PLA here is {J.PLA_E_PA / 1e9:g} GPa and may carry {J.PLA_ALLOW_PA / 1e6:.0f} MPa, and each "
+               "trial judges the teeth by Lewis at the force they carry and the rack as a beam from where the carriage holds it to "
+               "the gear.  A box touching the rack and running along most of it joins its section.  A cylinder with role "
+               "'roller' on the gripper, under the rack at the gear and touching it, takes the teeth's separating force.",
                "Part kinds, then a body's, joint's and constraint's fields:", *kinds, (patch_doc or "").strip(), "Modules (a patch applies to the module's graph):"]
         for name, (_, params) in MODULES.items():
             mid = {k: MODULE_DEFAULTS.get(k, (lo + hi) / 2) for k, (lo, hi) in params.items()}
@@ -622,6 +626,14 @@ class GripperWorld:
             I(name="bushing_load_n", unit="N", doc="the most loaded linear bushing at this opening (0 without rods)",
               args=w),
             I(name="bushing_rated_n", unit="N", doc="a linear bushing's rated load"),
+            I(name="tooth_stress_mpa", unit="MPa", doc="a slide's printed teeth at their root at the servo's stall (Lewis; 0 "
+              "without teeth)"),
+            I(name="rack_bend_mm", unit="mm", doc="a slide's printed rack's own bend off the gear at this opening, at stall "
+              "(counts toward rack_lift_mm; 0 with a roller behind the mesh)", args=w),
+            I(name="rack_stress_mpa", unit="MPa", doc="the printed rack's bending stress at this opening, at stall", args=w),
+            I(name="rack_buckle_n", unit="N", doc="the load the rack buckles at at this opening when the mesh pushes it toward "
+              "the carriage (1e9 when in tension)", args=w),
+            I(name="print_allow_mpa", unit="MPa", doc="the stress printed PLA is allowed: measured flexural strength over 1.5"),
             I(name="pad_mm", unit="mm", doc="the pad thickness on each face (0: bare faces)"),
             I(name="face_mu", unit="", doc="the faces' friction against the objects"),
             I(name="lift_stall_nm", unit="N*m", doc="the arm's lifting joints' stall torque"),
@@ -637,7 +649,13 @@ class GripperWorld:
     def read(self, body: Body, name: str, args: dict[str, Any], task: Task | None = None) -> float:
         f = to_design(body).fingers
         lo, hi = F.q_range(f)
-        if name in ("servo_at", "face_tilt_deg", "tip_rise_mm", "squeeze_n", "rack_lift_mm", "bushing_load_n"):
+        if name == "print_allow_mpa":
+            return J.PLA_ALLOW_PA / 1e6
+        if name == "tooth_stress_mpa":
+            r = _rod_numbers(f, hi, hi)
+            return 0.0 if r is None else float(r["tooth_mpa"])
+        if name in ("servo_at", "face_tilt_deg", "tip_rise_mm", "squeeze_n", "rack_lift_mm", "bushing_load_n", "rack_bend_mm",
+                    "rack_stress_mpa", "rack_buckle_n"):
             width = float(args.get("width_mm", 0.0))
             q = F.tip_opening(f, width / 1000)
             if q is None:
@@ -653,7 +671,9 @@ class GripperWorld:
             if name == "squeeze_n":
                 return float(F.squeeze_n(f, q, GRIP_TORQUE_NM))
             r = _rod_numbers(f, q, hi)
-            return 0.0 if r is None else float(r["lift_mm" if name == "rack_lift_mm" else "bushing_n"])
+            key = {"rack_lift_mm": "lift_mm", "bushing_load_n": "bushing_n", "rack_bend_mm": "bend_mm",
+                   "rack_stress_mpa": "rack_mpa", "rack_buckle_n": "buckle_n"}[name]
+            return 0.0 if r is None else float(r[key])
         if name in ("tooth_skip_mm", "bushing_rated_n"):
             r = _rod_numbers(f, 0.0, hi)
             return 0.0 if r is None else float(r["skip_mm" if name == "tooth_skip_mm" else "rated_n"])
@@ -931,6 +951,8 @@ def _built_bom(mechanism: str) -> list[BomLine]:
                 bought[item] = bought.get(item, 0) + 1
             elif isinstance(p, Cylinder) and p.role == "rod":
                 rods.append((round(2000 * p.radius), 2 * p.half_length))
+            elif isinstance(p, Cylinder) and p.role == "roller":
+                bought["mr63_bearing"] = bought.get("mr63_bearing", 0) + 1
             elif getattr(p, "material", "pla") == "pla":
                 pla += part_kg(p) * 1000
             if getattr(p, "role", "") in ("clamp", "bracket"):
@@ -956,11 +978,28 @@ def _rods(f, q: float, q_hi: float) -> str:
     if f.jaw != "built":
         return (f"; rods {r['overhang_mm']:.0f} mm out from their clamp: the squeeze lifts the rack up to "
                 f"{r['lift_mm']:.1f} mm off the gear (teeth skip past {r['skip_mm']:.1f}) and loads each bushing "
-                f"{r['bushing_n']:.0f} N (rated {r['rated_n']:g})")
+                f"{r['bushing_n']:.0f} N (rated {r['rated_n']:g})" + _rack_text(r))
     held = "held at both ends" if r["both_ends"] else f"{r['overhang_mm']:.0f} mm out from their clamp"
     return (f"; rods {held}, {r['bushings']} bushing(s) per rod: the squeeze lifts the rack up to "
             f"{r['lift_mm']:.1f} mm off the gear (teeth skip past {r['skip_mm']:.1f}) and loads "
-            f"the worst bushing {r['bushing_n']:.0f} N (rated {r['rated_n']:g})")
+            f"the worst bushing {r['bushing_n']:.0f} N (rated {r['rated_n']:g})" + _rack_text(r))
+
+
+def _rack_text(r: dict[str, float]) -> str:
+    return (f"; the printed rack bends {r['bend_mm']:.1f} mm of that at {r['rack_mpa']:.0f} MPa, its teeth carry "
+            f"{r['tooth_mpa']:.0f} MPa (printed PLA allows {J.PLA_ALLOW_PA / 1e6:.0f})")
+
+
+def _rack_numbers(g, gd, s: float, teeth_n: float) -> dict[str, float]:
+    """The printed rack and teeth at travel ``s`` with this force on the teeth (D-100), as the trial judges them."""
+    from sea.mech.build import rack_beam
+
+    beam = rack_beam(g, gd)
+    if beam is None:
+        return {"bend_mm": 0.0, "rack_mpa": 0.0, "tooth_mpa": 0.0, "buckle_n": 1e9}
+    r = beam.loads(gd.mesh_x - s, teeth_n)
+    return {"bend_mm": r["bend"] * 1000, "rack_mpa": r["stress"] / 1e6, "tooth_mpa": r["tooth"] / 1e6,
+            "buckle_n": min(r["buckle"], 1e9)}
 
 
 def _rod_numbers(f, q: float, q_hi: float) -> dict[str, float] | None:
@@ -973,10 +1012,14 @@ def _rod_numbers(f, q: float, q_hi: float) -> dict[str, float] | None:
     from sea.sim import jaws
 
     if f.jaw == "prismatic":
+        from sea.mech.seed.gripper import jaw_graph
+
         a, lift, bushing = jaws.rack_lift_mm(f.drive_mm_per_rad / 1000, f.sector, q, q_hi, GRIP_TORQUE_NM)
         m = jaws.module_for(f.drive_mm_per_rad / 1000)[1] * 1000
-        return {"overhang_mm": a, "lift_mm": lift, "skip_mm": jaws.TOOTH_SKIP * m, "bushing_n": bushing,
-                "rated_n": jaws.BUSHING_RATED_N, "both_ends": False, "bushings": 1}
+        g = jaw_graph(f, _site())
+        rack = _rack_numbers(g, g.guides[0], f.drive_mm_per_rad / 1000 * q, GRIP_TORQUE_NM / (f.drive_mm_per_rad / 1000))
+        return {"overhang_mm": a, "lift_mm": lift + rack["bend_mm"], "skip_mm": jaws.TOOTH_SKIP * m, "bushing_n": bushing,
+                "rated_n": jaws.BUSHING_RATED_N, "both_ends": False, "bushings": 1, **rack}
     if f.jaw != "built":
         return None
     g = Graph.model_validate_json(f.mechanism)
@@ -996,7 +1039,8 @@ def _rod_numbers(f, q: float, q_hi: float) -> dict[str, float] | None:
     a, lift, load = jaws.guide_static(gd.clamp_end, gd.centre, gd.bushings, gd.far_end, s,
                                       teeth * math.tan(jaws.PRESSURE_ANGLE), gd.mesh_x - (gd.centre + s),
                                       squeeze * (tip[2] - rod_z), squeeze * (tip[1] - rod_y), hw)
-    return {"overhang_mm": a * 1000, "lift_mm": lift * 1000, "skip_mm": jaws.TOOTH_SKIP * gd.module * 1000,
+    rack = _rack_numbers(g, gd, s, teeth)
+    return {**rack, "overhang_mm": a * 1000, "lift_mm": lift * 1000 + rack["bend_mm"], "skip_mm": jaws.TOOTH_SKIP * gd.module * 1000,
             "bushing_n": load, "rated_n": hw.rated_n, "both_ends": gd.far_end is not None,
             "bushings": len(gd.bushings)}
 

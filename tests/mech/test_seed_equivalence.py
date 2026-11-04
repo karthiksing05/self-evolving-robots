@@ -41,7 +41,9 @@ def _close(a, b, path: str, errs: list[str], tol: float = 1e-6) -> None:
 @pytest.mark.parametrize("key", sorted(GOLD))
 def test_the_graph_compiles_the_jaw_the_builders_made(key):
     errs: list[str] = []
-    _close(GOLD[key], json.loads(json.dumps(_now()[key])), key, errs)
+    now = json.loads(json.dumps(_now()[key]))
+    now["numeric"].pop("jaw_rack", None)  # D-100: what the judge reads of the rack, not part of what the builders made
+    _close(GOLD[key], now, key, errs)
     assert not errs, "\n".join(errs[:20])
 
 

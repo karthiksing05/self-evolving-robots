@@ -3,6 +3,7 @@
 import json
 import math
 
+import numpy as np
 import pytest
 
 from sea.evolve.core import Idea, Mechanism, Part, Requirement
@@ -58,7 +59,8 @@ def test_a_thicker_rod_holds_what_a_thin_one_cannot(world):
     q = 1.0
     t, k = G._rod_numbers(thin, q, 1.7), G._rod_numbers(thick, q, 1.7)
     assert t["rated_n"] == J.BUSHING_RATED_N and t["bushing_n"] > t["rated_n"]
-    assert k["rated_n"] == 265.0 and k["bushing_n"] < k["rated_n"] and k["lift_mm"] < k["skip_mm"] < t["lift_mm"]
+    rod_lift = lambda r: r["lift_mm"] - r["bend_mm"]  # noqa: E731  the rods' share: the rack's own flex is D-100's
+    assert k["rated_n"] == 265.0 and k["bushing_n"] < k["rated_n"] and rod_lift(k) < k["skip_mm"] < rod_lift(t)
 
 
 def test_the_simulator_uses_the_parts_named():
@@ -162,3 +164,80 @@ def test_the_tuner_moves_only_catalogue_parameters_when_a_swap_builds_on_a_built
     space = tunable(built, ["jaw", "pads"], catalogue)  # how the slots read: the jaw differs from the current body
     assert {slot for slot, _, _ in space} == {"pads"} and {k for _, k, _ in space} == set(pads.params)
     assert tunable(built, ["jaw"], catalogue) == []
+
+
+# ---------------------------------------------------------------- printed racks and teeth (D-100)
+def _beam(world, rod=6.0, radius=50.0):
+    from sea.mech.build import rack_beam
+
+    g = Graph.model_validate_json(_slide(world, rod, radius).parts["jaw"].mechanism)
+    return g, rack_beam(g, g.guides[0])
+
+
+def test_lewis_and_a_racks_bend_match_the_hand_numbers(world):
+    assert J.lewis_y(17) == pytest.approx(0.302) and J.lewis_y(100) == pytest.approx(0.447)
+    g, beam = _beam(world)
+    # the module's rack is 6 wide and 5 tall: I = 6 * 5^3 / 12 = 62.5 mm^4; EI = 1.808e9 * 62.5e-12 = 0.113 N m^2
+    assert beam.ei_sep == pytest.approx(J.PLA_E_PA * 62.5e-12, rel=1e-6) and beam.c_sep == pytest.approx(2.5e-3)
+    # 11.2 N at 85 mm: F L^3 / 3 EI = 11.2 * 6.14e-4 / 0.339 = 20 mm, where teeth skip at 0.5 mm
+    teeth = 1.62 / 0.0525
+    r = beam.loads(beam.lo - 0.085, teeth)
+    assert r["overhang"] == pytest.approx(0.085) and r["bend"] * 1000 == pytest.approx(20.5, abs=1.0)
+    # a tooth on the 6 mm rack face, module 1: 30.9 N / (6e-3 * 1e-3 * Y(100) = 0.447) = 11.5 MPa
+    assert r["tooth"] / 1e6 == pytest.approx(11.5, abs=0.3)
+
+
+def test_the_racks_loads_follow_the_section_the_roller_and_the_direction(world):
+    g, beam = _beam(world)
+    teeth = 30.0
+    behind, ahead = beam.loads(beam.lo - 0.05, teeth), beam.loads(beam.hi + 0.05, teeth)
+    assert behind["buckle"] == math.inf and ahead["buckle"] == pytest.approx(math.pi**2 * beam.ei_min / (2 * 0.05) ** 2)
+    backed = J.RackBeam(beam.lo, beam.hi, beam.ei_sep, beam.c_sep, beam.ei_min, beam.tooth, True).loads(beam.lo - 0.085, teeth)
+    assert backed["bend"] == 0.0 and backed["stress"] == 0.0 and beam.loads((beam.lo + beam.hi) / 2, teeth)["overhang"] == 0.0
+
+    from sea.mech.build import rack_beam
+    from sea.mech.graph import Cylinder
+
+    gd = g.guides[0]
+    car = next(b for b in g.bodies if b.name == gd.carriage)
+    rack = next(p for p in car.parts if getattr(p, "name", "") == "jaw_rack")
+    # a rib along the rack, 20 mm tall, stiffens it by far more than the depth it adds
+    rib = rack.model_copy(update={"name": "rib", "half": (rack.half[0], 0.01, 0.0015), "pos": (rack.pos[0], rack.pos[1] - rack.half[1] - 0.01, rack.pos[2])})
+    deep = g.model_copy(update={"bodies": tuple(b.model_copy(update={"parts": (*b.parts, rib)}) if b.name == gd.carriage else b for b in g.bodies)})
+    assert rack_beam(deep, gd).ei_sep > 20 * beam.ei_sep
+    # a roller under the rack at the mesh, touching it, backs it; one elsewhere does not
+    span_low = float((J.HINGE + J.R0 @ np.array(rack.pos))[2] - rack.half[1])
+    y = float((J.HINGE + J.R0 @ np.array(rack.pos))[1])
+
+    def with_roller(x, gap=0.0):
+        roller = Cylinder(name="roller", pos=(x, y, span_low - 0.003 - gap), radius=0.003, half_length=0.002, material="steel", role="roller")
+        return g.model_copy(update={"bodies": tuple(b.model_copy(update={"parts": (*b.parts, roller)}) if b.name == "gripper" else b for b in g.bodies)})
+
+    assert rack_beam(with_roller(gd.mesh_x), gd).backed and not rack_beam(g, gd).backed
+    assert not rack_beam(with_roller(gd.mesh_x + 0.05), gd).backed and not rack_beam(with_roller(gd.mesh_x, 0.005), gd).backed
+
+
+def test_the_thin_rack_that_won_on_the_old_judge_now_fails_for_the_right_reason(world):
+    from pathlib import Path
+
+    from sea.evolve.core import Body
+
+    summary = Path("runs/evolve/gripper_f_s0/summary.json")
+    if not summary.exists():
+        pytest.skip("the run's record is not here")
+    body = Body.model_validate(json.loads(summary.read_text())["final_body"])
+    f = G.to_design(body).fingers
+    r = G._rod_numbers(f, 1.47, 1.7)
+    assert r["bend_mm"] > r["skip_mm"] and r["tooth_mpa"] > J.PLA_ALLOW_PA / 1e6 and r["rack_mpa"] > J.PLA_ALLOW_PA / 1e6
+    assert world.read(body, "tooth_stress_mpa", {}) == pytest.approx(r["tooth_mpa"])
+    assert world.read(body, "rack_bend_mm", {"width_mm": 85}) > 1.0
+
+
+def test_a_roller_is_priced_as_the_bearing_it_is(world):
+    g, _ = _beam(world)
+    from sea.mech.graph import Cylinder
+
+    roller = Cylinder(name="roller", pos=(0.02, -0.03, -0.09), radius=0.003, half_length=0.002, material="steel", role="roller")
+    g = g.model_copy(update={"bodies": tuple(b.model_copy(update={"parts": (*b.parts, roller)}) if b.name == "gripper" else b for b in g.bodies)})
+    items = {b.item: b.qty for b in G._built_bom(g.model_dump_json())}
+    assert items["mr63_bearing"] >= 1
