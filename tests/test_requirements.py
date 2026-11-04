@@ -64,3 +64,8 @@ def test_sensitivity_finds_a_parameter_that_pulls_two_requirements_apart():
     text, err = s.call("measure", {"proposal": draft})
     assert not err and "requirements, now and on the draft" in text and "draft -0.25: no" in text
     assert "no requirements yet" in Server(_ctx(w), None, w).call("sensitivity", {"proposal": draft})[0]
+
+
+def test_rule_coverage_reads_the_sources():
+    a = Requirement(id="R1", statement="s", metric="1", sense=">=", marginal=0, source="rule 2 of the brief, and rule 3")
+    assert R.rule_coverage([a], ["x", "y", "z", "w"]) == [1, 4]

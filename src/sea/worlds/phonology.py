@@ -868,6 +868,11 @@ class PhonologyWorld:
             return float(np.nanmin(bab.peak[ch]) if name == "hiss_lo_hz" else np.nanmax(bab.peak[ch]))
         raise ValueError(f"no instrument {name!r}")
 
+    def brief_rules(self) -> list[str]:
+        return ["A sound counts only when it repeats on fresh servo noise.",  # what counts, not how (D-095)
+                "A stop needs its closure sealed at its place, the rest of the airway open, and its release reaching the "
+                "vowel within about 50 ms, or listeners do not hear it."]
+
     def principles(self) -> list[str]:
         return [
             "A tube closed at the glottis and open at the lips resonates near (2n-1)c/4L: every formant scales "

@@ -675,6 +675,9 @@ class MobileWorld:
             return float(_vsafe(s, _mu(s, "wood"))[0])
         raise ValueError(f"no instrument {name!r}")
 
+    def brief_rules(self) -> list[str]:
+        return []  # its description says what counts; everything in ``principles`` is how (D-095)
+
     def principles(self) -> list[str]:
         return [
             "A driven wheel climbs an edge by friction at the contact: alone it climbs h = r(1 - 1/sqrt(1+mu^2)); "

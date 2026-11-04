@@ -335,8 +335,11 @@ class KitWorld:
                 f"{BOX[2]:g}); {self.read(body, 'mass_kg', {}, None):.2f} kg with the kit's parts; kit used: "
                 + ", ".join(f"{n} of {KIT[k]} {k}" for k, n in used.items()) + "; joints: " + (", ".join(joints) or "none"))
 
-    def principles(self) -> list[str]:
+    def brief_rules(self) -> list[str]:
         return list(RULES)
+
+    def principles(self) -> list[str]:
+        return []  # there is no arm of this world with hand-written design knowledge
 
     def bom(self, body: Body) -> list[BomLine]:
         g = graph_of(body)

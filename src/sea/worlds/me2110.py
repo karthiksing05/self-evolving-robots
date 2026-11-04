@@ -597,6 +597,11 @@ class ME2110World:
             return float(sum(_print_g(body).values()))
         raise ValueError(f"no instrument {name!r}")
 
+    def brief_rules(self) -> list[str]:
+        from sea.worlds.me2110_kit import RULES
+
+        return list(RULES)
+
     def principles(self) -> list[str]:
         return [
             "Every part must fit the 12 x 24 x 18 in box folded; anything larger must unfold after the start, by an "

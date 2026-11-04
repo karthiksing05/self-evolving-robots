@@ -79,6 +79,7 @@ class RunConfig(BaseModel):
     research: bool = False  # System 2 searches and reads the web and keeps the notebook; needs the tools (D-090)
     notebook: str = "library/notebook.jsonl"  # shared across runs and worlds
     concepts: bool = False  # the concept set, functions, computed comparison and failure modes (D-091)
+    stripped: bool = False  # the world's brief alone, none of its hand-written design knowledge (D-095)
     plans: bool = False  # operating plans, and whether the operation or the body failed (D-092)
 
 
@@ -365,6 +366,7 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
     frontier: dict[str, dict[str, Any]] = {}  # promising bodies not kept: they gained more groups than they lost
     t_start = time.time()
 
+    rules = list(world.brief_rules()) if cfg.stripped else None
     by_points = getattr(world, "objective", "groups") == "points"
     noise = float(getattr(world, "points_noise", 0.0))
 
@@ -503,7 +505,7 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
             groups = sorted({t.group for t in train})
             if cfg.requirements:
                 cur_rows = R.measure(world, body, reqs, train, body, manifest, spent)
-                req_text = R.text(reqs, cur_rows, held, groups)
+                req_text = R.text(reqs, cur_rows, held, groups, rules=rules or ())
             if cfg.concepts:
                 concepts.refresh(reqs, partial(R.measure, world, reqs=reqs, tasks=train, base=body, manifest=manifest,
                                                spent=spent))
@@ -535,7 +537,7 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
             prompt = build(world, body, train, outcomes, held, history, ideas, spent, manifest, it, cfg.iterations,
                            cfg.max_proposals, frontier=front[:5], tune_trials=cfg.tune_trials, tools=budget,
                            requirements=req_text, notebook=notes_text, concepts=concept_text,
-                           points=points_line(world, points_of(train, outcomes)) if by_points else None,
+                           points=points_line(world, points_of(train, outcomes)) if by_points else None, rules=rules,
                            plans=OP.text(sorted(world.control_names(body)) if hasattr(world, "control_names") else [])
                            if cfg.plans else None, current_plan=body.plan if cfg.plans else None)
             try:
@@ -559,6 +561,8 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
             if cfg.requirements:
                 rec["requirement_rows"] = [r.model_dump() for r in cur_rows]
                 rec["uncovered"] = R.coverage(reqs, groups)
+                if rules is not None:
+                    rec["uncited_rules"] = R.rule_coverage(reqs, rules)
             if cfg.concepts and batch.functions:
                 functions = list(batch.functions)
                 rec["functions"] = [f.model_dump() for f in functions]

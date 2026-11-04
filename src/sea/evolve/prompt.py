@@ -42,6 +42,14 @@ refused before any trial.  Do not repeat a refused or failed change; change your
 prediction, decides what is kept."""
 
 
+def _knowledge(world: World, rules: Sequence[str] | None) -> str:
+    """What the world tells System 2 in words: its brief's rules alone in a stripped run (D-095), else its principles."""
+    if rules is None:
+        return "# Physics principles of this world\n" + "\n".join(f"- {p}" for p in world.principles())
+    return ("# Rules of this world\n" + ("\n".join(f"- rule {k + 1}: {r}" for k, r in enumerate(rules))
+                                         or "The task's description states them all."))
+
+
 def _catalogue_text(world: World, body: Body, manifest: dict[str, Any], spent: Spent) -> str:
     out = []
     cat = world.catalogue()
@@ -87,7 +95,7 @@ def build(world: World, body: Body, tasks: Sequence[Task], outcomes: dict[str, O
           iteration: int, iterations: int, max_proposals: int = 3, frontier: Sequence[dict[str, Any]] = (),
           tune_trials: int = 0, tools: dict[str, int] | None = None, requirements: str | None = None,
           notebook: str | None = None, concepts: str | None = None, plans: str | None = None,
-          current_plan: Any = None, points: str | None = None) -> str:
+          current_plan: Any = None, points: str | None = None, rules: Sequence[str] | None = None) -> str:
     by_id = {t.id: t for t in tasks}
     groups = sorted({t.group for t in tasks})
     failing = [t for t in tasks if not outcomes[t.id].success]
@@ -101,7 +109,7 @@ def build(world: World, body: Body, tasks: Sequence[Task], outcomes: dict[str, O
            f"({sum(o.success for o in outcomes.values())}/{len(tasks)} tasks).",
            f"# Current body\n{body.describe()}",
            f"# Brief: computed facts about the current body\n{world.brief(body, tasks)}",
-           "# Physics principles of this world\n" + "\n".join(f"- {p}" for p in world.principles()),
+           _knowledge(world, rules),
            f"# Catalogue: every part type, by slot\n{_catalogue_text(world, body, manifest, spent)}",
            *([f"# Mechanisms: modules an idea's mechanism may change (D-079)\n{world.modules_text()}"]
              if hasattr(world, "modules_text") else []),

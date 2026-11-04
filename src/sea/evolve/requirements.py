@@ -16,6 +16,7 @@ revises it as it learns.  The harness never writes a requirement.  It:
 from __future__ import annotations
 
 import math
+import re
 from collections.abc import Sequence
 from typing import Any, Literal
 
@@ -93,8 +94,14 @@ def coverage(reqs: Sequence[Requirement], groups: Sequence[str]) -> list[str]:
     return sorted(set(groups) - named)
 
 
+def rule_coverage(reqs: Sequence[Requirement], rules: Sequence[str]) -> list[int]:
+    """The brief's rules (numbered from 1) no requirement cites in its source (D-095)."""
+    cited = {int(n) for r in reqs for n in re.findall(r"\brule (\d+)", r.source)}
+    return [k for k in range(1, len(rules) + 1) if k not in cited]
+
+
 def text(reqs: Sequence[Requirement], rows: Sequence[Row], held: set[str], groups: Sequence[str],
-         draft: Sequence[Row] | None = None) -> str:
+         draft: Sequence[Row] | None = None, rules: Sequence[str] = ()) -> str:
     """The table for the prompt (and, with ``draft``, the draft's values beside the current body's)."""
     if not reqs:
         return ("No requirements yet.  Write them in your answer's `requirements`: each a metric over the "
@@ -111,6 +118,9 @@ def text(reqs: Sequence[Requirement], rows: Sequence[Row], held: set[str], group
     missing = coverage(reqs, groups)
     if missing:
         lines.append(f"Coverage: no requirement is measured on {len(missing)} train groups: {', '.join(missing)}")
+    uncited = rule_coverage(reqs, rules)
+    if uncited:
+        lines.append("Coverage: no requirement cites " + ", ".join(f"rule {k}" for k in uncited) + " in its source")
     return "\n".join(lines)
 
 

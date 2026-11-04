@@ -679,6 +679,9 @@ class GripperWorld:
         return {"width_mm": float(o["width_mm"]), "depth_mm": float(o["depth_mm"]), "height_mm": float(o["height_mm"]),
                 "mass_g": float(o["mass_g"]), "friction": float(o["friction"]), "round": float(bool(o["round"]))}
 
+    def brief_rules(self) -> list[str]:
+        return []  # its description says what counts; everything in ``principles`` is how (D-095)
+
     def principles(self) -> list[str]:
         return [
             "Two contacts hold an object when their normals are horizontal and opposed (antipodal).  A contact whose "

@@ -306,6 +306,8 @@ class World(Protocol):
 
     # Optional: ``part_facts(body, part_type) -> list[str]``, computed facts about a part type fitted to this
     # body (its reach, force, range at the ends of its parameters), shown in the catalogue.  Facts, not advice.
+    # Optional (D-095): ``brief_rules() -> list[str]``, what the task's brief itself says: what counts and what may be
+    # built, never how.  A stripped run shows these instead of ``principles``.
     # Optional (D-093): ``objective = "points"``, ``points_noise`` and ``sprint_bars``: the loop keeps what raises the
     # mean ``Outcome.points`` over the tasks that carry them, unless a part (``points.*`` in its states) drops past the noise.
     # Optional (D-092): ``control_names(body) -> dict[str, tuple[float, float]]``, what an operating plan may set here.
