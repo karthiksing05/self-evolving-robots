@@ -32,7 +32,7 @@ from typing import Any
 import numpy as np
 
 from sea.evolve.core import Body, BomLine, Outcome, Param, Part, PartType, Task
-from sea.evolve.search import local_search
+from sea.evolve.search import local_search, planned
 from sea.sim import me2110_model as MM
 
 BOX = (12.0, 24.0, 18.0)  # in: the go/no-go box, length x width x height
@@ -399,7 +399,10 @@ def _attempt(body: Body, rb: MM.Robot, v: MM.Variant, task: str, ctl: dict[str, 
         mech = "" if ok else _label(task, body, r)
     if r.laws:
         detail += "; broke: " + "; ".join(r.laws[:3])
-    return Outcome(task="", success=ok, score=score, mechanism=mech, detail=detail, sim_s=time.perf_counter() - t0)
+    states = {**{f"points.{k}": float(v) for k, v in r.points.items()},
+              **{f"progress.{k}": float(v) for k, v in r.progress.items()}}
+    return Outcome(task="", success=ok, score=score, mechanism=mech, detail=detail, states=states,
+                   sim_s=time.perf_counter() - t0)
 
 
 class ME2110World:
@@ -435,6 +438,9 @@ class ME2110World:
             "cannon": Part(type="no_cannon"), "flag": Part(type="no_flag"), "heart": Part(type="no_heart"),
             "treasure": Part(type="no_treasure"), "release": Part(type="drive_trip")})
 
+    def control_names(self, body: Body) -> dict[str, tuple[float, float]]:
+        return _space(body, "match")[0]
+
     def solve(self, body: Body, task: Task, seed: int = 0) -> Outcome:
         g = task.data["task"]
         v = VARIANTS[task.split][task.data["variant"]]
@@ -445,6 +451,8 @@ class ME2110World:
         rb = _robot(body)
         key = zlib.crc32(task.id.encode())
         space, start = _space(body, g)
+        start, m_task = planned(body, space, start, 12)
+        m_match = planned(body, space, start, 10)[1]
 
         def run(ctl: dict[str, float], k: int) -> Outcome:
             return _attempt(body, rb, v, g, ctl, int(np.random.default_rng([key, k & 0xFFFFFFFF]).integers(1 << 30)))
@@ -453,9 +461,9 @@ class ME2110World:
             starts = [start] + [{**start, **{k: c[k] for k in c if k in start}}
                                 for (bk, _), c in self._best.items() if bk == body.key()]
             best_start = max(starts, key=lambda s: run(s, 0).score) if len(starts) > 1 else start
-            out = local_search(run, space, best_start, m=10, confirm=1, seed=seed + int(task.data["seed"]))
+            out = local_search(run, space, best_start, m=m_match, confirm=1, seed=seed + int(task.data["seed"]))
         else:
-            out = local_search(run, space, start, m=12, confirm=1, seed=seed + int(task.data["seed"]))
+            out = local_search(run, space, start, m=m_task, confirm=1, seed=seed + int(task.data["seed"]))
             if task.split == "train":
                 self._best[(body.key(), g)] = dict(out.controls)
         return out.model_copy(update={"task": task.id})

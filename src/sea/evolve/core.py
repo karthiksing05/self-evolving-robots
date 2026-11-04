@@ -61,15 +61,37 @@ class Part(_Model):
     mechanism: str = ""  # a mechanism System 2 composed, as its graph's JSON (sea.mech, D-079); "" for the catalogue's
 
 
+class Intent(_Model):
+    """A state the body should reach when operated (D-092), in the world's own name for it."""
+
+    state: str = Field(description="a state the world reads on a task's outcome")
+    lo: float | None = Field(default=None, description="the least it should reach")
+    hi: float | None = Field(default=None, description="the most it should reach")
+    tasks: list[str] = Field(default_factory=list, description="the task groups it applies to; empty: all")
+
+
+class OperatingPlan(_Model):
+    """How System 2 means a body to be operated (D-092).  It travels with the body and counts in its key."""
+
+    controls: dict[str, float] = Field(default_factory=dict, description="control name -> the value System 1 starts from")
+    triggers: dict[str, str] = Field(default_factory=dict, description="actuator -> the sensor that starts its clock")
+    intents: list[Intent] = Field(default_factory=list, description="the states the body should reach")
+    search: int = Field(default=1, ge=1, le=4, description="how many times longer System 1 searches")
+
+
 class Body(_Model):
     id: str = "stock"
     parent: str | None = None
     parts: dict[str, Part]
+    plan: OperatingPlan | None = None  # how it is meant to be operated (D-092)
 
     def key(self) -> str:
         """Content hash: two bodies with the same parts are the same body, whatever their ids."""
-        blob = json.dumps({s: p.model_dump(exclude=set() if p.mechanism else {"mechanism"})
-                           for s, p in sorted(self.parts.items())}, sort_keys=True)
+        content: dict[str, Any] = {s: p.model_dump(exclude=set() if p.mechanism else {"mechanism"})
+                                   for s, p in sorted(self.parts.items())}
+        if self.plan is not None:
+            content["(plan)"] = self.plan.model_dump()
+        blob = json.dumps(content, sort_keys=True)
         return hashlib.sha256(blob.encode()).hexdigest()[:12]
 
     def describe(self) -> str:
@@ -116,6 +138,8 @@ class Outcome(_Model):
     controls: dict[str, float] = {}
     attempts: int = 1
     sim_s: float = 0.0
+    states: dict[str, float] = {}  # what the world read at the end of this attempt (D-092)
+    nominal: float | None = None  # the score of System 1's first attempt, from the plan where there is one
 
 
 # ---------------------------------------------------------------- System 2's moves
@@ -190,6 +214,8 @@ class Proposal(_Model):
     options: dict[str, str] = Field(default_factory=dict, description="function -> the option this takes, where the "
                                     "functions section applies")
     failure_modes: list[FailureMode] = Field(default_factory=list, description="how this could fail")
+    plan: OperatingPlan | None = Field(default=None, description="how the body is to be operated; omit to keep the "
+                                       "base body's plan")
 
 
 class Requirement(_Model):
@@ -279,6 +305,7 @@ class World(Protocol):
 
     # Optional: ``part_facts(body, part_type) -> list[str]``, computed facts about a part type fitted to this
     # body (its reach, force, range at the ends of its parameters), shown in the catalogue.  Facts, not advice.
+    # Optional (D-092): ``control_names(body) -> dict[str, tuple[float, float]]``, what an operating plan may set here.
     # Optional (D-088): ``instruments() -> list[Instrument]`` and ``read(body, name, args, task) -> float``, the
     # quantities System 2 can measure on any draft; ``task_facts(task) -> dict[str, float]``, a task's numbers
     # by name (else every number in ``Task.data``).

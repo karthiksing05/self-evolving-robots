@@ -12,9 +12,16 @@ from collections.abc import Callable
 
 import numpy as np
 
-from sea.evolve.core import Outcome
+from sea.evolve.core import Body, Outcome
 
 Run = Callable[[dict[str, float], int], Outcome]
+
+
+def planned(body: Body, space: dict[str, tuple[float, float]], start: dict[str, float], m: int) -> tuple[dict[str, float], int]:
+    """The search's start and attempts for ``body``: its operating plan's values over ``start``, and its allowance (D-092)."""
+    if body.plan is None:
+        return start, m
+    return {**start, **{k: v for k, v in body.plan.controls.items() if k in space}}, m * body.plan.search
 
 
 def local_search(run: Run, space: dict[str, tuple[float, float]], start: dict[str, float], m: int = 16,
@@ -26,11 +33,14 @@ def local_search(run: Run, space: dict[str, tuple[float, float]], start: dict[st
     x = np.clip(np.array([start.get(k, (space[k][0] + space[k][1]) / 2) for k in keys]), lo, hi)
     best_x, best, attempts, sim_s = x, None, 0, 0.0
     sigma = step
+    nominal = None
     for trial in range(m):
         cand = x if trial == 0 else np.clip(best_x + rng.normal(0.0, sigma, len(keys)) * (hi - lo), lo, hi)
         ctl = {k: float(v) for k, v in zip(keys, cand, strict=True)}
         out = run(ctl, seed)
         attempts += 1
+        if trial == 0:
+            nominal = out.score
         sim_s += out.sim_s
         if best is None or out.score > best.score or (out.success and not best.success):
             best, best_x = out, cand
@@ -40,9 +50,10 @@ def local_search(run: Run, space: dict[str, tuple[float, float]], start: dict[st
             sim_s += sum(r.sim_s for r in reruns)
             failed = next((r for r in reruns if not r.success), None)
             if failed is None:
-                return out.model_copy(update={"controls": ctl, "attempts": attempts, "sim_s": round(sim_s, 3)})
+                return out.model_copy(update={"controls": ctl, "attempts": attempts, "sim_s": round(sim_s, 3),
+                                              "nominal": nominal})
             best = failed.model_copy(update={"detail": f"passed once, failed a confirmation: {failed.detail}"})
         sigma = max(0.05, sigma * shrink)
     assert best is not None
     return best.model_copy(update={"controls": {k: float(v) for k, v in zip(keys, best_x, strict=True)},
-                                   "attempts": attempts, "sim_s": round(sim_s, 3), "success": False})
+                                   "attempts": attempts, "sim_s": round(sim_s, 3), "success": False, "nominal": nominal})
