@@ -5,7 +5,7 @@ import math
 
 import pytest
 
-from sea.evolve.core import Idea, Mechanism, Requirement
+from sea.evolve.core import Idea, Mechanism, Part, Requirement
 from sea.evolve.loop import make_world
 from sea.evolve.requirements import coverage
 from sea.evolve.research import Note, add
@@ -149,3 +149,16 @@ def test_a_body_that_cannot_be_priced_is_refused_and_does_not_end_the_run():
         body = w.stock()
         errs, _ = screen(w, body.model_copy(update={"id": "bad"}), body, w.manifest(), _ctx(w).spent, {})
         assert any(want in e for e in errs)
+
+
+def test_the_tuner_moves_only_catalogue_parameters_when_a_swap_builds_on_a_built_jaw(world):
+    from sea.evolve.loop import tunable
+
+    catalogue = {p.name: p for p in world.catalogue()}
+    slide = _slide(world, 6.0)
+    pads = catalogue["pads"]
+    built = slide.model_copy(update={"parts": {**slide.parts, "pads": Part(type="pads", params={k: p.lo for k, p in pads.params.items()})}})
+    assert built.parts["jaw"].type == "built"
+    space = tunable(built, ["jaw", "pads"], catalogue)  # how the slots read: the jaw differs from the current body
+    assert {slot for slot, _, _ in space} == {"pads"} and {k for _, k, _ in space} == set(pads.params)
+    assert tunable(built, ["jaw"], catalogue) == []
