@@ -37,9 +37,21 @@ import numpy as np
 from pydantic import BaseModel, ConfigDict
 
 from sea.evolve import concepts as C
+from sea.evolve import operation as OP
 from sea.evolve import requirements as R
 from sea.evolve import research as RS
-from sea.evolve.core import Body, Edit, Outcome, Proposal, ProposalBatch, Task, World, apply, edit_rung
+from sea.evolve.core import (
+    Body,
+    Edit,
+    OperatingPlan,
+    Outcome,
+    Proposal,
+    ProposalBatch,
+    Task,
+    World,
+    apply,
+    edit_rung,
+)
 from sea.evolve.llm import Proposer
 from sea.evolve.prompt import SYSTEM, build
 from sea.evolve.resources import ResourceReport, charge, check, cost_idea, idea_text, start
@@ -67,6 +79,7 @@ class RunConfig(BaseModel):
     research: bool = False  # System 2 searches and reads the web and keeps the notebook; needs the tools (D-090)
     notebook: str = "library/notebook.jsonl"  # shared across runs and worlds
     concepts: bool = False  # the concept set, functions, computed comparison and failure modes (D-091)
+    plans: bool = False  # operating plans, and whether the operation or the body failed (D-092)
 
 
 # ---------------------------------------------------------------- parallel evaluation
@@ -214,7 +227,8 @@ def _merge(body: Body, ranked: Sequence[Body], it: int) -> tuple[Body, list[str]
         ids.append(cand.id)
     if len(ids) < 2:
         return None
-    return Body(id=f"b{it:02d}m", parent=body.id, parts=parts), ids
+    plan = next((c.plan for c in ranked if c.id in ids and c.plan is not None), body.plan)
+    return Body(id=f"b{it:02d}m", parent=body.id, parts=parts, plan=plan), ids
 
 
 # ---------------------------------------------------------------- one path from proposal to trial, shared with System 2's tools (D-086)
@@ -235,6 +249,20 @@ def candidate(world: World, body: Body, bases: dict[str, Body], prop: Proposal, 
     if prop.base is not None and prop.base not in bases:
         raise ValueError(f"no promising body {prop.base!r} in the record; ids: {sorted(bases)}")
     base = body if prop.base is None else bases[prop.base]
+    cand = _built(world, base, prop, catalogue, new_id)
+    plan = prop.plan if prop.plan is not None else base.plan
+    if plan is None:
+        return cand
+    names = world.control_names(cand) if hasattr(world, "control_names") else {}
+    for k, v in plan.controls.items():
+        if k not in names:
+            raise ValueError(f"the plan sets {k!r}, which is not a control here; the controls are {sorted(names)}")
+        if not names[k][0] - 1e-9 <= v <= names[k][1] + 1e-9:
+            raise ValueError(f"the plan sets {k}={v:g}, outside its range [{names[k][0]:g}, {names[k][1]:g}]")
+    return cand.model_copy(update={"plan": plan})
+
+
+def _built(world: World, base: Body, prop: Proposal, catalogue: dict[str, Any], new_id: str) -> Body:
     if not builds(world, prop):
         return apply(base, prop.edits, catalogue, new_id=new_id)
     slot = prop.idea.slot  # a mechanism the catalogue lacks, built from the world's modules (D-079)
@@ -388,7 +416,7 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
             for (s, k, p), v in zip(space, xi, strict=True):
                 edits.setdefault(s, {})[k] = round(float(p.lo + v * (p.hi - p.lo)), 3)
             ed = [Edit(slot=s, params=ps) for s, ps in edits.items()]
-            cand = apply(seed, ed, catalogue, new_id=f"b{it:02d}t{i}")
+            cand = apply(seed, ed, catalogue, new_id=f"b{it:02d}t{i}").model_copy(update={"plan": seed.plan})
             entry: dict[str, Any] = {"k": f"t{i}", "iteration": it, "move": "tune", "base": seed.id,
                                      "slots": seed_entry["slots"], "edit": _edit_text(ed),
                                      "hypothesis": f"the loop fits {seed.id}'s new {', '.join(seed_entry['slots'])} "
@@ -463,7 +491,9 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                     proposer.research = hooks
             prompt = build(world, body, train, outcomes, held, history, ideas, spent, manifest, it, cfg.iterations,
                            cfg.max_proposals, frontier=front[:5], tune_trials=cfg.tune_trials, tools=budget,
-                           requirements=req_text, notebook=notes_text, concepts=concept_text)
+                           requirements=req_text, notebook=notes_text, concepts=concept_text,
+                           plans=OP.text(sorted(world.control_names(body)) if hasattr(world, "control_names") else [])
+                           if cfg.plans else None, current_plan=body.plan if cfg.plans else None)
             try:
                 batch = proposer.propose(SYSTEM, prompt, tag=f"iter{it:02d}")
             except (PlanLimitReached, PlanBillingError):
@@ -518,6 +548,9 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                         full = concepts.full_refusal() if opening else ""
                         if full:
                             raise ValueError(full)
+                        if cfg.plans and opening:  # a new structure is searched longer; what is developed from it inherits that
+                            cand = cand.model_copy(update={"plan": (cand.plan or OperatingPlan()).model_copy(
+                                update={"search": OP.SEARCH_NEW})})
                 except ValueError as exc:
                     entry.update(result=f"refused before trial: {exc}", tried=False)
                     trials.append(entry)
@@ -531,6 +564,8 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                     entry["prediction"] = _score_prediction(prop.gains, entry["gained"], entry["lost"])
                     if entry["move"] == "swap":
                         swaps.append((cand, entry))
+                if cfg.plans and entry.get("tried"):
+                    entry["operation"] = OP.diagnose(cand.plan, entry["outcomes"], {t.id: t.group for t in train})
                 if cfg.concepts:
                     entry["failure_modes"], entry["unpredicted_failures"] = C.rate(prop.failure_modes, entry,
                                                                                    {t.id: t.group for t in train})

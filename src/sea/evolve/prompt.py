@@ -86,7 +86,8 @@ def build(world: World, body: Body, tasks: Sequence[Task], outcomes: dict[str, O
           history: Sequence[dict[str, Any]], ideas: Sequence[dict[str, Any]], spent: Spent, manifest: dict[str, Any],
           iteration: int, iterations: int, max_proposals: int = 3, frontier: Sequence[dict[str, Any]] = (),
           tune_trials: int = 0, tools: dict[str, int] | None = None, requirements: str | None = None,
-          notebook: str | None = None, concepts: str | None = None) -> str:
+          notebook: str | None = None, concepts: str | None = None, plans: str | None = None,
+          current_plan: Any = None) -> str:
     by_id = {t.id: t for t in tasks}
     groups = sorted({t.group for t in tasks})
     failing = [t for t in tasks if not outcomes[t.id].success]
@@ -136,6 +137,9 @@ def build(world: World, body: Body, tasks: Sequence[Task], outcomes: dict[str, O
                    "\n".join(f"- {i['name']} (iteration {i['iteration'] + 1}): {idea_text(i['cost'])}" for i in ideas[-6:]))
     if concepts is not None:
         sec.append(f"# Concepts (D-091)\n{concepts}")
+    if plans is not None:
+        now = f"\nThe current body's plan: {current_plan.model_dump_json()}" if current_plan is not None else ""
+        sec.append(f"# Operating plans (D-092)\n{plans}{now}\n" + _operation(failing, outcomes, current_plan))
     if notebook is not None:
         from sea.evolve.research import BUDGET
 
@@ -176,6 +180,19 @@ def build(world: World, body: Body, tasks: Sequence[Task], outcomes: dict[str, O
                   "part type by what it can do across its range.")
     sec.append(close)
     return "\n\n".join(sec)
+
+
+def _operation(failing: Sequence[Task], outcomes: dict[str, Outcome], plan: Any) -> str:
+    """Each failing task's label on the current body: did the operation or the body fail, and the plan's first try."""
+    from sea.evolve.operation import label
+
+    rows = []
+    for t in failing:
+        o = outcomes[t.id]
+        lab, states = label(plan, o, t.group)
+        first = f"; first attempt scored {o.nominal:.2f}, best {o.score:.2f}" if o.nominal is not None else ""
+        rows.append(f"- {t.id}: {lab}{first}" + (f"; {', '.join(states)}" if states else ""))
+    return "Failing tasks, by what failed:\n" + "\n".join(rows) if rows else ""
 
 
 def _calibration(history: Sequence[dict[str, Any]]) -> str:

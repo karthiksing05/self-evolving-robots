@@ -427,7 +427,10 @@ class Server:
         o = self.world.solve(cand, self.tasks[task], 0)
         self.sim_s = o.sim_s
         return (f"{task}: {'succeeded' if o.success else 'failed'} (score {o.score:.2f})"
-                + (f"; {o.mechanism}: {o.detail[:800]}" if not o.success else "") + " -- one task, not a trial")
+                + (f"; {o.mechanism}: {o.detail[:800]}" if not o.success else "")
+                + (f"; first attempt scored {o.nominal:.2f}" if o.nominal is not None and o.nominal != o.score else "")
+                + (f"; states: {', '.join(f'{k} {v:.3g}' for k, v in o.states.items())}" if o.states else "")
+                + " -- one task, not a trial")
 
     # ---------------------------------------------------------------- JSON-RPC
     def handle(self, msg: dict[str, Any]) -> dict[str, Any] | None:

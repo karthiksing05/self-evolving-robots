@@ -35,7 +35,8 @@ COMPONENTS: dict[str, tuple[str, tuple[str, ...]]] = {
     "physics": ("world", ("src/sea/sim/build_model.py", "src/sea/sim/controls.py", "src/sea/sim/jaws.py",
                          "src/sea/sim/shoe.py", "src/sea/mech/graph.py", "src/sea/mech/build.py",
                          "src/sea/mech/seed/gripper.py", "src/sea/mech/kinematics.py",
-                         "src/sea/mech/patch.py", "src/sea/mech/base.py", "src/sea/mech/runtime.py")),
+                         "src/sea/mech/patch.py", "src/sea/mech/base.py", "src/sea/mech/runtime.py",
+                         "src/sea/mech/program.py")),
     # what the robot can feel; the verifier never reads it, so it is world, not judge (D-031)
     "sensors": ("world", ("src/sea/sim/sensors.py", "configs/sensors.yaml")),
     # the fixed pick that measures the gripper's capability table (V1); an instrument, not a skill
@@ -59,7 +60,7 @@ COMPONENTS: dict[str, tuple[str, tuple[str, ...]]] = {
     "evolve_loop": ("policy", ("src/sea/evolve/loop.py", "src/sea/evolve/prompt.py", "src/sea/evolve/llm.py",
                                "src/sea/evolve/search.py", "src/sea/evolve/tools.py",
                                "src/sea/evolve/instruments.py", "src/sea/evolve/requirements.py",
-                               "src/sea/evolve/research.py", "src/sea/evolve/concepts.py")),
+                               "src/sea/evolve/research.py", "src/sea/evolve/concepts.py", "src/sea/evolve/operation.py")),
     # each world's tasks, physics and parts catalogue: the ruler for runs in that world (D-042)
     "world_gripper": ("judge", ("src/sea/worlds/gripper.py",)),
     "world_mobile": ("judge", ("src/sea/worlds/mobile.py", "src/sea/sim/mobile_model.py")),

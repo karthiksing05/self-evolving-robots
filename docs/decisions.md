@@ -2898,3 +2898,21 @@ LLM-written requirement lists leave most needs out (Massoudi and Fuge 2025 measu
 - no claim on groups until F9.
 
 **Result (tests).** The prediction held on the toy world (`tests/test_concepts.py`, 14 tests). The full suite: 777 passed, 1 xfailed, 2 skipped, 1 failed. The failure is `test_real_embedders_shapes`, a slow nightly test that downloads models: it hung in a socket connect until its 300 s timeout, twice, and `memory/embed.py` is untouched by this work. It passed at F0. This was the first full run since F0, and it found a break of my own: D-088 renamed `_built_rods` to `_rod_numbers` and left `tests/mech/test_guide.py` importing the old name, so the suite could not collect from `5dbae24` until the repair here. The subsets I ran for D-088 to D-090 did not include that file. No claim on groups until F9.
+
+## D-092 System 1 carries out System 2's ideas: controls from the graph, operating plans, and whether the operation or the body failed (skill: mech program, search; world: states, plans; policy: operation, loop, prompt; F5 of the general framework)
+
+**Why.** A new mechanism is only as good as what operates it. ME 2110's controls are written by hand per part (`me2110._space`), so a mechanism System 2 composes has no controls unless someone writes them; System 1 starts each search from defaults that know nothing of what System 2 intended; and a failed trial does not say whether the mechanism could not do the task or System 1 did not find how. The mobile world already separates those for itself (`not_found_by_search`, D-041's probe). This makes that general.
+
+**Change** (`RunConfig.plans`, off by default).
+- **Controls from the graph** (`mech/program.py`). Every actuator, latch and sensor exposes typed controls: a servo's time and target (its joint's range), a motor's start, run and duty, a piston's time and hold, a latch's release, a sensor's threshold. `Program` plays any such set of values on a `Machine`. An actuator may be triggered by a sensor, and its time then counts from the sensor firing. No world's code names a part.
+- **The operating plan** (`core.OperatingPlan`, `Proposal.plan`). Starting values by control name, the sensor triggers, and intents: a state the body should reach, with its bounds. It travels with the body and counts in its key, so a plan alone can be proposed and trialled. A name the world does not control is refused, naming those it does.
+- **System 1 starts from it.** `local_search` tries the plan first and records that first attempt's score (`Outcome.nominal`). This reaches the worlds that search continuous controls (mobile, ME 2110). The gripper picks among programs and the talking robot starts from its babbling map, so they take intents only, for now.
+- **Operation or body** (`evolve/operation.py`). Each failed task of a trial is labelled from the outcome's states (`Outcome.states`): `operation_not_found` if an intended state was not reached (or the world's probe says the body could), `body_cannot` if every intended state was reached and the task still failed, `unobserved` if there is no intent or the world does not read that state. ME 2110 reads each task's points and progress; every other world reads none yet, and says `unobserved` rather than guess.
+- **A new structure gets a larger search.** A plan's `search` multiplies System 1's attempts. Under the concept set, a new concept searches twice as long (philosophy §7: a new structure is protected until its own parameters are fitted). Its developments inherit that with the plan, so it costs simulation for as long as that lineage lives; dropping it on a kept body would change the body's key and risk losing what was held.
+- `simulate` also reports states and the plan's first score, which covers the deferred `experiment` tool.
+
+**Prediction** (before the code):
+- with the switch off and no plan, scripted runs reproduce exactly and bodies keep their keys;
+- on a compiled graph, `Program` plays a motor's window, a piston's stroke, a latch's release and a sensor-triggered actuator at the commanded times, with no part named in the code;
+- on a toy world: System 1's first attempt uses the plan; a plan-only proposal is trialled; an unknown control is refused; the three labels come out as defined; a new concept's body searches twice as long;
+- no claim on groups until F9.
