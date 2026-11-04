@@ -2630,3 +2630,48 @@ Against the prediction:
 **Prediction for the campaign:** seeing these refusals, System 2 adds the bushings or shrinks the sector, and on at least 2 of 3 seeds a mechanism it wrote reaches a trial.
 
 **Open question for the user (no change made):** the interference law sweeps the wrist's whole roll range (±2.74 rad). Whether the robot ever rolls that far while gripping, and whether a roll limit should be a variable System 2 can set, decides whether the 50 mm sector is outlawed.
+
+## D-084 The brief describes a built jaw (world: gripper), and what the first C1 campaign showed before it crashed
+
+**Why.** The C1 campaign (`runs/evolve/gripper_c1c_s{0,1,2}`, D-079 to D-083) crashed on every seed on the iteration after a built jaw was kept: the brief named a jaw's kind from a table with no entry for `built`. The crashes came at iteration 13 on seeds 0 and 1 (of 0–13) and iteration 6 on seed 2, so no seed reached its test-split evaluation. The paths that run after a keep had no test.
+
+**Change.** The brief names a built jaw by its mechanism's name. A test builds the brief for a built body, and the part facts, bill of materials and check were run on a kept one.
+
+**What the campaign showed** (train only; no test split):
+
+| seed | mechanisms written (long slide / revolute / parallelogram) | refused | trialled | kept | groups |
+|---|---|---|---|---|---|
+| 0 | 21 (14 / 6 / 1) | 14 | 7 | 1 | 16 → 19 |
+| 1 | 25 (11 / 11 / 3) | 12 | 13 | 1 | 16 → 18 |
+| 2, to iteration 6 | 9 (4 / 4 / 1) | 5 | 4 | 1 | 16 → 18 |
+
+- **D-083's prediction is met.** On every seed a mechanism System 2 wrote reached a trial, and on every seed one was kept.
+- **System 2 answered the refusals it saw.** It added the missing bushings and moved the bushings apart. For the wrist it first shrank the sector to 48 mm, then trimmed the sector's arc, which passed the laws and reached trial.
+- **Every long slide that reached a trial lost most groups**, to the bushing and tooth-skip laws and to the rack jamming on the object. None was kept.
+- **The three kept mechanisms are all one new variable.** Each is the stock hinged jaw with a `pad_mount` moved 0.5–3 mm: a pad whose face sits off its usual place on the finger.
+  - Seed 0: a "standoff" 3 mm along the pad's own 33° axis, which it described as a printed spacer.
+  - Seed 1: raised 1 mm.
+  - Seed 2: dropped 3 mm.
+
+  Each gained one task (the tuna can on seeds 1 and 2). Checked against the model:
+  - the shoe is regenerated around the real finger in the moved pad frame (`sim/shoe.frames`, `_finger_hosts`), so it still wraps the finger (no gap, the same ~12 mm socket overlap as a stock-mounted pad);
+  - its screws sit as they do on a stock-mounted pad (the drawn heads 2.0–2.4 mm off the finger in both cases);
+  - the pad is printed as one piece and priced by its volume.
+
+  So these are real, printable pads with a variable the catalogue never exposed (where the land sits on the finger), found through D-081's pad mount.
+- **The wrist-roll refusal was examined (no change yet).** All 84 stock picks roll the wrist between −1.95 and 0 rad (train −1.95 to 0, test −1.69 to 0). The sector's 0.2–0.4 mm clash is at −2.74 rad, the joint's limit. The user's decision: the law's roll range is to be derived from the IK per body, and the sim limited to it (next).
+
+## D-085 The wrist's roll is limited to what the body's grasps need, derived from the IK (judge: mechanism; world: physics, gripper)
+
+**Why.** The interference law swept the wrist through its whole joint range (±2.74 rad), so every long slide with a large sector was refused for clipping the wrist by 0.2–0.4 mm at −2.74 rad (D-083, D-084). No grasp rolls that far: the stock picks stay within −1.95 to 0 rad. A real SO-101's roll can be limited in its servo's firmware. The user's decision: the roll range is to be derived from the IK, per body, and the simulator held to it, so the law checks exactly the poses a trial can reach.
+
+**Change.**
+- For each body, the world computes the roll its grasps need. For every task (train and test) it takes the grasp poses `motor.grasp` commands (above the object, at the grip, lifting), aligned with the object's roll direction, solves them with the IK from the home pose for the body's tool, and records the wrist roll.
+- The range runs from home (roll 0) to the furthest roll needed, widened by `ROLL_MARGIN` = 0.2 rad for the tracking that moves the arm between those poses. It is clipped to the joint's limits.
+- The design carries this range. The simulator sets the wrist roll joint's limits to it, so a trial cannot roll past what the law checked, and the interference law's sweep, which reads the model's joint range, follows it.
+
+**Prediction** (written before the code):
+- for the stock body the range is about −2.13 to +0.2 rad (IK −1.93 to 0, measured −1.95 to 0);
+- golden verdicts are unchanged, since no pick rolls outside the range;
+- the law's output changes only where a part met the wrist beyond the range: the catalogue's 50 mm long slide no longer meets the rolled wrist (the D-078 law equivalence test is re-recorded for that body, and the change is listed);
+- the trimmed and full 50 mm sectors System 2 wrote in `gripper_c1c` pass the interference law, unless something else stops them.

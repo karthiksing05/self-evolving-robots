@@ -439,7 +439,9 @@ class GripperWorld:
         jaw = {"revolute": "hinged moving jaw (the stock part)",
                "parallelogram": f"parallelogram linkage, link {f.link_mm:g} mm",
                "prismatic": f"rack-and-pinion slide, {2 * f.drive_mm_per_rad:g}-tooth pinion, "
-                            f"{f.drive_mm_per_rad:g} mm per servo radian"}[f.jaw]
+                            f"{f.drive_mm_per_rad:g} mm per servo radian",
+               "built": f"built mechanism {json.loads(f.mechanism or '{}').get('name', '')!r} (its motion measured "
+                        f"from its parts, D-079)"}[f.jaw]
         if f.sector:
             jaw = (f"long slide: a {f.drive_mm_per_rad:g} mm gear sector on 150 mm rods, "
                    f"{f.drive_mm_per_rad:g} mm per servo radian")

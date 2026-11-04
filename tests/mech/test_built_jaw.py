@@ -66,3 +66,12 @@ def test_the_mechanisms_section_lists_every_module_and_part_kind():
     text = GripperWorld().modules_text()
     for name in ("revolute", "parallelogram", "prismatic", "long_slide", "- link:", "- guide:", "loops/<a>/<field>"):
         assert name in text
+
+
+def test_the_brief_describes_a_built_jaw():
+    """D-084: a kept built jaw is the body the next iteration's brief describes (all three C1 seeds crashed here)."""
+    w = GripperWorld()
+    b = w.build_idea(w.stock(), _four_bar(0.06), "t")
+    tasks = [t for t in w.tasks() if t.split == "train"][:2]
+    text = w.brief(b, tasks)
+    assert "jaw: built mechanism 'tilting four-bar'" in text and "by object width" in text
