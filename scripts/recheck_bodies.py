@@ -43,11 +43,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--seeds", nargs="+", type=int, default=[0, 1, 2])
     ap.add_argument("--workers", type=int, default=6)
     ap.add_argument("--out", type=Path, required=True)
+    ap.add_argument("--no-stock", action="store_true", help="leave out the stock body, already measured")
     args = ap.parse_args(argv)
     world = make_world(args.world)
     tasks = world.tasks()
     train, test = [t for t in tasks if t.split == "train"], [t for t in tasks if t.split != "train"]
-    bodies = {"stock": world.stock(), **{r.name: final_body(r, world) for r in args.runs}}
+    bodies = {**({} if args.no_stock else {"stock": world.stock()}), **{r.name: final_body(r, world) for r in args.runs}}
     out: dict = {}
     for name, body in bodies.items():
         out[name] = {"body": body.model_dump(), "seeds": {}}
