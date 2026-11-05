@@ -47,9 +47,7 @@ class GraphWorld:
 
     # mechanisms System 2 composes
     def build_idea(self, body: Body, idea: Any, new_id: str) -> Body:
-        mech = idea.mechanism
-        if idea.slot not in ("", SLOT):
-            raise ValueError(f"a robot here is one graph: slot {idea.slot!r} does not exist")
+        mech = idea.mechanism  # a robot here is one graph: whatever slot an idea names, it is that graph
         if mech.module == "self":
             if mech.params:
                 raise ValueError("module self has no parameters: write the change in the patch")

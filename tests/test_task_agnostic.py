@@ -282,3 +282,11 @@ def test_a_hinge_with_nothing_to_turn_on_is_refused():
     bare = g.model_copy(update={"bodies": (robot, *g.bodies[1:])})
     body = w.stock().model_copy(update={"parts": {SLOT: Part(type="built", mechanism=bare.model_dump_json())}})
     assert any("no axle or bearing holds it" in e for e in w.check(body))
+
+
+def test_a_graph_robot_runs_an_idea_whatever_slot_it_names():
+    from sea.evolve.core import Idea, Mechanism
+
+    w = make_world("mobile_kit")
+    idea = Idea(name="same", description="the stock robot again", slot="chassis", mechanism=Mechanism(module="self"))
+    assert w.check(w.build_idea(w.stock(), idea, "x")) == []

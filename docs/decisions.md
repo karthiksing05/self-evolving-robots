@@ -3277,3 +3277,17 @@ The rod's Euler margin is 3.4 by the reading, 2.3 over D-104's print factor, so 
 **What.** A hinge's anchor must lie within `PIN` of a solid on what carries it. The law at once refused `mobile_kit`'s own stock module, whose axle sat at the robot's middle rather than at its wheels. That module now has an axle at each wheel pair. It also refused the library's `cam`, whose hub stopped 8 mm short of its bracket; that element now has a shaft.
 
 **Prediction.** Stock verdicts on the routes don't move. The first live run's 6 to 12 of 13 was on the flawed module and under the weaker law, so it is not a result; the live iteration is repeated.
+
+## D-114 (policy: every graph world): a graph robot's idea runs whatever slot it names
+
+**Why.** The repeat of the live iteration on `mobile_kit` (`runs/evolve/smoke_mobile_kit_s1`) tested nothing. All three of System 2's designs came back "refused before trial: slot 'chassis' does not exist", while its `check` tool had said each "would trial". `check` reads the graph and never the slot; the loop's `build_idea` refused the name. System 2 was told one thing and the loop did another, on a field that means nothing where a robot is one graph.
+
+**What.** `GraphWorld.build_idea` no longer reads the slot. Nothing about what a design must obey changes.
+
+**Prediction.** Replaying the same three answers through the loop gives trials. If they hold, the paddle robot keeps its gain under D-113: at least 10 of 13 train and test against stock's 6, losing no place stock holds.
+
+**Measured.** The replay (`runs/evolve/replay_mobile_kit_s1`, System 2's answer scripted, no new call) kept `short_paddle_sonar_w12`: a 15 cm tub on 4 cm tyres with one 8.9 cm printed bar across each hub, standing 0.45 cm proud of the tyre, plus an ultrasonic sensor. Train 6 to 12 of 13, losing none. On 8 fresh seeds it holds 12 of 13 on train and test under every seed (37-38 of 39 tasks); stock holds 6 of 13 (18-19 of 39). Patio's 7.5 cm stairs stay failed: the belly grounds on the steps. Prediction held.
+
+**Does it rest on friction? It does not.** System 2 wrote that the bars' `mu` of 0.9 assumes a rubber tip the parts list doesn't have. That number does nothing here: the terrain's `priority="1"` sets every contact's friction to rubber-on-that-surface. Forcing the bars' friction in the sim to 1, 0.67, 0.4 and 0.01 of that value left 12 of 13 each time, so the bars work by hooking the edge, not by grip. As a control, the tyres at 0.15 of it lost the shed's gravel ramp as well.
+
+**Open.** (1) `mu` on a part is free and unpriced, and in this world silently ignored; every printed part in `mobile_kit` slides with rubber's grip. It doesn't change this result, but it's wrong, and a design that did rest on grip would be flattered. Only a generic hard-plastic figure was found (0.3 on dry concrete, 0.4 on dry wood, on an unsourced University of Florida class page); nothing measured for PLA on these surfaces, so no value is written in yet. (2) One live answer on one world, replayed, is not a campaign. (3) Nothing in the world prices a bar's shock on a real floor or what it does to the floor.
