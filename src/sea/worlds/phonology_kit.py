@@ -71,7 +71,7 @@ def _model(g: G.Graph) -> tuple[mujoco.MjModel, int]:
     compile_graph(spec, g, WORLD)
     names = {b.name for b in g.bodies}
     for x in spec.geoms:
-        if x.parent.name in names:
+        if x.parent.name in names and (x.contype or x.conaffinity):
             x.contype, x.conaffinity = 2, 1
     spec.worldbody.add_geom(name="bore_probe", type=mujoco.mjtGeom.mjGEOM_SPHERE, size=[1e-5, 0.0, 0.0], pos=[0.0, 0.0, 1.0],
                             contype=0, conaffinity=0, group=4)

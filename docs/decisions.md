@@ -3260,7 +3260,7 @@ The rod's Euler margin is 3.4 by the reading, 2.3 over D-104's print factor, so 
 
 **What.** `mobile_kit`: the same routes, terrain and motors, on a graph robot. The route walk is shared with `mobile`; each obstacle's MuJoCo episode runs on the graph, and what the old world reads from its catalogue is measured from the graph. What can be bought is a law: a motor's numbers, a pack, a sensor's range. The old world stays as the baseline.
 
-**Measured, stock at seed 0, train.** It gives the same verdict as the old stock on all 13 routes, with the same failure label on all 7 that fail, without any tuning against them. Its masses differ, 0.32 kg against 0.43 kg, because the graph doesn't yet count the tub's walls.
+**Measured, stock at seed 0, train.** It gives the same verdict as the old stock on all 13 routes, with the same failure label on all 7 that fail, without any tuning against them. A first reading gave 0.32 kg against 0.43 kg: `mech.build` dropped a `Bought` part's mass on a body with a joint or in a robot built whole, since it has no solid to carry it. Fixed for robots built whole, which now read 0.42 kg, and the 13 verdicts are unchanged. **Open, not changed here:** the same drop applies to a gripper slide's bushings on its carriage, so catalogue slides have been a little light. `wide_rod` carries no bought part, so its result doesn't depend on this. Correcting it would move slide verdicts, so it needs its own judge-tier decision.
 
 ## D-112 (world: phonology): the talking robot from a kit
 

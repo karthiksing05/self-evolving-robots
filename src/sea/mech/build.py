@@ -442,6 +442,9 @@ def compile(spec: mujoco.MjSpec, g: Graph, base: str | Base) -> list[tuple[str, 
                 n0 = len(sb.geoms)
                 kg = _add_part(spec, sb, p, pose)
                 new = [x for x in sb.geoms[n0:] if x.contype or x.conaffinity] or list(sb.geoms[n0:])
+                if not new and kg > 0 and whole:  # a bought part with no solid here still weighs (D-111)
+                    new = [sb.add_geom(name=f"{b.name}_{p.item}_{n0}", type=mujoco.mjtGeom.mjGEOM_SPHERE, size=[0.001, 0.0, 0.0],
+                                       contype=0, conaffinity=0, group=4)]
                 for x in new:
                     x.mass = kg / len(new)
                     if getattr(p, "mu", None) is not None and not isinstance(p, Wheel):

@@ -414,7 +414,7 @@ def graph_model(g: Any, kind: str, f: dict[str, float], mu: float, kit_kg: float
     names = {b.name for b in g.bodies}
     solref, solimp = [float(x) for x in SOLREF.split()], [*(float(x) for x in SOLIMP.split()), 0.5, 2.0]
     for x in spec.geoms:
-        if x.parent.name in names:
+        if x.parent.name in names and (x.contype or x.conaffinity):
             x.contype, x.conaffinity, x.solref, x.solimp = 2, 1, solref, solimp
     if kit_kg > 0:
         spec.body("robot").add_geom(name="kit_parts", type=mujoco.mjtGeom.mjGEOM_SPHERE, size=[0.001, 0.0, 0.0], pos=[0.0, 0.0, 0.02],
