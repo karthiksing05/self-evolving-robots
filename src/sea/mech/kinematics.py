@@ -20,7 +20,7 @@ from functools import lru_cache
 import mujoco
 import numpy as np
 
-from sea.mech.base import GRIPPER, base
+from sea.mech.base import Base, base
 from sea.mech.graph import Blade, Graph, PadMount
 
 GUIDE_JOINTS = ("jaw_rod_dy", "jaw_rod_dz", "jaw_rod_yaw", "jaw_rod_pitch")  # a guide's bending: zero when posed
@@ -60,8 +60,7 @@ def _residual(model: mujoco.MjModel, data: mujoco.MjData) -> np.ndarray:
     return data.efc_pos[: data.nefc][rows].copy()
 
 
-def closure(model: mujoco.MjModel, g: Graph, steps: int = STEPS,
-            driver: str = "gripper") -> tuple[list[tuple[str, Follow]], float, float]:
+def closure(model: mujoco.MjModel, g: Graph, driver: str, steps: int = STEPS) -> tuple[list[tuple[str, Follow]], float, float]:
     """Each of the mechanism's own joints as a ``Follow`` of the driving joint, and the worst constraint left open
     over its range with the angle where it is.  Joints already given in ``g.linked`` keep their ratios."""
     from scipy.optimize import least_squares
@@ -101,32 +100,32 @@ def closure(model: mujoco.MjModel, g: Graph, steps: int = STEPS,
 
 
 @lru_cache(maxsize=64)
-def _tables(graph_json: str, base_name: str = GRIPPER.name) -> tuple[tuple[tuple[str, Follow], ...], float, float]:
+def _tables(graph_json: str, base_name: str | Base) -> tuple[tuple[tuple[str, Follow], ...], float, float]:
     from sea.mech import build
 
     bs = base(base_name)
     g = Graph.model_validate_json(graph_json)
     spec = bs.model()
     build.compile(spec, g, bs)
-    tables, worst, at = closure(spec.compile(), g, driver=bs.driver)
+    tables, worst, at = closure(spec.compile(), g, bs.driver)
     return tuple(tables), worst, at
 
 
-def closure_tables(g: Graph, base_name: str = GRIPPER.name) -> list[tuple[str, Follow]]:
+def closure_tables(g: Graph, base_name: str | Base) -> list[tuple[str, Follow]]:
     """``closure`` on the base robot with the mechanism, cached: the joints the graph does not link by ratio."""
     if not g.new_bodies():
         return []
     return list(_tables(graph_key(g), base_name)[0])
 
 
-def closes(g: Graph, base_name: str = GRIPPER.name) -> tuple[float, float]:
+def closes(g: Graph, base_name: str | Base) -> tuple[float, float]:
     """The worst constraint left open over the driving joint's range, and where (m or rad, rad)."""
     if not g.new_bodies():
         return 0.0, 0.0
     return _tables(graph_key(g), base_name)[1:]
 
 
-def finger_body(g: Graph, base_name: str = GRIPPER.name) -> tuple[str, np.ndarray]:
+def finger_body(g: Graph, base_name: str | Base) -> tuple[str, np.ndarray]:
     """The finger: the body the pads ride on (a ``PadMount``'s, D-081, else the blade's), and the offset in it
     (where the jaw's frame at q = 0 sits in the finger body's frame)."""
     for b in g.bodies:
@@ -141,7 +140,7 @@ def finger_body(g: Graph, base_name: str = GRIPPER.name) -> tuple[str, np.ndarra
 
 
 @lru_cache(maxsize=64)
-def finger_motion(graph_json: str, base_name: str = GRIPPER.name) -> tuple[np.ndarray, np.ndarray, np.ndarray, str,
+def finger_motion(graph_json: str, base_name: str | Base) -> tuple[np.ndarray, np.ndarray, np.ndarray, str,
                                                                           np.ndarray]:
     """The finger through the driving joint's range: its angles, and at each the rotation and translation that
     carry a point fixed on the finger from where it is at q = 0 to where it is (root frame); the finger's body

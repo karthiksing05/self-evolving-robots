@@ -171,7 +171,7 @@ def _beam(world, rod=6.0, radius=50.0):
     from sea.mech.build import rack_beam
 
     g = Graph.model_validate_json(_slide(world, rod, radius).parts["jaw"].mechanism)
-    return g, rack_beam(g, g.guides[0])
+    return g, rack_beam(g, g.guides[0], "gripper")
 
 
 def test_lewis_and_a_racks_bend_match_the_hand_numbers(world):
@@ -204,7 +204,7 @@ def test_the_racks_loads_follow_the_section_the_roller_and_the_direction(world):
     # a rib along the rack, 20 mm tall, stiffens it by far more than the depth it adds
     rib = rack.model_copy(update={"name": "rib", "half": (rack.half[0], 0.01, 0.0015), "pos": (rack.pos[0], rack.pos[1] - rack.half[1] - 0.01, rack.pos[2])})
     deep = g.model_copy(update={"bodies": tuple(b.model_copy(update={"parts": (*b.parts, rib)}) if b.name == gd.carriage else b for b in g.bodies)})
-    assert rack_beam(deep, gd).ei_sep > 20 * beam.ei_sep
+    assert rack_beam(deep, gd, "gripper").ei_sep > 20 * beam.ei_sep
     # a roller under the rack at the mesh, touching it, backs it; one elsewhere does not
     span_low = float((J.HINGE + J.R0 @ np.array(rack.pos))[2] - rack.half[1])
     y = float((J.HINGE + J.R0 @ np.array(rack.pos))[1])
@@ -213,8 +213,8 @@ def test_the_racks_loads_follow_the_section_the_roller_and_the_direction(world):
         roller = Cylinder(name="roller", pos=(x, y, span_low - 0.003 - gap), radius=0.003, half_length=0.002, material="steel", role="roller")
         return g.model_copy(update={"bodies": tuple(b.model_copy(update={"parts": (*b.parts, roller)}) if b.name == "gripper" else b for b in g.bodies)})
 
-    assert rack_beam(with_roller(gd.mesh_x), gd).backed and not rack_beam(g, gd).backed
-    assert not rack_beam(with_roller(gd.mesh_x + 0.05), gd).backed and not rack_beam(with_roller(gd.mesh_x, 0.005), gd).backed
+    assert rack_beam(with_roller(gd.mesh_x), gd, "gripper").backed and not rack_beam(g, gd, "gripper").backed
+    assert not rack_beam(with_roller(gd.mesh_x + 0.05), gd, "gripper").backed and not rack_beam(with_roller(gd.mesh_x, 0.005), gd, "gripper").backed
 
 
 def test_the_thin_rack_that_won_on_the_old_judge_now_fails_for_the_right_reason(world):

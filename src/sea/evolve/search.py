@@ -3,7 +3,7 @@
 ``local_search(run, space, start)`` tries the world's default controls, then samples around the best
 score so far with a shrinking step, and stops at the first success.  A success counts only if it repeats
 on ``confirm`` fresh seeds (spec 8.5): a lucky draw is not a skill.  ``score`` guides the search;
-``success`` decides.  Worlds with their own System 1 (the MuJoCo grasp world) call theirs instead.
+``success`` decides.  A world may keep its own System 1 instead.
 """
 
 from __future__ import annotations

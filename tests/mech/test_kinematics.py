@@ -7,16 +7,17 @@ import pytest
 
 from sea.design import fingers as F
 from sea.mech.kinematics import closes, closure_tables, follow
+from sea.mech.seed.gripper import BASE
 from sea.worlds.gripper import GripperWorld, _module, to_design
 
 
 def test_closure_recovers_the_parallelograms_ratios():
     g = _module("parallelogram", {"link_mm": 70})
-    tables = dict(closure_tables(g.model_copy(update={"linked": ()})))
+    tables = dict(closure_tables(g.model_copy(update={"linked": ()}), BASE))
     for joint, ratio in g.linked:  # the hand-given ratios, now solved from the loops
         for q in (-0.1, 0.5, 1.2):
             assert follow(tables[joint], q) == pytest.approx(ratio * q, abs=1e-6)
-    assert closes(g.model_copy(update={"linked": ()}))[0] < 1e-8
+    assert closes(g.model_copy(update={"linked": ()}), BASE)[0] < 1e-8
 
 
 @pytest.mark.parametrize("jaw, params", [("parallelogram", {"link_mm": 70}), ("prismatic", {"pinion_teeth": 30})])

@@ -300,7 +300,7 @@ def _built(world: World, base: Body, prop: Proposal, catalogue: dict[str, Any], 
 
 def tunable(body: Body, slots: Sequence[str], catalogue: dict[str, Any]) -> list[tuple[str, str, Any]]:
     """The parameters the tuner may move in ``slots``.  A built part has no catalogue ranges, a patch changes it; such a
-    slot is here when a pad swap builds on a concept's built jaw, which differs from the current body (D-099)."""
+    slot is here when a swap builds on a concept's built part, which differs from the current body (D-099)."""
     return [(slot, k, catalogue[body.parts[slot].type].params[k]) for slot in slots if body.parts[slot].type in catalogue
             for k in sorted(catalogue[body.parts[slot].type].params)]
 
@@ -474,7 +474,7 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
         """Fit the parameters of the slots a promising swap edited: a Gaussian step in each parameter's range,
         centred on the best body so far, until one is kept-eligible or ``tune_trials`` trials have run.  Each step
         moves one or two parameters: a swap's values are System 2's reasoned guess, and moving all of them at
-        once breaks a different held group each time (gripper_s2v3_s0, iteration 1)."""
+        once breaks a different held group each time."""
         space = tunable(seed, seed_entry["slots"], catalogue)
         if not space:
             return

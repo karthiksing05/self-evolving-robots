@@ -1,7 +1,7 @@
 """The world-agnostic core of body evolution (docs/evolve.md, D-041).
 
 A *world* supplies tasks, a simulator, and a catalogue of parts.  A *body* is one part per slot.  The
-loop never knows what a gripper or a vocal tract is: it asks the world to solve tasks with System 1,
+loop never knows what the robot is: it asks the world to solve tasks with System 1,
 shows System 2 what failed and why, and lets it change the body in one of three ways, cheapest first:
 
 - ``params``: new values for parameters of the parts the body already has;

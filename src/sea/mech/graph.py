@@ -210,7 +210,7 @@ Part = Annotated[Box | Cylinder | Capsule | Sphere | Link | Web | Gear | RackTee
 
 # ---------------------------------------------------------------- bodies and joints
 class Joint(_M):
-    """A joint of a body to its parent.  ``free``: the body moves in every way (a chassis on the floor)."""
+    """A joint of a body to its parent.  ``free``: the body moves in every way (a robot on the floor)."""
 
     name: str
     type: Literal["hinge", "slide", "free"]
@@ -234,7 +234,7 @@ class Inertial(_M):
 
 
 class Body(_M):
-    """A rigid body.  A ``stock`` body is the robot's own (the gripper, the servo's horn body): it is not
+    """A rigid body.  A ``stock`` body is the base robot's own: it is not
     created, and its parts' mass joins its mass, unless ``inertial`` is given, which then sets it whole."""
 
     name: str

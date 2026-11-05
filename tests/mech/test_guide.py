@@ -12,6 +12,7 @@ from sea.contracts import FingerSpec
 from sea.mech import build
 from sea.mech.graph import Bought, Box
 from sea.mech.patch import Op, apply_patch
+from sea.mech.seed.gripper import BASE
 from sea.sim import jaws as J
 from sea.worlds.gripper import _guide_errors, _module, _rod_numbers
 
@@ -58,7 +59,7 @@ def test_the_trials_rods_load_the_beam():
 
     g = _long_slide((-0.012, 0.012), True)
     spec = mujoco.MjSpec.from_file(str(STOCK_MJCF))
-    build.compile(spec, g)
+    build.compile(spec, g, BASE)
     m = spec.compile()
     rods = J.RodSprings(m)
     assert rods.beam is not None and rods.beam[2] == (-0.012, 0.012)
@@ -82,7 +83,7 @@ def test_catalogue_slides_keep_d076s_rods():
 
     for name, p in (("prismatic", {"pinion_teeth": 30}), ("long_slide", {"sector_radius_mm": 40})):
         spec = mujoco.MjSpec.from_file(str(STOCK_MJCF))
-        build.compile(spec, _module(name, p))
+        build.compile(spec, _module(name, p), BASE)
         m = spec.compile()
         assert all(m.numeric(i).name != "jaw_guide" for i in range(m.nnumeric)) and J.RodSprings(m).beam is None
 
@@ -98,4 +99,4 @@ def test_a_built_guide_must_be_buildable_as_drawn():
     assert any("nothing holds the rods' far end" in e for e in _guide_errors(loose, loose.guides[0]))
     assert isinstance(next(p for b in good.bodies for p in b.parts if getattr(p, "name", "") == "far_clamp"), Box)
     assert sum(isinstance(p, Bought) for b in good.bodies for p in b.parts) == 4
-    assert math.isfinite(build.rod_end(good))
+    assert math.isfinite(build.rod_end(good, BASE.root))

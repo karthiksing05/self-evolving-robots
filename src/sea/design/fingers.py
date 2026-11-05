@@ -99,8 +99,9 @@ def q_range(spec: FingerSpec) -> tuple[float, float]:
 def _motion(spec: FingerSpec):
     """A built mechanism's finger through the servo's range, measured on its compiled model (``mech.kinematics``)."""
     from sea.mech.kinematics import finger_motion
+    from sea.mech.seed.gripper import BASE
 
-    return finger_motion(spec.mechanism)
+    return finger_motion(spec.mechanism, BASE)
 
 
 def _at(spec: FingerSpec, q: float) -> tuple[np.ndarray, np.ndarray]:

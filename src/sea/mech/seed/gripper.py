@@ -11,8 +11,10 @@ from __future__ import annotations
 import math
 from typing import NamedTuple
 
+import mujoco
 import numpy as np
 
+from sea.mech.base import Base, register
 from sea.mech.graph import (
     Blade,
     Body,
@@ -34,6 +36,16 @@ from sea.mech.graph import (
 from sea.sim import jaws as J
 
 MM = J.MM
+
+
+def _so101() -> mujoco.MjSpec:
+    from sea.control.frames import STOCK_MJCF
+
+    return mujoco.MjSpec.from_file(str(STOCK_MJCF))
+
+
+BASE = register(Base(name="so101_gripper", root="gripper", driver="gripper", model=_so101, finger="moving_jaw_so101_v1"))  # D-107
+
 SIDES = {"horn": J.HORN_SIDE, "rear": J.REAR_SIDE}  # the jaw's two link planes (jaw frame z)
 
 

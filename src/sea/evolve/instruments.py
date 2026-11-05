@@ -1,7 +1,7 @@
 """What the harness can measure about a body, the same way in every world (D-088; the general framework, F1).
 
 A world declares its **instruments**: named quantities it can compute on a body, or on a body facing one task
-(an opening, a squeeze, an edge it climbs, a formant it reaches).  An instrument is a reading with a unit,
+(a width, a force, a height it reaches).  An instrument is a reading with a unit,
 never advice.  The harness adds the readings every world has: what a body costs, how long it takes to make
 and to arrive, and how many of the world's laws refuse it.  A task's own numbers (an object's width, a step's
 height) are its **facts**.

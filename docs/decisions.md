@@ -3211,3 +3211,13 @@ The rod's Euler margin is 3.4 by the reading, 2.3 over D-104's print factor, so 
 **What.** `docs/bench-servo-shaft.md` fixes the protocol, its pass rules and what each result does to the judge. Nothing in the harness changes until there is data.
 
 **Prediction.** It survives one static 106 N without visible damage, and repeated loading grows play past the limit, so "survives but degrades". Held weakly: it rests on one comparable rating.
+
+## D-107 (policy: tools; world: physics): general code names no task
+
+**Why.** An audit on 2026-11-05 asked whether the harness is task-agnostic. The loop and prompt were clean, but System 2's tool descriptions told every world about the gripper's fingertips and wrist, the tool server held a gripper hook and a fallback to the gripper's modules, and a graph with no base was assumed to be on the gripper.
+
+**What.** A world may now supply `measure_extra` and `module_text`; the gripper's moved into it. The gripper's base moved to `mech/seed/gripper.py`, and every graph function takes its base. `tests/test_task_agnostic.py` keeps this so: general code imports no world, the loop names no task, and a prompt names nothing of another world.
+
+**Prediction.** No verdict moves in any world, since only text and where code lives change. The gripper's tool answers read the same.
+
+**Still world-specific in `mech/`.** The part kinds `Blade`, `PadMount` and `Guide`, with their parts of `mech/build.py` and `sim/jaws.py`, are the SO-101's own hardware in the graph language. Other worlds' prompts don't list them.

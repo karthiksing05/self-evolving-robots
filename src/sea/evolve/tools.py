@@ -3,8 +3,7 @@
 While it writes an iteration's proposals, System 2 can ask what the harness would say about a draft:
 
 - ``check``: whether the loop would trial it, or every reason it would refuse it, word for word;
-- ``measure``: the body's computed facts (the world's brief, its cost, and for the gripper the wrist roll its grasps
-  need and whether a built mechanism's loops close);
+- ``measure``: the body's computed facts (the world's brief, its cost, and what more the world measures);
 - ``module``: a module's graph at given parameters, to patch against;
 - ``simulate``: one train task solved by the draft body.  One task is not a trial, and nothing it finds is kept.
 
@@ -88,10 +87,8 @@ def specs() -> list[dict[str, Any]]:
         tool("check", "Would the loop trial this proposal?  Returns 'would trial' with its cost, or every reason it "
              "would be refused before its trial (the build rules, the mechanism laws, the resources, the record), as "
              "the loop words them.", draft, ["proposal"]),
-        tool("measure", "The computed facts of the body this proposal makes: the world's brief of it (for the "
-             "gripper: by object width, the servo angle, the faces' tilt, the fingertips, the squeeze and any rods' "
-             "loads), its cost, and for the gripper the wrist roll each task's grasp needs and the range the "
-             "simulator holds the wrist to; for a built mechanism, how far its loops are from closing.", draft,
+        tool("measure", "The computed facts of the body this proposal makes: the world's brief of it, its cost, and "
+             "anything more the world measures on it.", draft,
              ["proposal"]),
         tool("read", "One instrument read on the body this proposal makes (the instruments section lists them; "
              "a per-task one needs a train task id).", {**draft, "instrument": {"type": "string"},
@@ -110,7 +107,7 @@ def specs() -> list[dict[str, Any]]:
         tool("compare", f"Up to {COMPARE_DRAFTS} drafts against the current body and each other on every requirement, "
              "each reading marked + better, 0 the same or - worse than the current body.",
              {"proposals": {"type": "array", "items": prop}}, ["proposals"]),
-        tool("facts", "A train task's numbers by name (an object's size and mass, a route's features, a target).",
+        tool("facts", "A train task's numbers by name.",
              {"task": {"type": "string"}}, ["task"]),
         tool("note", "Record a finding from your research in the engineering notebook, with the page you read it "
              "on: it outlives this run, and a kept change that cites its id credits it.  Returns its id.",
@@ -257,9 +254,8 @@ class Server:
                     self.ctx.spent)
         out.append(f"cost: ${res.usd:.2f}, {res.fab_minutes:.0f} machine min, {res.lead_days:g} days' wait; "
                    + "; ".join(res.lines))
-        extra = EXTRA.get(self.ctx.world)
-        if extra is not None:
-            out += extra(cand, train)
+        if hasattr(self.world, "measure_extra"):  # anything more the world reads on a body
+            out += self.world.measure_extra(cand, train)
         if self.ctx.requirements:
             from sea.evolve import requirements as R
 
@@ -409,18 +405,7 @@ class Server:
                 return self.world.module_text(str(args.get("name", "")), dict(args.get("params") or {}))
             except ValueError as exc:
                 raise ToolError(str(exc)) from exc
-        from sea.worlds import gripper as W
-
-        name, params = args.get("name", ""), dict(args.get("params") or {})
-        if name not in W.MODULES:
-            raise ToolError(f"no module {name!r}; the modules are {sorted(W.MODULES)}")
-        ranges = W.MODULES[name][1]
-        bad = [f"{k} {v:g} outside {ranges[k][0]:g}..{ranges[k][1]:g}" if k in ranges else f"no parameter {k!r}"
-               for k, v in params.items() if k not in ranges or not ranges[k][0] <= v <= ranges[k][1]]
-        if bad:
-            raise ToolError("; ".join(bad))
-        params = {k: params.get(k, (lo + hi) / 2) for k, (lo, hi) in ranges.items()}
-        return f"{name} at {params or 'its only setting'}:\n" + W._compact(W._module(name, params))
+        raise ToolError("this world has no modules")
 
     def _research_first(self) -> None:
         """Refuse a first iteration's simulation until the run has written down what it read, or spent its searches."""
@@ -520,35 +505,6 @@ def summary(log: Path, iteration: int | None = None) -> dict[str, Any]:
 
 
 # ---------------------------------------------------------------- per-world facts beyond the brief
-def _gripper(body: Body, train: list[Any]) -> list[str]:
-    """The wrist roll each train task's grasp needs, from the IK at the poses the grasp commands (D-085), and the
-    range the simulator holds the wrist to; a built mechanism's worst open loop."""
-    from sea.worlds import gripper as W
-
-    f = W.to_design(body).fingers
-    lo, hi = W.roll_range(f)
-    j_lo, j_hi = W.ik_joint_range("wrist_roll")
-    ids = {t.id for t in train}
-    need = {k: v for k, v in W.roll_needed(f).items() if k in ids}
-    if not need:
-        return []
-    a, b = min(need, key=lambda k: need[k][0]), max(need, key=lambda k: need[k][1])
-    rows = [f"{k} {x:+.2f}" if y - x < 0.01 else f"{k} {x:+.2f}..{y:+.2f}" for k, (x, y) in need.items()]
-    out = [f"wrist roll: the simulator holds the wrist to {lo:+.2f}..{hi:+.2f} rad (the joint allows "
-           f"{j_lo:+.2f}..{j_hi:+.2f}); the grasps need {need[a][0]:+.2f} ({a}) to {need[b][1]:+.2f} ({b}), above the "
-           "object, at the grip and lifted; by task: " + ", ".join(rows)]
-    if body.parts["jaw"].type == "built":
-        from sea.mech.graph import Graph
-        from sea.mech.kinematics import closes
-
-        gap, q = closes(Graph.model_validate_json(body.parts["jaw"].mechanism))
-        out.append(f"loops: the worst is {gap * 1000:.3f} mm (or mrad) open, at servo {q:.2f} rad")
-    return out
-
-
-EXTRA = {"gripper": _gripper}
-
-
 def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--context", type=Path, required=True)

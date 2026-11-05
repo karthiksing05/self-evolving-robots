@@ -542,10 +542,10 @@ def _jaw_joint(spec: mujoco.MjSpec, f):
     joints with their units per servo radian.  The gripper joint stays the servo's output, a hinge in
     radians: the slide's pinion turns on it (D-058), and the parallelogram's driving links (D-057)."""
     from sea.mech import build
-    from sea.mech.seed.gripper import Site, jaw_graph
+    from sea.mech.seed.gripper import BASE, Site, jaw_graph
 
     g = jaw_graph(f, Site.of(spec))
-    build.compile(spec, g)
+    build.compile(spec, g, BASE)
     return g
 
 
@@ -553,8 +553,9 @@ def _jaw_linked(g) -> list:
     """The jaw mechanism's joints that move with the servo: the graph's ratios, and for the rest of its own joints
     a table solved from its loops and meshes (``mech.kinematics.closure``)."""
     from sea.mech.kinematics import closure_tables
+    from sea.mech.seed.gripper import BASE
 
-    return [*g.linked, *closure_tables(g)]
+    return [*g.linked, *closure_tables(g, BASE)]
 
 
 def build_model(design: Design, panel: PanelSpec | None = None, tools: list | None = None,

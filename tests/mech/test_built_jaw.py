@@ -10,6 +10,7 @@ from sea.design import fingers as F
 from sea.evolve.core import Idea, Mechanism
 from sea.mech.graph import Graph
 from sea.mech.kinematics import closes
+from sea.mech.seed.gripper import BASE
 from sea.sim import jaws as J
 from sea.worlds.gripper import GripperWorld, _built_bom, to_design
 
@@ -32,7 +33,7 @@ def test_a_four_bar_closes_tilts_its_finger_is_priced_and_judged():
     b = w.build_idea(w.stock(), _four_bar(0.06), "t")
     f = to_design(b).fingers
     assert f.jaw == "built" and "tilting four-bar" in b.describe()
-    assert closes(Graph.model_validate_json(f.mechanism))[0] < 1e-8
+    assert closes(Graph.model_validate_json(f.mechanism), BASE)[0] < 1e-8
     tilts = [F.finger_tilt_deg(f, q) for q in (0.0, 0.5, 1.0, 1.5)]
     assert abs(tilts[0]) < 1e-6 and 0 < tilts[1] < tilts[2] < tilts[3]  # a parallelogram's would stay 0
     bom = {line.item: line.qty for line in _built_bom(f.mechanism)}

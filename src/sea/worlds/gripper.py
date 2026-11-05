@@ -519,6 +519,41 @@ class GripperWorld:
         jaw = body.parts["jaw"]
         return _compact(Graph.model_validate_json(jaw.mechanism)) if jaw.mechanism else ""
 
+    def module_text(self, name: str, params: dict[str, float]) -> str:
+        """A module's graph at ``params``, each left out at its range's middle, for the ``module`` tool."""
+        if name not in MODULES:
+            raise ValueError(f"no module {name!r}; the modules are {sorted(MODULES)}")
+        ranges = MODULES[name][1]
+        bad = [f"{k} {v:g} outside {ranges[k][0]:g}..{ranges[k][1]:g}" if k in ranges else f"no parameter {k!r}"
+               for k, v in params.items() if k not in ranges or not ranges[k][0] <= v <= ranges[k][1]]
+        if bad:
+            raise ValueError("; ".join(bad))
+        params = {k: params.get(k, (lo + hi) / 2) for k, (lo, hi) in ranges.items()}
+        return f"{name} at {params or 'its only setting'}:\n" + _compact(_module(name, params))
+
+    def measure_extra(self, body: Body, train: Sequence[Task]) -> list[str]:
+        """The wrist roll each train task's grasp needs, from the IK at the poses the grasp commands (D-085), and the
+        range the simulator holds the wrist to; a built mechanism's worst open loop."""
+        f = to_design(body).fingers
+        lo, hi = roll_range(f)
+        j_lo, j_hi = ik_joint_range("wrist_roll")
+        ids = {t.id for t in train}
+        need = {k: v for k, v in roll_needed(f).items() if k in ids}
+        if not need:
+            return []
+        a, b = min(need, key=lambda k: need[k][0]), max(need, key=lambda k: need[k][1])
+        rows = [f"{k} {x:+.2f}" if y - x < 0.01 else f"{k} {x:+.2f}..{y:+.2f}" for k, (x, y) in need.items()]
+        out = [f"wrist roll: the simulator holds the wrist to {lo:+.2f}..{hi:+.2f} rad (the joint allows "
+               f"{j_lo:+.2f}..{j_hi:+.2f}); the grasps need {need[a][0]:+.2f} ({a}) to {need[b][1]:+.2f} ({b}), above the "
+               "object, at the grip and lifted; by task: " + ", ".join(rows)]
+        if body.parts["jaw"].type == "built":
+            from sea.mech.graph import Graph
+            from sea.mech.kinematics import closes
+
+            gap, q = closes(Graph.model_validate_json(body.parts["jaw"].mechanism), _base())
+            out.append(f"loops: the worst is {gap * 1000:.3f} mm (or mrad) open, at servo {q:.2f} rad")
+        return out
+
     def modules_text(self) -> str:
         """The modules a mechanism may start from: each catalogue jaw's graph at its parameters' midpoints."""
         from sea.mech import graph as G
@@ -727,7 +762,7 @@ class GripperWorld:
             from sea.mech.graph import Graph
             from sea.mech.kinematics import closes
 
-            return float(closes(Graph.model_validate_json(body.parts["jaw"].mechanism))[0] * 1000)
+            return float(closes(Graph.model_validate_json(body.parts["jaw"].mechanism), _base())[0] * 1000)
         raise ValueError(f"no instrument {name!r}")
 
     def task_facts(self, task: Task) -> dict[str, float]:
@@ -802,6 +837,12 @@ MODULES: dict[str, tuple[str, dict[str, tuple[float, float]]]] = {
 MODULE_DEFAULTS = {"rod_mm": 3.0}  # the bench's own rods, not the range's middle (D-098)
 
 
+def _base():
+    from sea.mech.seed.gripper import BASE
+
+    return BASE
+
+
 @lru_cache(maxsize=1)
 def _site():
     from sea.control.frames import STOCK_MJCF
@@ -857,7 +898,7 @@ def _built_errors(mechanism: str) -> list[str]:
     g = Graph.model_validate_json(mechanism)
     try:
         spec = mj.MjSpec.from_file(str(STOCK_MJCF))
-        build.compile(spec, g)
+        build.compile(spec, g, _base())
         spec.compile()
     except Exception as exc:  # MuJoCo names the element
         return [f"the mechanism does not compile: {str(exc)[:300]}"]
@@ -879,10 +920,10 @@ def _built_errors(mechanism: str) -> list[str]:
         errs = _guide_errors(g, gd)
         if errs:
             return errs
-    worst, at = closes(g)
+    worst, at = closes(g, _base())
     if worst > CLOSE_TOL:
         return [f"the mechanism's loops do not close: {worst * 1000:.2f} mm (or mrad) apart at servo {at:.2f} rad; "
-                f"the linkage jams before the servo's range ends ({finger_body(g)[0]} carries the finger)"]
+                f"the linkage jams before the servo's range ends ({finger_body(g, _base())[0]} carries the finger)"]
     return []
 
 
@@ -1017,7 +1058,7 @@ def _rack_numbers(g, gd, s: float, teeth_n: float) -> dict[str, float]:
     """The printed rack and teeth at travel ``s`` with this force on the teeth (D-100), as the trial judges them."""
     from sea.mech.build import rack_beam
 
-    beam = rack_beam(g, gd)
+    beam = rack_beam(g, gd, _base().root)
     if beam is None:
         return {"bend_mm": 0.0, "rack_mpa": 0.0, "tooth_mpa": 0.0, "buckle_n": 1e9}
     r = beam.loads(gd.mesh_x - s, teeth_n)

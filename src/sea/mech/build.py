@@ -220,7 +220,7 @@ def _inertial(sb, b: Body, mass: float) -> None:
         sb.inertia = [mass * i.size] * 3
 
 
-def _pose(spec: mujoco.MjSpec, name: str, root: str = "gripper") -> tuple[np.ndarray, np.ndarray]:
+def _pose(spec: mujoco.MjSpec, name: str, root: str) -> tuple[np.ndarray, np.ndarray]:
     """A body's position and rotation in the base's root frame (its parent chain up to the root)."""
     pos, rot = np.zeros(3), np.eye(3)
     b = spec.body(name)
@@ -233,9 +233,9 @@ def _pose(spec: mujoco.MjSpec, name: str, root: str = "gripper") -> tuple[np.nda
     return pos, rot
 
 
-def rack_beam(g: Graph, gd) -> jaws.RackBeam | None:  # noqa: F821
+def rack_beam(g: Graph, gd, root: str) -> jaws.RackBeam | None:  # noqa: F821
     """A guide's printed rack as a beam (D-100), from its parts: the box longest along the teeth is the rack, boxes
-    touching it that run along most of it join its section, the others hold it, and a ``roller`` on the gripper behind
+    touching it that run along most of it join its section, the others hold it, and a ``roller`` on the root behind
     the rack at the mesh takes the teeth's separating force.  None without printed teeth."""
     from sea.sim import jaws
 
@@ -269,20 +269,20 @@ def rack_beam(g: Graph, gd) -> jaws.RackBeam | None:  # noqa: F821
     gears = [p for b in g.bodies for p in b.parts if isinstance(p, Gear)]
     width = min([teeth.width, *(p.width for p in gears)])
     y = min([jaws.LEWIS_RACK, *(jaws.lewis_y(2 * p.r_pitch / gd.module) for p in gears)])
-    rollers = [p for b in g.bodies if b.name == "gripper" for p in b.parts if isinstance(p, Cylinder) and p.role == "roller"]
+    rollers = [p for b in g.bodies if b.name == root for p in b.parts if isinstance(p, Cylinder) and p.role == "roller"]
     under = [p for p in rollers if abs(p.pos[0] - gd.mesh_x) <= p.radius + 5e-3 and abs(p.pos[2] + p.radius - lo[2]) <= 0.5e-3
              and lo[1] - 1e-3 <= p.pos[1] <= hi[1] + 1e-3]
     return jaws.RackBeam(float(min(h[0][0] for h in hold)), float(max(h[1][0] for h in hold)), jaws.PLA_E_PA * float(i_sep),
                          float(c), jaws.PLA_E_PA * float(min(i_sep, i_lat)), 1.0 / (width * gd.module * y), bool(under),
-                         *(_roller_arm(g, under[0], gd.mesh_x) if under else ()))
+                         *(_roller_arm(g, under[0], gd.mesh_x, root) if under else ()))
 
 
-def _roller_arm(g: Graph, roller: Cylinder, mesh_x: float) -> tuple[float, float, float]:
-    """A roller's printed arm as a cantilever (D-103): the gripper's longest box touching the roller, from the nearest
+def _roller_arm(g: Graph, roller: Cylinder, mesh_x: float, root: str) -> tuple[float, float, float]:
+    """A roller's printed arm as a cantilever (D-103): the root's longest box touching the roller, from the nearest
     edge of a box holding it to the mesh; its bending stiffness and half depth against the teeth's separating force."""
     from sea.sim import jaws
 
-    boxes = [p for b in g.bodies if b.name == "gripper" for p in b.parts if isinstance(p, Box)]
+    boxes = [p for b in g.bodies if b.name == root for p in b.parts if isinstance(p, Box)]
 
     def touches(p: Box, q: Box) -> bool:
         return all(abs(p.pos[i] - q.pos[i]) <= p.half[i] + q.half[i] + 0.5e-3 for i in range(3))
@@ -337,7 +337,7 @@ def printed_members(g: Graph, model: mujoco.MjModel) -> list:
     return out
 
 
-def rod_end(g: Graph, root: str = "gripper") -> float:
+def rod_end(g: Graph, root: str) -> float:
     """Where the guide's rods end, toward the carriage's travel (root x): the nearest free end of the rods on
     the root."""
     ends = []
@@ -353,8 +353,8 @@ def rod_end(g: Graph, root: str = "gripper") -> float:
     return min(ends) if ends else math.inf
 
 
-def compile(spec: mujoco.MjSpec, g: Graph, base: str | Base | None = None) -> list[tuple[str, float]]:
-    """Add the mechanism ``g`` to ``spec`` (the robot ``base`` names, the gripper by default); returns the joints
+def compile(spec: mujoco.MjSpec, g: Graph, base: str | Base) -> list[tuple[str, float]]:
+    """Add the mechanism ``g`` to ``spec`` (the robot ``base`` names); returns the joints
     that move with the driving joint, with their units per radian of it (``Sim.set_arm_q``)."""
     from sea.sim import jaws
     from sea.sim.build_model import TIMESTEP
@@ -411,7 +411,7 @@ def compile(spec: mujoco.MjSpec, g: Graph, base: str | Base | None = None) -> li
         spec.add_numeric(name="jaw_rods", data=[gd.clamp_end, gd.centre, gd.module, gd.mesh_x])
         if hw is not jaws.LM3:
             spec.add_numeric(name="jaw_bushing", data=[hw.ei, hw.length, hw.rated_n])
-        beam = rack_beam(g, gd)
+        beam = rack_beam(g, gd, root)
         if beam is not None:
             spec.add_numeric(name="jaw_rack", data=beam.data())
         if gd.bushings != (0.0,) or gd.far_end is not None:  # the rods as beams through every bushing (D-080)
