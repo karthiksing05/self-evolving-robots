@@ -3203,3 +3203,11 @@ Member audit of `wide_rod`, one seed (1000), 84 tasks, all passing:
 The rod's Euler margin is 3.4 by the reading, 2.3 over D-104's print factor, so the two steps that made this body (arms, then rod) each left room rather than landing on the limit.
 
 **What 21 of 21 does not show.** It is the score of a simulation against the laws the judge reads. Not judged: the servo shaft's side load, about 106 N steady, roughly 6 times the stock jaw's, with no published STS3215 radial rating (D-104); the rocker link plates and hub flex. A judgement, not a measurement: the print factor of 1.5 on Euler load. An estimate: the peak jaw impact, kept at the simulator's value (D-103). A bench test of a printed part on a real servo is the verification this cannot give.
+
+## D-106 (world: physics, not yet changed): the servo shaft's side load goes to the bench
+
+**Why.** `wide_rod`'s 21 of 21 doesn't read the shaft's side load, about 106 N steady at about 20 mm from the horn, and no rating for this servo is published. Another servo's rating shouldn't become a law, so the number has to be measured.
+
+**What.** `docs/bench-servo-shaft.md` fixes the protocol, its pass rules and what each result does to the judge. Nothing in the harness changes until there is data.
+
+**Prediction.** It survives one static 106 N without visible damage, and repeated loading grows play past the limit, so "survives but degrades". Held weakly: it rests on one comparable rating.
