@@ -85,6 +85,8 @@ class RunConfig(BaseModel):
     plans: bool = False  # operating plans, and whether the operation or the body failed (D-092)
     library: bool = False  # machine elements in the prompt, and what kept bodies prove, kept across runs (D-096)
     library_dir: str = "library"
+    robust: int = 0  # once every train group holds, this many more seeds must hold too before the run ends (D-101)
+    start: str = ""  # a run's summary.json: begin from its final body rather than stock (D-101)
 
 
 # ---------------------------------------------------------------- parallel evaluation
@@ -117,7 +119,8 @@ class Evaluator:
 
     def __init__(self, world: World, wname: str, workers: int = 1, seed: int = 0):
         self.world, self.wname, self.workers, self.seed = world, wname, workers, seed
-        self.cache: dict[tuple[str, str], Outcome] = {}
+        self.seeds = [seed]  # a task is solved when it holds under all of these (D-101)
+        self.cache: dict[tuple[str, str, int], Outcome] = {}
         self.sim_s = 0.0
         self.attempts = 0
         self._pool: ProcessPoolExecutor | None = None
@@ -132,17 +135,25 @@ class Evaluator:
             self._pool.shutdown()
 
     def solve(self, body: Body, tasks: Sequence[Task]) -> dict[str, Outcome]:
-        todo = [t for t in tasks if (body.key(), t.id) not in self.cache]
+        todo = [(t, s) for s in self.seeds for t in tasks if (body.key(), t.id, s) not in self.cache]
         if self.workers > 1 and len(todo) > 1:
-            args = [(self.wname, body.model_dump_json(), t.model_dump_json(), self.seed) for t in todo]
-            results = [Outcome.model_validate_json(s) for s in self.pool().map(_solve_one, args)]
+            args = [(self.wname, body.model_dump_json(), t.model_dump_json(), s) for t, s in todo]
+            results = [Outcome.model_validate_json(x) for x in self.pool().map(_solve_one, args)]
         else:
-            results = [self.world.solve(body, t, self.seed) for t in todo]
-        for t, o in zip(todo, results, strict=True):
-            self.cache[(body.key(), t.id)] = o
+            results = [self.world.solve(body, t, s) for t, s in todo]
+        for (t, s), o in zip(todo, results, strict=True):
+            self.cache[(body.key(), t.id, s)] = o
             self.sim_s += o.sim_s
             self.attempts += o.attempts
-        return {t.id: self.cache[(body.key(), t.id)] for t in tasks}
+        return {t.id: self._across_seeds(body, t) for t in tasks}
+
+    def _across_seeds(self, body: Body, task: Task) -> Outcome:
+        """The first seed's outcome, or under several seeds the first that failed, naming it (D-101)."""
+        for s in self.seeds:
+            o = self.cache[(body.key(), task.id, s)]
+            if not o.success:
+                return o if s == self.seed else o.model_copy(update={"detail": f"under seed {s}: {o.detail}"})
+        return self.cache[(body.key(), task.id, self.seeds[0])]
 
 
 def held_groups(tasks: Sequence[Task], outcomes: dict[str, Outcome]) -> set[str]:
@@ -369,6 +380,8 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
         proposer = RandomProposer(world, cfg.seed)
     ev = Evaluator(world, cfg.world, cfg.workers, cfg.seed)
     body = world.stock()
+    if cfg.start:  # the id is the run's own: the trials below number theirs from b000 (D-101)
+        body = Body.model_validate(json.loads(Path(cfg.start).read_text())["final_body"]).model_copy(update={"id": "start"})
     spent = start(world.bom(body))
     history: list[dict[str, Any]] = []
     reqs: list[Any] = []  # System 2's requirements list (D-089)
@@ -500,6 +513,11 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
             t0 = time.time()
             outcomes = ev.solve(body, train)
             held = held_groups(train, outcomes)
+            if cfg.robust and len(ev.seeds) == 1 and len(held) == len({t.group for t in train}):
+                ev.seeds = [cfg.seed + 100 * k for k in range(cfg.robust + 1)]
+                log(f"[{cfg.world}/{cfg.arm}] every train group holds: now judging under seeds {ev.seeds}")
+                outcomes = ev.solve(body, train)
+                held = held_groups(train, outcomes)
             n_ok = sum(o.success for o in outcomes.values())
             curve.append({"iteration": it, "body": body.id, "held_groups": len(held), "tasks_passed": n_ok,
                           "sim_s": round(ev.sim_s, 1), "wall_s": round(time.time() - t_start, 1),

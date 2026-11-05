@@ -40,6 +40,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--plans", action="store_true", help="operating plans, and operation-or-body labels (D-092)")
     ap.add_argument("--concepts", action="store_true", help="the concept set, functions, comparison, failure modes (D-091)")
     ap.add_argument("--library", action="store_true", help="machine elements, and what kept bodies prove across runs (D-096)")
+    ap.add_argument("--robust", type=int, default=0, help="once train is full, this many more seeds must hold (D-101)")
+    ap.add_argument("--start", type=Path, default=None, help="a run's summary.json: begin from its final body (D-101)")
     ap.add_argument("--out", type=Path, default=None)
     args = ap.parse_args(argv)
     out = args.out or ROOT / "runs" / "evolve" / f"{args.world}_{args.arm}_s{args.seed}"
@@ -48,7 +50,7 @@ def main(argv: list[str] | None = None) -> int:
     cfg = RunConfig(world=args.world, arm=args.arm, iterations=args.iterations, seed=args.seed, workers=args.workers,
                     tune_trials=args.tune_trials, model=args.model, effort=args.effort, tools=args.tools,
                     requirements=args.requirements, research=args.research, concepts=args.concepts, plans=args.plans, stripped=args.stripped,
-                    library=args.library)
+                    library=args.library, robust=args.robust, start=str(args.start or ""))
     summary = run(cfg, out, log=lambda m: print(m, flush=True))
     keep = {k: summary[k] for k in ("world", "arm", "final_held_train", "test", "spent", "llm", "wall_s", "sim_s")}
     print(json.dumps(keep, indent=1))
