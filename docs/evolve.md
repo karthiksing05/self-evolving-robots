@@ -199,8 +199,11 @@ whose replay disagrees with the run's record is not written.
    reasons, and a gold body built from the catalogue within the budget holds every group.
    Otherwise a result means nothing.
 
+A world whose robot is composed from parts subclasses `mech.world.GraphWorld`. It supplies only its tasks, physics, a stock graph and what can be bought, and it inherits modules, patches, machine elements, the laws (`mech.laws`, `mech.members`), graph-derived controls (`mech.program`) and System 1 (`evolve.search`), which searches other ways of using a body before a failure counts. `tests/test_task_agnostic.py` checks that general code names no task and runs a new world through the whole loop.
+
 Worlds so far:
 - `gripper`: the SO-101 and 21 YCB objects (D-042).
+- `me2110_kit`, `mobile_kit`, `phonology_kit`: built whole from graphs (D-094, D-111, D-112). `me2110`, `mobile` and `phonology` stay as their catalogue baselines.
 - `phonology`: a mechanical talking robot.
 - `mobile`: a ground robot exploring a house and garden. It has ten routes and five slots
   (locomotion, chassis, drive, battery, sensor), modelled with quasi-static vehicle mechanics:

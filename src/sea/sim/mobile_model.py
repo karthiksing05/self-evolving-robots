@@ -331,15 +331,24 @@ def episode(rb: Robot, kind: str, f: dict[str, float], mu: float, duty: float, y
     for k in range(m.nu):
         d.ctrl[k] = duty
     mujoco.mj_forward(m, d)
-    tub = m.geom("tub").id
     goal = past - rear + 0.01  # the robot's centre once its rear is past
     t_max = min(15.0, 2.0 + 2.5 * (goal - x0) / max(v_ss, 0.1 * rb.omega0 * rb.r, 0.03))
+    return _roll(m, d, kind, x0, goal, t_max, jid, radii, {m.geom("tub").id}, trace)
+
+
+def _roll(m: mujoco.MjModel, d: mujoco.MjData, kind: str, x0: float, goal: float, t_max: float, jid: list[int],
+          radii: list[float], belly_geoms: set[int], trace: bool, members: Any = None) -> Episode:
+    """Run a robot set going at an obstacle until it is past, or what stopped it."""
     ts, qs = [], []
     best_x, hist = d.qpos[0], []
     belly = bounced = walled = False
     every = int(0.02 / DT)
     for i in range(int(t_max / DT)):
         mujoco.mj_step(m, d)
+        if members is not None:  # printed members, judged as on any robot (D-109)
+            members.read(d)
+            if broke := members.broken():
+                return _done(False, d.qpos[0], x0, goal, "broke", broke, ts, qs, m)
         if trace and i % every == 0:
             ts.append(d.time)
             qs.append(d.qpos.copy())
@@ -348,7 +357,8 @@ def episode(rb: Robot, kind: str, f: dict[str, float], mu: float, duty: float, y
         if best_x - x > 0.01 and kind in EDGES:
             bounced = True
         for c in d.contact[:d.ncon]:
-            if tub in (c.geom1, c.geom2) and m.geom_bodyid[c.geom1 if c.geom2 == tub else c.geom2] == 0:
+            hit = c.geom1 if c.geom1 in belly_geoms else c.geom2 if c.geom2 in belly_geoms else -1
+            if hit >= 0 and m.geom_bodyid[c.geom1 if c.geom2 == hit else c.geom2] == 0:
                 belly = True
             if kind == "gap" and (m.geom(c.geom1).name.startswith(("obstacle", "jamb"))
                                   or m.geom(c.geom2).name.startswith(("obstacle", "jamb"))):
@@ -386,3 +396,71 @@ def cached(rb: Robot, kind: str, items: tuple[tuple[str, float], ...], mu: float
            standing: bool = False) -> Episode:
     """``episode`` for search: its arguments arrive quantised, so attempts that differ by less share physics."""
     return episode(rb, kind, dict(items), mu, duty, y0, standing=standing)
+
+
+def graph_model(g: Any, kind: str, f: dict[str, float], mu: float, kit_kg: float) -> tuple[mujoco.MjModel, float]:
+    """An obstacle's terrain with the graph robot ``g`` on it, whose solids meet the terrain and not each other (D-111);
+    and the x its rear must get past."""
+    from sea.mech.base import WORLD
+    from sea.mech.build import compile as compile_graph
+
+    ground, past = terrain_xml(kind, f, mu)
+    spec = mujoco.MjSpec.from_string(f"""<mujoco model="mobile_{kind}">
+  <option timestep="{DT}" integrator="implicitfast" cone="elliptic" impratio="10"/>
+  <default><default class="ground"><geom contype="1" conaffinity="2" solref="{SOLREF}" solimp="{SOLIMP}" condim="3"/></default></default>
+  <worldbody>{ground}</worldbody>
+</mujoco>""")
+    compile_graph(spec, g, WORLD)
+    names = {b.name for b in g.bodies}
+    solref, solimp = [float(x) for x in SOLREF.split()], [*(float(x) for x in SOLIMP.split()), 0.5, 2.0]
+    for x in spec.geoms:
+        if x.parent.name in names:
+            x.contype, x.conaffinity, x.solref, x.solimp = 2, 1, solref, solimp
+    if kit_kg > 0:
+        spec.body("robot").add_geom(name="kit_parts", type=mujoco.mjtGeom.mjGEOM_SPHERE, size=[0.001, 0.0, 0.0], pos=[0.0, 0.0, 0.02],
+                                    mass=kit_kg, contype=0, conaffinity=0, group=4)
+    return spec.compile(), past
+
+
+def graph_episode(graph_json: str, kind: str, f: dict[str, float], mu: float, duty: float, y0: float, crr: float, kit_kg: float,
+                  standing: bool = False, trace: bool = False) -> Episode:
+    """``episode`` for a robot built from a graph: its wheels' motors at ``duty``, each signed to drive it forward."""
+    from sea.mech.build import printed_members
+    from sea.mech.graph import Gearmotor, Graph, Wheel
+    from sea.mech.members import PrintedMembers
+
+    g = Graph.model_validate_json(graph_json)
+    m, past = graph_model(g, kind, f, mu, kit_kg)
+    d = mujoco.MjData(m)
+    mujoco.mj_forward(m, d)
+    wheels = {b.joints[0].name: p for b in g.bodies for p in b.parts if isinstance(p, Wheel) and b.joints}
+    mine = [i for i in range(m.ngeom) if m.geom_contype[i] == 2]
+    front = max(d.geom_xpos[i][0] + m.geom_rbound[i] for i in mine)
+    rear = min(d.geom_xpos[i][0] - m.geom_rbound[i] for i in mine)
+    x0 = -front - (0.002 if standing else 0.02)
+    d.qpos[0:3] = (x0, y0, d.qpos[2])
+    drive = [a for a in g.actuators if isinstance(a, Gearmotor) and a.joint in wheels]
+    stall = sum(a.stall_nm / wheels[a.joint].radius for a in drive) or 1e-6
+    v0 = min((a.no_load_rad_s * wheels[a.joint].radius for a in drive), default=0.03)
+    mass = float(m.body_subtreemass[m.body("robot").id])
+    v_ss = 0.0 if standing else max(0.0, v0 * (duty - crr * mass * 9.81 / stall))
+    jid = [m.joint(a.joint).id for a in drive]
+    radii = [wheels[a.joint].radius for a in drive]
+    for a, j in zip(drive, jid, strict=True):
+        axis = d.xmat[m.jnt_bodyid[j]].reshape(3, 3) @ m.jnt_axis[j]
+        sign = 1.0 if axis[1] >= 0 else -1.0  # a wheel on this axis rolls toward +x when it turns about +y
+        d.ctrl[m.actuator(a.name).id] = duty * sign
+        d.qvel[m.jnt_dofadr[j]] = sign * v_ss / wheels[a.joint].radius
+    d.qvel[0] = v_ss
+    mujoco.mj_forward(m, d)
+    goal = past - rear + 0.01
+    t_max = min(15.0, 2.0 + 2.5 * (goal - x0) / max(v_ss, 0.1 * v0, 0.03))
+    wheel_geoms = {p.name for p in wheels.values()}
+    return _roll(m, d, kind, x0, goal, t_max, jid, radii, {i for i in mine if m.geom(i).name not in wheel_geoms}, trace,
+                 PrintedMembers(m, found) if (found := printed_members(g, m)) else None)
+
+
+@cache
+def graph_cached(graph_json: str, kind: str, items: tuple[tuple[str, float], ...], mu: float, duty: float, y0: float, crr: float,
+                 kit_kg: float, standing: bool = False) -> Episode:
+    return graph_episode(graph_json, kind, dict(items), mu, duty, y0, crr, kit_kg, standing)

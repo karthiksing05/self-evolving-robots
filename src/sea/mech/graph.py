@@ -196,6 +196,7 @@ class Wheel(_M):
     quat: Quat = (1.0, 0.0, 0.0, 0.0)
     mu: float = 0.9
     condim: int = 3
+    fill: float = Field(default=1.0, ge=0.1, le=1.0)  # the share of its volume that is material: a spoked hub is far from solid
     material: Material = "pla"
     role: Role = "structure"
     piece: str = ""
@@ -332,7 +333,7 @@ class Piston(_M):
 
 
 class TorsionSpring(_M):
-    """A wound torsion spring on hinge ``joint`` (a mousetrap): its torque falls linearly from ``torque_nm[0]``
+    """A wound torsion spring on hinge ``joint``: its torque falls linearly from ``torque_nm[0]``
     with the joint at ``set_rad`` to ``torque_nm[1]`` after it has swung ``span_rad`` in direction ``sign``."""
 
     kind: Literal["torsion_spring"] = "torsion_spring"

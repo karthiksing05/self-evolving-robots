@@ -124,6 +124,7 @@ class Rig:
     lips: str = "jaw_lips"
     servos: int = 0
     opposed: bool = False  # the tip blade presses from the palate, the body pad from the floor (a tip tongue)
+    areas: Any = None  # a robot built from a graph: its own area function (D-112)
 
     def lip_range(self) -> tuple[float, float, float, float]:
         """Smallest and largest lip opening (cm2), shortest and longest lip tube (cm)."""
@@ -165,6 +166,8 @@ def rig(body: Body) -> Rig:
 def tract(r: Rig, ctl: dict[str, np.ndarray]) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Area function for a batch of postures: areas and section lengths (B, NT+2), glottis first, and the
     distance of each section behind the teeth (lips negative)."""
+    if r.areas is not None:
+        return r.areas(ctl)
     n = next(iter(ctl.values())).shape[0]
     length = r.length + ctl.get("larynx", np.zeros(n))
     d = (1.0 - (np.arange(NT) + 0.5) / NT)[None, :] * length[:, None]
@@ -423,6 +426,12 @@ class PhonologyWorld:
     def __init__(self) -> None:
         self._babble: dict[str, Babble] = {}
 
+    def rig_of(self, body: Body) -> Rig:
+        return rig(body)
+
+    def angles(self, r: Rig, body: Body, ctl: dict[str, np.ndarray]) -> tuple[list[str], np.ndarray]:
+        return linkages.servo_angles(r, body.parts, ctl)
+
     # -------------------------------------------------- tasks and parts
     def tasks(self) -> list[Task]:
         out = []
@@ -482,7 +491,7 @@ class PhonologyWorld:
         errs += [f"slot {s!r} is empty" for s in missing]
         if errs:
             return errs
-        r = rig(body)
+        r = self.rig_of(body)
         if r.servos > CHANNELS:
             errs.append(f"the body needs {r.servos} servos and the servo controller drives {CHANNELS} channels")
         errs += linkages.faults(r, body.parts)
@@ -496,7 +505,7 @@ class PhonologyWorld:
     def babble(self, body: Body) -> Babble:
         key = body.key()
         if key not in self._babble:
-            r = rig(body)
+            r = self.rig_of(body)
             keys = sorted(r.controls)
             rng = np.random.default_rng(int(hashlib.sha256(key.encode()).hexdigest()[:8], 16))
             u = rng.beta(0.5, 0.5, (self.n_babble, len(keys)))  # dense near each servo's end stops
@@ -506,7 +515,7 @@ class PhonologyWorld:
             ctl = {k: x[:, j] for j, k in enumerate(keys)}
             f, clo = acoustics(r, ctl)
             self._babble[key] = Babble(keys, x, f, clo, clash(r, ctl)[0], noise_peak(r, ctl),
-                                       linkages.servo_angles(r, body.parts, ctl)[1])
+                                       self.angles(r, body, ctl)[1])
         return self._babble[key]
 
     @staticmethod
@@ -554,7 +563,7 @@ class PhonologyWorld:
     def solve(self, body: Body, task: Task, seed: int = 0) -> Outcome:
         """System 1: ``local_search`` from the nearest postures in the body's map, up to ``starts`` of them.  A syllable
         searches its closure and its vowel together."""
-        r, bab, sides = rig(body), self.babble(body), self._sides(task)
+        r, bab, sides = self.rig_of(body), self.babble(body), self._sides(task)
         space = {p + k: rng for p, _ in sides for k, rng in r.controls.items()}
 
         def attempt(ctl: dict[str, float], s: int) -> Outcome:
@@ -573,7 +582,7 @@ class PhonologyWorld:
                     said[-1] += (f"; the tip blade presses {20 * over[0]:.1f} mm into the tongue pad {at[0]:.1f} cm "
                                  "behind the teeth: no posture the parts can take")
                 if len(sides) > 1:
-                    angles.append(linkages.servo_angles(r, body.parts, x))
+                    angles.append(self.angles(r, body, x))
             detail = said[0]
             if angles:
                 names, (a0, a1) = angles[0][0], (angles[0][1][0], angles[1][1][0])
@@ -629,7 +638,7 @@ class PhonologyWorld:
             return self._diagnose_syllable(body, task, out)
         if task.data["kind"] == "fricative":
             return self._diagnose_fricative(body, task, out)
-        r, bab = rig(body), self.babble(body)
+        r, bab = self.rig_of(body), self.babble(body)
         best = {k: np.array([out.controls[k]]) for k in r.controls}
         fb, cb = acoustics(r, best)
         keep = np.concatenate([bab.clash, clash(r, best)[0]]) <= CLASH  # only postures the parts can take
@@ -664,7 +673,7 @@ class PhonologyWorld:
                       f"{fk.min():.0f}-{fk.max():.0f} Hz; {span}; target {name} {tgt[k]} Hz")
 
     def _diagnose_fricative(self, body: Body, task: Task, out: Outcome) -> tuple[str, str]:
-        r, bab, d = rig(body), self.babble(body), task.data
+        r, bab, d = self.rig_of(body), self.babble(body), task.data
         best = {k: np.array([out.controls[k]]) for k in r.controls}
         _, cb = acoustics(r, best)
         keep = np.concatenate([bab.clash, clash(r, best)[0]]) <= CLASH
@@ -695,7 +704,7 @@ class PhonologyWorld:
 
     def _diagnose_syllable(self, body: Body, task: Task, out: Outcome) -> tuple[str, str]:
         """Each half alone first (System 1 on the closure, then on the vowel); if both hold, the move between them."""
-        r, bab, d = rig(body), self.babble(body), task.data
+        r, bab, d = self.rig_of(body), self.babble(body), task.data
         found = []
         for p, part in (("c.", d["stop"]), ("v.", d["vowel"])):
             sub = task.model_copy(update={"data": part | {"noise": d["noise"]}})
@@ -704,13 +713,13 @@ class PhonologyWorld:
                 return o.mechanism or "not_found_by_search", f"its {'closure' if p == 'c.' else 'vowel'} alone: " + \
                     o.detail.split("; ", 1)[-1]
             found.append({k: np.array([v]) for k, v in o.controls.items()})
-        names = linkages.servo_angles(r, body.parts, found[0])[0]
+        names = self.angles(r, body, found[0])[0]
         if not names:
             return "not_found_by_search", "both postures hold alone and nothing times the move between them"
         sets = []
         for part, x in zip((d["stop"], d["vowel"]), found, strict=True):
             clean = self._errors(part, bab.f, bab.clo, bab.clash) <= 1.0
-            sets.append(np.vstack([bab.angles[clean], linkages.servo_angles(r, body.parts, x)[1]]))
+            sets.append(np.vstack([bab.angles[clean], self.angles(r, body, x)[1]]))
         diff = np.abs(sets[0][:, None, :] - sets[1][None, :, :])
         worst = diff.max(2)
         a, b = np.unravel_index(int(np.argmin(worst)), worst.shape)
@@ -767,7 +776,7 @@ class PhonologyWorld:
 
     # -------------------------------------------------- what System 2 is told
     def brief(self, body: Body, tasks: Sequence[Task]) -> str:
-        r, bab = rig(body), self.babble(body)
+        r, bab = self.rig_of(body), self.babble(body)
         lar = r.controls.get("larynx", (0.0, 0.0))[1]
         a_lo, a_hi, l_lo, l_hi = r.lip_range()
         lips = f"opening {a_lo:.2f}-{a_hi:.2f} cm2, lip tube " + (f"{l_lo:g}-{l_hi:g} cm (protrusion)" if l_hi > l_lo
@@ -782,7 +791,7 @@ class PhonologyWorld:
         lines.append(f"- lips: {lips}")
         lines.append(f"- servos: {r.servos} of {CHANNELS} controller channels; controls: "
                      + ", ".join(f"{k} {lo:.2f}-{hi:.2f}" for k, (lo, hi) in sorted(r.controls.items())))
-        names = linkages.servo_angles(r, body.parts, {k: bab.x[:1, j] for j, k in enumerate(bab.keys)})[0]
+        names = self.angles(r, body, {k: bab.x[:1, j] for j, k in enumerate(bab.keys)})[0]
         if names:
             turns = np.degrees(np.ptp(bab.angles, 0))
             lines.append("- drives, degrees each servo turns over its controls' whole ranges (an MG90S turns 60 in "
@@ -841,7 +850,7 @@ class PhonologyWorld:
         ]
 
     def read(self, body: Body, name: str, args: dict[str, Any], task: Task | None = None) -> float:
-        r, bab = rig(body), self.babble(body)
+        r, bab = self.rig_of(body), self.babble(body)
         f = bab.f[~np.isnan(bab.f).any(1) & (bab.clo[:, 0] >= A_VOWEL)]
         if name == "tract_cm":
             return float(r.length)

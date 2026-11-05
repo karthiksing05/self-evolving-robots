@@ -23,22 +23,16 @@ from sea.evolve.core import Body, BomLine, Instrument, Outcome, Part, PartType, 
 from sea.evolve.search import local_search, planned, ways_of
 from sea.mech import graph as G
 from sea.mech.build import part_kg
-from sea.mech.elements import compose
-from sea.mech.members import PLA_ALLOW_PA, PRINT_FACTOR
-from sea.mech.patch import Op, apply_patch
-from sea.mech.patch import __doc__ as PATCH_DOC
+from sea.mech.laws import floating, interference
 from sea.mech.program import controls
+from sea.mech.world import SLOT, GraphWorld, graph_of
 from sea.sim import kit_match as K
 from sea.sim import me2110_model as MM
 from sea.worlds.me2110 import BOX, VARIANTS, ME2110World, fits_box, judged, law_label
 
 IN = MM.IN
-SLOT = "robot"
 ATTEMPTS = 24  # System 1's matches per body and track; a plan's ``search`` multiplies them
 SCORED_OVER = 3  # matches a score is the mean of, at System 1's best controls (D-094)
-TOUCH = 0.002  # m: two parts of one body closer than this are fastened
-PIN = 0.01  # m: a jointed body this far from what it moves on can still be pinned to it
-SWEEP = 5  # poses over each driven joint's range
 PASS_TOL = 0.1 * IN  # m: how far two parts may overlap where one is fastened to the other
 # the brief's p. 26 list; a limit switch, the IR and ultrasonic rangers, and the encoder and potentiometer
 KIT = {"gearmotors": 2, "pistons": 2, "mousetraps": 4, "bands": 5, "limit_switches": 2, "rangefinders": 2, "encoders": 2}
@@ -86,18 +80,7 @@ MODULES: dict[str, tuple[Any, dict[str, tuple[float, float]]]] = {
 
 
 def _module(name: str, params: dict[str, float]) -> G.Graph:
-    if name not in MODULES:
-        raise ValueError(f"no module {name!r}; the modules are {sorted(MODULES)}")
-    build, ranges = MODULES[name]
-    bad = [f"{k} {v:g} outside {ranges[k][0]:g}..{ranges[k][1]:g}" if k in ranges else f"no parameter {k!r}"
-           for k, v in params.items() if k not in ranges or not ranges[k][0] <= v <= ranges[k][1]]
-    if bad:
-        raise ValueError("; ".join(bad))
-    return build({k: params.get(k, (lo + hi) / 2) for k, (lo, hi) in ranges.items()})
-
-
-def graph_of(body: Body) -> G.Graph:
-    return G.Graph.model_validate_json(body.parts[SLOT].mechanism)
+    return KitWorld.module(name, params)
 
 
 def _usage(g: G.Graph) -> dict[str, int]:
@@ -110,115 +93,14 @@ def _usage(g: G.Graph) -> dict[str, int]:
             "encoders": sum(isinstance(s, G.Encoder) for s in g.sensors)}
 
 
-# ---------------------------------------------------------------- the laws
-def _floating(g: G.Graph, m: mujoco.MjModel, d: mujoco.MjData) -> list[str]:
-    """What is rigid must touch: each solid of a body, and of the bodies bolted to it without a joint, is fastened to
-    another or it is floating.  What moves must be near what it moves on: a joint needs a pin to hold it (D-096)."""
-    by_name = {b.name: b for b in g.bodies}
-
-    def rigid(b: G.Body) -> str:  # the body this one is bolted to, through every body without a joint
-        while not b.joints and b.parent in by_name:
-            b = by_name[b.parent]
-        return b.name
-
-    groups: dict[str, list[int]] = {}
-    for x in range(m.ngeom):
-        name = mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_BODY, m.geom_bodyid[x])
-        if m.geom_contype[x] == 2 and name in by_name:
-            groups.setdefault(rigid(by_name[name]), []).append(x)
-    out = []
-    for name, ids in groups.items():
-        reached, todo = {ids[0]}, [ids[0]]
-        while todo:
-            a = todo.pop()
-            for c in ids:
-                if c not in reached and mujoco.mj_geomDistance(m, d, a, c, TOUCH * 2, None) <= TOUCH:
-                    reached.add(c)
-                    todo.append(c)
-        loose = sorted(m.geom(x).name for x in ids if x not in reached)
-        if loose:
-            out.append(f"on body {name!r}, {', '.join(loose)} touch(es) nothing fastened to {m.geom(ids[0]).name}: floating")
-    for b in g.bodies:
-        if not b.joints or b.parent not in by_name or b.name not in groups:
-            continue
-        on = rigid(by_name[b.parent])
-        if on in groups and min(mujoco.mj_geomDistance(m, d, x, y, PIN * 2, None) for x in groups[b.name] for y in groups[on]) > PIN:
-            out.append(f"body {b.name!r} comes nowhere near {on!r}, which its joint is on: nothing holds the joint")
-    return out
-
-
-def _driven(g: G.Graph) -> list[str]:
-    names = [a.joint for a in g.actuators if not isinstance(a, G.Band)] + [lt.joint for lt in g.latches]
-    return list(dict.fromkeys(names))
-
-
-def _close(m: mujoco.MjModel, d: mujoco.MjData, free: list[int]) -> None:
-    """Move the joints of closed loops until the loops close, by least squares from where they are."""
-    from scipy.optimize import least_squares
-
-    adrs = [m.jnt_qposadr[j] for j in free]
-
-    def res(x: np.ndarray) -> np.ndarray:
-        d.qpos[adrs] = x
-        mujoco.mj_kinematics(m, d)
-        mujoco.mj_comPos(m, d)
-        mujoco.mj_makeConstraint(m, d)
-        rows = d.efc_type[: d.nefc] == mujoco.mjtConstraint.mjCNSTR_EQUALITY
-        return d.efc_pos[: d.nefc][rows].copy()
-
-    if free and res(d.qpos[adrs].copy()).size:
-        d.qpos[adrs] = least_squares(res, d.qpos[adrs].copy(), max_nfev=40).x
-
-
-def _interference(g: G.Graph, m: mujoco.MjModel) -> list[str]:
-    """Parts may not pass through each other: each driven joint swept over its range, with closed loops solved at each
-    pose.  Parts of bodies joined to each other may overlap as they are fastened, not further as they move."""
-    d = mujoco.MjData(m)
-    names = {b.name for b in g.bodies}
-    ids = [x for x in range(m.ngeom) if m.geom_contype[x] == 2 and m.body(m.geom_bodyid[x]).name in names]
-    excl = {frozenset(e) for e in g.excludes}
-    pairs = []
-    for i, a in enumerate(ids):
-        for b in ids[i + 1:]:
-            ba, bb = int(m.geom_bodyid[a]), int(m.geom_bodyid[b])
-            if ba != bb and frozenset((m.body(ba).name, m.body(bb).name)) not in excl:
-                pairs.append((a, b, m.body_parentid[ba] == bb or m.body_parentid[bb] == ba))
-    keep = [i for i in range(m.neq) if m.eq(i).name in {lt.name for lt in g.latches} or m.eq(i).name in ("prop", "clip")]
-    looped = [m.joint(j.name).id for lp in g.loops for b in g.bodies if b.name in (lp.a, lp.b) for j in b.joints
-              if j.type != "free"]
-    over: dict[tuple[int, int], list[float]] = {}
-    worst_pose: dict[tuple[int, int], str] = {}
-    for jn in _driven(g) or [""]:
-        jid = m.joint(jn).id if jn else -1
-        lo, hi = (m.jnt_range[jid] if jn and m.jnt_limited[jid] else (0.0, 0.0))
-        for q in np.linspace(lo, hi, SWEEP if hi > lo else 1):
-            mujoco.mj_resetData(m, d)
-            d.eq_active[keep] = 0
-            if jn:
-                d.qpos[m.jnt_qposadr[jid]] = q
-            _close(m, d, sorted({j for j in looped if j != jid}))
-            mujoco.mj_kinematics(m, d)
-            for a, b, _ in pairs:
-                r = m.geom_rbound[a] + m.geom_rbound[b]
-                gap = 0.0 if np.sum((d.geom_xpos[a] - d.geom_xpos[b]) ** 2) > r * r else \
-                    min(0.0, mujoco.mj_geomDistance(m, d, a, b, 0.01, None))
-                over.setdefault((a, b), []).append(-gap)
-                if -gap >= max(over[(a, b)]):
-                    worst_pose[(a, b)] = f"{jn or 'at rest'} at {q:.2f}" if jn else "at rest"
-    rows = []
-    for a, b, joined in pairs:
-        ov = over.get((a, b), [0.0])
-        bad = max(ov) - (min(ov) if joined else 0.0)
-        if bad > PASS_TOL:
-            rows.append((bad, f"{m.geom(a).name} and {m.geom(b).name} pass {bad / IN:.2f} in into each other "
-                              f"({worst_pose[(a, b)]})"))
-    return [t for _, t in sorted(rows, reverse=True)[:6]]
-
-
 @lru_cache(maxsize=64)
 def _laws(graph_json: str) -> tuple[str, ...]:
     g = G.Graph.model_validate_json(graph_json)
     errs = [f"it uses {n} {k}; the kit has {KIT[k]}" for k, n in _usage(g).items() if n > KIT[k]]
+    errs += [f"{a.name} is a servo: the kit has none" for a in g.actuators if isinstance(a, G.Servo)]
+    errs += [f"{a.name} states {a.stall_nm:g} N m and {a.no_load_rad_s:g} rad/s: the kit's gearmotor is {MM.MOTOR_TS:g} N m and "
+             f"{MM.MOTOR_W0:g} rad/s" for a in g.actuators if isinstance(a, G.Gearmotor)
+             and (abs(a.stall_nm - MM.MOTOR_TS) > 1e-6 or abs(a.no_load_rad_s - MM.MOTOR_W0) > 1e-6)]
     stated = [p.name for b in g.bodies for p in b.parts if getattr(p, "kg", None) is not None]
     if stated:
         errs.append(f"{', '.join(stated)} state their mass: a part's mass is its material's volume")
@@ -236,10 +118,13 @@ def _laws(graph_json: str) -> tuple[str, ...]:
     m = cp.model
     d = mujoco.MjData(m)
     mujoco.mj_kinematics(m, d)
-    return (*errs, *_floating(g, m, d), *_interference(g, m))
+    return (*errs, *floating(g, m, d), *interference(g, m, ("prop", "clip"), (IN, "in"), PASS_TOL))
 
 
-class KitWorld:
+class KitWorld(GraphWorld):
+    modules = MODULES
+    frame = ("A robot is a graph (lengths in metres; a part's coordinates in its body's frame; x forward, z up from the floor).  "
+             "Its first body is 'robot' on a free joint 'root'.")
     name = "me2110_kit"
     description = ("The ME 2110 'Pirates of the Caribbean' robot, from the kit: one machine that in a 40 s match leaves "
                    "the dock (11 points), sorts coins and jewels off a turning fortress onto their mounds (10 or 4 a coin, "
@@ -261,47 +146,6 @@ class KitWorld:
     def stock(self) -> Body:
         return Body(parts={SLOT: Part(type="built", mechanism=_module("chassis", {"length_in": 11.0, "width_in": 12.0})
                                       .model_dump_json())})
-
-    # mechanisms System 2 composes
-    def build_idea(self, body: Body, idea: Any, new_id: str) -> Body:
-        mech = idea.mechanism
-        if idea.slot not in ("", SLOT):
-            raise ValueError(f"a robot here is one graph: slot {idea.slot!r} does not exist")
-        if mech.module == "self":
-            if mech.params:
-                raise ValueError("module self has no parameters: write the change in the patch")
-            g = graph_of(body)
-        else:
-            g = _module(mech.module, mech.params)
-        g = apply_patch(compose(g, mech.uses), [Op.model_validate(o) for o in mech.patch]).model_copy(update={"name": idea.name})
-        return Body(id=new_id, parent=body.id, parts={SLOT: Part(type="built", mechanism=g.model_dump_json())})
-
-    def module_names(self) -> list[str]:
-        return sorted(MODULES)
-
-    def mechanism_text(self, body: Body) -> str:
-        return body.parts[SLOT].mechanism
-
-    def module_text(self, name: str, params: dict[str, float]) -> str:
-        return _module(name, params).model_dump_json()
-
-    def modules_text(self) -> str:
-        kinds = []
-        for cls in (G.Box, G.Cylinder, G.Capsule, G.Sphere, G.Link, G.Web, G.Wheel, G.Bought, G.Body, G.Joint, G.Loop, G.Servo, G.Gearmotor,
-                    G.Piston, G.TorsionSpring, G.Band, G.Latch, G.LimitSwitch, G.RangeFinder, G.Encoder, G.Carry):
-            fields = ", ".join(f"{n}" + ("" if f.is_required() else f"={f.default!r}") for n, f in cls.model_fields.items()
-                               if n not in ("kind", "kg"))
-            kinds.append(f"- {cls.__name__}: {' '.join((cls.__doc__ or '').split())} ({fields})")
-        out = ["A robot is a graph (lengths in metres; a part's coordinates in its body's frame; x forward, z up from the "
-               "floor).  Its first body is 'robot' on a free joint 'root'.  Every part fastened to a body must touch "
-               "another on it.  Joints, actuators, latches and sensors are what operate it: each gives System 1 controls, "
-               "which your plan sets.  A printed bar, link or web on a loop is judged at its pin's force, held 20 ms: in stress, "
-               f"at most {PLA_ALLOW_PA / 1e6:.0f} MPa, and pushed, against its Euler load over {PRINT_FACTOR:g}.", "Kinds:", *kinds, (PATCH_DOC or "").strip(), "Modules:"]
-        for name, (_, ranges) in MODULES.items():
-            mid = {k: (lo + hi) / 2 for k, (lo, hi) in ranges.items()}
-            out += [f"## {name} ({', '.join(f'{k} {lo:g}..{hi:g}' for k, (lo, hi) in ranges.items())}); at {mid}:",
-                    _module(name, mid).model_dump_json()]
-        return "\n".join(out)
 
     def control_names(self, body: Body) -> dict[str, tuple[float, float]]:
         return {k: v[:2] for k, v in self._space(graph_of(body)).items()}
@@ -333,7 +177,8 @@ class KitWorld:
 
         if not space:  # nothing on the robot can be commanded
             return run({}, seed).model_copy(update={"task": task.id})
-        best = local_search(run, space, start, m=m, confirm=0, seed=seed + int(task.data["seed"]), ways=ways_of(body, space))
+        best = local_search(run, space, start, m=m, confirm=0, seed=seed + int(task.data["seed"]), ways=ways_of(body, space),
+                            other=1)  # its bar is rarely met and a match is dear: one spread way, and the plan's
         again = [run(best.controls, seed + 2000 + j) for j in range(SCORED_OVER)]  # a lucky match is not a score
         keys = {k for o in again for k in o.states}
         return best.model_copy(update={

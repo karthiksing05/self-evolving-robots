@@ -5,9 +5,11 @@ from __future__ import annotations
 
 import ast
 import json
+import math
 import re
 from pathlib import Path
 
+import numpy as np
 import pytest
 
 from sea.evolve.core import Outcome
@@ -25,6 +27,7 @@ WORDS = {"gripper": r"gripper|\bjaws?\b|\bfingers?\b|fingertip|wrist|grasp|musta
          "me2110": r"mousetrap|me ?2110"}
 EVERY = "|".join(WORDS.values())
 OTHERS = {"mobile": ["gripper", "phonology", "me2110"], "phonology": ["mobile", "me2110"],  # a mouth has a jaw
+          "mobile_kit": ["gripper", "phonology", "me2110"], "phonology_kit": ["mobile", "me2110"],
           "me2110": ["gripper", "mobile", "phonology"], "me2110_kit": ["gripper", "mobile", "phonology"],
           "gripper": ["mobile", "phonology", "me2110"]}
 
@@ -153,7 +156,7 @@ def test_a_plywood_or_steel_bar_is_not_read():
     from sea.mech.build import _bar_section
     from sea.mech.graph import Box
 
-    pin = __import__("numpy").array([0.1, 0.0, 0.0])
+    pin = np.array([0.1, 0.0, 0.0])
     bar = dict(name="b", pos=(0.05, 0.0, 0.0), half=(0.05, 0.003, 0.006))
     assert _bar_section(Box(**bar), pin, None) is not None
     assert _bar_section(Box(**bar, material="plywood"), pin, None) is None
@@ -169,3 +172,101 @@ def test_a_broken_member_disqualifies_a_kit_match(monkeypatch):
     k.members = type("M", (), {"read": lambda s, d: None, "broken": lambda s: "unphysical: the printed bar carried 99 MPa"})()
     r = k.run()
     assert law_label(r) == "printed_part_overloaded"
+
+
+def test_the_kit_worlds_measure_up_to_the_worlds_they_rebuild():
+    new, old = make_world("mobile_kit"), make_world("mobile")
+    for name in ("kitchen", "bedroom", "porch", "under_sofa"):
+        task = next(t for t in new.tasks() if t.id == f"{name}_train0")
+        assert new.solve(new.stock(), task, 0).mechanism == old.solve(old.stock(), task, 0).mechanism, name
+
+
+@pytest.mark.parametrize("name", ["mobile_kit", "phonology_kit"])
+def test_a_rebuilt_world_starts_lawful_and_refuses_what_cannot_be_bought(name):
+    from sea.evolve.core import Part
+    from sea.mech.world import SLOT, graph_of
+
+    w = make_world(name)
+    assert w.check(w.stock()) == [] and w.bom(w.stock())
+    g = graph_of(w.stock())
+    strong = g.model_copy(update={"actuators": tuple(a.model_copy(update={"stall_nm": 99.0}) for a in g.actuators)})
+    bad = w.stock().model_copy(update={"parts": {SLOT: Part(type="built", mechanism=strong.model_dump_json())}})
+    assert w.check(bad)
+
+
+class _Lever:
+    """A new world in a few lines: a servo's bar must reach a mark, with no line of general code knowing of it."""
+
+    def __new__(cls):
+        from sea.evolve.core import Body, BomLine, Part, Task
+        from sea.evolve.search import local_search, planned, ways_of
+        from sea.mech import graph as G
+        from sea.mech.world import SLOT, GraphWorld, graph_of
+
+        def bar(p):
+            return G.Graph(name="bar", bodies=(G.Body(name="frame", parent="world", parts=(
+                G.Box(name="post", pos=(0.0, 0.0, 0.0), half=(0.005, 0.005, 0.005)),)),
+                G.Body(name="arm", parent="frame", joints=(G.Joint(name="q", type="hinge", axis=(0.0, 1.0, 0.0), range=(0.0, 1.5)),),
+                       parts=(G.Box(name="beam", pos=(p["length"] / 2, 0.0, 0.0), half=(p["length"] / 2, 0.003, 0.003)),))),
+                actuators=(G.Servo(name="s", joint="q", stall_nm=1.0),))
+
+        class World(GraphWorld):
+            name, description, objective = "lever", "A bar reaches a mark.", "groups"
+            frame = "A graph in metres."
+            modules = {"bar": (bar, {"length": (0.05, 0.3)})}
+
+            def tasks(self):
+                return [Task(id=f"mark_{s}", split=s, group="mark", facts="reach 0.2 m", data={}) for s in ("train", "test")]
+
+            def catalogue(self):
+                return []
+
+            def stock(self):
+                return Body(parts={SLOT: Part(type="built", mechanism=bar({"length": 0.1}).model_dump_json())})
+
+            def solve(self, body, task, seed=0):
+                ln = graph_of(body).bodies[1].parts[0].half[0] * 2
+                space, start = {"s": (0.0, 1.5)}, {"s": 0.1}
+
+                def run(c, k):
+                    far = ln * math.cos(c["s"])
+                    return Outcome(task=task.id, success=far >= 0.2, score=min(far / 0.2, 1.0), mechanism="" if far >= 0.2 else "short")
+
+                start, m = planned(body, space, start, 8)
+                return local_search(run, space, start, m=m, seed=seed, ways=ways_of(body, space))
+
+            def brief(self, body, tasks):
+                return "a bar"
+
+            def principles(self):
+                return []
+
+            def brief_rules(self):
+                return []
+
+            def bom(self, body):
+                return [BomLine(item="print:PLA", qty=1.0, slot=SLOT)]
+
+            def check(self, body):
+                return []
+
+            def manifest(self):
+                return {"budget": {"usd": 10, "lead_days": 1, "fab_minutes": 100},
+                        "fabrication": {"print:PLA": {"minutes_per_unit": 1.0, "unit": "g", "doc": "printer"}}, "items": {}}
+
+        return World()
+
+
+def test_a_world_nobody_planned_for_runs_the_whole_loop(tmp_path):
+    from sea.evolve.core import Idea, Mechanism, ProposalBatch
+    from sea.evolve.llm import Scripted
+    from sea.evolve.loop import RunConfig, run
+    from tests.test_evolve import _p
+
+    w = _Lever()
+    longer = _p("idea", idea=Idea(name="long_bar", description="a longer bar", slot="robot",
+                                  mechanism=Mechanism(module="bar", params={"length": 0.25})))
+    out = run(RunConfig(world="lever", iterations=2, stripped=True), tmp_path, proposer=Scripted([ProposalBatch(proposals=[longer])]),
+              world=w, log=lambda m: None)
+    assert out["curve"][0]["held_groups"] == 0 and out["train_groups"] == 1
+    assert "long_bar" in out["final_body"]["parts"]["robot"]["mechanism"]

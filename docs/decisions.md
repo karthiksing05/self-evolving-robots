@@ -3241,3 +3241,31 @@ The rod's Euler margin is 3.4 by the reading, 2.3 over D-104's print factor, so 
 **Limit.** Only PLA has sourced values. A search found no citable bending modulus for birch plywood, so a plywood or steel bar isn't read rather than judged on an invented number. A kit robot built of plywood bars is therefore not judged by this law. This is a real gap in comparability, and it stays open until a measured value exists.
 
 **Prediction.** No gripper verdict moves, since `wide_rod` and the fixtures use links and webs. Measured: 3 seeds at 84 of 84.
+
+**D-108 corrected on measurement.** The first full suite failed four tests. ME 2110's bar of 174 points is rarely met, so the other ways ran on nearly every task and tripled its cost. The old catalogue world now takes no other ways: it is a fixed baseline, and its earlier scores stay comparable. The kit world takes one spread way, plus any its plan names.
+
+## D-110 (policy and judge: every graph world): a world's robot can be one graph, from general code
+
+**Why.** The laws and the interface for System 2 that let a robot be composed from parts lived in the ME 2110 kit world, so no other world could use them without copying.
+
+**What.** `mech/laws.py` holds floating and interference; `mech/world.py` holds `GraphWorld`, with modules, patches, machine elements and the text that explains them. The kit world is now a subclass. Checking this found holes in that world: a graph could state any gearmotor's numbers, and could use servos the kit doesn't have. Both are now refused.
+
+**Prediction.** No kit robot's score moves, except one that stated its own motor. The test suite decides.
+
+**Test.** `tests/test_task_agnostic.py` writes a new world as a subclass, a servo's bar reaching a mark, and runs the whole loop on it: it starts at 0 groups, System 2's scripted idea builds a longer bar, and the loop keeps it, with no general code changed.
+
+## D-111 (world: mobile): the house and garden from a kit
+
+**Why.** The mobile world was a catalogue, so System 2 could only pick parts. It could not invent a mechanism there as it does on the gripper.
+
+**What.** `mobile_kit`: the same routes, terrain and motors, on a graph robot. The route walk is shared with `mobile`; each obstacle's MuJoCo episode runs on the graph, and what the old world reads from its catalogue is measured from the graph. What can be bought is a law: a motor's numbers, a pack, a sensor's range. The old world stays as the baseline.
+
+**Measured, stock at seed 0, train.** It gives the same verdict as the old stock on all 13 routes, with the same failure label on all 7 that fail, without any tuning against them. Its masses differ, 0.32 kg against 0.43 kg, because the graph doesn't yet count the tub's walls.
+
+## D-112 (world: phonology): the talking robot from a kit
+
+**What.** `phonology_kit`: the same sounds and acoustics. The tube has no solid. At each section its bore is the distance from its axis to the nearest solid, so what a graph puts around it sets the area function. Servos turn hinges, and sliding motion must come through a loop.
+
+**Measured, stock at seed 0, train.** 5 of 17 sounds against the old stock's 6, on a different mechanism. It holds /uh/, which the old stock can't, and misses /iy/ and /ɑ/, which it holds.
+
+**Limits.** The bore is concentric, as in the old world, so two pads from opposite walls could pass through each other unnoticed within one posture. Forces aren't simulated here, so the printed-member law can't read this world; an MG90S's 0.216 N m is small against the other worlds' loads, but that is untested.

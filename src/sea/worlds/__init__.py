@@ -41,9 +41,23 @@ def _me2110_kit():
     return KitWorld()
 
 
+def _mobile_kit():
+    from sea.worlds.mobile_kit import MobileKit
+
+    return MobileKit()
+
+
+def _phonology_kit():
+    from sea.worlds.phonology_kit import PhonologyKit
+
+    return PhonologyKit()
+
+
 register("gripper", _gripper)
 register("gripper_dense", _gripper_dense)
 register("phonology", _phonology)
+register("phonology_kit", _phonology_kit)
 register("mobile", _mobile)
+register("mobile_kit", _mobile_kit)
 register("me2110", _me2110)
 register("me2110_kit", _me2110_kit)

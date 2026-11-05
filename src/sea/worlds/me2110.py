@@ -32,7 +32,7 @@ from typing import Any
 import numpy as np
 
 from sea.evolve.core import Body, BomLine, Outcome, Param, Part, PartType, Task
-from sea.evolve.search import local_search, planned, ways_of
+from sea.evolve.search import local_search, planned
 from sea.sim import me2110_model as MM
 
 BOX = (12.0, 24.0, 18.0)  # in: the go/no-go box, length x width x height
@@ -484,11 +484,9 @@ class ME2110World:
             starts = [start] + [{**start, **{k: c[k] for k in c if k in start}}
                                 for (bk, _), c in self._best.items() if bk == body.key()]
             best_start = max(starts, key=lambda s: run(s, 0).score) if len(starts) > 1 else start
-            out = local_search(run, space, best_start, m=m_match, confirm=1, seed=seed + int(task.data["seed"]),
-                               ways=ways_of(body, space))
+            out = local_search(run, space, best_start, m=m_match, confirm=1, seed=seed + int(task.data["seed"]), other=0)
         else:
-            out = local_search(run, space, start, m=m_task, confirm=1, seed=seed + int(task.data["seed"]),
-                               ways=ways_of(body, space))
+            out = local_search(run, space, start, m=m_task, confirm=1, seed=seed + int(task.data["seed"]), other=0)  # a fixed baseline
             if task.split == "train":
                 self._best[(body.key(), g)] = dict(out.controls)
         return out.model_copy(update={"task": task.id})

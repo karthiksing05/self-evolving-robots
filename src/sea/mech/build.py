@@ -104,7 +104,7 @@ def part_kg(p) -> float:
     if isinstance(p, Bought):
         return p.kg
     if isinstance(p, Wheel):
-        return DENSITY[p.material] * math.pi * p.radius**2 * 2 * p.half_width if p.massive else 0.0
+        return DENSITY[p.material] * p.fill * math.pi * p.radius**2 * 2 * p.half_width if p.massive else 0.0
     return 0.0  # a rack's teeth: drawn
 
 

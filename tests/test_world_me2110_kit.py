@@ -66,7 +66,7 @@ def test_system_1_finds_it_and_the_score_is_a_mean_of_matches(monkeypatch):
     b = b.model_copy(update={"plan": OperatingPlan(controls=plan)})
     o = W.solve(b, W.tasks()[0], 0)
     assert o.points == pytest.approx(11.0) and o.states["points.activate"] == pytest.approx(11.0)
-    assert o.attempts == 3 + 3 and "over 3 matches" in o.detail and o.nominal is not None
+    assert o.attempts == 3 + 4 + 3 and "over 3 matches" in o.detail and o.nominal is not None
 
 
 @pytest.mark.parametrize("fault,msg", [

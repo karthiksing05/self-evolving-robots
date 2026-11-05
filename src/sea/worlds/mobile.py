@@ -158,6 +158,8 @@ class Spec:
     idler: float = 0.0  # cm, tracks: front idler height
     track: float = 0.0  # cm, tracks: contact length
     bogie: float = 0.0  # cm, rocker-bogie: bogie length
+    graph: str = ""  # a robot built from a graph: its episodes run on that (D-111)
+    kit_kg: float = 0.0  # what its kit adds to the graph's own mass
 
     @property
     def usable_j(self) -> float:
@@ -267,6 +269,11 @@ def _drive(s: Spec, kind: str, f: dict[str, Any], mu: float, duty: float, y0: fl
     ``trace`` (a film), the same episode run afresh with its trajectory kept."""
     q = {"h": 0.1, "w": 0.1, "depth": 0.1, "deg": 0.25, "off": 0.25, "run": 0.5, "n": 1.0, "d": 0.1}  # cm, deg, count
     items = tuple(sorted((k, round(f[k] / q[k]) * q[k]) for k in q if k in f))
+    if s.graph:
+        built = (s.graph, kind, items, round(mu / 0.03) * 0.03, round(duty / 0.05) * 0.05, round(y0 / 0.25) * 0.25 / 100, _crr(s, f["s"]), s.kit_kg)
+        if trace:
+            return MM.graph_episode(built[0], kind, dict(items), *built[3:], standing=standing, trace=True)
+        return MM.graph_cached(*built, standing)
     args = (_robot(s, f["s"]), kind, items, round(mu / 0.03) * 0.03, round(duty / 0.05) * 0.05,
             round(y0 / 0.25) * 0.25 / 100)
     if trace:
@@ -532,6 +539,9 @@ class MobileWorld:
                    "dark corridors.  System 1 drives each route (cruise duty, the line through an opening, the "
                    "approach duty at an edge, the speed in the dark); the body decides what any driving can reach.")
 
+    def spec_of(self, body: Body) -> Spec:
+        return _spec(body)
+
     def tasks(self) -> list[Task]:
         out = []
         for name, (where, secs, route) in ROUTES.items():
@@ -564,7 +574,7 @@ class MobileWorld:
         return {c: v[0] for c, v in CONTROLS.items()}
 
     def solve(self, body: Body, task: Task, seed: int = 0) -> Outcome:
-        s = _spec(body)
+        s = self.spec_of(body)
         route, secs = task.data["route"], float(task.data["secs"])
         key = zlib.crc32(task.id.encode())
         space, start = _space(route)
@@ -585,7 +595,7 @@ class MobileWorld:
         return out
 
     def brief(self, body: Body, tasks: Sequence[Task]) -> str:
-        s = _spec(body)
+        s = self.spec_of(body)
         feats = [f for t in ([t for t in tasks if t.split == "train"] or tasks) for f in t.data["route"]]
         edges = sorted({f["s"] for f in feats if f["k"] in MM.EDGES}, key=lambda x: SURF[x][0])
         rows = [f"mass {s.m:.2f} kg; {s.width:.1f} cm wide overall, {s.length:.1f} cm long, {s.height:.1f} cm tall; "
@@ -648,7 +658,7 @@ class MobileWorld:
         ]
 
     def read(self, body: Body, name: str, args: dict[str, Any], task: Task | None = None) -> float:
-        s = _spec(body)
+        s = self.spec_of(body)
         surf = str(args.get("surface", "wood"))
         if "surface" in args and surf not in SURF:
             raise ValueError(f"no surface {surf!r}; the surfaces are {sorted(SURF)}")
@@ -723,7 +733,7 @@ class MobileWorld:
         errs = []
         ch, lo, dr, bt = (body.parts[k] for k in ("chassis", "locomotion", "drive", "battery"))
         w, ln, ride = ch.params["width"], ch.params["length"], ch.params["ride_height"]
-        s, n = _spec(body), _motors(body)
+        s, n = self.spec_of(body), _motors(body)
         inner = (w - 1) * (ln - 1)
         motor_cm2 = n * (15.0 if dr.type == "jga25_gearmotor" else 4.2)
         need = 50.0 + _cells(bt) * CELL[bt.type][3] + motor_cm2
