@@ -10,6 +10,7 @@ import numpy as np
 import pytest
 import trimesh
 
+from sea.compose.library import Library
 from sea.evolve.core import Body, Edit, Part, apply
 from sea.mechanism.audit import Penetration
 from sea.mechanism.geometry import Solid, clearance, crossings, extent, from_axis, grounded, overlap, winding
@@ -266,7 +267,7 @@ def test_the_fingers_meeting_as_the_jaw_closes_is_its_stop_not_interference():
     assert world.check(Body(parts={**world.stock().parts, "pads": pads})) == []
 
 
-def test_a_slides_rods_bend_and_a_long_overhang_skips_its_teeth_or_dents_its_bushings():
+def test_a_slides_rods_bend_and_a_long_overhang_skips_its_teeth_or_dents_its_bushings(monkeypatch):
     """D-076: a slide's carriage rides two 3 mm rods cantilevered from their clamp.  At the long slide's wide
     openings the squeeze's couple and the teeth's separating force bend them past what the parts allow: the
     brief's static numbers say so, and the simulator, loading the rods as cantilevers each step, stops the pick."""
@@ -279,5 +280,15 @@ def test_a_slides_rods_bend_and_a_long_overhang_skips_its_teeth_or_dents_its_bus
     world = GripperWorld()
     cube = next(t for t in world.tasks() if t.id == "reg_wood_block_cube")
     assert world.solve(world.stock(), cube).success
-    out = world.solve(_jaw(world, "long_slide", sector_radius_mm=46.0), cube)
+    slide = _jaw(world, "long_slide", sector_radius_mm=46.0)
+    assert not world.solve(slide, cube).success  # however System 1 holds the cube (D-102)
+    seed = Library.seed
+
+    def plain(*a, **k):  # what the rods do to the grasp this was written about, the others reported apart
+        lib = seed(*a, **k)
+        lib.prims["grasp"] = lib.prims["grasp"].model_copy(update={"modes": []})
+        return lib
+
+    monkeypatch.setattr(Library, "seed", plain)
+    out = world.solve(slide.model_copy(update={"id": "plain"}), cube)
     assert not out.success and out.mechanism == "unphysical" and ("bushing" in out.detail or "teeth skip" in out.detail)

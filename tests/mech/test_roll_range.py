@@ -12,7 +12,8 @@ from sea.worlds.gripper import ROLL_MARGIN, GripperWorld, roll_range, to_design
 
 def test_the_stock_grasps_need_the_roll_the_picks_measured():
     lo, hi = roll_range(to_design(GripperWorld().stock()).fingers)
-    assert lo == pytest.approx(-1.93 - ROLL_MARGIN, abs=0.05) and hi == pytest.approx(ROLL_MARGIN, abs=1e-6)
+    # the plain grasps' -1.93 rad, and the 0.2 rad a turned wrist adds (D-102)
+    assert lo == pytest.approx(-1.93 - 0.2 - ROLL_MARGIN, abs=0.05) and hi == pytest.approx(ROLL_MARGIN, abs=1e-6)
     assert lo <= -1.95  # every stock pick, train and test, stayed within -1.95..0 rad (measured)
 
 

@@ -102,22 +102,38 @@ def _grasp_scenes() -> tuple:
     return tuple(out)
 
 
+@lru_cache(maxsize=1)
+def _ways() -> tuple[dict[str, float], ...]:
+    """The plain grasp and every other way System 1 may hold an object (D-102)."""
+    from sea.compose.library import Library
+
+    return ({}, *Library.seed().prims["grasp"].modes)
+
+
+def _way_poses(fingers: FingerSpec, spec, contact, down, roll, way: dict[str, float]):
+    """The poses ``motor.grasp`` commands for one way of holding: above the object, at the grip, lifted."""
+    from sea.control.motor import grasp_poses, held_way
+
+    point, d, r = held_way(contact, down, roll, **way)
+    target, above, _, _, _ = grasp_poses(spec, fingers, point, d, r)
+    return [(p, d, r) for p in (above, target, target - d * 0.05)]
+
+
 @lru_cache(maxsize=256)
 def roll_range(fingers: FingerSpec) -> tuple[float, float]:
-    """The wrist roll this body's grasps need (D-085): over every task, the IK's roll at the poses ``motor.grasp``
-    commands (above the object, at the grip, lifted), from the home pose (roll 0), widened by ``ROLL_MARGIN`` and
-    kept inside the joint's limits."""
+    """The wrist roll this body's grasps need (D-085): over every task and every way of holding it (D-102), the IK's
+    roll at the poses ``motor.grasp`` commands (above the object, at the grip, lifted), from the home pose (roll 0),
+    widened by ``ROLL_MARGIN`` and kept inside the joint's limits."""
     from sea.control.executor import HOME_Q, stock_ik
-    from sea.control.motor import grasp_poses
 
     ik = stock_ik()
     lo, hi = 0.0, 0.0
     for spec, contact, down, roll in _grasp_scenes():
-        target, above, _, _, _ = grasp_poses(spec, fingers, contact, down, roll)
-        q = HOME_Q.copy()
-        for p in (above, target, target - down * 0.05):
-            q, _, _ = ik.track(p, down, q, roll_axis=roll)
-            lo, hi = min(lo, float(q[4])), max(hi, float(q[4]))
+        for way in _ways():
+            q = HOME_Q.copy()
+            for p, d, r in _way_poses(fingers, spec, contact, down, roll, way):
+                q, _, _ = ik.track(p, d, q, roll_axis=r)
+                lo, hi = min(lo, float(q[4])), max(hi, float(q[4]))
     j_lo, j_hi = ik_joint_range("wrist_roll")
     return max(j_lo, lo - ROLL_MARGIN), min(j_hi, hi + ROLL_MARGIN)
 
@@ -127,16 +143,16 @@ def roll_needed(fingers: FingerSpec) -> dict[str, tuple[float, float]]:
     """Each task's wrist roll, least and greatest, at the poses its grasp commands (above the object, at the grip,
     lifted), from the IK started at home, as ``roll_range`` takes them (D-085)."""
     from sea.control.executor import HOME_Q, stock_ik
-    from sea.control.motor import grasp_poses
 
     ik = stock_ik()
     out = {}
     for t, (spec, contact, down, roll) in zip(GripperWorld().tasks(), _grasp_scenes(), strict=True):
-        target, above, _, _, _ = grasp_poses(spec, fingers, contact, down, roll)
-        q, qs = HOME_Q.copy(), []
-        for p in (above, target, target - down * 0.05):
-            q, _, _ = ik.track(p, down, q, roll_axis=roll)
-            qs.append(float(q[4]))
+        qs = []
+        for way in _ways():
+            q = HOME_Q.copy()
+            for p, d, r in _way_poses(fingers, spec, contact, down, roll, way):
+                q, _, _ = ik.track(p, d, q, roll_axis=r)
+                qs.append(float(q[4]))
         out[t.id] = (min(qs), max(qs))
     return out
 
@@ -317,7 +333,9 @@ class GripperWorld:
                    "with the jaws closing along the object's narrow side.  The fixed jaw's face is a vertical plane; "
                    "the moving jaw is driven by the gripper servo (1.62 N*m at 7.4 V).  Each object is one task "
                    "group: it is held when every placement passes.  System 1 tunes the grasp (side clearance, close "
-                   "target and speed, lift, hold, speed) by CMA-ES with confirmation re-runs.")
+                   "target and speed, lift, hold, speed) by CMA-ES with confirmation re-runs, and when the plain grasp "
+                   "fails it searches other ways of holding the object: shifted along it, leaning about the closing "
+                   "axis, the wrist turned.  A task that fails has failed every one of them.")
 
     def __init__(self, train_offsets: int = 1, test_offsets: int = 2):
         self.train_offsets, self.test_offsets = train_offsets, test_offsets
@@ -759,6 +777,7 @@ class GripperWorld:
                            controls=_flat(run.params), attempts=n, sim_s=round(sim_s, 2))
         score = {"wrong_behavior": 0.5, "stuck": 0.25}.get(verdict, 0.0)
         mech, detail = verdict, trace.note if trace is not None else ""
+        ways = f"; System 1 tried {run.ways} ways of holding it, this is the best" if run.ways > 1 else ""
         cands = dict(candidate_programs(panel.controls[0], panel, cfg))
         prog = cands.get(run.program)
         if prog is not None:
@@ -768,7 +787,7 @@ class GripperWorld:
             note = box["t"].note if "t" in box else ""
             mech, detail = diagnose(rows, note, built.design.fingers, task.data["height_mm"] / 1000, task.data["mass_g"],
                                     peak)
-        return Outcome(task=task.id, success=False, score=score, mechanism=mech, detail=f"verdict {verdict}; {detail}",
+        return Outcome(task=task.id, success=False, score=score, mechanism=mech, detail=f"verdict {verdict}; {detail}{ways}",
                        controls=_flat(run.params), attempts=n, sim_s=round(sim_s, 2))
 
 

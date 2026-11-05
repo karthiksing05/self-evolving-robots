@@ -59,6 +59,7 @@ def load_seed(path: Path = SEED_PATH) -> dict[str, PrimitiveDef]:
         lib[m["name"]] = PrimitiveDef(
             name=m["name"], kind="motor", doc=m["doc"], requires=m.get("requires", {}),
             provides=m.get("provides", {}), params={k: (float(v[0]), float(v[1])) for k, v in m["params"].items()},
+            modes=[{k: float(v) for k, v in mode.items()} for mode in m.get("modes", [])],
         )
     for c in data["checks"]:
         lib[c["name"]] = PrimitiveDef(name=c["name"], kind="check", doc=c["doc"])

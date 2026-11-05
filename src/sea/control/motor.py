@@ -533,23 +533,41 @@ def grasp_poses(spec, fing, contact: np.ndarray, down: np.ndarray, roll: np.ndar
     return target, above, opening, depth, below
 
 
+def _turned(v: np.ndarray, axis: np.ndarray, angle: float) -> np.ndarray:
+    """``v`` turned by ``angle`` about the unit ``axis``."""
+    return v * np.cos(angle) + np.cross(axis, v) * np.sin(angle) + axis * float(axis @ v) * (1.0 - np.cos(angle))
+
+
+def held_way(contact: np.ndarray, down: np.ndarray, roll: np.ndarray, lean: float = 0.0, yaw: float = 0.0,
+             along: float = 0.0) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """One way to hold an object (D-102), as the point, approach and closing direction ``grasp_poses`` takes: leaning
+    by ``lean`` about the closing axis, the wrist turned by ``yaw`` about the approach, shifted ``along`` the long axis.
+    The arm has five joints, so turning about the long axis is not offered: at these placements it cannot hold that."""
+    long_axis = np.cross(down, roll)
+    long_axis = long_axis / np.linalg.norm(long_axis)
+    point = contact + long_axis * along
+    roll = _turned(roll, down, yaw)
+    return point, _turned(down, roll, lean), roll
+
+
 def grasp(ep: Episode, cid: str, depth: float | None = None, side: float = PICK_SIDE, close: float = GRIP_CLOSED,
-          close_s: float = 0.6, lift: float = 0.05, hold_s: float = 1.2, speed: float = 0.03) -> Gen:
+          close_s: float = 0.6, lift: float = 0.05, hold_s: float = 1.2, speed: float = 0.03, lean: float = 0.0,
+          yaw: float = 0.0, along: float = 0.0) -> Gen:
     """Pick a free object from above with the stock jaws: open, descend beside it with the fixed jaw
     ``side`` clear, close toward ``close`` (the servo stalls on the object first), lift by ``lift`` and
-    hold for ``hold_s``.  ``depth`` is how far below the object's top the tool point goes.  Returns
+    hold for ``hold_s``.  ``depth`` is how far below the object's top the tool point goes; ``lean``, ``yaw`` and
+    ``along`` hold it another way (``held_way``).  Returns
     False if the descent lands on something (the opening does not fit) or a tool is mounted."""
     h = ep.sim.controls[cid]
     if h.spec.cls != "grasp" or ep.sim.mounted is not None:
         return False
-    down = ep.approach_dir(cid)
-    roll = ep.sim.ctl_dir_world(cid, h.geo.roll_ctl)
-    target, above, opening, depth, below = grasp_poses(h.spec, ep.sim.design.fingers, ep.contact_point(cid), down,
-                                                       roll, depth, side)
+    point, down, roll = held_way(ep.contact_point(cid), ep.approach_dir(cid), ep.sim.ctl_dir_world(cid, h.geo.roll_ctl),
+                                 lean, yaw, along)
+    target, above, opening, depth, below = grasp_poses(h.spec, ep.sim.design.fingers, point, down, roll, depth, side)
     v = min(speed, ep.cfg.limits.max_tip_speed_mps)
     ep.axis_ref, ep.roll_ref = down, roll  # type: ignore[attr-defined]
     yield from ep.set_gripper(opening, 0.3)
-    clip = float((ep.tip_cmd - ep.contact_point(cid)) @ down) + below + PICK_CLEAR
+    clip = float((ep.tip_cmd - point) @ down) + below + PICK_CLEAR
     if clip > 0:  # the jaws would pass lower than the object's top: rise to the approach height first
         yield from ep.move_to(ep.tip_cmd - down * max(0.0, float((ep.tip_cmd - above) @ down)), down, None, roll)
     yield from ep.move_to(above, down, None, roll)

@@ -106,7 +106,7 @@ def test_measure_reads_a_built_gripper_jaw_s_wrist_and_loops():
                                  mechanism=Mechanism(module="revolute")))
     text, err = s.call("measure", {"proposal": built.model_dump()})
     assert not err and "built mechanism 'plain'" in text
-    assert "wrist roll: the simulator holds the wrist to -2.13..+0.20 rad" in text  # D-085's stock range
+    assert "wrist roll: the simulator holds the wrist to -2.31..+0.20 rad" in text  # D-085's stock range, D-102's ways
     assert "loops: the worst is 0.000" in text
 
 

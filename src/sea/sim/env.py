@@ -82,6 +82,7 @@ class ControlRun:
     confirmed: bool = True  # passes are always confirmed
     s1_exhausted: bool = False  # local search used all m trials without a pass
     repeats: list[str] = field(default_factory=list)  # verdicts of the confirmation re-runs
+    ways: int = 1  # ways of using the mechanism System 1 searched before this result (D-102)
 
     @property
     def key(self) -> str:
@@ -209,6 +210,34 @@ class PanelRunner:
         return run_program(self.sim, program, control.id, ecfg, panel_id=self.panel.id, attempt=attempt)
 
 
+def other_ways(runner: PanelRunner, control: ControlSpec, prog: Program, first: ControlRun, judge_fn) -> ControlRun:
+    """A failure is not yet the mechanism's: search each other way its primitives can be used, as System 1 searched the
+    plain one, and stop at the first that passes (D-102).  Otherwise the best of them, saying how many were tried."""
+    from sea.control.local_search import modes_of, objective, run_system1
+
+    cfg, panel = runner.cfg, runner.panel
+    if first.result.verdict == "pass":
+        return first
+    travel = runner.sim.controls[control.id].spec.travel
+    best, trials, ways = first, first.result.s1_trials, 1
+    for name, mode in modes_of(prog, cfg.library.prims):
+        reset_episode(runner.sim)
+        ecfg = runner.config(control)
+        ecfg.param_overrides = {name: dict(mode)}
+        out = run_system1(runner.sim, prog, control.id, ecfg, judge_fn, m=cfg.m, max_param_delta=cfg.max_param_delta,
+                          seed=runner.seed, panel_id=panel.id, reparam=cfg.reparam or None)
+        params = {**out.params, name: {**mode, **out.params.get(name, {})}}
+        run = ControlRun(out.result, out.trace, first.program, params, s1_exhausted=out.escalate == "s1_exhausted")
+        trials, ways = trials + out.result.s1_trials + 1, ways + 1
+        if objective(run.result, run.trace, travel) < objective(best.result, best.trace, travel):
+            best = run
+        if run.result.verdict == "pass":
+            break
+    best.ways = ways
+    best.result = best.result.model_copy(update={"s1_trials": trials})
+    return best
+
+
 def run_control(runner: PanelRunner, control: ControlSpec) -> ControlRun:
     """System 1 on one control: candidates in order, local search on the first."""
     from sea.control.local_search import run_system1
@@ -229,6 +258,7 @@ def run_control(runner: PanelRunner, control: ControlSpec) -> ControlRun:
                               max_param_delta=cfg.max_param_delta, seed=runner.seed, panel_id=panel.id,
                               reparam=cfg.reparam or None)
             run = ControlRun(out.result, out.trace, name, out.params, s1_exhausted=out.escalate == "s1_exhausted")
+            run = other_ways(runner, control, prog, run, judge_fn)
         else:
             trace = runner.attempt(control, prog, {})
             run = ControlRun(judge_fn(trace), trace, name, {})

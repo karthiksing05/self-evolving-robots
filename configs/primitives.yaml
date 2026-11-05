@@ -51,7 +51,10 @@ motor:
     doc: Pick a free object from above with the jaws - open, descend beside it, close (the servo stalls on the object), lift by `lift`, hold `hold_s`. `depth` is how far below the object's top the tool point goes.
     requires: {contact: pinch, aperture: width}
     provides: {lifts: "grasp"}
-    params: {depth: [0.002, 0.035], side: [0.0, 0.006], close: [-0.17, 0.2], close_s: [0.2, 1.0], lift: [0.035, 0.07], hold_s: [1.0, 2.0], speed: [0.01, 0.06]}
+    params: {depth: [0.002, 0.06], side: [0.0, 0.006], close: [-0.17, 0.2], close_s: [0.2, 1.0], lift: [0.035, 0.07], hold_s: [1.0, 2.0], speed: [0.01, 0.06]}
+    # Other ways to hold the same object (D-102): shifted along it, leaning about the closing axis, the wrist turned.
+    # Both signs, nearest first: which way helps depends on the jaw and the object.
+    modes: [{along: -0.03}, {along: 0.03}, {lean: -0.2}, {lean: 0.2}, {yaw: -0.2}, {yaw: 0.2}]
 
 checks:
   - {name: moved_at_least, doc: "True when the control moved at least d (m or rad) from rest; d may be `travel`."}

@@ -215,6 +215,7 @@ class PrimitiveDef(_Model):
     requires: dict[str, str | float] = {}
     provides: dict[str, str] = {}
     params: dict[str, tuple[float, float]] = {}  # name -> (lo, hi)
+    modes: list[dict[str, float]] = []  # other ways to use it, each searched in turn when the plain one fails (D-102)
     body: Program | None = None  # for composites
     uses: int = 0
     passes: int = 0

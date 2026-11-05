@@ -108,6 +108,12 @@ def default_value(name: str, param: str, sim, cid: str, cfg: EpisodeConfig) -> f
     return None  # control-dependent budgets (hook_pull distance) are not searched
 
 
+def modes_of(program: Program, library: Mapping[str, PrimitiveDef]) -> list[tuple[str, dict[str, float]]]:
+    """The program's motor primitives' other ways to be used, as (primitive, values), in the library's order (D-102)."""
+    names = dict.fromkeys(_composite_motor_names(program.root, library))
+    return [(n, dict(m)) for n in names if (d := library.get(n)) is not None for m in d.modes]
+
+
 def _reparam_for(name: str, reparam: Mapping[str, tuple[float, float]] | None) -> dict[str, tuple[float, float]]:
     out: dict[str, tuple[float, float]] = {}
     for key, rng in (reparam or {}).items():
