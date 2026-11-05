@@ -157,4 +157,15 @@ def test_a_rod_of_half_the_depth_buckles():
     web["half"] = [w / 2 if h == w else h for h in web["half"]]
     body["parts"]["jaw"]["mechanism"] = json.dumps(graph)
     load, at, name = gripped(body).members.buckled
-    assert name == "jaw_drive_rod_web" and load > at
+    assert name == "jaw_drive_rod_web" and load > at / J.PRINT_FACTOR
+
+
+def test_a_strut_may_carry_its_euler_load_over_the_print_factor():
+    """A printed strut's pins are not concentric nor its section true, so it is held short of the ideal column (D-104)."""
+    p = J.PrintedMembers.__new__(J.PrintedMembers)
+    p.members = []
+    p.reset()
+    p.buckled = (0.9 * 150.0, 150.0, "rod")
+    assert "may carry 100" in p.broken()
+    p.buckled = (0.6 * 150.0, 150.0, "rod")
+    assert p.broken() == ""

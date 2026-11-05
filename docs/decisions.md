@@ -3161,3 +3161,13 @@ Mechanisms in `library/` entered under the old judge are archived (`mechanisms.p
 
 No body has yet been rechecked on several seeds under this law; the 2517 of 2520 of D-102 was measured without it and no longer stands as this body's score.
 
+
+## D-104 (judge: mechanism): a printed strut may carry its Euler load over the print factor
+
+**Why.** D-103 compares a strut's load, and D-100 a rack's, with the ideal Euler load. That is the load of a perfectly straight column on concentric pins, which a printed part is not, while the same parts' stress carries a factor of 1.5. System 2's `deep_cranks` replays at 192 N on a drive rod whose Euler load is 186 N: its arms have a margin of four and its rod has none. Design references say a working load must stay well below the theoretical one, without giving a number for printed struts, and I found no printed-PLA knockdown for solid struts. So this uses the factor the stress already uses, 1.5, as a judgement, not a measured value.
+
+**What.** A strut or rack in compression may carry its Euler load over `PRINT_FACTOR`. The readings stay physical, and the refusal names both numbers.
+
+**Prediction.** On seed 0, `deep_cranks` passes at least 75 of 84, losing runs to its rod (124 N allowed, 106 N steady), with System 1 closing slower. A campaign from it deepens the rod within a few iterations.
+
+**Not judged: the servo's shaft.** The drive rod puts its full force on the horn: about 106 N steady, six or so times what the stock jaw does. No radial rating is published for the STS3215; ROBOTIS rates the comparable XM430 and XH430 at 40 N, 10 mm from the horn. That is another servo's number, so it does not become a law here, and only a bench test on the real servo can settle it. It is the largest open doubt about any jaw of this family as a real part.

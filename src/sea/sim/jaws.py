@@ -490,9 +490,9 @@ class PrintedMembers:
         if self.stress[0] > PLA_ALLOW_PA / 1e6:
             return (f"unphysical: the printed {self.stress[1]} carried {self.stress[0]:.0f} MPa at the pin's force; "
                     f"printed PLA allows {PLA_ALLOW_PA / 1e6:.0f}")
-        if self.buckled[0] > self.buckled[1]:
-            return (f"unphysical: the printed {self.buckled[2]} buckled: {self.buckled[0]:.0f} N along it, past the "
-                    f"{self.buckled[1]:.0f} N it can take")
+        if self.buckled[0] > self.buckled[1] / PRINT_FACTOR:
+            return (f"unphysical: the printed {self.buckled[2]} carried {self.buckled[0]:.0f} N along it; it buckles at "
+                    f"{self.buckled[1]:.0f} N, so may carry {self.buckled[1] / PRINT_FACTOR:.0f}")
         return ""
 
 
@@ -606,8 +606,9 @@ class RodSprings:
             return f"unphysical: the printed teeth carried {self.tooth_mpa:.0f} MPa at their root; printed PLA allows {allow:.0f} MPa"
         if self.bend_mpa > allow:
             return f"unphysical: the printed rack bent to {self.bend_mpa:.0f} MPa beyond the carriage; printed PLA allows {allow:.0f} MPa"
-        if self.buckled[0] > self.buckled[1]:
-            return f"unphysical: the rack buckled: {self.buckled[0]:.0f} N along it, past the {self.buckled[1]:.0f} N it can take at that length"
+        if self.buckled[0] > self.buckled[1] / PRINT_FACTOR:
+            return (f"unphysical: the rack carried {self.buckled[0]:.0f} N along it; at that length it buckles at "
+                    f"{self.buckled[1]:.0f} N, so may carry {self.buckled[1] / PRINT_FACTOR:.0f}")
         if self.bushing_n > self.rated:
             return (f"unphysical: a bushing carried {self.bushing_n:.0f} N; it is rated {self.rated:g} N, past "
                     "which it dents the rod")

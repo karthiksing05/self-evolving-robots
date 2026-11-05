@@ -548,7 +548,7 @@ class GripperWorld:
                "the gear.  A box touching the rack and running along most of it joins its section.  A cylinder with role "
                "'roller' on the gripper, under the rack at the gear and touching it, takes the teeth's separating force.  Each "
                "trial also reads the force at every loop's pin, held 20 ms: a link or web spanning its body's origin to the pin is "
-               "a strut, judged in stress and, pushed, by Euler buckling on its weakest axis; a web from a hub to a pin is a crank, "
+               f"a strut, judged in stress and, pushed, against its Euler load on its weakest axis over {J.PRINT_FACTOR:g}; a web from a hub to a pin is a crank, "
                "judged in bending at the hub.  That force includes the jaw's arrival at the object, so it is more than the servo's "
                "torque alone when the jaw closes fast.  A web's `half` and a link's `half_width` and `z` set their sections.",
                "Part kinds, then a body's, joint's and constraint's fields:", *kinds, (patch_doc or "").strip(), "Modules (a patch applies to the module's graph):"]
