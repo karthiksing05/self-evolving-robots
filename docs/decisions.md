@@ -3274,7 +3274,6 @@ The rod's Euler margin is 3.4 by the reading, 2.3 over D-104's print factor, so 
 
 **Why.** The first live System 2 call on `mobile_kit` kept a body with no axles, saying itself that "the graph does not model that bracket". The law only asked that a body come near what it moves on, so a wheel could turn on nothing. That breaks the standard that every part is a real mechanism.
 
-**What.** A hinge's anchor must lie within `PIN` of a solid on what carries it. The law at once refused `mobile_kit`'s own stock module, whose axle sat at the robot's middle rather than at its wheels. That module now has an axle at each wheel pair.
+**What.** A hinge's anchor must lie within `PIN` of a solid on what carries it. The law at once refused `mobile_kit`'s own stock module, whose axle sat at the robot's middle rather than at its wheels. That module now has an axle at each wheel pair. It also refused the library's `cam`, whose hub stopped 8 mm short of its bracket; that element now has a shaft.
 
 **Prediction.** Stock verdicts on the routes don't move. The first live run's 6 to 12 of 13 was on the flawed module and under the weaker law, so it is not a result; the live iteration is repeated.
-

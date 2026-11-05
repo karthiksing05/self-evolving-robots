@@ -134,8 +134,10 @@ def cam(p: str, on: str, at: Vec, quat: Quat, a: dict[str, float]) -> Graph:
     disc = Cylinder(name=f"{p}_disc", pos=(e, 0.0, 0.0), radius=r, half_length=0.005, quat=(0.7071068, 0.7071068, 0.0, 0.0))
     hub = Cylinder(name=f"{p}_hub", pos=(0.0, 0.0, 0.0), radius=BOSS, half_length=0.006, quat=(0.7071068, 0.7071068, 0.0, 0.0))
     lift = r + e  # the disc's top with its eccentric point up: the follower's start clears it there
+    mount = _mount(p, on, at, quat, half=(0.006, 0.006, (lift + 0.03) / 2), centre=(0.0, 0.02, (lift + 0.03) / 2))
+    shaft = Cylinder(name=f"{p}_shaft", pos=(0.0, 0.007, 0.0), radius=0.002, half_length=0.008, quat=(0.7071068, 0.7071068, 0.0, 0.0))
     return Graph(name=p, bodies=(
-        _mount(p, on, at, quat, half=(0.006, 0.006, (lift + 0.03) / 2), centre=(0.0, 0.02, (lift + 0.03) / 2)),
+        mount.model_copy(update={"parts": (*mount.parts, shaft)}),
         Body(name=f"{p}_cam", parent=f"{p}_mount", quat=_roty(-math.pi / 2), joints=(Joint(name=f"{p}_q", type="hinge", axis=Y),),
              parts=(disc, hub)),
         Body(name=f"{p}_follower", parent=f"{p}_mount", pos=(0.0, 0.0, lift),
