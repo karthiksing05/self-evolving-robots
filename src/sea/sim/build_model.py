@@ -42,7 +42,7 @@ from sea.sim.controls import (
     MovingPart,
     build_geometry,
 )
-from sea.sim.jaws import RodSprings
+from sea.sim.jaws import PrintedMembers, RodSprings
 
 TIMESTEP = 0.002
 STALL_TORQUE = {7.4: 1.62, 12.0: 2.94}
@@ -252,6 +252,7 @@ class Sim:
     object_geoms: dict[str, int] = field(default_factory=dict)  # scene object name -> geom id
     linked: list[tuple[int, Any]] = field(default_factory=list)  # (qpos address, units per servo radian or a table)
     rods: RodSprings | None = None  # a slide's rods, bending under the carriage (D-076)
+    members: PrintedMembers | None = None  # printed parts carrying a loop's pin force (D-103)
     mech: Any = None  # the jaw's mechanism graph (sea.mech.graph.Graph, D-078)
     _limit_type: int = int(mujoco.mjtConstraint.mjCNSTR_LIMIT_JOINT)
 
@@ -350,6 +351,8 @@ class Sim:
             if self.rods is not None:
                 self.rods.apply(self.data)
             mujoco.mj_step(self.model, self.data)
+            if self.members is not None:
+                self.members.read(self.data)
             self.update_controls()
 
 
@@ -763,6 +766,12 @@ def build_model(design: Design, panel: PanelSpec | None = None, tools: list | No
     sim.mech = jaw_mech
     if "jaw_rods" in {model.numeric(i).name for i in range(model.nnumeric)}:
         sim.rods = RodSprings(model)
+    if getattr(design.fingers, "mechanism", ""):
+        from sea.mech.build import printed_members
+        from sea.mech.graph import Graph
+
+        members = printed_members(Graph.model_validate_json(design.fingers.mechanism), model)
+        sim.members = PrintedMembers(model, members) if members else None
     sim.mount(None)
     mujoco.mj_forward(model, data)
     return sim

@@ -12,6 +12,7 @@ transmission angle stays above 35 degrees over the jaw's range (it reaches toggl
 from __future__ import annotations
 
 import math
+from collections.abc import Sequence
 from dataclasses import dataclass
 from functools import lru_cache
 
@@ -296,9 +297,13 @@ class RackBeam:
     ei_min: float
     tooth: float
     backed: bool
+    back_l: float = 0.0  # the roller's arm, from its support to the mesh, and its bending stiffness and half depth (D-103)
+    back_ei: float = math.inf
+    back_c: float = 0.0
 
     def data(self) -> list[float]:
-        return [self.lo, self.hi, self.ei_sep, self.c_sep, self.ei_min, self.tooth, float(self.backed)]
+        return [self.lo, self.hi, self.ei_sep, self.c_sep, self.ei_min, self.tooth, float(self.backed), self.back_l,
+                self.back_ei, self.back_c]
 
     def overhang(self, x_mesh: float) -> float:
         return max(self.lo - x_mesh, x_mesh - self.hi, 0.0)
@@ -308,8 +313,12 @@ class RackBeam:
         bend off the gear (m), the bending and tooth stress (Pa) and the load it buckles at (N, inf when in tension)."""
         n = self.overhang(x_mesh)
         sep = teeth_n * math.tan(PRESSURE_ANGLE)
-        bend = 0.0 if self.backed else sep * n**3 / (3 * self.ei_sep)
-        stress = 0.0 if self.backed else sep * n * self.c_sep * PLA_E_PA / self.ei_sep
+        if self.backed:  # the roller holds the rack at the mesh, as far as its arm does
+            bend = sep * self.back_l**3 / (3 * self.back_ei)
+            stress = sep * self.back_l * self.back_c * PLA_E_PA / self.back_ei
+        else:
+            bend = sep * n**3 / (3 * self.ei_sep)
+            stress = sep * n * self.c_sep * PLA_E_PA / self.ei_sep
         k = 1.0 if self.backed else 2.0
         # closing pulls the rack rearward: behind its support it is in tension, ahead of it in compression
         buckle = math.pi**2 * self.ei_min / (k * n) ** 2 if x_mesh > self.hi and n > 0 else math.inf
@@ -409,6 +418,84 @@ def rack_lift_mm(r_pitch: float, sector: bool, q: float, q_hi: float, torque: fl
     return a * 1000, lift * 1000, bushing
 
 
+@dataclass(frozen=True)
+class Member:
+    """A printed member carrying a loop's pin force (D-103).  A ``strut`` runs from its body's origin to the pin, in
+    ``plates`` equal plates or webs; a ``crank`` reaches from a hub of radius ``root`` to the pin.  ``pin`` is in the
+    body's frame; ``i_bend`` and ``c`` are its in-plane bending, ``i_min`` its weakest axis's, per plate."""
+
+    name: str
+    kind: str
+    loop: int
+    body: str
+    pin: tuple[float, float, float]
+    plates: int
+    root: float
+    area: float
+    i_bend: float
+    c: float
+    i_min: float
+
+    @property
+    def length(self) -> float:
+        return float(np.linalg.norm(self.pin))
+
+    def loads(self, force: np.ndarray, axis: np.ndarray) -> tuple[float, float, float]:
+        """With ``force`` on the pin and the unit ``axis`` from the body's origin to it: the stress (Pa), and the load
+        along one plate in compression (N) with the load it buckles at (N)."""
+        along = float(force @ axis)
+        if self.kind == "crank":
+            across = float(np.linalg.norm(force - along * axis))
+            return across * (self.length - self.root) * self.c / self.i_bend, 0.0, math.inf
+        per = along / self.plates
+        return abs(per) / self.area, max(-per, 0.0), math.pi**2 * PLA_E_PA * self.i_min / self.length**2
+
+
+class PrintedMembers:
+    """The pin forces on printed members, step by step, each judged as held ``HOLD_STEPS`` steps (D-103)."""
+
+    def __init__(self, model: mujoco.MjModel, members: Sequence[Member]):
+        self.members = list(members)
+        connects = [i for i in range(model.neq) if model.eq_type[i] == mujoco.mjtEq.mjEQ_CONNECT]
+        self.eq = [connects[m.loop] for m in self.members]
+        self.body = [model.body(m.body).id for m in self.members]
+        self.reset()
+
+    def reset(self) -> None:
+        self.stress = (0.0, "")  # MPa, the part
+        self.buckled = (0.0, math.inf, "")  # N along a plate, the N it buckles at, the part
+        self._recent: list[list[tuple[float, float, float]]] = [[] for _ in self.members]
+
+    def read(self, d: mujoco.MjData) -> None:
+        if not d.nefc:
+            return
+        kinds, ids, forces = d.efc_type[: d.nefc], d.efc_id[: d.nefc], d.efc_force[: d.nefc]
+        for k, m in enumerate(self.members):
+            rows = (kinds == mujoco.mjtConstraint.mjCNSTR_EQUALITY) & (ids == self.eq[k])
+            f = forces[rows]
+            if len(f) != 3:
+                continue
+            axis = d.xmat[self.body[k]].reshape(3, 3) @ (np.array(m.pin) / m.length)
+            recent = [*self._recent[k][-(HOLD_STEPS - 1):], m.loads(f, axis)]
+            self._recent[k] = recent
+            if len(recent) == HOLD_STEPS:
+                held = min(r[0] for r in recent) / 1e6
+                if held > self.stress[0]:
+                    self.stress = (held, m.name)
+                load, at = min(r[1] for r in recent), recent[-1][2]
+                if load / at > self.buckled[0] / self.buckled[1]:
+                    self.buckled = (load, at, m.name)
+
+    def broken(self) -> str:
+        if self.stress[0] > PLA_ALLOW_PA / 1e6:
+            return (f"unphysical: the printed {self.stress[1]} carried {self.stress[0]:.0f} MPa at the pin's force; "
+                    f"printed PLA allows {PLA_ALLOW_PA / 1e6:.0f}")
+        if self.buckled[0] > self.buckled[1]:
+            return (f"unphysical: the printed {self.buckled[2]} buckled: {self.buckled[0]:.0f} N along it, past the "
+                    f"{self.buckled[1]:.0f} N it can take")
+        return ""
+
+
 class RodSprings:
     """The rods' bending as forces on the carriage's four rod joints (D-076).  Per step, at the carriage's
     overhang a from the clamp, each plane's deflection v and slope t are loaded by the two cantilevers'
@@ -431,8 +518,8 @@ class RodSprings:
             self.ei, self.length, self.rated = (float(x) for x in model.numeric("jaw_bushing").data)
         self.rack = None  # the printed rack as a beam (D-100)
         if any(model.numeric(i).name == "jaw_rack" for i in range(model.nnumeric)):
-            lo, hi, ei_sep, c, ei_min, tooth, backed = (float(x) for x in model.numeric("jaw_rack").data)
-            self.rack = RackBeam(lo, hi, ei_sep, c, ei_min, tooth, bool(backed))
+            lo, hi, ei_sep, c, ei_min, tooth, backed, *back = (float(x) for x in model.numeric("jaw_rack").data)
+            self.rack = RackBeam(lo, hi, ei_sep, c, ei_min, tooth, bool(backed), *back)
         self.q = [int(model.jnt_qposadr[model.joint(n).id]) for n in self.JOINTS]
         self.v = [int(model.jnt_dofadr[model.joint(n).id]) for n in self.JOINTS]
         self.slide = int(model.jnt_qposadr[model.joint("jaw_slide").id])

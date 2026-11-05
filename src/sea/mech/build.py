@@ -270,10 +270,71 @@ def rack_beam(g: Graph, gd) -> jaws.RackBeam | None:  # noqa: F821
     width = min([teeth.width, *(p.width for p in gears)])
     y = min([jaws.LEWIS_RACK, *(jaws.lewis_y(2 * p.r_pitch / gd.module) for p in gears)])
     rollers = [p for b in g.bodies if b.name == "gripper" for p in b.parts if isinstance(p, Cylinder) and p.role == "roller"]
-    backed = any(abs(p.pos[0] - gd.mesh_x) <= p.radius + 5e-3 and abs(p.pos[2] + p.radius - lo[2]) <= 0.5e-3
-                 and lo[1] - 1e-3 <= p.pos[1] <= hi[1] + 1e-3 for p in rollers)
+    under = [p for p in rollers if abs(p.pos[0] - gd.mesh_x) <= p.radius + 5e-3 and abs(p.pos[2] + p.radius - lo[2]) <= 0.5e-3
+             and lo[1] - 1e-3 <= p.pos[1] <= hi[1] + 1e-3]
     return jaws.RackBeam(float(min(h[0][0] for h in hold)), float(max(h[1][0] for h in hold)), jaws.PLA_E_PA * float(i_sep),
-                         float(c), jaws.PLA_E_PA * float(min(i_sep, i_lat)), 1.0 / (width * gd.module * y), backed)
+                         float(c), jaws.PLA_E_PA * float(min(i_sep, i_lat)), 1.0 / (width * gd.module * y), bool(under),
+                         *(_roller_arm(g, under[0], gd.mesh_x) if under else ()))
+
+
+def _roller_arm(g: Graph, roller: Cylinder, mesh_x: float) -> tuple[float, float, float]:
+    """A roller's printed arm as a cantilever (D-103): the gripper's longest box touching the roller, from the nearest
+    edge of a box holding it to the mesh; its bending stiffness and half depth against the teeth's separating force."""
+    from sea.sim import jaws
+
+    boxes = [p for b in g.bodies if b.name == "gripper" for p in b.parts if isinstance(p, Box)]
+
+    def touches(p: Box, q: Box) -> bool:
+        return all(abs(p.pos[i] - q.pos[i]) <= p.half[i] + q.half[i] + 0.5e-3 for i in range(3))
+
+    near = [p for p in boxes if all(abs(roller.pos[i] - p.pos[i]) <= p.half[i] + roller.radius + 1e-3 for i in range(3))]
+    if not near:  # nothing printed reaches it: the mounted law's to refuse
+        return 0.0, math.inf, 0.0
+    arm = max(near, key=lambda p: p.half[0])
+    edges = [e for p in boxes if p is not arm and touches(p, arm) for e in (p.pos[0] - p.half[0], p.pos[0] + p.half[0])]
+    length = min((abs(mesh_x - e) for e in edges), default=abs(mesh_x - arm.pos[0]) + arm.half[0])
+    return length, jaws.PLA_E_PA * (2 * arm.half[1]) * (2 * arm.half[2]) ** 3 / 12, arm.half[2]
+
+
+def printed_members(g: Graph, model: mujoco.MjModel) -> list:
+    """The printed members a loop's pin force passes through (D-103), from the graph's parts and the assembled pose: at
+    each loop, what on ``a`` spans its origin to the pin (a strut), and what reaches from a hub to the same pin on ``b``
+    or to ``a``'s own pin on its parent (a crank)."""
+    from sea.sim import jaws
+
+    d = mujoco.MjData(model)
+    mujoco.mj_forward(model, d)
+    bodies = {b.name: b for b in g.bodies}
+    out = []
+
+    def web(p: Web, kind: str, loop: int, body: str, pin, plates: int, root: float) -> None:
+        w, h = 2 * p.half[0], 2 * p.half[1]
+        out.append(jaws.Member(p.name, kind, loop, body, tuple(float(x) for x in pin), plates, root, w * h, h * w**3 / 12, w / 2,
+                               min(h * w**3, w * h**3) / 12))
+
+    def crank(loop: int, body: str, xy: np.ndarray) -> None:
+        for p in getattr(bodies.get(body), "parts", ()):
+            if isinstance(p, Web) and np.linalg.norm(p.a) < 1e-3 and np.linalg.norm(np.array(p.b) - xy) < 3e-3:
+                hubs = [c.radius for c in bodies[body].parts if isinstance(c, Cylinder) and np.linalg.norm(c.pos[:2]) < 1e-3]
+                web(p, "crank", loop, body, (*p.b, 0.0), 1, max(hubs, default=0.0))
+
+    for k, lp in enumerate(g.loops):
+        point = np.array(lp.point)
+        parts = getattr(bodies.get(lp.a), "parts", ())
+        plates = [p for p in parts if isinstance(p, Link) and abs(p.length - np.linalg.norm(point)) < 2e-3]
+        webs = [p for p in parts if isinstance(p, Web) and np.linalg.norm(p.a) < 1e-3 and np.linalg.norm(np.array(p.b) - point[:2]) < 2e-3]
+        for p in plates:
+            t, w = p.z[1] - p.z[0], 2 * p.half_width
+            out.append(jaws.Member(p.name, "strut", k, lp.a, tuple(float(x) for x in point), len(plates), 0.0, t * w, t * w**3 / 12,
+                                   w / 2, min(t * w**3, w * t**3) / 12))
+        for p in webs:
+            web(p, "strut", k, lp.a, point, len(webs), 0.0)
+        ia, ib = model.body(lp.a).id, model.body(lp.b).id
+        world = d.xpos[ia] + d.xmat[ia].reshape(3, 3) @ point
+        crank(k, lp.b, (d.xmat[ib].reshape(3, 3).T @ (world - d.xpos[ib]))[:2])
+        parent = model.body_parentid[ia]
+        crank(k, model.body(parent).name, model.body_pos[ia][:2])
+    return out
 
 
 def rod_end(g: Graph, root: str = "gripper") -> float:

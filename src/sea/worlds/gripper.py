@@ -546,7 +546,11 @@ class GripperWorld:
                f"are not rigid at a rack: PLA here is {J.PLA_E_PA / 1e9:g} GPa and may carry {J.PLA_ALLOW_PA / 1e6:.0f} MPa, and each "
                "trial judges the teeth by Lewis at the force they carry and the rack as a beam from where the carriage holds it to "
                "the gear.  A box touching the rack and running along most of it joins its section.  A cylinder with role "
-               "'roller' on the gripper, under the rack at the gear and touching it, takes the teeth's separating force.",
+               "'roller' on the gripper, under the rack at the gear and touching it, takes the teeth's separating force.  Each "
+               "trial also reads the force at every loop's pin, held 20 ms: a link or web spanning its body's origin to the pin is "
+               "a strut, judged in stress and, pushed, by Euler buckling on its weakest axis; a web from a hub to a pin is a crank, "
+               "judged in bending at the hub.  That force includes the jaw's arrival at the object, so it is more than the servo's "
+               "torque alone when the jaw closes fast.  A web's `half` and a link's `half_width` and `z` set their sections.",
                "Part kinds, then a body's, joint's and constraint's fields:", *kinds, (patch_doc or "").strip(), "Modules (a patch applies to the module's graph):"]
         for name, (_, params) in MODULES.items():
             mid = {k: MODULE_DEFAULTS.get(k, (lo + hi) / 2) for k, (lo, hi) in params.items()}

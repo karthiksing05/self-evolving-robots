@@ -285,6 +285,8 @@ class Episode:
             raise Abort("sim_unstable")  # the only abort that leaves a trace incomplete (verdict 0)
         if sim.rods is not None and (broke := sim.rods.broken()):
             raise Abort(broke)
+        if sim.members is not None and (broke := sim.members.broken()):
+            raise Abort(broke)
         sunk = self._sunk_mm() if self._grasp else 0.0
         self._sunk_ticks = self._sunk_ticks + 1 if sunk > SINK_MM else 0
         if self._sunk_ticks * TICK_DT >= SINK_S:
@@ -707,6 +709,8 @@ def reset_episode(sim: Sim, q_home: np.ndarray | None = None) -> None:
     mujoco.mj_resetData(sim.model, sim.data)
     if sim.rods is not None:
         sim.rods.reset()
+    if sim.members is not None:
+        sim.members.reset()
     for h in sim.controls.values():
         h.dyn.reset()
         sim.model.jnt_range[h.joint_id][1] = h.upper
