@@ -3269,3 +3269,12 @@ The rod's Euler margin is 3.4 by the reading, 2.3 over D-104's print factor, so 
 **Measured, stock at seed 0, train.** 5 of 17 sounds against the old stock's 6, on a different mechanism. It holds /uh/, which the old stock can't, and misses /iy/ and /ɑ/, which it holds.
 
 **Limits.** The bore is concentric, as in the old world, so two pads from opposite walls could pass through each other unnoticed within one posture. Forces aren't simulated here, so the printed-member law can't read this world; an MG90S's 0.216 N m is small against the other worlds' loads, but that is untested.
+
+## D-113 (judge: every graph): a hinge's axis must pass through what carries it
+
+**Why.** The first live System 2 call on `mobile_kit` kept a body with no axles, saying itself that "the graph does not model that bracket". The law only asked that a body come near what it moves on, so a wheel could turn on nothing. That breaks the standard that every part is a real mechanism.
+
+**What.** A hinge's anchor must lie within `PIN` of a solid on what carries it. The law at once refused `mobile_kit`'s own stock module, whose axle sat at the robot's middle rather than at its wheels. That module now has an axle at each wheel pair.
+
+**Prediction.** Stock verdicts on the routes don't move. The first live run's 6 to 12 of 13 was on the flawed module and under the weaker law, so it is not a result; the live iteration is repeated.
+

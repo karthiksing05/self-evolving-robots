@@ -49,6 +49,41 @@ def floating(g: G.Graph, m: mujoco.MjModel, d: mujoco.MjData) -> list[str]:
         on = rigid(by_name[b.parent])
         if on in groups and min(mujoco.mj_geomDistance(m, d, x, y, PIN * 2, None) for x in groups[b.name] for y in groups[on]) > PIN:
             out.append(f"body {b.name!r} comes nowhere near {on!r}, which its joint is on: nothing holds the joint")
+    out += _unheld_hinges(g, m, d, rigid, groups)
+    return out
+
+
+def _distance_to_geom(m: mujoco.MjModel, d: mujoco.MjData, g: int, p: np.ndarray) -> float:
+    """From a point to a solid (m): in its frame, by its shape.  0 inside."""
+    q = d.geom_xmat[g].reshape(3, 3).T @ (p - d.geom_xpos[g])
+    s, t = m.geom_size[g], int(m.geom_type[g])
+    if t == int(mujoco.mjtGeom.mjGEOM_BOX):
+        return float(np.linalg.norm(np.maximum(np.abs(q) - s[:3], 0.0)))
+    if t == int(mujoco.mjtGeom.mjGEOM_SPHERE):
+        return max(float(np.linalg.norm(q)) - s[0], 0.0)
+    if t == int(mujoco.mjtGeom.mjGEOM_CAPSULE):
+        return max(float(np.linalg.norm([q[0], q[1], max(abs(q[2]) - s[1], 0.0)])) - s[0], 0.0)
+    if t == int(mujoco.mjtGeom.mjGEOM_CYLINDER):
+        return float(np.hypot(max(np.hypot(q[0], q[1]) - s[0], 0.0), max(abs(q[2]) - s[1], 0.0)))
+    return max(float(np.linalg.norm(q)) - m.geom_rbound[g], 0.0)
+
+
+def _unheld_hinges(g: G.Graph, m: mujoco.MjModel, d: mujoco.MjData, rigid, groups: dict[str, list[int]]) -> list[str]:
+    """A hinge needs something to turn on: its axis must pass through what carries it, or a bearing there, not merely
+    beside it (D-113).  A body on a free joint carries itself."""
+    by_name = {b.name: b for b in g.bodies}
+    out = []
+    for b in g.bodies:
+        if b.parent not in by_name:
+            continue
+        on = rigid(by_name[b.parent])
+        for j in b.joints:
+            if j.type != "hinge" or on not in groups:
+                continue
+            at = d.xanchor[m.joint(j.name).id]
+            far = min(_distance_to_geom(m, d, x, at) for x in groups[on])
+            if far > PIN:
+                out.append(f"joint {j.name!r} turns {far * 1000:.0f} mm from anything on {on!r}: no axle or bearing holds it")
     return out
 
 

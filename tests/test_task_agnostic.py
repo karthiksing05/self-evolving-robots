@@ -270,3 +270,15 @@ def test_a_world_nobody_planned_for_runs_the_whole_loop(tmp_path):
               world=w, log=lambda m: None)
     assert out["curve"][0]["held_groups"] == 0 and out["train_groups"] == 1
     assert "long_bar" in out["final_body"]["parts"]["robot"]["mechanism"]
+
+
+def test_a_hinge_with_nothing_to_turn_on_is_refused():
+    from sea.evolve.core import Part
+    from sea.mech.world import SLOT, graph_of
+
+    w = make_world("mobile_kit")
+    g = graph_of(w.stock())
+    robot = g.bodies[0].model_copy(update={"parts": tuple(p for p in g.bodies[0].parts if not getattr(p, "name", "").startswith("axle"))})
+    bare = g.model_copy(update={"bodies": (robot, *g.bodies[1:])})
+    body = w.stock().model_copy(update={"parts": {SLOT: Part(type="built", mechanism=bare.model_dump_json())}})
+    assert any("no axle or bearing holds it" in e for e in w.check(body))

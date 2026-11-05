@@ -57,7 +57,8 @@ def _chassis(p: dict[str, float]) -> G.Graph:
         motors.append(G.Gearmotor(name=f"motor{k}", joint=f"wheel{k}_q", stall_nm=stall, no_load_rad_s=w0))
     tub = (G.Box(name="tub_floor", pos=(0.0, 0.0, ride + 0.0015), half=(ln / 2, w / 2, 0.0015)),
            G.Box(name="tub", pos=(0.0, 0.0, ride + W.TUB_H * CM / 2), half=(ln / 2, w / 2, W.TUB_H * CM / 2), massive=False),
-           G.Cylinder(name="axles", pos=(0.0, 0.0, r), radius=0.002, half_length=w / 2 + 0.002, quat=Y_AXIS),
+           *(G.Cylinder(name=f"axle{k}", pos=(s * (ln / 2 - r / 2), 0.0, r), radius=0.002, half_length=w / 2 + hw + 0.001, quat=Y_AXIS)
+             for k, s in enumerate((1, -1))),
            *(G.Box(name=f"axle_post{k}", pos=(s * (ln / 2 - r / 2), 0.0, (r + ride) / 2), half=(0.003, 0.003, max(abs(ride - r) / 2, 0.001)))
              for k, s in enumerate((1, -1))),
            *(G.Bought(item=cell[0], kg=cell[2] / 1000) for _ in range(cells)))
