@@ -77,6 +77,9 @@ class OperatingPlan(_Model):
     triggers: dict[str, str] = Field(default_factory=dict, description="actuator -> the sensor that starts its clock")
     intents: list[Intent] = Field(default_factory=list, description="the states the body should reach")
     search: int = Field(default=1, ge=1, le=4, description="how many times longer System 1 searches")
+    ways: list[dict[str, float]] = Field(default_factory=list, max_length=4, description="other ways to use the same "
+                                         "body, each control name -> value: System 1 searches from each if the first "
+                                         "fails, before the failure counts against the body")
 
 
 class Body(_Model):
@@ -90,7 +93,7 @@ class Body(_Model):
         content: dict[str, Any] = {s: p.model_dump(exclude=set() if p.mechanism else {"mechanism"})
                                    for s, p in sorted(self.parts.items())}
         if self.plan is not None:
-            content["(plan)"] = self.plan.model_dump()
+            content["(plan)"] = self.plan.model_dump(exclude=set() if self.plan.ways else {"ways"})
         blob = json.dumps(content, sort_keys=True)
         return hashlib.sha256(blob.encode()).hexdigest()[:12]
 
@@ -141,6 +144,7 @@ class Outcome(_Model):
     states: dict[str, float] = {}  # what the world read at the end of this attempt (D-092)
     points: float | None = None  # what this task scores in a world judged on points (D-093), 0 if it broke a rule
     nominal: float | None = None  # the score of System 1's first attempt, from the plan where there is one
+    ways: int = 1  # how many ways of using the body System 1 searched before this outcome (D-108)
 
 
 # ---------------------------------------------------------------- System 2's moves

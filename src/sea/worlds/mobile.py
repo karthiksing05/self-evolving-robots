@@ -48,7 +48,7 @@ from typing import Any
 import numpy as np
 
 from sea.evolve.core import Body, BomLine, Outcome, Param, Part, PartType, Task
-from sea.evolve.search import local_search, planned
+from sea.evolve.search import local_search, planned, ways_of
 from sea.sim import mobile_model as MM
 
 G = 9.81
@@ -576,7 +576,8 @@ class MobileWorld:
                            sim_s=time.perf_counter() - t0)
 
         start, m = planned(body, space, start, 32)
-        out = local_search(run, space, start, m=m, confirm=2, seed=seed + int(task.data.get("seed", 0)))
+        out = local_search(run, space, start, m=m, confirm=2, seed=seed + int(task.data.get("seed", 0)),
+                           ways=ways_of(body, space))
         if not out.success and out.mechanism in CONTROL_LEVEL:  # a limit of the body further on, or the search's
             ok, _, mech, detail = _attempt(s, route, secs, PROBE, _Calm(), probe=True)
             out = out.model_copy(update={"mechanism": "not_found_by_search", "detail": f"{out.mechanism}: {out.detail}"}

@@ -3221,3 +3221,23 @@ The rod's Euler margin is 3.4 by the reading, 2.3 over D-104's print factor, so 
 **Prediction.** No verdict moves in any world, since only text and where code lives change. The gripper's tool answers read the same.
 
 **Still world-specific in `mech/`.** The part kinds `Blade`, `PadMount` and `Guide`, with their parts of `mech/build.py` and `sim/jaws.py`, are the SO-101's own hardware in the graph language. Other worlds' prompts don't list them.
+
+## D-108 (skill: every world; policy: plans): any world searches other ways before a failure counts
+
+**Why.** D-102 and D-105 established that a failure isn't yet the mechanism's until the mechanism has been used other ways, each with its own samples. That lived only in the gripper's System 1. System 2's operating plan also went unread there and in the talking robot.
+
+**What.** `local_search` itself now does it: after the first search fails, it searches from the ways the plan names and then from `WAYS` = 3 starts spread over the control space, each with half the attempts and its own seed, stopping at the first that passes. `OperatingPlan.ways` lets System 2 name other ways, and the gripper and the talking robot now read the plan. An outcome says how many ways it took, and the prompt reports it. The talking robot's posture map already gives it several starts, so it keeps those instead of the spread.
+
+**Prediction.** The first way runs exactly as before, so no held group can be lost on a given seed. Failures cost about 2.5 times the attempts. Stock bodies gain little, since their failures are mostly the body's.
+
+**Measured, stock bodies, seed 0, train.** Mobile 6 of 13 with and without, 246 against 582 attempts, 3 s against 7 s. The talking robot 6 of 17 and 1074 attempts both ways: its starts are unchanged. Nothing rescued, nothing lost. `wide_rod` holds 21 of 21 on seeds 5000–5002 with this in place.
+
+## D-109 (judge: every graph): printed members are judged on any robot
+
+**Why.** D-103's law lived in the gripper's simulator and read only link plates and webs. The library's own four-bars and slider-cranks are `Box` bars, so a robot built from them, or a gripper that used a box, was never judged. ME 2110's kit robots had no such law at all, so their scores weren't comparable with the gripper's.
+
+**What.** The law moved to `mech/members.py`. `printed_members` also reads any printed box, cylinder or capsule that spans a loop's body from its origin to the pin. The kit match reads members each step, and a broken one disqualifies the match under the label `printed_part_overloaded`. The kit's prompt lists links and webs and says how they're judged.
+
+**Limit.** Only PLA has sourced values. A search found no citable bending modulus for birch plywood, so a plywood or steel bar isn't read rather than judged on an invented number. A kit robot built of plywood bars is therefore not judged by this law. This is a real gap in comparability, and it stays open until a measured value exists.
+
+**Prediction.** No gripper verdict moves, since `wide_rod` and the fixtures use links and webs. Measured: 3 seeds at 84 of 84.

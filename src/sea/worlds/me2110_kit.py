@@ -20,10 +20,11 @@ import mujoco
 import numpy as np
 
 from sea.evolve.core import Body, BomLine, Instrument, Outcome, Part, PartType, Task
-from sea.evolve.search import local_search, planned
+from sea.evolve.search import local_search, planned, ways_of
 from sea.mech import graph as G
 from sea.mech.build import part_kg
 from sea.mech.elements import compose
+from sea.mech.members import PLA_ALLOW_PA, PRINT_FACTOR
 from sea.mech.patch import Op, apply_patch
 from sea.mech.patch import __doc__ as PATCH_DOC
 from sea.mech.program import controls
@@ -286,7 +287,7 @@ class KitWorld:
 
     def modules_text(self) -> str:
         kinds = []
-        for cls in (G.Box, G.Cylinder, G.Capsule, G.Sphere, G.Wheel, G.Bought, G.Body, G.Joint, G.Loop, G.Servo, G.Gearmotor,
+        for cls in (G.Box, G.Cylinder, G.Capsule, G.Sphere, G.Link, G.Web, G.Wheel, G.Bought, G.Body, G.Joint, G.Loop, G.Servo, G.Gearmotor,
                     G.Piston, G.TorsionSpring, G.Band, G.Latch, G.LimitSwitch, G.RangeFinder, G.Encoder, G.Carry):
             fields = ", ".join(f"{n}" + ("" if f.is_required() else f"={f.default!r}") for n, f in cls.model_fields.items()
                                if n not in ("kind", "kg"))
@@ -294,7 +295,8 @@ class KitWorld:
         out = ["A robot is a graph (lengths in metres; a part's coordinates in its body's frame; x forward, z up from the "
                "floor).  Its first body is 'robot' on a free joint 'root'.  Every part fastened to a body must touch "
                "another on it.  Joints, actuators, latches and sensors are what operate it: each gives System 1 controls, "
-               "which your plan sets.", "Kinds:", *kinds, (PATCH_DOC or "").strip(), "Modules:"]
+               "which your plan sets.  A printed bar, link or web on a loop is judged at its pin's force, held 20 ms: in stress, "
+               f"at most {PLA_ALLOW_PA / 1e6:.0f} MPa, and pushed, against its Euler load over {PRINT_FACTOR:g}.", "Kinds:", *kinds, (PATCH_DOC or "").strip(), "Modules:"]
         for name, (_, ranges) in MODULES.items():
             mid = {k: (lo + hi) / 2 for k, (lo, hi) in ranges.items()}
             out += [f"## {name} ({', '.join(f'{k} {lo:g}..{hi:g}' for k, (lo, hi) in ranges.items())}); at {mid}:",
@@ -331,7 +333,7 @@ class KitWorld:
 
         if not space:  # nothing on the robot can be commanded
             return run({}, seed).model_copy(update={"task": task.id})
-        best = local_search(run, space, start, m=m, confirm=0, seed=seed + int(task.data["seed"]))
+        best = local_search(run, space, start, m=m, confirm=0, seed=seed + int(task.data["seed"]), ways=ways_of(body, space))
         again = [run(best.controls, seed + 2000 + j) for j in range(SCORED_OVER)]  # a lucky match is not a score
         keys = {k for o in again for k in o.states}
         return best.model_copy(update={

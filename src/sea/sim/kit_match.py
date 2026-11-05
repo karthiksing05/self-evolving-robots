@@ -14,7 +14,9 @@ import numpy as np
 
 from sea.mech import build as B
 from sea.mech.base import WORLD
+from sea.mech.build import printed_members
 from sea.mech.graph import Gearmotor, Graph, Piston, Servo, TorsionSpring
+from sea.mech.members import PrintedMembers
 from sea.mech.program import Program
 from sea.mech.runtime import Machine
 from sea.sim import me2110_model as MM
@@ -132,6 +134,9 @@ class KitMatch(MM.Match):
         self.g = g
         self.gate_t = 0.0  # the projectile rule watches every ball from the start: any mechanism may let one go
         self.machine = Machine(self.m, self.d, g)
+        members = printed_members(g, self.m)
+        self.members = PrintedMembers(self.m, members) if members else None
+        self.member_broke = False
         self.program = Program(g, ctl, 40.0, triggers)
         self.pistons = [a for a in g.actuators if isinstance(a, Piston)]
         self.commanded = [a.name for a in g.actuators if isinstance(a, Servo | Gearmotor | Piston)]
@@ -141,6 +146,11 @@ class KitMatch(MM.Match):
     def control(self) -> None:
         d = self.d
         d.ctrl[self.aid["spin"]] = -self.v.rpm * 2 * math.pi / 60
+        if self.members is not None and not self.member_broke:  # printed members, judged as on any robot (D-109)
+            self.members.read(d)
+            if broke := self.members.broken():
+                self.member_broke = True
+                self.laws.append(broke)
         self.program.step(self.machine, d.time)
         for name in list(self.held):
             if not self.machine.held(name):

@@ -71,6 +71,7 @@ class SuiteConfig:
     trace_dir: Path | None = None
     only: set[str] | None = None  # restrict to these control keys (regression samples)
     on_control: Callable[[ControlRun], None] | None = None
+    plan_ways: tuple[dict[str, dict[str, float]], ...] = ()  # ways System 2's plan names, primitive -> values (D-108)
 
 
 @dataclass
@@ -220,13 +221,15 @@ def other_ways(runner: PanelRunner, control: ControlSpec, prog: Program, first: 
         return first
     travel = runner.sim.controls[control.id].spec.travel
     best, trials, ways = first, first.result.s1_trials, 1
-    for k, (name, mode) in enumerate(modes_of(prog, cfg.library.prims), 1):
+    modes = [{name: mode} for name, mode in modes_of(prog, cfg.library.prims)]
+    planned = [(k + 100, way) for k, way in enumerate(cfg.plan_ways)]  # System 2's own ideas come first
+    for k, way in [*planned, *enumerate(modes, 1)]:
         reset_episode(runner.sim)
         ecfg = runner.config(control)
-        ecfg.param_overrides = {name: dict(mode)}
+        ecfg.param_overrides = {name: dict(mode) for name, mode in way.items()}
         out = run_system1(runner.sim, prog, control.id, ecfg, judge_fn, m=cfg.m, max_param_delta=cfg.max_param_delta,
                           seed=runner.seed + k, panel_id=panel.id, reparam=cfg.reparam or None)  # its own samples (D-105)
-        params = {**out.params, name: {**mode, **out.params.get(name, {})}}
+        params = {**out.params, **{name: {**mode, **out.params.get(name, {})} for name, mode in way.items()}}
         run = ControlRun(out.result, out.trace, first.program, params, s1_exhausted=out.escalate == "s1_exhausted")
         trials, ways = trials + out.result.s1_trials + 1, ways + 1
         if objective(run.result, run.trace, travel) < objective(best.result, best.trace, travel):

@@ -51,6 +51,9 @@ _JOINT = {"hinge": mujoco.mjtJoint.mjJNT_HINGE, "slide": mujoco.mjtJoint.mjJNT_S
 _GEOM = mujoco.mjtGeom
 
 
+BAR_TOL = 5e-3  # how far off a bar's own volume a pin may sit and the bar still carry it
+
+
 def _rgba(material: str) -> list[float]:
     return STEEL if material == "steel" else PRINTED
 
@@ -296,44 +299,98 @@ def _roller_arm(g: Graph, roller: Cylinder, mesh_x: float, root: str) -> tuple[f
     return length, jaws.PLA_E_PA * (2 * arm.half[1]) * (2 * arm.half[2]) ** 3 / 12, arm.half[2]
 
 
+def _ends(p) -> tuple[np.ndarray, np.ndarray]:
+    """A round bar's two ends, along its quat's z axis."""
+    q = p.quat
+    axis = np.array([2 * (q[1] * q[3] + q[0] * q[2]), 2 * (q[2] * q[3] - q[0] * q[1]), 1 - 2 * (q[1] ** 2 + q[2] ** 2)])
+    return np.array(p.pos) - axis * p.half_length, np.array(p.pos) + axis * p.half_length
+
+
+def _bar_section(p, pin: np.ndarray, hinge: np.ndarray | None) -> tuple[float, float, float, float] | None:
+    """If the printed bar ``p`` carries the body's origin to ``pin``: its area, bending in the plane the body turns in
+    (the weakest axis if it has no hinge along one of the bar's), half depth, and weakest axis's bending."""
+    length = float(np.linalg.norm(pin))
+    if length < 1e-6 or p.material != "pla":
+        return None
+    if isinstance(p, Box):
+        half = np.array(p.half)
+        pos = np.array(p.pos)
+        long = int(np.argmax(half))
+        if 2 * half[long] < 0.8 * length or np.any(np.minimum(0.0, pin) < pos - half - BAR_TOL) or np.any(np.maximum(0.0, pin) > pos + half + BAR_TOL):
+            return None
+        a, b = (2 * half[i] for i in range(3) if i != long)
+        depths = [i for i in range(3) if i != long and (hinge is None or abs(hinge[i]) < 0.5)]
+        w = 2 * half[depths[0]] if len(depths) == 1 else min(a, b)
+        h = a * b / w
+        return w * h, h * w**3 / 12, w / 2, min(a * b**3, b * a**3) / 12
+    if isinstance(p, Cylinder | Capsule):
+        x0, x1 = _ends(p)
+        if np.linalg.norm(x1 - x0) < 0.8 * length or min(np.linalg.norm(x0), np.linalg.norm(x1)) > p.radius + BAR_TOL \
+                or min(np.linalg.norm(x0 - pin), np.linalg.norm(x1 - pin)) > p.radius + BAR_TOL:
+            return None
+        i = math.pi * p.radius**4 / 4
+        return math.pi * p.radius**2, i, p.radius, i
+    return None
+
+
 def printed_members(g: Graph, model: mujoco.MjModel) -> list:
     """The printed members a loop's pin force passes through (D-103), from the graph's parts and the assembled pose: at
     each loop, what on ``a`` spans its origin to the pin (a strut), and what reaches from a hub to the same pin on ``b``
-    or to ``a``'s own pin on its parent (a crank)."""
-    from sea.sim import jaws
+    or to ``a``'s own pin on its parent (a crank).  A member is a link plate, a web, or any printed bar (D-109)."""
+    from sea.mech.members import Member
 
     d = mujoco.MjData(model)
     mujoco.mj_forward(model, d)
     bodies = {b.name: b for b in g.bodies}
+    connects = [(int(model.eq_obj1id[i]), int(model.eq_obj2id[i])) for i in range(model.neq)
+                if model.eq_type[i] == mujoco.mjtEq.mjEQ_CONNECT]
     out = []
 
     def web(p: Web, kind: str, loop: int, body: str, pin, plates: int, root: float) -> None:
         w, h = 2 * p.half[0], 2 * p.half[1]
-        out.append(jaws.Member(p.name, kind, loop, body, tuple(float(x) for x in pin), plates, root, w * h, h * w**3 / 12, w / 2,
-                               min(h * w**3, w * h**3) / 12))
+        out.append(Member(p.name, kind, loop, body, tuple(float(x) for x in pin), plates, root, w * h, h * w**3 / 12, w / 2,
+                          min(h * w**3, w * h**3) / 12))
 
-    def crank(loop: int, body: str, xy: np.ndarray) -> None:
-        for p in getattr(bodies.get(body), "parts", ()):
-            if isinstance(p, Web) and np.linalg.norm(p.a) < 1e-3 and np.linalg.norm(np.array(p.b) - xy) < 3e-3:
-                hubs = [c.radius for c in bodies[body].parts if isinstance(c, Cylinder) and np.linalg.norm(c.pos[:2]) < 1e-3]
-                web(p, "crank", loop, body, (*p.b, 0.0), 1, max(hubs, default=0.0))
+    def hinge_of(body: str) -> np.ndarray | None:
+        hinges = [j for j in getattr(bodies.get(body), "joints", ()) if j.type == "hinge"]
+        return np.array(hinges[0].axis) if hinges else None
+
+    def bars(body: str, kind: str, loop: int, pin: np.ndarray, root: float) -> None:
+        found = [(p, s) for p in getattr(bodies.get(body), "parts", ())
+                 if isinstance(p, Box | Cylinder | Capsule) and (s := _bar_section(p, pin, hinge_of(body))) is not None]
+        for p, (area, i_bend, c, i_min) in found:
+            out.append(Member(p.name, kind, loop, body, tuple(float(x) for x in pin), len(found), root, area, i_bend, c, i_min))
+
+    def crank(loop: int, body: str, pin: np.ndarray) -> None:
+        parts = getattr(bodies.get(body), "parts", ())
+        hubs = [c.radius for c in parts if isinstance(c, Cylinder) and np.linalg.norm(c.pos[:2]) < 1e-3]
+        root = max(hubs, default=0.0)
+        n = len(out)
+        for p in parts:
+            if isinstance(p, Web) and np.linalg.norm(p.a) < 1e-3 and np.linalg.norm(np.array(p.b) - pin[:2]) < 3e-3:
+                web(p, "crank", loop, body, (*p.b, 0.0), 1, root)
+        if len(out) == n and hinge_of(body) is not None:  # a frame's bracket turns about nothing: it is no crank
+            bars(body, "crank", loop, pin, root)
 
     for k, lp in enumerate(g.loops):
         point = np.array(lp.point)
         parts = getattr(bodies.get(lp.a), "parts", ())
+        ia, ib = model.body(lp.a).id, model.body(lp.b).id
+        loop = connects.index((ia, ib)) if (ia, ib) in connects else k
         plates = [p for p in parts if isinstance(p, Link) and abs(p.length - np.linalg.norm(point)) < 2e-3]
         webs = [p for p in parts if isinstance(p, Web) and np.linalg.norm(p.a) < 1e-3 and np.linalg.norm(np.array(p.b) - point[:2]) < 2e-3]
         for p in plates:
             t, w = p.z[1] - p.z[0], 2 * p.half_width
-            out.append(jaws.Member(p.name, "strut", k, lp.a, tuple(float(x) for x in point), len(plates), 0.0, t * w, t * w**3 / 12,
-                                   w / 2, min(t * w**3, w * t**3) / 12))
+            out.append(Member(p.name, "strut", loop, lp.a, tuple(float(x) for x in point), len(plates), 0.0, t * w, t * w**3 / 12,
+                              w / 2, min(t * w**3, w * t**3) / 12))
         for p in webs:
-            web(p, "strut", k, lp.a, point, len(webs), 0.0)
-        ia, ib = model.body(lp.a).id, model.body(lp.b).id
+            web(p, "strut", loop, lp.a, point, len(webs), 0.0)
+        if not plates and not webs:
+            bars(lp.a, "strut", loop, point, 0.0)
         world = d.xpos[ia] + d.xmat[ia].reshape(3, 3) @ point
-        crank(k, lp.b, (d.xmat[ib].reshape(3, 3).T @ (world - d.xpos[ib]))[:2])
+        crank(loop, lp.b, d.xmat[ib].reshape(3, 3).T @ (world - d.xpos[ib]))
         parent = model.body_parentid[ia]
-        crank(k, model.body(parent).name, model.body_pos[ia][:2])
+        crank(loop, model.body(parent).name, np.array(model.body_pos[ia]))
     return out
 
 

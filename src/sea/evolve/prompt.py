@@ -87,7 +87,8 @@ def _mid(pt: PartType):
 def _outcome_line(task: Task, o: Outcome) -> str:
     ctl = ", ".join(f"{k}={v:.3g}" for k, v in sorted(o.controls.items()))
     return (f"  - {task.id} [{task.group}] {task.facts}\n      mechanism: {o.mechanism or 'unlabelled'}"
-            f" | {o.detail}\n      System 1: {o.attempts} attempts, best score {o.score:.2f}" + (f" at {ctl}" if ctl else ""))
+            f" | {o.detail}\n      System 1: {o.attempts} attempts"
+            + (f" over {o.ways} ways of using the body" if o.ways > 1 else "") + f", best score {o.score:.2f}" + (f" at {ctl}" if ctl else ""))
 
 
 def build(world: World, body: Body, tasks: Sequence[Task], outcomes: dict[str, Outcome], held: set[str],

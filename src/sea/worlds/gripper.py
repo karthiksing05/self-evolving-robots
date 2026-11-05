@@ -804,7 +804,10 @@ class GripperWorld:
         if key not in self._built:
             self._built[key] = build(to_design(body), _limits())
         built = self._built[key]
-        cfg = SuiteConfig(design=built.design, tools=built.tools, library=Library.seed(), limits=_limits(), seed=seed)
+        cfg = SuiteConfig(design=built.design, tools=built.tools, library=Library.seed(), limits=_limits(), seed=seed,
+                          plan_ways=_plan_ways(body))
+        if body.plan is not None:
+            cfg.m *= body.plan.search
         panel = PanelSpec.model_validate(task.data["panel"])
         run = run_panel(panel, cfg)[0]
         trace = run.trace
@@ -813,10 +816,9 @@ class GripperWorld:
         sim_s = (trace.sim_seconds * n) if trace is not None else 0.0
         if verdict == "pass":
             return Outcome(task=task.id, success=True, score=1.0, mechanism="held", detail="held",
-                           controls=_flat(run.params), attempts=n, sim_s=round(sim_s, 2))
+                           controls=_flat(run.params), attempts=n, sim_s=round(sim_s, 2), ways=run.ways)
         score = {"wrong_behavior": 0.5, "stuck": 0.25}.get(verdict, 0.0)
         mech, detail = verdict, trace.note if trace is not None else ""
-        ways = f"; System 1 tried {run.ways} ways of holding it, this is the best" if run.ways > 1 else ""
         cands = dict(candidate_programs(panel.controls[0], panel, cfg))
         prog = cands.get(run.program)
         if prog is not None:
@@ -826,8 +828,8 @@ class GripperWorld:
             note = box["t"].note if "t" in box else ""
             mech, detail = diagnose(rows, note, built.design.fingers, task.data["height_mm"] / 1000, task.data["mass_g"],
                                     peak)
-        return Outcome(task=task.id, success=False, score=score, mechanism=mech, detail=f"verdict {verdict}; {detail}{ways}",
-                       controls=_flat(run.params), attempts=n, sim_s=round(sim_s, 2))
+        return Outcome(task=task.id, success=False, score=score, mechanism=mech, detail=f"verdict {verdict}; {detail}",
+                       controls=_flat(run.params), attempts=n, sim_s=round(sim_s, 2), ways=run.ways)
 
 
 MODULES: dict[str, tuple[str, dict[str, tuple[float, float]]]] = {
@@ -1107,6 +1109,22 @@ def _rod_numbers(f, q: float, q_hi: float) -> dict[str, float] | None:
     return {**rack, "overhang_mm": a * 1000, "lift_mm": lift * 1000 + rack["bend_mm"], "skip_mm": jaws.TOOTH_SKIP * gd.module * 1000,
             "bushing_n": load, "rated_n": hw.rated_n, "both_ends": gd.far_end is not None,
             "bushings": len(gd.bushings)}
+
+
+def _plan_ways(body: Body) -> tuple[dict[str, dict[str, float]], ...]:
+    """What System 2's plan names, in the terms an outcome's controls report them: ``primitive.parameter``."""
+    if body.plan is None:
+        return ()
+    out = []
+    for way in (body.plan.controls, *body.plan.ways):
+        nested: dict[str, dict[str, float]] = {}
+        for key, v in way.items():
+            prim, dot, param = key.partition(".")
+            if dot:
+                nested.setdefault(prim, {})[param] = v
+        if nested:
+            out.append(nested)
+    return tuple(out)
 
 
 def _flat(params: dict[str, dict[str, float]]) -> dict[str, float]:

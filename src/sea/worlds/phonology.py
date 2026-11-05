@@ -49,7 +49,7 @@ from typing import Any
 import numpy as np
 
 from sea.evolve.core import Body, BomLine, Outcome, Param, Part, PartType, Task
-from sea.evolve.search import local_search
+from sea.evolve.search import local_search, planned, ways_of
 from sea.worlds import linkages
 
 # ---------------------------------------------------------------- acoustics
@@ -587,8 +587,12 @@ class PhonologyWorld:
                            sim_s=time.perf_counter() - t0)
 
         out, attempts, sim_s = None, 0, 0.0
-        for j, start in enumerate(self._starts(r, bab, sides)):
-            o = local_search(attempt, space, start, m=32, confirm=2, seed=seed + 7919 * j, step=0.1, shrink=0.9)
+        # its ways are the map's postures, the plan's ahead of them; each searches with its own samples
+        starts = self._starts(r, bab, sides)
+        plan_start, m = planned(body, space, starts[0], 32)
+        for j, start in enumerate([plan_start, *ways_of(body, space), *starts[1:]]):
+            o = local_search(attempt, space, {**starts[0], **start}, m=m, confirm=2, seed=seed + 7919 * j, step=0.1, shrink=0.9,
+                             other=0)
             attempts, sim_s = attempts + o.attempts, sim_s + o.sim_s
             if out is None or o.success or o.score > out.score:
                 out = o

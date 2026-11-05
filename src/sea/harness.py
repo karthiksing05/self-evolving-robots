@@ -36,7 +36,7 @@ COMPONENTS: dict[str, tuple[str, tuple[str, ...]]] = {
                          "src/sea/sim/shoe.py", "src/sea/mech/graph.py", "src/sea/mech/build.py",
                          "src/sea/mech/seed/gripper.py", "src/sea/mech/kinematics.py",
                          "src/sea/mech/patch.py", "src/sea/mech/base.py", "src/sea/mech/runtime.py",
-                         "src/sea/mech/program.py", "src/sea/mech/elements.py")),
+                         "src/sea/mech/program.py", "src/sea/mech/elements.py", "src/sea/mech/members.py")),
     # what the robot can feel; the verifier never reads it, so it is world, not judge (D-031)
     "sensors": ("world", ("src/sea/sim/sensors.py", "configs/sensors.yaml")),
     # the fixed pick that measures the gripper's capability table (V1); an instrument, not a skill

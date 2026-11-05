@@ -64,7 +64,7 @@ def _stub(monkeypatch, verdicts):
     monkeypatch.setattr(LS, "objective", lambda r, t, travel: -10.0 if r.verdict == "pass" else 0.0)
     monkeypatch.setattr(env, "reset_episode", lambda sim: None)
     lib = Library.seed()
-    runner = SimpleNamespace(cfg=SimpleNamespace(library=lib, m=2, max_param_delta=0.3, reparam={}), panel=SimpleNamespace(id="p"),
+    runner = SimpleNamespace(cfg=SimpleNamespace(plan_ways=(), library=lib, m=2, max_param_delta=0.3, reparam={}), panel=SimpleNamespace(id="p"),
                              seed=0, sim=SimpleNamespace(controls={"c": SimpleNamespace(spec=SimpleNamespace(travel=0.03))}),
                              config=lambda control: SimpleNamespace(param_overrides={}))
     first = env.ControlRun(SimpleNamespace(verdict="stuck", s1_trials=2, model_copy=lambda update: SimpleNamespace(verdict="stuck", **update)),
@@ -97,7 +97,7 @@ def test_the_stock_jaw_says_how_many_ways_it_failed(task, seed):
     world = make_world("gripper")
     t = next(x for x in world.tasks() if x.id == task)
     out = world.solve(world.stock(), t, seed)
-    assert out.success or f"tried {len(G._ways())} ways" in out.detail
+    assert out.success or out.ways == len(G._ways())
 
 
 def test_each_way_draws_its_own_search_samples(monkeypatch):
@@ -116,7 +116,7 @@ def test_each_way_draws_its_own_search_samples(monkeypatch):
     lib = Library.seed().prims
     first = env.ControlRun(SimpleNamespace(verdict="stuck", s1_trials=1, model_copy=lambda update: None), None, "pick_up", {})
     runner = SimpleNamespace(
-        cfg=SimpleNamespace(library=SimpleNamespace(prims=lib), m=9, max_param_delta=0.5, reparam=None), panel=SimpleNamespace(id="p"),
+        cfg=SimpleNamespace(plan_ways=(), library=SimpleNamespace(prims=lib), m=9, max_param_delta=0.5, reparam=None), panel=SimpleNamespace(id="p"),
         sim=SimpleNamespace(controls={"c": SimpleNamespace(spec=SimpleNamespace(travel=0.01))}), seed=7,
         config=lambda c: SimpleNamespace(param_overrides=None))
     env.other_ways(runner, SimpleNamespace(id="c"), lib["pick_up"].body, first, None)
