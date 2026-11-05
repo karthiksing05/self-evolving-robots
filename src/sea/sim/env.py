@@ -220,12 +220,12 @@ def other_ways(runner: PanelRunner, control: ControlSpec, prog: Program, first: 
         return first
     travel = runner.sim.controls[control.id].spec.travel
     best, trials, ways = first, first.result.s1_trials, 1
-    for name, mode in modes_of(prog, cfg.library.prims):
+    for k, (name, mode) in enumerate(modes_of(prog, cfg.library.prims), 1):
         reset_episode(runner.sim)
         ecfg = runner.config(control)
         ecfg.param_overrides = {name: dict(mode)}
         out = run_system1(runner.sim, prog, control.id, ecfg, judge_fn, m=cfg.m, max_param_delta=cfg.max_param_delta,
-                          seed=runner.seed, panel_id=panel.id, reparam=cfg.reparam or None)
+                          seed=runner.seed + k, panel_id=panel.id, reparam=cfg.reparam or None)  # its own samples (D-105)
         params = {**out.params, name: {**mode, **out.params.get(name, {})}}
         run = ControlRun(out.result, out.trace, first.program, params, s1_exhausted=out.escalate == "s1_exhausted")
         trials, ways = trials + out.result.s1_trials + 1, ways + 1

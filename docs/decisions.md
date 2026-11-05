@@ -3177,3 +3177,29 @@ No body has yet been rechecked on several seeds under this law; the 2517 of 2520
 **D-104 measured.** `deep_cranks` under this law, seeds 2000 to 2004: 79, 77, 76, 72 and 75 of 84, so 379 of 420, about as predicted, and 5/21 groups held under every seed. Those seeds are one judge later than D-103's and the rest of the change is the factor. The other two seeds of campaign I were stopped at 20 groups, since they ran on the older law. Campaign J starts from `deep_cranks` under this law.
 
 **Campaign J, first result.** Seed 1 widened the rod to 20 x 4.2 mm on its first iteration, arguing from Euler that the rod's depth is boxed in by the cranks and its weak-axis stiffness grows linearly with width: `wide_rod`, 21 on train under four seeds. Unseen seeds 3000 to 3004: **418 of 420**, 20/21 under every seed. Both failures are the mustard bottle on test: a seed's draw of friction, stiffness and perceived pose under which all 7 ways fail, the moving jaw 4 to 8 mm above the fixed one and pushing the bottle 33 to 39 degrees down, so the fixed jaw never touches it. The same tasks under other seeds pass in 1 to 3 attempts.
+
+## D-105 (skill: gripper): each way of holding an object searches with its own samples
+
+**Why.** `wide_rod` fails rare seeds on the mustard bottle in all 7 ways, 63 attempts. A two-factor test on the two failures shows what that seed is: changing friction rescues 0 of 4, zeroing perceived pose noise 1 of 2, and changing only the search's seed 5 of 6, in 2 to 6 attempts. D-102 searched every way with one seed, so all 7 drew the same normalised samples and failed together. These were System 1's failures, charged to the mechanism, which D-102 exists to prevent.
+
+**What.** Each way searches with its own seed, derived from the run's. No law changes.
+
+**Prediction.** On unseen seeds `wide_rod`'s failure rate falls from what it was before this fix, which was first read as about 1 in 500 runs (2 of 420) and measures 2 of 2520 over 30 seeds, to near zero: the two failing seeds pass and 30 new seeds are clean, or nearly. Attempts rise slightly, only on tasks that used to fail. Any failure that remains is the mechanism's, or a search allowance too small for it.
+
+
+### D-105 measured
+
+`wide_rod` under the fix, one recheck on train and test: the two seeds that failed (3002, 3003) and 30 new ones (4000–4029), 32 of 32 seeds at 84 of 84 tasks, 2688 of 2688 runs. Held on train and test under every seed: 21 of 21. Seeds 3002 and 3003 chose the fix, so they count only as "the failures are gone"; the independent evidence is the 2520 of 2520 on 4000–4029. The prediction said clean or nearly, and it came out clean. Stock under the same judge and fix, seeds 4000–4004: 68 of 84 tasks on every seed, 17 of 21, never the mustard bottle, pudding box, sugar box or tuna can, the same as before the fix. So the fix did not rescue a weaker body.
+
+Member audit of `wide_rod`, one seed (1000), 84 tasks, all passing:
+
+| Member | Worst held stress (MPa, allowed 31.7) | Worst compression (N) | Buckles at (N) |
+|---|---|---|---|
+| Rocker arm | 7.9 | | |
+| Horn arm | 7.7 | | |
+| Drive rod web | 2.5 | 211 | 718 |
+| Follower plates | 1.0 | 36 per plate | 106 |
+
+The rod's Euler margin is 3.4 by the reading, 2.3 over D-104's print factor, so the two steps that made this body (arms, then rod) each left room rather than landing on the limit.
+
+**What 21 of 21 does not show.** It is the score of a simulation against the laws the judge reads. Not judged: the servo shaft's side load, about 106 N steady, roughly 6 times the stock jaw's, with no published STS3215 radial rating (D-104); the rocker link plates and hub flex. A judgement, not a measurement: the print factor of 1.5 on Euler load. An estimate: the peak jaw impact, kept at the simulator's value (D-103). A bench test of a printed part on a real servo is the verification this cannot give.

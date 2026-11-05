@@ -98,3 +98,27 @@ def test_the_stock_jaw_says_how_many_ways_it_failed(task, seed):
     t = next(x for x in world.tasks() if x.id == task)
     out = world.solve(world.stock(), t, seed)
     assert out.success or f"tried {len(G._ways())} ways" in out.detail
+
+
+def test_each_way_draws_its_own_search_samples(monkeypatch):
+    """Ways searched with one seed try the same samples, so they fail together and are not 7 tries (D-105)."""
+    from sea.control import local_search
+
+    seeds = []
+
+    def run(sim, prog, cid, cfg, judge, *, seed, **kw):
+        seeds.append(seed)
+        return SimpleNamespace(params={}, result=first.result, trace=first.trace, escalate="")
+
+    monkeypatch.setattr(local_search, "run_system1", run)
+    monkeypatch.setattr(local_search, "objective", lambda *a: 1.0)
+    monkeypatch.setattr(env, "reset_episode", lambda sim: None)
+    lib = Library.seed().prims
+    first = env.ControlRun(SimpleNamespace(verdict="stuck", s1_trials=1, model_copy=lambda update: None), None, "pick_up", {})
+    runner = SimpleNamespace(
+        cfg=SimpleNamespace(library=SimpleNamespace(prims=lib), m=9, max_param_delta=0.5, reparam=None), panel=SimpleNamespace(id="p"),
+        sim=SimpleNamespace(controls={"c": SimpleNamespace(spec=SimpleNamespace(travel=0.01))}), seed=7,
+        config=lambda c: SimpleNamespace(param_overrides=None))
+    env.other_ways(runner, SimpleNamespace(id="c"), lib["pick_up"].body, first, None)
+    assert len(seeds) == len(lib["grasp"].modes) and len(set(seeds)) == len(seeds) and 7 not in seeds
+

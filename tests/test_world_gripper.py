@@ -100,7 +100,7 @@ def test_solve_reads_the_failure():
     tasks = {t.id: t for t in W.tasks()}
     assert W.solve(W.stock(), tasks["reg_banana"]).success
     o = W.solve(W.stock(), tasks["reg_pudding_box"])  # the gelatin box is held since System 1 searches depth (D-065)
-    assert not o.success and o.mechanism in {"squeezed_down_out", "moving_jaw_on_top_face", "moving_jaw_missed"}
+    assert not o.success and o.mechanism in {"squeezed_down_out", "moving_jaw_on_top_face", "moving_jaw_missed", "fixed_jaw_missed"}
     assert "moving jaw" in o.detail and o.attempts > 1
 
 
