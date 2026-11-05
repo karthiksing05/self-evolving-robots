@@ -35,10 +35,25 @@ KIT_RULES = [
 ]
 
 
+CORNERS = ((1, 1), (1, -1), (-1, 1), (-1, -1))
+CASE_MM = {"n20_gearmotor": (34.0, 12.0, 10.0), "n20_encoder_gearmotor": (40.0, 12.0, 10.0), "jga25_gearmotor": (60.0, 25.0, 25.0)}
+
+
 def _motor_rating(kind: str, ratio: int, volts: float) -> tuple[float, float]:
     tau, w0, geta = W.MOTOR[kind][:3]
     k = volts / W.WINDING[kind]
     return k * tau * ratio * geta, k * w0 / ratio
+
+
+def _motor_mount(k: int, x: float, sy: int, w: float, r: float, ride: float, hw: float, kind: str) -> tuple[Any, ...]:
+    """A gearmotor as what it is (D-115): its case inside the wheel on the wheel's axis, a post from the case to the
+    floor, and the shaft from the case to the wheel."""
+    (cl, cw, ch), gap = CASE_MM[kind], hw + 0.001
+    half = (cl / 2000, cw / 2000, ch / 2000)
+    y = sy * (w / 2 - half[0])
+    return (G.Box(name=f"motor_case{k}", pos=(x, y, r), half=(half[1], half[0], half[2]), material="stock", kg=W.MOTOR[kind][3] / 1000),
+            G.Box(name=f"axle_post{k}", pos=(x, y, (r + ride) / 2), half=(0.003, 0.003, max(abs(ride - r) / 2, 0.001))),
+            G.Cylinder(name=f"axle{k}", pos=(x, sy * (w / 2 + gap / 2), r), radius=0.002, half_length=gap / 2, quat=Y_AXIS))
 
 
 def _chassis(p: dict[str, float]) -> G.Graph:
@@ -50,17 +65,14 @@ def _chassis(p: dict[str, float]) -> G.Graph:
     hw, cell = 0.0125, W.CELL["nimh_pack"]
     arm = W.ROTOR[kind] * ratio**2
     wheels, motors = [], []
-    for k, (sx, sy) in enumerate(((1, 1), (1, -1), (-1, 1), (-1, -1))):
+    for k, (sx, sy) in enumerate(CORNERS):
         wheels.append(G.Body(name=f"wheel{k}", parent="robot", pos=(sx * (ln / 2 - r / 2), sy * (w / 2 + hw + 0.001), r),
                              joints=(G.Joint(name=f"wheel{k}_q", type="hinge", axis=(0.0, 1.0, 0.0), armature=arm),),
                              parts=(G.Wheel(name=f"tyre{k}", pos=(0.0, 0.0, 0.0), radius=r, half_width=hw, quat=Y_AXIS, fill=0.15),)))
         motors.append(G.Gearmotor(name=f"motor{k}", joint=f"wheel{k}_q", stall_nm=stall, no_load_rad_s=w0))
     tub = (G.Box(name="tub_floor", pos=(0.0, 0.0, ride + 0.0015), half=(ln / 2, w / 2, 0.0015)),
            G.Box(name="tub", pos=(0.0, 0.0, ride + W.TUB_H * CM / 2), half=(ln / 2, w / 2, W.TUB_H * CM / 2), massive=False),
-           *(G.Cylinder(name=f"axle{k}", pos=(s * (ln / 2 - r / 2), 0.0, r), radius=0.002, half_length=w / 2 + hw + 0.001, quat=Y_AXIS)
-             for k, s in enumerate((1, -1))),
-           *(G.Box(name=f"axle_post{k}", pos=(s * (ln / 2 - r / 2), 0.0, (r + ride) / 2), half=(0.003, 0.003, max(abs(ride - r) / 2, 0.001)))
-             for k, s in enumerate((1, -1))),
+           *(x for k, (sx, sy) in enumerate(CORNERS) for x in _motor_mount(k, sx * (ln / 2 - r / 2), sy, w, r, ride, hw, kind)),
            *(G.Bought(item=cell[0], kg=cell[2] / 1000) for _ in range(cells)))
     return G.Graph(name="chassis", bodies=(G.Body(name="robot", parent="world", joints=(G.Joint(name="root", type="free"),),
                                                   parts=tub), *wheels), actuators=tuple(motors))
@@ -112,9 +124,9 @@ def _sensor(g: G.Graph) -> str:
 
 
 def kit_mass(g: G.Graph) -> float:
-    """What the kit adds in kg, without a solid of its own: electronics, motors, drivers and sensor."""
+    """What the kit adds in kg, without a solid of its own: electronics, drivers and sensor."""
     motors, _ = _motors(g)
-    grams = W.ELEC_G + sum(W.MOTOR[k][3] + W.DRIVER[k][1] / DRIVER_EVERY for _, k, _ in motors) + W.SENSOR.get(_sensor(g), W.SENSOR["bump_switch"])[2]
+    grams = W.ELEC_G + sum(W.DRIVER[k][1] / DRIVER_EVERY for _, k, _ in motors) + W.SENSOR.get(_sensor(g), W.SENSOR["bump_switch"])[2]
     return grams / 1000
 
 
@@ -185,7 +197,8 @@ class MobileKit(GraphWorld, W.MobileWorld):
         g = graph_of(body)
         motors, _ = _motors(g)
         kind, cells = _pack(g)
-        out = [BomLine(item="print:PLA", qty=round(sum(part_kg(p) * 1000 for p in _parts(g) if not isinstance(p, G.Bought)), 1), slot=SLOT)]
+        out = [BomLine(item="print:PLA", qty=round(sum(part_kg(p) * 1000 for p in _parts(g)
+                                                       if not isinstance(p, G.Bought) and getattr(p, "material", "pla") != "stock"), 1), slot=SLOT)]
         if _wheels(g):
             out.append(BomLine(item="tire_oring", qty=len(_wheels(g)), slot=SLOT))
         counts: dict[str, int] = {}
@@ -215,6 +228,33 @@ class MobileKit(GraphWorld, W.MobileWorld):
         return super().brief(body, tasks) + "\njoints: " + (", ".join(joints) or "none")
 
 
+def _caseless(g: G.Graph, motors: list[tuple[G.Gearmotor, str, int]]) -> list[str]:
+    """A gearmotor is a solid on what carries its wheel, on the wheel's axis, the size and mass it is (D-115)."""
+    m = MM.graph_model(g, "floor", {}, 0.6, 0.0)[0]
+    d = mujoco.MjData(m)
+    mujoco.mj_kinematics(m, d)
+    boxes = {p.name: p for p in _parts(g) if isinstance(p, G.Box) and p.material == "stock"}
+    out, used = [], set()
+    for a, kind, _ in motors:
+        j = m.joint(a.joint).id
+        size = np.sort(np.array(CASE_MM[kind]) / 2000)
+        grams = W.MOTOR[kind][3] / 1000
+        hit = None
+        for name, p in boxes.items():
+            i = m.geom(name).id
+            off = d.geom_xpos[i] - d.xanchor[j]
+            if (name not in used and m.geom_bodyid[i] == m.body_parentid[m.jnt_bodyid[j]] and np.allclose(np.sort(p.half), size, atol=1e-4)
+                    and abs((p.kg or 0.0) - grams) < 1e-6 and np.linalg.norm(np.cross(off, d.xaxis[j])) < 0.002):
+                hit = name
+                break
+        if hit is None:
+            out.append(f"{a.name} has no case on {a.joint}'s axis on what carries it: a stock Box of {CASE_MM[kind][0]:g} x "
+                       f"{CASE_MM[kind][1]:g} x {CASE_MM[kind][2]:g} mm and {W.MOTOR[kind][3]:g} g")
+        else:
+            used.add(hit)
+    return out
+
+
 @lru_cache(maxsize=256)
 def _laws(graph_json: str) -> tuple[str, ...]:
     g = G.Graph.model_validate_json(graph_json)
@@ -234,6 +274,7 @@ def _laws(graph_json: str) -> tuple[str, ...]:
     motors, bad = _motors(g)
     errs += bad
     errs += [f"{a.name} is on {a.joint}, which turns no wheel" for a, _, _ in motors if a.joint not in _wheels(g)]
+    errs += _caseless(g, motors)
     if not any(a.joint in _wheels(g) for a, _, _ in motors):
         errs.append("nothing drives a wheel")
     if kind:

@@ -22,9 +22,9 @@ from sea.design import pad_cad
 from sea.design.cad import CadModel, CadPart, View, solid
 from sea.evolve.core import Body
 from sea.sim.build_model import build_model
+from sea.worlds import graph_cad, rig_cad
 from sea.worlds import gripper as G
 from sea.worlds import mobile as M
-from sea.worlds import rig_cad
 
 
 # ---------------------------------------------------------------- the gripper
@@ -217,4 +217,5 @@ def phonology(body: Body, ctl: dict[str, float] | None = None) -> CadModel:
 
 
 CAD: dict[str, Callable[..., CadModel]] = {"gripper": gripper, "gripper_dense": gripper, "mobile": mobile,
-                                              "phonology": phonology}
+                                              "phonology": phonology, "mobile_kit": graph_cad.graph,
+                                              "phonology_kit": graph_cad.graph}

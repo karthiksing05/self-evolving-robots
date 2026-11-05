@@ -108,6 +108,15 @@ def part_kg(p) -> float:
     return 0.0  # a rack's teeth: drawn
 
 
+def solids_centre(parts) -> tuple[float, float, float]:
+    """The centre of a body's plain solids by volume: where a part with no place of its own weighs (D-115)."""
+    at = [(np.array(p.pos), 8 * float(np.prod(p.half)) if isinstance(p, Box) else math.pi * p.radius**2 * 2
+           * getattr(p, "half_length", getattr(p, "half_width", p.radius))) for p in parts if isinstance(p, Box | Cylinder | Capsule | Wheel)]
+    if not at:
+        return (0.0, 0.0, 0.0)
+    return tuple(float(x) for x in sum(c * v for c, v in at) / sum(v for _, v in at))
+
+
 def _add_part(spec: mujoco.MjSpec, body, p, pose: tuple[np.ndarray, np.ndarray]) -> float:
     """Add one part's solids to ``body``; returns the mass it brings (kg)."""
     from sea.sim import jaws
@@ -442,9 +451,9 @@ def compile(spec: mujoco.MjSpec, g: Graph, base: str | Base) -> list[tuple[str, 
                 n0 = len(sb.geoms)
                 kg = _add_part(spec, sb, p, pose)
                 new = [x for x in sb.geoms[n0:] if x.contype or x.conaffinity] or list(sb.geoms[n0:])
-                if not new and kg > 0 and whole:  # a bought part with no solid here still weighs (D-111)
+                if not new and kg > 0 and whole:  # a bought part with no solid here still weighs (D-111), where it can (D-115)
                     new = [sb.add_geom(name=f"{b.name}_{p.item}_{n0}", type=mujoco.mjtGeom.mjGEOM_SPHERE, size=[0.001, 0.0, 0.0],
-                                       contype=0, conaffinity=0, group=4)]
+                                       pos=list(p.pos or solids_centre(b.parts)), contype=0, conaffinity=0, group=4)]
                 for x in new:
                     x.mass = kg / len(new)
                     if getattr(p, "mu", None) is not None and not isinstance(p, Wheel):

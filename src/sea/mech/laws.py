@@ -50,6 +50,21 @@ def floating(g: G.Graph, m: mujoco.MjModel, d: mujoco.MjData) -> list[str]:
         if on in groups and min(mujoco.mj_geomDistance(m, d, x, y, PIN * 2, None) for x in groups[b.name] for y in groups[on]) > PIN:
             out.append(f"body {b.name!r} comes nowhere near {on!r}, which its joint is on: nothing holds the joint")
     out += _unheld_hinges(g, m, d, rigid, groups)
+    out += _unsupported(g, m, d)
+    return out
+
+
+def _unsupported(g: G.Graph, m: mujoco.MjModel, d: mujoco.MjData) -> list[str]:
+    """A bought part given a place must sit on a solid of its body (D-115)."""
+    out = []
+    for b in g.bodies:
+        bid = m.body(b.name).id
+        solids = [i for i in range(m.ngeom) if m.geom_bodyid[i] == bid and m.geom_group[i] != 4]
+        for p in b.parts:
+            if isinstance(p, G.Bought) and p.pos is not None:
+                at = d.xpos[bid] + d.xmat[bid].reshape(3, 3) @ np.array(p.pos)
+                if min((_distance_to_geom(m, d, i, at) for i in solids), default=np.inf) > PIN:
+                    out.append(f"{p.item} on {b.name} is placed where no solid of it is")
     return out
 
 

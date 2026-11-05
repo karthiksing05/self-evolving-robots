@@ -182,6 +182,7 @@ class Bought(_M):
     kind: Literal["bought"] = "bought"
     item: str
     kg: float
+    pos: Vec | None = None  # where it sits on its body, on one of its solids; by default at their centre (D-115)
 
 
 class Wheel(_M):

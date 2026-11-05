@@ -403,6 +403,7 @@ def graph_model(g: Any, kind: str, f: dict[str, float], mu: float, kit_kg: float
     and the x its rear must get past."""
     from sea.mech.base import WORLD
     from sea.mech.build import compile as compile_graph
+    from sea.mech.build import solids_centre
 
     ground, past = terrain_xml(kind, f, mu)
     spec = mujoco.MjSpec.from_string(f"""<mujoco model="mobile_{kind}">
@@ -417,7 +418,7 @@ def graph_model(g: Any, kind: str, f: dict[str, float], mu: float, kit_kg: float
         if x.parent.name in names and (x.contype or x.conaffinity):
             x.contype, x.conaffinity, x.solref, x.solimp = 2, 1, solref, solimp
     if kit_kg > 0:
-        spec.body("robot").add_geom(name="kit_parts", type=mujoco.mjtGeom.mjGEOM_SPHERE, size=[0.001, 0.0, 0.0], pos=[0.0, 0.0, 0.02],
+        spec.body("robot").add_geom(name="kit_parts", type=mujoco.mjtGeom.mjGEOM_SPHERE, size=[0.001, 0.0, 0.0], pos=list(solids_centre(g.bodies[0].parts)),
                                     mass=kit_kg, contype=0, conaffinity=0, group=4)
     return spec.compile(), past
 

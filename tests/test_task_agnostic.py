@@ -290,3 +290,39 @@ def test_a_graph_robot_runs_an_idea_whatever_slot_it_names():
     w = make_world("mobile_kit")
     idea = Idea(name="same", description="the stock robot again", slot="chassis", mechanism=Mechanism(module="self"))
     assert w.check(w.build_idea(w.stock(), idea, "x")) == []
+
+
+def test_a_whole_robots_mass_is_where_its_parts_can_be():
+    import mujoco
+
+    from sea.mech.world import graph_of
+    from sea.sim.mobile_model import graph_model
+    from sea.worlds.mobile_kit import kit_mass
+
+    w = make_world("mobile_kit")
+    g = graph_of(w.stock())
+    m = graph_model(g, "floor", {}, 0.6, kit_mass(g))[0]
+    d = mujoco.MjData(m)
+    mujoco.mj_forward(m, d)
+    floor = m.geom("tub_floor").id
+    assert d.subtree_com[m.body("robot").id][2] > d.geom_xpos[floor][2] - m.geom_size[floor][2]
+
+
+def test_a_part_placed_off_its_body_and_a_motor_with_no_case_are_refused():
+    from sea.evolve.core import Part
+    from sea.mech import graph as G
+    from sea.mech.world import SLOT, graph_of
+
+    w = make_world("mobile_kit")
+    g = graph_of(w.stock())
+    robot = g.bodies[0]
+    cell = next(p for p in robot.parts if isinstance(p, G.Bought))
+
+    def body_of(parts):
+        graph = g.model_copy(update={"bodies": (robot.model_copy(update={"parts": parts}), *g.bodies[1:])})
+        return w.stock().model_copy(update={"parts": {SLOT: Part(type="built", mechanism=graph.model_dump_json())}})
+
+    moved = tuple(cell.model_copy(update={"pos": (0.0, 0.0, -1.0)}) if p is cell else p for p in robot.parts)
+    assert any("placed where no solid" in e for e in w.check(body_of(moved)))
+    bare = tuple(p for p in robot.parts if not getattr(p, "name", "").startswith("motor_case"))
+    assert any("has no case" in e for e in w.check(body_of(bare)))

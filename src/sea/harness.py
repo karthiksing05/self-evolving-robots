@@ -75,7 +75,7 @@ COMPONENTS: dict[str, tuple[str, tuple[str, ...]]] = {
 # Modules that read runs but never shape one; every other module under src/sea belongs to a component.
 # The CAD modules draw a run's bodies for people (D-049): a picture is not part of the ruler.
 TOOLING = ("src/sea/cli.py", "src/sea/harness.py", "src/sea/report.py", "src/sea/design/cad.py",
-           "src/sea/worlds/cad.py", "src/sea/worlds/film.py",
+           "src/sea/worlds/cad.py", "src/sea/worlds/graph_cad.py", "src/sea/worlds/film.py",
            # contact penetration over a replay: measured for the audit (D-051), it decides nothing yet
            "src/sea/mechanism/audit.py",
            # the design language shapes how parts are drawn; its laws are tooling until they join the judge
