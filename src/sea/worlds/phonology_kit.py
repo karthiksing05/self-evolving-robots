@@ -23,11 +23,12 @@ from sea.mech import graph as G
 from sea.mech.base import WORLD
 from sea.mech.build import compile as compile_graph
 from sea.mech.build import part_kg
-from sea.mech.laws import _close, floating, interference
+from sea.mech.laws import _close, floating, interference, overlapping, unjoined_solids
 from sea.mech.world import SLOT, GraphWorld, graph_of
 from sea.worlds import phonology as P
 
 CM = 0.01
+BLOCKED_CM2 = 0.01  # what a posture that cannot exist reads as (D-116)
 SERVO_NM = 0.216  # an MG90S at 4.8 V: 2.2 kg cm, its datasheet's stall
 Y, X = (0.0, 1.0, 0.0), (1.0, 0.0, 0.0)
 ALONG_X = (0.7071068, 0.0, 0.7071068, 0.0)  # a round part's axis along x
@@ -92,6 +93,7 @@ class _Tract:
                             for j in b.joints if j.name not in moved})
         self.solids = [i for i in range(self.m.ngeom) if self.m.geom_contype[i] == 2]
         self.glottis, self.lip_end = self.m.body("glottis").id, self.m.body("lip_end").id
+        self.unjoined = unjoined_solids(g, self.m)
 
     def _bore(self, x: float, cap: float) -> float:
         """The bore at ``x`` m along the axis, cm: from the axis to the nearest solid, up to ``cap``."""
@@ -115,6 +117,9 @@ class _Tract:
                     d.qpos[adr] = ctl[name][i]
             _close(m, d, self.free)
             mujoco.mj_kinematics(m, d)
+            if overlapping(m, d, self.unjoined):  # no such posture: a tract shut everywhere, which no sound accepts (D-116)
+                areas[i], lens[i] = BLOCKED_CM2, 1.0
+                continue
             length, lip = d.xpos[self.glottis][0] / CM, max(-d.xpos[self.lip_end][0] / CM, 0.1)
             at = np.concatenate([(1.0 - (np.arange(P.NT) + 0.5) / P.NT) * length, -np.array([lip / 4, 3 * lip / 4])])
             caps = [P.BORE] * P.NT + [P.RING] * 2

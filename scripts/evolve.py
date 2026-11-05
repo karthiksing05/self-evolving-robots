@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shlex
 import sys
 from pathlib import Path
 
@@ -21,7 +22,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def main(argv: list[str] | None = None) -> int:
-    from sea.evolve.loop import RunConfig, run
+    from sea.evolve.feedback import ProductFeedback
+    from sea.evolve.loop import RunConfig, make_world, run
 
     ap = argparse.ArgumentParser()
     ap.add_argument("--world", required=True)
@@ -43,6 +45,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--robust", type=int, default=0, help="once train is full, this many more seeds must hold (D-101)")
     ap.add_argument("--start", type=Path, default=None, help="a run's summary.json: begin from its final body (D-101)")
     ap.add_argument("--out", type=Path, default=None)
+    ap.add_argument("--notebook", default=RunConfig.model_fields["notebook"].default, help="the notebook this run reads and writes")
+    ap.add_argument("--library-dir", default=RunConfig.model_fields["library_dir"].default, help="the library this run reads and writes")
+    ap.add_argument("--product", default="", help="a command that gives each verdict from the product itself (sea.evolve.feedback)")
     args = ap.parse_args(argv)
     out = args.out or ROOT / "runs" / "evolve" / f"{args.world}_{args.arm}_s{args.seed}"
     if out.exists():  # a run's record is never overwritten (two were lost that way, D-082)
@@ -50,8 +55,12 @@ def main(argv: list[str] | None = None) -> int:
     cfg = RunConfig(world=args.world, arm=args.arm, iterations=args.iterations, seed=args.seed, workers=args.workers,
                     tune_trials=args.tune_trials, model=args.model, effort=args.effort, tools=args.tools,
                     requirements=args.requirements, research=args.research, concepts=args.concepts, plans=args.plans, stripped=args.stripped,
-                    library=args.library, robust=args.robust, start=str(args.start or ""))
-    summary = run(cfg, out, log=lambda m: print(m, flush=True))
+                    library=args.library, robust=args.robust, start=str(args.start or ""), notebook=args.notebook,
+                    library_dir=args.library_dir)
+    if args.product and args.workers > 1:
+        ap.error("--product gives one verdict at a time: use --workers 1")
+    world = ProductFeedback(make_world(args.world), shlex.split(args.product)) if args.product else None
+    summary = run(cfg, out, world=world, log=lambda m: print(m, flush=True))
     keep = {k: summary[k] for k in ("world", "arm", "final_held_train", "test", "spent", "llm", "wall_s", "sim_s")}
     print(json.dumps(keep, indent=1))
     return 0

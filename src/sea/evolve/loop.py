@@ -537,7 +537,7 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
             front = sorted(frontier.values(), key=lambda f: (-(len(f["gained"]) - len(f["lost"])), f["iteration"]))
             budget, req_text, notes_text, concept_text = None, None, None, None
             if cfg.research:
-                notes_text = RS.text(RS.load(notebook))
+                notes_text = RS.text(RS.load(notebook), world=cfg.world)
             groups = sorted({t.group for t in train})
             if cfg.requirements:
                 cur_rows = R.measure(world, body, reqs, train, body, manifest, spent)

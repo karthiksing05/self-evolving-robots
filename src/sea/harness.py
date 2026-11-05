@@ -56,7 +56,7 @@ COMPONENTS: dict[str, tuple[str, tuple[str, ...]]] = {
     "network": ("policy", ("src/sea/plan/network.py",)),
     # the world-agnostic evolution core (D-041): its contracts and resource check decide what a body change
     # is and whether the bench can build it; the loop, prompt and backends decide how boldly it searches
-    "evolve": ("judge", ("src/sea/evolve/core.py", "src/sea/evolve/resources.py")),
+    "evolve": ("judge", ("src/sea/evolve/core.py", "src/sea/evolve/resources.py", "src/sea/evolve/feedback.py")),
     "evolve_loop": ("policy", ("src/sea/evolve/loop.py", "src/sea/evolve/prompt.py", "src/sea/evolve/llm.py",
                                "src/sea/evolve/search.py", "src/sea/evolve/tools.py",
                                "src/sea/evolve/instruments.py", "src/sea/evolve/requirements.py",

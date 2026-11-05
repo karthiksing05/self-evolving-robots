@@ -3303,3 +3303,29 @@ The rod's Euler margin is 3.4 by the reading, 2.3 over D-104's print factor, so 
 **Measured.** The paddle robot's centre of mass rose from 21 to 50 mm, about as predicted, and its motors are now cases on the wheels' axes, so its belly drops from 3.7 to 3.5 cm. Stock stays 6 of 13 under 8 seeds, with the same verdict and label as the catalogue world on all 13 routes. Replayed under the corrected module (`runs/evolve/replay_mobile_kit_s2`), the paddle robot holds 11 of 13 under every seed against 12 before (35-36 of 39 tasks against 37-38). The porch is the one lost: it fails on train under 1 of 8 seeds and holds on test, so it is marginal, not gone. Patio now fails by tipping over rather than grounding its belly. The prediction of 1 to 3 places lost held, at its low end, and the bars' gain mostly does not rest on the error.
 
 **Open.** `kit_match`'s lump for ME 2110 sits at a stated 5 cm and was not moved here.
+
+## D-116 (judge: every graph; world: phonology): a posture where unjoined parts pass through each other does not exist
+
+**Why.** The talking robot of the first live call on `phonology_kit` (`runs/evolve/smoke_phonology_kit_s0`) excluded the contact between its tongue lever and its palate flap, and said so: "the simulator lets the pad and flap overlap if both are raised at once." `excludes` is free, and the interference law moves one joint at a time, so two joints moving together were never judged at all. System 1 could be using a posture no mechanism can hold.
+
+**What.** Refusing the design would outlaw an idea before its trial, and a design that never needs both raised is fine. So each posture is judged: solids of two moving bodies, neither carrying the other, that overlap make that posture nothing the tract can say. `excludes` no longer hides this.
+
+**Prediction.** Stock and the catalogue comparison don't move. `six_servo_palate` keeps most of its gain and may lose a sound or two whose best posture needed both parts raised: 11 to 13 of 17 on test against 13, still far above stock's 5.
+
+**Measured.** I wrote that stock has no such pair and it does: its jaw and its lever are unjoined. Stock's numbers don't move anyway (5 of 17 on train; 4-5 on test, 14-15 of 51 tasks, under 8 seeds). `six_servo_palate` holds 14 of 17 on train and test under every seed (44-47 of 51 tasks), above the prediction of 11 to 13: its one live test read 13 and the recheck shows that was one seed's search. No sound it holds needed the overlap. `ao`, `er` and `ka` stay failing.
+
+## D-117 (policy: every world): a world reads its own notes, and few of any other's
+
+**Why.** The notebook is shared, and every world's prompt carried the same 29.3k characters of notes, naming the gripper's mustard bottle 20 times. Of the 80 notes, 70 are the gripper's, and all 37 with credit earned it on the gripper. Credit says a note helped there, not here, so a new world's System 2 read another world's findings rather than researching its own.
+
+**What.** A world's prompt shows its own family's notes and at most 5 of the most credited notes from other worlds, labelled with their world, and says how many were left out. Nothing is deleted.
+
+**Prediction.** No verdict moves: it changes only what System 2 reads. The notes on `mobile_kit` shrink from 29.3k to 8.3k characters and on `phonology_kit` to 5.1k, measured; the gripper's stay as they were. Research calls per iteration rise or stay level.
+
+## D-118 (judge: evolve): a verdict can come from the product itself
+
+**Why.** The goal (`docs/framework-goal.md`) is design verified by feedback from the product, in simulation or in real life. The loop reads only `World.solve`'s `Outcome`, but nothing showed that holds with no simulator.
+
+**What.** `sea.evolve.feedback.ProductFeedback` keeps a world's brief, kit and laws and takes each verdict from a command: JSON in, an `Outcome` out. `scripts/evolve.py --product`. A product that gives no verdict stops the run. `--notebook` and `--library-dir` let a run start knowing nothing.
+
+**Measured.** A test runs the loop on a world whose own `solve` is removed: the verdicts come from a separate process, its labelled failure reaches System 2's prompt, and the change it proposes is kept on that feedback. This shows the channel works, with a stand-in. No real product has been tried, and none is planned for now.

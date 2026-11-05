@@ -68,6 +68,23 @@ def _unsupported(g: G.Graph, m: mujoco.MjModel, d: mujoco.MjData) -> list[str]:
     return out
 
 
+def unjoined_solids(g: G.Graph, m: mujoco.MjModel) -> list[tuple[int, int]]:
+    """Solids of moving bodies neither carrying the other: what ``interference``, one joint at a time, can't judge
+    when two joints move together, and what ``excludes`` may hide from it (D-116)."""
+    root = g.bodies[0].name
+    by_body = {b.name: [i for i in range(m.ngeom) if m.geom_bodyid[i] == m.body(b.name).id and m.geom_contype[i] == 2]
+               for b in g.bodies if b.joints and b.name != root}
+    parent = {b.name: b.parent for b in g.bodies}
+    names = sorted(by_body)
+    return [(x, y) for i, a in enumerate(names) for b in names[i + 1:] if parent[a] != b and parent[b] != a
+            for x in by_body[a] for y in by_body[b]]
+
+
+def overlapping(m: mujoco.MjModel, d: mujoco.MjData, pairs: Sequence[tuple[int, int]], tol: float = 0.0005) -> bool:
+    """Do any of these solids pass through each other at this pose?  Such a pose does not exist in a real mechanism."""
+    return any(mujoco.mj_geomDistance(m, d, x, y, tol + 1e-3, None) < -tol for x, y in pairs)
+
+
 def _distance_to_geom(m: mujoco.MjModel, d: mujoco.MjData, g: int, p: np.ndarray) -> float:
     """From a point to a solid (m): in its frame, by its shape.  0 inside."""
     q = d.geom_xmat[g].reshape(3, 3).T @ (p - d.geom_xpos[g])

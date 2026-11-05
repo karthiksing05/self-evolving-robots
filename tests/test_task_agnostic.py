@@ -326,3 +326,74 @@ def test_a_part_placed_off_its_body_and_a_motor_with_no_case_are_refused():
     assert any("placed where no solid" in e for e in w.check(body_of(moved)))
     bare = tuple(p for p in robot.parts if not getattr(p, "name", "").startswith("motor_case"))
     assert any("has no case" in e for e in w.check(body_of(bare)))
+
+
+def test_a_posture_where_unjoined_parts_overlap_says_nothing():
+    from sea.mech import graph as G
+    from sea.mech.world import graph_of
+    from sea.worlds.phonology_kit import BLOCKED_CM2, _Tract
+
+    base = graph_of(make_world("phonology_kit").stock())
+
+    def block(name):
+        return G.Body(name=name, parent="frame", joints=(G.Joint(name=f"{name}_q", type="hinge", axis=(0.0, 1.0, 0.0), range=(0.0, 0.0)),),
+                      parts=(G.Box(name=f"{name}_box", pos=(0.0, 0.0, 0.001 if name == "plate" else 0.0), half=(0.002, 0.002, 0.002)),))
+
+    clear = _Tract(base)({"arm": np.zeros(1)})[0]
+    assert not (clear == BLOCKED_CM2).all()
+    both = base.model_copy(update={"bodies": (*base.bodies, block("flap"), block("plate")), "excludes": (*base.excludes, ("flap", "plate"))})
+    assert (_Tract(both)({"arm": np.zeros(1)})[0] == BLOCKED_CM2).all()
+
+
+def test_another_worlds_notes_are_few_and_the_most_credited():
+    from sea.evolve.research import Note, text
+
+    def note(i, world, credit=0):
+        return Note(id=i, claim=f"claim {i}", source_url="u", world=world, credit=credit)
+
+    got = text([note("mine", "mobile_kit"), note("old", "mobile"), note("far", "gripper"), note("low", "gripper", 1), note("high", "gripper", 9)],
+               world="mobile_kit", visiting=1)
+    assert all(f"claim {x}" in got for x in ("mine", "old", "high")) and "claim far" not in got and "claim low" not in got
+    assert "2 notes from other worlds" in got
+
+
+PRODUCT = """
+import json, sys
+ask = json.load(sys.stdin)
+length, d = ask["body"]["parts"]["stick"]["params"]["length"], ask["task"]["data"]["d"]
+far = length >= d
+print(json.dumps({"task": "", "success": far, "score": float(far), "mechanism": "" if far else "too_short",
+                  "detail": f"measured {length} against {d}"}))
+"""
+
+
+def test_a_run_iterates_on_feedback_from_outside_the_process(tmp_path):
+    import sys
+
+    from sea.evolve.core import Edit, ProposalBatch
+    from sea.evolve.feedback import ProductFeedback
+    from sea.evolve.llm import Scripted
+    from sea.evolve.loop import RunConfig, run
+    from tests.test_evolve import _p
+
+    script = tmp_path / "product.py"
+    script.write_text(PRODUCT)
+    inner = Reach()
+    inner.solve = None  # nothing here may judge: every verdict is the product's
+    w = ProductFeedback(inner, [sys.executable, str(script)])
+    longer = _p("params", [Edit(slot="stick", params={"length": 0.3})])
+    p = Scripted([ProposalBatch(proposals=[longer]), ProposalBatch(proposals=[longer])])
+    out = run(RunConfig(world="toy", iterations=2), tmp_path / "run", proposer=p, world=w, log=lambda m: None)
+    assert [c["held_groups"] for c in out["curve"]][:2] == [1, 2]
+    assert out["final_body"]["parts"]["stick"]["params"]["length"] == 0.3
+    assert "too_short" in p.prompts[0] and "measured 0.2 against 0.25" in p.prompts[0]
+
+
+def test_a_product_that_gives_no_verdict_stops_the_run(tmp_path):
+    import sys
+
+    from sea.evolve.feedback import ProductFeedback
+
+    w = ProductFeedback(Reach(), [sys.executable, "-c", "import sys; sys.exit('the rig is off')"])
+    with pytest.raises(RuntimeError, match="the rig is off"):
+        w.solve(w.stock(), w.tasks()[0])

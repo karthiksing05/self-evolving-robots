@@ -201,10 +201,23 @@ def against(path: Path, text: str) -> list[str]:
     return ids
 
 
-def text(notes: list[Note], limit: int = 40) -> str:
-    """The notebook for the prompt: most credited first, then newest."""
+def _family(world: str) -> str:
+    return world.split("_")[0]
+
+
+def text(notes: list[Note], limit: int = 40, world: str = "", visiting: int = 5) -> str:
+    """The notebook for the prompt: most credited first, then newest.  Given a world, its own notes and the ``visiting``
+    most credited of any other world's: credit earned elsewhere says a note was useful there, not here (D-117)."""
     if not notes:
         return "The notebook is empty."
+    rest = 0
+    if world:
+        own = [n for n in notes if _family(n.world) == _family(world)]
+        others = sorted((n for n in notes if _family(n.world) != _family(world) and n.credit > 0), key=lambda n: -n.credit)[:visiting]
+        rest = len(notes) - len(own) - len(others)
+        notes = own + others
+    if not notes:
+        return f"The notebook holds nothing on this yet.  {rest} notes from other worlds were left out."
     order = sorted(notes, key=lambda n: (-n.credit, -n.iteration))[:limit]
     rows = []
     for n in order:
@@ -213,7 +226,8 @@ def text(notes: list[Note], limit: int = 40) -> str:
                     + (f" ({nums})" if nums else "") + (f"; holds {n.validity}" if n.validity else "")
                     + f"; source {n.source_url}")
     more = len(notes) - len(order)
-    return "\n".join(rows + ([f"... and {more} more notes"] if more > 0 else []))
+    return "\n".join(rows + ([f"... and {more} more notes"] if more > 0 else [])
+                     + ([f"{rest} notes from other worlds were left out."] if rest else []))
 
 
 def main(argv: list[str] | None = None) -> None:
