@@ -34,6 +34,14 @@ def _num(v) -> str:
     return f"{v:g}" if isinstance(v, (int, float)) else str(v)
 
 
+def _called(body) -> str:
+    """A body by what it is: the mechanism it was built as, or its id where it was changed by parameters and swaps."""
+    for part in body.parts.values():
+        if part.mechanism:
+            return _human(json.loads(part.mechanism)["name"])
+    return body.id
+
+
 def changes(prev, new) -> tuple[str, frozenset[str]]:
     """What a kept change did to the body, in a line ("What changed: pads none -> pads (pad angle deg 7, ...)"),
     and the slots it touched."""
@@ -43,7 +51,9 @@ def changes(prev, new) -> tuple[str, frozenset[str]]:
         if a == b:
             continue
         slots.add(slot)
-        if a is None or b is None or a.type != b.type:
+        if a is not None and b is not None and a.mechanism != b.mechanism and not (set(b.params.items()) - set(a.params.items())):
+            said.append(f"{_human(json.loads(a.mechanism)['name']) if a.mechanism else _human(a.type)} → {_human(json.loads(b.mechanism)['name'])}")
+        elif a is None or b is None or a.type != b.type:
             shown = ", ".join(f"{_human(k)} {_num(v)}" for k, v in list((b.params if b else {}).items())[:3])
             said.append(f"{_human(slot)} {_human(a.type) if a else 'none'} → {_human(b.type) if b else 'none'}"
                         + (f" ({shown})" if shown else ""))
@@ -118,7 +128,7 @@ def main(argv: list[str] | None = None) -> int:
                     b.verdict = f"{_human(before['mechanism'])} ({b.verdict})"
                     b.headline = grip_headline(tasks[tid], before["mechanism"])
                 title = tasks[tid].facts if len(tasks[tid].facts) <= 110 else tasks[tid].facts[:107] + "…"
-                film, audio = pair(b, a, title, (f"before · {fs[k - 1]['id']}", f"after · {f['id']} (this change)"),
+                film, audio = pair(b, a, title, (f"before · {_called(prev_body)}", f"after · {_called(new_body)} (this change)"),
                                    change=change)
                 name = f"{k:02d}_{f['id']}_{g}.mp4"
                 encode(film, d / name, audio)

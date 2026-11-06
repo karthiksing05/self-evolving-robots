@@ -24,7 +24,7 @@ at that duty, and runs until it is past, stuck for 0.8 s, tipped over, or out of
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from functools import cache
 from typing import Any
 
@@ -73,6 +73,11 @@ class Episode:
     t: np.ndarray = field(default_factory=lambda: np.zeros(0))  # trace times (s)
     qpos: np.ndarray = field(default_factory=lambda: np.zeros((0, 0)))  # trace of every joint, every 20 ms
     model: Any = None
+    v: float = 0.0  # m/s, its speed over the last moments
+    power: float = 0.0  # W, what its motors delivered over the last moments
+    sink: float = 0.0  # m, how deep it runs in soft ground
+    elapsed: float = 0.0  # s it took, as simulated
+    work: float = 0.0  # J its motors delivered, as simulated
 
 
 def _cyl_y(name: str, pos: tuple[float, float, float], r: float, half: float, rgba: str, mass: float) -> str:
@@ -216,6 +221,12 @@ def self_clashes(rb: Robot, tol: float = 0.0005) -> list[tuple[str, str, float, 
     return [(a, b, dz, what) for (a, b), (dz, what) in sorted(worst.items(), key=lambda kv: -kv[1][0])]
 
 
+OBST = (0.05, 0.08, 0.06)  # m: a corridor obstacle's half length and half width, and how far off the line it stands
+SAND_DEPTH = 0.2  # m of soil above the hard floor
+BUMP_V, REACT_S, BACKOFF_S = 0.25, 0.1, 4.0  # a bumper's rated impact speed (m/s), the time to react to a reading, to back off and turn (s)
+CORRIDOR_S = 300.0  # s, a corridor given up on
+SWERVE = 0.35  # rad off the line at most, going round something: what's ahead stays in the sensor's cone
+BEAM = np.radians([0.0, -7.5, 7.5, -15.0, 15.0])  # an ultrasonic ranger's cone, as an HC-SR04's datasheet gives it
 EDGES = ("step", "trench", "stairs", "bump", "threshold")  # obstacles met at an approach duty, that can throw it back
 BEVEL = 30.0  # degrees: a threshold strip's two bevels
 NOSE = 0.003  # m: an edge's rounding (a sharp box edge gives contact normals from one face, not the corner)
@@ -241,8 +252,8 @@ def terrain_xml(kind: str, f: dict[str, float], mu: float) -> tuple[str, float]:
     rounded by NOSE, as a real one is."""
     g = f'friction="{mu:.4f} 0.005 0.0001" priority="1" class="ground"'
     floor = '<geom name="floor" type="plane" size="3 1 0.1" rgba="0.55 0.53 0.5 1" {g}/>'
-    if kind == "floor":  # flat ground: a film's still of a feature MuJoCo does not drive
-        return floor.format(g=g), 0.0
+    if kind == "floor":  # flat ground, as long as the feature is
+        return floor.format(g=g), f.get("len", 0.0)
     if kind == "step":
         h = f["h"] / 100
         return floor.format(g=g) + _block("obstacle", 0.0, 2.0, 0.0, h, g, +1), 0.0
@@ -275,17 +286,71 @@ def terrain_xml(kind: str, f: dict[str, float], mu: float) -> tuple[str, float]:
                 + _block("near", -2.0, 0.0, -d, 0.0, g, -1) + _block("obstacle", w, w + 2.0, -d, 0.0, g, +1)), w
     if kind == "ramp":
         th = math.radians(f["deg"])
-        ln = 1.0
+        ln = max(f.get("len", 0.0) + 0.5, 1.0)  # past its top, as long as the feature; 1 m for a robot from the catalogue
         return floor.format(g=g) + (
             f'<geom name="obstacle" type="box" size="{ln / 2:.5f} 0.6 0.01" euler="0 {-f['deg']:.4f} 0" '
             f'pos="{ln / 2 * math.cos(th) + 0.01 * math.sin(th):.5f} 0 {ln / 2 * math.sin(th) - 0.01 * math.cos(th):.5f}" '
-            f'rgba="0.7 0.68 0.64 1" {g}/>'), 0.5 * math.cos(th)
+            f'rgba="0.7 0.68 0.64 1" {g}/>'), (ln - 0.5) * math.cos(th)
+    if kind == "low":  # a ceiling over the way, ``clear`` above the floor
+        ln, clear = f.get("len", 0.8), f["clear"] / 100
+        return floor.format(g=g) + (f'<geom name="obstacle" type="box" size="{ln / 2:.5f} 0.6 0.05" pos="{ln / 2:.5f} 0 {clear + 0.05:.5f}" '
+                                    f'rgba="0.55 0.42 0.3 1" {g}/>'), ln
+    if kind == "dark":  # a corridor's obstacles, spaced along it, either side of the line by turns
+        ln, n = f.get("len", 2.0), int(round(f.get("n", 1)))
+        return floor.format(g=g) + "".join(
+            f'<geom name="{"obstacle" if i == 0 else f"obstacle{i}"}" type="box" size="{OBST[0]} {OBST[1]} 0.15" '
+            f'pos="{(i + 0.5) * ln / n:.5f} {OBST[2] * (1 if i % 2 else -1):.5f} 0.15" rgba="0.55 0.42 0.3 1" {g}/>' for i in range(n)), ln
+    if kind == "sand":  # a deep bed: its surface is drawn at z = 0, the soil's forces are ``_Soil``'s, and the hard floor is far below
+        return (f'<geom name="floor" type="plane" size="3 1 0.1" pos="0 0 {-SAND_DEPTH:.5f}" rgba="0.4 0.38 0.35 1" {g}/>'
+                '<geom name="sand_top" type="plane" size="3 1 0.1" rgba="0.8 0.72 0.52 1" contype="0" conaffinity="0"/>'), f.get("len", 0.6)
     if kind == "gap":  # two jambs, the opening centred ``off`` off the robot's line
         w, off = f["w"] / 100, f["off"] / 100
         jamb = '<geom name="{n}" type="box" size="0.02 0.25 0.15" pos="0.02 {y:.5f} 0.15" rgba="0.55 0.42 0.3 1" {g}/>'
         return floor.format(g=g) + jamb.format(n="obstacle", y=off + w / 2 + 0.25, g=g) + \
             jamb.format(n="jamb_r", y=off - w / 2 - 0.25, g=g), 0.04
     raise ValueError(kind)
+
+
+class _Soil:
+    """Soft ground under a graph robot (D-119): a Winkler soil, p = k z, in forces applied where each solid meets it.  A
+    wheel bears on the contact patch the brief's area reports, half its radius long, and its traction is mu N limited
+    by slip.  Compacting the soil resists its travel by k z^2 b / 2.  Anything else that reaches the soil bears on its
+    own footprint and is dragged along by mu N, and it bulldozes the same way."""
+
+    def __init__(self, m: mujoco.MjModel, mine: list[int], wheels: set[int], k_kpa_cm: float, mu: float):
+        self.k, self.mu = k_kpa_cm * 1e5, mu  # Pa/m
+        self.wheels, self.rest = [i for i in mine if i in wheels], [i for i in mine if i not in wheels]
+        self.m, self.res, self.sink = m, np.zeros(6), 0.0
+
+    def _apply(self, d: mujoco.MjData, i: int, z: float, b: float, ln: float, at: np.ndarray, slip: float, vel: np.ndarray) -> None:
+        n = max(self.k * b * ln * (z - 0.05 * vel[2]), 0.0)  # soil doesn't bounce
+        fx = -self.mu * n * math.tanh(slip / 0.03) - 0.5 * self.k * z**2 * b * math.tanh(vel[0] / 0.02)
+        fy = -self.mu * n * math.tanh(vel[1] / 0.03)
+        mujoco.mj_applyFT(self.m, d, np.array([fx, fy, n]), np.zeros(3), at, int(self.m.geom_bodyid[i]), d.qfrc_applied)
+
+    def __call__(self, d: mujoco.MjData) -> None:
+        m = self.m
+        d.qfrc_applied[:] = 0.0
+        deep = max((m.geom_size[i][0] - d.geom_xpos[i][2] for i in self.wheels), default=0.0)
+        self.sink += (DT / 0.3) * (max(deep, 0.0) - self.sink)  # how deep it runs, not how it first dropped in
+        for i in self.wheels:
+            r, hw = m.geom_size[i][0], m.geom_size[i][1]
+            c = d.geom_xpos[i]
+            z = r - c[2]
+            if z > 0:
+                mujoco.mj_objectVelocity(m, d, mujoco.mjtObj.mjOBJ_BODY, int(m.geom_bodyid[i]), self.res, 0)
+                vel = self.res[3:]
+                self._apply(d, i, z, 2 * hw, 0.5 * r, np.array([c[0], c[1], -z]), vel[0] - self.res[1] * r, vel)
+        for i in self.rest:
+            c, rot = d.geom_xpos[i], d.geom_xmat[i].reshape(3, 3)
+            s, t = m.geom_size[i], int(m.geom_type[i])
+            local = s[:3] if t == int(mujoco.mjtGeom.mjGEOM_BOX) else np.array([s[0], s[0], s[1] + (s[0] if t == int(mujoco.mjtGeom.mjGEOM_CAPSULE) else 0.0)])
+            half = np.abs(rot) @ local
+            z = half[2] - c[2]
+            if z > 0:
+                mujoco.mj_objectVelocity(m, d, mujoco.mjtObj.mjOBJ_GEOM, i, self.res, 0)
+                vel = self.res[3:]
+                self._apply(d, i, z, 2 * half[1], 2 * half[0], np.array([c[0], c[1], -z]), vel[0], vel)
 
 
 def build(rb: Robot, kind: str, f: dict[str, float], mu: float) -> tuple[mujoco.MjModel, list[str], float]:
@@ -337,18 +402,32 @@ def episode(rb: Robot, kind: str, f: dict[str, float], mu: float, duty: float, y
 
 
 def _roll(m: mujoco.MjModel, d: mujoco.MjData, kind: str, x0: float, goal: float, t_max: float, jid: list[int],
-          radii: list[float], belly_geoms: set[int], trace: bool, members: Any = None) -> Episode:
+          radii: list[float], belly_geoms: set[int], trace: bool, members: Any = None, soil: _Soil | None = None) -> Episode:
     """Run a robot set going at an obstacle until it is past, or what stopped it."""
     ts, qs = [], []
+    run = {"v": float(d.qvel[0]), "power": 0.0, "work": 0.0}
+    done = _done
+
+    def _done_measured(*args: Any) -> Episode:
+        return replace(done(*args), v=run["v"], power=run["power"], sink=soil.sink if soil else 0.0, elapsed=float(d.time), work=run["work"])
+
     best_x, hist = d.qpos[0], []
     belly = bounced = walled = False
     every = int(0.02 / DT)
+    dofs = [m.jnt_dofadr[j] for j in jid]
     for i in range(int(t_max / DT)):
+        if soil is not None:
+            soil(d)
         mujoco.mj_step(m, d)
+        a = DT / 0.3  # what it is doing now, not how it got going
+        run["v"] += a * (float(d.qvel[0]) - run["v"])
+        now = sum(abs(float((d.qfrc_actuator[k] + d.qfrc_passive[k]) * d.qvel[k])) for k in dofs)
+        run["power"] += a * (now - run["power"])
+        run["work"] += now * DT
         if members is not None:  # printed members, judged as on any robot (D-109)
             members.read(d)
             if broke := members.broken():
-                return _done(False, d.qpos[0], x0, goal, "broke", broke, ts, qs, m)
+                return _done_measured(False, d.qpos[0], x0, goal, "broke", broke, ts, qs, m)
         if trace and i % every == 0:
             ts.append(d.time)
             qs.append(d.qpos.copy())
@@ -360,19 +439,19 @@ def _roll(m: mujoco.MjModel, d: mujoco.MjData, kind: str, x0: float, goal: float
             hit = c.geom1 if c.geom1 in belly_geoms else c.geom2 if c.geom2 in belly_geoms else -1
             if hit >= 0 and m.geom_bodyid[c.geom1 if c.geom2 == hit else c.geom2] == 0:
                 belly = True
-            if kind == "gap" and (m.geom(c.geom1).name.startswith(("obstacle", "jamb"))
+            if kind in ("gap", "low") and (m.geom(c.geom1).name.startswith(("obstacle", "jamb"))
                                   or m.geom(c.geom2).name.startswith(("obstacle", "jamb"))):
                 walled = True
         up = d.xmat[1].reshape(3, 3)[2, 2]
         if up < math.cos(math.radians(70)):
-            return _done(False, x, x0, goal, "tipped", "it rolled or pitched past 70 degrees", ts, qs, m)
+            return _done_measured(False, x, x0, goal, "tipped", "it rolled or pitched past 70 degrees", ts, qs, m)
         if x >= goal:
-            return _done(True, x, x0, goal, "", f"past in {d.time:.2f} s", ts, qs, m)
+            return _done_measured(True, x, x0, goal, "", f"past in {d.time:.2f} s", ts, qs, m)
         if i % every == 0:
             hist.append(x)
             if len(hist) > 40 and hist[-1] - hist[-41] < 0.005:  # under 5 mm in the last 0.8 s
                 spin = np.mean([abs(d.qvel[m.jnt_dofadr[j]]) * r for j, r in zip(jid, radii, strict=True)])
-                if kind == "gap":
+                if kind == "gap" or (kind == "low" and walled):
                     why = "wall"
                 elif belly and kind in EDGES:
                     why = "belly"
@@ -380,9 +459,9 @@ def _roll(m: mujoco.MjModel, d: mujoco.MjData, kind: str, x0: float, goal: float
                     why = "bounced"
                 else:
                     why = "stuck_slipping" if spin > 0.03 else "stuck_stalled"
-                return _done(False, x, x0, goal, why, f"stuck {100 * (x - x0):.1f} cm along, its running gear "
+                return _done_measured(False, x, x0, goal, why, f"stuck {100 * (x - x0):.1f} cm along, its running gear "
                              f"turning at {spin:.2f} m/s", ts, qs, m)
-    return _done(False, d.qpos[0], x0, goal, "wall" if walled else "slow", f"not past after {t_max:.1f} s",
+    return _done_measured(False, d.qpos[0], x0, goal, "wall" if walled else "slow", f"not past after {t_max:.1f} s",
                  ts, qs, m)
 
 
@@ -457,8 +536,164 @@ def graph_episode(graph_json: str, kind: str, f: dict[str, float], mu: float, du
     goal = past - rear + 0.01
     t_max = min(15.0, 2.0 + 2.5 * (goal - x0) / max(v_ss, 0.1 * v0, 0.03))
     wheel_geoms = {p.name for p in wheels.values()}
+    dofs = [m.jnt_dofadr[j] for j in jid]
+    if kind == "floor" and f.get("len", 0.0) > 0:
+        _friction(m, dofs, radii, crr, mass)
+        return _cruise(m, d, x0, goal, max(t_max, 3.0 * goal / max(v_ss, 0.05) + 10.0), dofs, f.get("cap", 0.0), trace)
+    if kind == "dark":
+        _friction(m, dofs, radii, crr, mass)
+        sides = [(m.actuator(a.name).id, float(np.sign(d.ctrl[m.actuator(a.name).id]) or 1.0), 1 if d.xpos[m.jnt_bodyid[m.joint(a.joint).id]][1] > 0 else -1) for a in drive]
+        lo, hi = min((d.geom_xpos[i][1] - m.geom_rbound[i] for i in mine), default=0.0), max((d.geom_xpos[i][1] + m.geom_rbound[i] for i in mine), default=0.0)
+        return _corridor(m, d, g, x0, goal, duty, sides, dofs, front - rear, (hi - lo) / 2, trace)
+    soil = _Soil(m, mine, {i for i in mine if m.geom(i).name in wheel_geoms}, f["kmod"], mu) if kind == "sand" else None
+    if soil is None:  # soil brings its own
+        _friction(m, dofs, radii, crr, mass)
     return _roll(m, d, kind, x0, goal, t_max, jid, radii, {i for i in mine if m.geom(i).name not in wheel_geoms}, trace,
-                 PrintedMembers(m, found) if (found := printed_members(g, m)) else None)
+                 PrintedMembers(m, found) if (found := printed_members(g, m)) else None, soil)
+
+
+def _friction(m: mujoco.MjModel, dofs: list[int], radii: list[float], crr: float, mass: float) -> None:
+    """Rolling resistance, on the wheels' own joints."""
+    for k, r in zip(dofs, radii, strict=True):
+        m.dof_frictionloss[k] = crr * mass * 9.81 * r / max(len(dofs), 1)
+
+
+def _cruise(m: mujoco.MjModel, d: mujoco.MjData, x0: float, goal: float, t_max: float, dofs: list[int], cap: float, trace: bool) -> Episode:
+    """Plain ground, driven its whole length: a long way, so stepped in C, and read every 0.1 s.  ``cap``: the J its pack
+    could ever deliver, past which there's no use going on."""
+    ts, qs, work, best, last = [], [], 0.0, d.qpos[0], 0.0
+    power = 0.0
+    m.opt.timestep = 2 * DT  # as coarse as the contact's time constant allows: there is nothing here to climb
+    chunk = 50
+    n = int(t_max / (chunk * m.opt.timestep))
+    for _ in range(n):
+        mujoco.mj_step(m, d, nstep=chunk)
+        power = sum(abs(float((d.qfrc_actuator[k] + d.qfrc_passive[k]) * d.qvel[k])) for k in dofs)
+        work += power * chunk * m.opt.timestep
+        x = float(d.qpos[0])
+        if trace and len(ts) < 1000:
+            ts.append(d.time)
+            qs.append(d.qpos.copy())
+        if x >= goal or work >= cap > 0:
+            return replace(_done(x >= goal, x, x0, goal, "" if x >= goal else "drained", f"past in {d.time:.1f} s", ts, qs, m),
+                           v=float(d.qvel[0]), power=power, elapsed=float(d.time), work=work)
+        if x - best > 0.005:
+            best, last = x, d.time
+        elif d.time - last > 1.0:
+            return replace(_done(False, x, x0, goal, "stuck_stalled", f"stuck {100 * (x - x0):.1f} cm along", ts, qs, m),
+                           v=float(d.qvel[0]), power=power, elapsed=float(d.time), work=work)
+    return replace(_done(False, float(d.qpos[0]), x0, goal, "slow", f"not past after {t_max:.0f} s", ts, qs, m),
+                   v=float(d.qvel[0]), power=power, elapsed=float(d.time), work=work)
+
+
+def _corridor(m: mujoco.MjModel, d: mujoco.MjData, g: Any, x0: float, goal: float, duty: float, drive: list[tuple[int, float, int]],
+              dofs: list[int], length: float, half_w: float, trace: bool) -> Episode:
+    """A dark corridor driven whole (D-119).  Its sensors read what is ahead by rays from where they are mounted and aimed.
+    Seeing something with room to go round, it steers past on the nearer side by driving its wheels unequally; too close for
+    that, a reaction time later it brakes and backs up until there is room; with nothing seen, it learns of an obstacle by
+    touching it.  A touch above the
+    bumper's rating fails, and so does getting nowhere."""
+    from sea.mech.graph import RangeFinder
+
+    rays = []
+    for s in g.sensors:
+        if isinstance(s, RangeFinder):
+            q = np.zeros(9)
+            mujoco.mju_quat2Mat(q, np.array(s.quat))
+            rays.append((m.body(s.body).id, np.array(s.pos), q.reshape(3, 3)[:, 2], s.max_m))
+    names = {i: m.geom(i).name for i in range(m.ngeom)}
+    obstacles = {i for i, n in names.items() if n.startswith("obstacle")}
+    mine = {i for i in range(m.ngeom) if m.geom_contype[i] == 2}
+    ts, qs, work, power, geom = [], [], 0.0, 0.0, np.zeros(1, np.int32)
+    mask = np.array([1, 0, 0, 0, 0, 0], np.uint8)  # the terrain's geom group, not the robot's own solids
+    chunk, dt = 10, 10 * DT
+    mode, until, target_y, passing = "cruise", 0.0, 0.0, None
+    best, last, tries = float(d.qpos[0]), 0.0, 0
+    before, back_to = d.qvel[:3].copy(), float(d.qpos[0])
+
+    def done(ok: bool, why: str, detail: str) -> Episode:
+        return replace(_done(ok, float(d.qpos[0]), x0, goal, why, detail, ts, qs, m), v=abs(float(d.qvel[0])), power=power,
+                       elapsed=float(d.time), work=work)
+
+    def wheels(left: float, right: float) -> None:
+        for i, sign, side in drive:
+            d.ctrl[i] = sign * float(np.clip(left if side > 0 else right, -1.0, 1.0))
+
+    while d.time < CORRIDOR_S:
+        x, y, v = float(d.qpos[0]), float(d.qpos[1]), float(d.qvel[0])
+        w, _, _, z = d.qpos[3:7]
+        yaw = 2.0 * math.atan2(z, w)
+        hit = next((c for c in d.contact[:d.ncon]
+                    if (c.geom1 in obstacles and c.geom2 in mine) or (c.geom2 in obstacles and c.geom1 in mine)), None)
+        touching = None if hit is None else (hit.geom1 if hit.geom1 in obstacles else hit.geom2)
+        if touching is not None and mode != "back":
+            into = abs(float(before @ hit.frame[:3]))  # into the obstacle, as it arrived: brushing past at speed is no impact
+            if into > BUMP_V:
+                return done(False, "wall", f"met an obstacle at {into:.2f} m/s; a bumper is rated for {BUMP_V:.2f} m/s")
+            passing, tries = touching, tries + 1
+            if tries > 6 * len(obstacles):
+                return done(False, "wall", f"kept meeting obstacles, {tries} times")
+            target_y = _clear_line(m, d, touching, half_w)
+            mode, until = "back", d.time + BACKOFF_S
+            back_to = x - abs(target_y - y) / math.tan(SWERVE) - 0.1
+        elif mode == "cruise":
+            for bid, pos, axis, reach in rays:
+                rot = d.xmat[bid].reshape(3, 3)
+                aim = rot @ axis
+                for off in BEAM:  # a sensor sees a cone, not a line: across it, in the plane of the floor
+                    c, s_ = math.cos(off), math.sin(off)
+                    r = mujoco.mj_ray(m, d, d.xpos[bid] + rot @ pos, np.array([c * aim[0] - s_ * aim[1], s_ * aim[0] + c * aim[1], aim[2]]),
+                                      mask, 1, -1, geom)
+                    seen = int(geom[0])
+                    if not (0 <= r <= reach and seen in obstacles and seen != passing):
+                        continue
+                    stop = v**2 / (2 * 0.5 * 9.81) + v * REACT_S + 0.05 + half_w * abs(math.sin(yaw))  # to stop, its corner included
+                    aside = _clear_line(m, d, seen, half_w)
+                    swerve = abs(aside - y) / math.tan(SWERVE) + stop
+                    if r >= swerve and (passing is None or x > d.geom_xpos[passing][0] + OBST[0] + length):  # room to go round
+                        passing, target_y = seen, aside
+                    elif r < swerve:  # too late to go round: stop, and back up until there is room
+                        passing, target_y, mode, until = seen, aside, "brake", d.time + REACT_S
+                        back_to = float(d.geom_xpos[seen][0]) - OBST[0] - length - abs(aside - y) / math.tan(SWERVE) - 0.1
+                        break
+                if mode == "brake":
+                    break
+        if mode == "brake" and d.time >= until:
+            wheels(0.0, 0.0)
+            if abs(v) < 0.02:
+                mode, until = "back", d.time + BACKOFF_S
+        elif mode == "back":
+            wheels(-0.5, -0.5)
+            if x <= back_to or d.time >= until:
+                mode = "cruise"
+        elif mode == "cruise":
+            if passing is not None and x > d.geom_xpos[passing][0] + OBST[0] + length:
+                passing, target_y = None, 0.0
+            want = float(np.clip(-4.0 * (y - target_y), -SWERVE, SWERVE))
+            steer = float(np.clip(1.5 * (want - yaw), -0.6, 0.6))
+            wheels(duty - steer, duty + steer)
+        before = d.qvel[:3].copy()
+        mujoco.mj_step(m, d, nstep=chunk)
+        power = sum(abs(float((d.qfrc_actuator[k] + d.qfrc_passive[k]) * d.qvel[k])) for k in dofs)
+        work += power * dt
+        if trace and int(d.time / dt) % 2 == 0:
+            ts.append(d.time)
+            qs.append(d.qpos.copy())
+        if d.xmat[1].reshape(3, 3)[2, 2] < math.cos(math.radians(70)):
+            return done(False, "tipped", "it rolled or pitched past 70 degrees")
+        if d.qpos[0] >= goal:
+            return done(True, "", f"through in {d.time:.1f} s, touching {tries} times")
+        if d.qpos[0] - best > 0.01:
+            best, last = float(d.qpos[0]), d.time
+        elif d.time - last > 20.0:
+            return done(False, "stuck_stalled", f"got nowhere for 20 s at {100 * (d.qpos[0] - x0):.0f} cm along")
+    return done(False, "slow", f"not through after {CORRIDOR_S:.0f} s")
+
+
+def _clear_line(m: mujoco.MjModel, d: mujoco.MjData, obstacle: int, half_w: float) -> float:
+    """The line past an obstacle on whichever side of it is nearer."""
+    c, y = float(d.geom_xpos[obstacle][1]), float(d.qpos[1])
+    return c + (1.0 if y >= c else -1.0) * (OBST[1] + half_w + 0.03)
 
 
 @cache

@@ -871,7 +871,8 @@ def _formants(task: Task, f: np.ndarray, w: int, h: int = 64) -> np.ndarray:
     return np.asarray(im)
 
 
-def phonology(body: Body, task: Task, controls: dict[str, float], seed: int = 0, size: tuple[int, int] = (860, 300)) -> Clip:
+def phonology(body: Body, task: Task, controls: dict[str, float], seed: int = 0, size: tuple[int, int] = (860, 300),
+              rig: Any = None, model: Any = None) -> Clip:
     """The body at the recorded posture, heard and seen: the tube's shape as the sound plays (for a stop, the
     glide into the closure and out, frame by frame with the sound), a vowel's resonances against its target,
     and the CAD of the body in a corner.  A posture's verdict draws on no seed; ``seed`` keeps the signature
@@ -880,7 +881,7 @@ def phonology(body: Body, task: Task, controls: dict[str, float], seed: int = 0,
 
     from sea.design.cad import render
 
-    r = P.rig(body)
+    r = rig or P.rig(body)
     kind = task.data["kind"]
 
     def posture(prefix: str) -> dict[str, float]:
@@ -907,7 +908,7 @@ def phonology(body: Body, task: Task, controls: dict[str, float], seed: int = 0,
         said = (f"closure: {said}; vowel: {P.PhonologyWorld._said(task.data['vowel'], fv[0], cv[0])}; the servos "
                 f"take {1000 * release:.0f} ms between them")
     w, h = size
-    model = C.phonology(body, ctl)
+    model = model if model is not None else C.phonology(body, ctl)
     tw = w - 640
     model.views, model.tile = model.views[:1], (tw, int(tw * 0.72))
     thumb = np.asarray(Image.open(__import__("io").BytesIO(render([model])[0])).convert("RGB"))
@@ -986,6 +987,7 @@ GROUND = {"concrete": (0.70, 0.70, 0.68), "tile": (0.86, 0.85, 0.81), "wood": (0
           "sand": (0.86, 0.78, 0.55)}
 RUBBER = (0.13, 0.13, 0.14, 1.0)
 PHYSICAL = ("step", "trench", "stairs", "bump", "threshold", "ramp", "gap")  # what MuJoCo drives (D-063, D-069)
+DRIVEN = (*PHYSICAL, "sand", "low", "dark")  # and for a robot built as a graph (D-119)
 
 
 @dataclass
@@ -994,10 +996,10 @@ class Leg:
     ep: Any  # sea.sim.mobile_model.Episode, traced
 
 
-def legs(body: Body, task: Task, controls: dict[str, float]) -> tuple[bool, str, str, list[Leg]]:
+def legs(body: Body, task: Task, controls: dict[str, float], spec: Any = None) -> tuple[bool, str, str, list[Leg]]:
     """The route at its nominal dimensions, as the world judges it, and the MuJoCo episode of every obstacle the
     robot reached: (success, mechanism, detail, legs).  Each episode is the judge's own, rerun with its trace."""
-    s = M._spec(body)
+    s = spec or M._spec(body)
     route, secs = task.data["route"], float(task.data["secs"])
     ctl = {**M.PROBE, **controls}
     ok, _, mech, detail = M._attempt(s, route, secs, ctl, M._Calm())
@@ -1010,9 +1012,13 @@ def legs(body: Body, task: Task, controls: dict[str, float]) -> tuple[bool, str,
             out.append(Leg(f, M._drive(s, k, f, mu * s.edge, ctl["approach"], trace=True)))
         elif k == "ramp":
             out.append(Leg(f, M._drive(s, k, f, mu, ctl["speed"], trace=True)))
-        elif k == "gap" and f["w"] > s.width:
+        elif s.graph and k in ("sand", "low"):
+            out.append(Leg(f, M._drive(s, k, f, mu, ctl["speed"], trace=True)))
+        elif s.graph and k == "dark":
+            out.append(Leg(f, M._drive(s, k, f, mu, ctl["dark"], trace=True)))
+        elif k == "gap" and (f["w"] > s.width or s.graph):
             out.append(Leg(f, M._drive(s, k, f | {"off": f["off"] - ctl["line"]}, mu, ctl["speed"], trace=True)))
-    if not out or (not ok and route[upto - 1]["k"] not in PHYSICAL):  # it stopped where MuJoCo does not drive
+    if not out or (not ok and route[upto - 1]["k"] not in (DRIVEN if s.graph else PHYSICAL)):  # it stopped where MuJoCo does not drive
         last = route[upto - 1]
         out.append(Leg(last, M._drive(s, "floor", {"k": "floor", "s": last["s"]}, M._mu(s, last["s"]), 0.0,
                                       trace=True)))
@@ -1103,6 +1109,8 @@ def _dimension(img: np.ndarray, scn, f: dict) -> np.ndarray:
         x, yy = pt(0.12, y, 0.0)
         d.rectangle([x - 4, yy - 30, x + 110, yy - 10], fill=(255, 255, 255, 215))
         d.text((x, yy - 30), f"{f['deg']:.1f}° ramp", fill=(150, 60, 20), font=_font(15, True))
+    elif f["k"] == "low":
+        _arrow(d, pt(0.0, y, 0.0), pt(0.0, y, f["clear"] / 100), f"{f['clear']:.1f} cm clearance")
     elif f["k"] == "gap":
         off, half = f["off"] / 100, f["w"] / 200
         _arrow(d, pt(0.0, off - half, 0.3), pt(0.0, off + half, 0.3), f"opening {f['w']:.1f} cm")
@@ -1146,11 +1154,12 @@ def mobile_headline(body: Body, ok: bool, mech: str, detail: str, where: dict) -
         got = re.search(r"reached in (\d+) s of (\d+)", detail)
         return f"Makes it: the end of the route in {got[1]} s (limit {got[2]} s)" if got else "Makes it to the end"
     thing = THING.get(where["k"], "the route").format(**where)
-    loco = LOCO.get(body.parts["locomotion"].type, body.parts["locomotion"].type.replace("_", " "))
+    drive = body.parts["locomotion"].type if "locomotion" in body.parts else "wheels4"  # a robot built as a graph has wheels
+    loco = LOCO.get(drive, drive.replace("_", " "))
     return MOBILE_PLAIN.get(mech, "Stops at {thing} (" + mech.replace("_", " ") + ")").format(thing=thing, loco=loco)
 
 
-def mobile(body: Body, task: Task, controls: dict[str, float], seed: int = 0, size: tuple[int, int] = (640, 420)) -> Clip:
+def mobile(body: Body, task: Task, controls: dict[str, float], seed: int = 0, size: tuple[int, int] = (640, 420), spec: Any = None) -> Clip:
     """Each obstacle on the route replayed in MuJoCo at the recorded controls, as the judge drove it (D-063),
     up to where the robot stopped.  A failure MuJoCo does not drive (sand, an overhang, the dark, the battery)
     ends on a still of the robot on that ground with the world's numbers.  ``seed`` is unused: the route
@@ -1158,7 +1167,8 @@ def mobile(body: Body, task: Task, controls: dict[str, float], seed: int = 0, si
     size drawn on its near face; a doorway from above, its opening drawn across it."""
     import mujoco
 
-    ok, mech, detail, route_legs = legs(body, task, controls)
+    ok, mech, detail, route_legs = legs(body, task, controls, spec)
+    driven = DRIVEN if spec is not None else PHYSICAL
     w, h = size
     frames: list[np.ndarray] = []
     deepest = 0.0
@@ -1198,13 +1208,13 @@ def mobile(body: Body, task: Task, controls: dict[str, float], seed: int = 0, si
             cam.lookat[:] = (x_cam, 0.0, z)
             view.colour.scene.flags[mujoco.mjtRndFlag.mjRND_FOG] = 1
             img = view.shot(d, cam, opt)
-            if f["k"] in PHYSICAL:  # a doorway refused before driving still has its size drawn, over its jambs
+            if f["k"] in driven:  # a doorway refused before driving still has its size drawn, over its jambs
                 img = _dimension(img, view.colour.scene, f)
             calc = (f"calculated, not simulated: it sinks {float(sunk[1]):.1f} cm into the sand" if sunk else
-                    "" if f["k"] in PHYSICAL else "calculated, not simulated: " + here)
+                    "" if f["k"] in driven else "calculated, not simulated: " + here)
             frames.append(caption(img, top=f"t {ep.t[k]:.1f} s · MuJoCo" if k is not None and not calc else calc))
         view.close()
-        if f["k"] in PHYSICAL:
+        if f["k"] in driven:
             tag = f"gets past {here}" if ep.ok else f"stopped at {here}"
             frames += [caption(frames[-1], bottom=tag, colour=GOOD if ep.ok else BAD)] * int(0.8 * FPS)
     verdict = detail.split(": ", 1)[1] if (not ok and ": " in detail) else detail
@@ -1216,8 +1226,23 @@ def mobile(body: Body, task: Task, controls: dict[str, float], seed: int = 0, si
                 headline=mobile_headline(body, ok, mech, detail, where), clipping_mm=1000 * deepest)
 
 
+def mobile_kit(body: Body, task: Task, controls: dict[str, float], seed: int = 0, size: tuple[int, int] = (640, 420)) -> Clip:
+    """A robot built as a graph, driven through the same film as the catalogue's: only where its numbers come from differs."""
+    from sea.worlds.mobile_kit import _spec
+
+    return mobile(body, task, controls, seed, size, spec=_spec(body.parts["robot"].mechanism))
+
+
+def phonology_kit(body: Body, task: Task, controls: dict[str, float], seed: int = 0, size: tuple[int, int] = (860, 300)) -> Clip:
+    """A talking robot built as a graph: its own area function, and the CAD of its graph in the corner."""
+    from sea.evolve.loop import make_world
+    from sea.worlds.graph_cad import graph
+
+    return phonology(body, task, controls, seed, size, rig=make_world("phonology_kit").rig_of(body), model=graph(body))
+
+
 FILM: dict[str, Callable[..., Clip]] = {"gripper": gripper, "gripper_dense": gripper, "mobile": mobile,
-                                        "phonology": phonology}
+                                        "phonology": phonology, "mobile_kit": mobile_kit, "phonology_kit": phonology_kit}
 # The harness components each replay reads (sea/harness.py): a run recorded when any of them differed is not
 # filmed, since today's replay would show what the run never saw.
 _GRIPPER = ("world_gripper", "physics", "tools", "grasp_world", "verifier", "contracts", "limits", "kinematics",
@@ -1226,4 +1251,5 @@ _GRIPPER = ("world_gripper", "physics", "tools", "grasp_world", "verifier", "con
 # (Body, Part, Task), and what changes there (costs, ledgers, proposal rules: D-043..D-047) never reaches a
 # replay.  A replay that still disagrees with the run's record is not filmed (scripts/film_bodies.py).
 READS: dict[str, tuple[str, ...]] = {"gripper": _GRIPPER, "gripper_dense": _GRIPPER, "mobile": ("world_mobile",),
-                                     "phonology": ("world_phonology",)}
+                                     "phonology": ("world_phonology",), "mobile_kit": ("world_mobile",),
+                                     "phonology_kit": ("world_phonology",)}

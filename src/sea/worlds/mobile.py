@@ -6,6 +6,9 @@ tub, drive gearmotors, a battery pack and an obstacle sensor.  System 1 drives t
 the line through an opening, the approach duty at an edge and the speed in the dark, under seeded noise
 (terrain dimensions ±2 %, traction ±3 %, steering error), and must repeat a success on fresh seeds.
 
+A robot built as a graph (`worlds/mobile_kit.py`) drives every feature in MuJoCo instead (D-119): the formulas below are then what its
+brief estimates and what the catalogue world still judges by.
+
 The simulator walks the route feature by feature with quasi-static vehicle mechanics (plain Python, tens of
 microseconds per attempt).  The pack's cells are in series and its voltage drives the motors: stall force
 and no-load speed scale with volts / the winding's rated volts, which must lie in 0.5-1.5 times it (D-062).
@@ -39,6 +42,7 @@ from __future__ import annotations
 
 import functools
 import math
+import re
 import time
 import zlib
 from collections.abc import Sequence
@@ -54,7 +58,7 @@ from sea.sim import mobile_model as MM
 G = 9.81
 TUB_H = 4.0  # cm: depth of the chassis tub
 ELEC_W, ELEC_G = 2.5, 60.0  # onboard computer, IMU and wiring: power (W) and mass (g)
-BUMP_V, BACKOFF_S, REACT_S = 0.25, 4.0, 0.1  # bumper's rated impact speed, time to back off and turn, reaction
+BUMP_V, BACKOFF_S, REACT_S = MM.BUMP_V, MM.BACKOFF_S, MM.REACT_S  # bumper's rated impact speed, time to back off and turn, reaction
 SURF = {  # rubber-on-surface friction, rolling-resistance coefficient of a 3 cm wheel
     "tile": (0.60, 0.012), "wood": (0.60, 0.014), "carpet": (0.70, 0.045), "concrete": (0.75, 0.015),
     "gravel": (0.55, 0.060), "grass": (0.55, 0.120), "sand": (0.50, 0.150)}
@@ -267,7 +271,9 @@ def _drive(s: Spec, kind: str, f: dict[str, Any], mu: float, duty: float, y0: fl
            standing: bool = False, trace: bool = False) -> MM.Episode:
     """One MuJoCo episode at an obstacle, its arguments quantised so that search shares physics (D-063).  With
     ``trace`` (a film), the same episode run afresh with its trajectory kept."""
-    q = {"h": 0.1, "w": 0.1, "depth": 0.1, "deg": 0.25, "off": 0.25, "run": 0.5, "n": 1.0, "d": 0.1}  # cm, deg, count
+    q = {"h": 0.1, "w": 0.1, "depth": 0.1, "deg": 0.25, "off": 0.25, "run": 0.5, "n": 1.0, "d": 0.1, "clear": 0.05, "len": 0.1, "kmod": 0.01, "cap": 100.0}  # cm, deg, count; m; kPa/cm; J
+    if not s.graph:  # the catalogue world judges these by its formulas
+        q = {k: v for k, v in q.items() if k not in ("clear", "len", "kmod", "cap")}
     items = tuple(sorted((k, round(f[k] / q[k]) * q[k]) for k in q if k in f))
     if s.graph:
         built = (s.graph, kind, items, round(mu / 0.03) * 0.03, round(duty / 0.05) * 0.05, round(y0 / 0.25) * 0.25 / 100, _crr(s, f["s"]), s.kit_kg)
@@ -368,6 +374,8 @@ def _attempt(s: Spec, route: list[dict[str, Any]], secs: float, ctl: dict[str, f
              rng: np.random.Generator | _Calm, probe: bool = False) -> tuple[bool, float, str, str]:
     """Drive one route once: (success, score, mechanism, detail).  A ``probe`` ignores control-level failures
     and drives at the best speed everywhere, so only a limit of the body can stop it."""
+    if s.graph:
+        return _route(s, route, secs, ctl, rng, probe)
     n, t, t_best, e, e_best, dark_note = len(route), 0.0, 0.0, 0.0, 0.0, ""
     for i, nominal in enumerate(route):
         f = {key: v * (1 + rng.uniform(-0.02, 0.02)) if isinstance(v, float) and key != "off" else v
@@ -456,6 +464,88 @@ def _attempt(s: Spec, route: list[dict[str, Any]], secs: float, ctl: dict[str, f
         return False, 1 - 0.5 / n * (1 - secs / t), mech, (
             f"reached the end in {t:.0f} s ({t_best:.0f} s at best); {secs:.0f} s allowed{dark_note}")
     return True, 1.0, "", f"reached in {t:.0f} s of {secs:.0f}, using {e / 3600:.3f} Wh"
+
+
+def _route(s: Spec, route: list[dict[str, Any]], secs: float, ctl: dict[str, float], rng: np.random.Generator | _Calm,
+           probe: bool = False) -> tuple[bool, float, str, str]:
+    """A robot built as a graph: every feature driven in MuJoCo at its whole length, and the clock and the pack as those
+    episodes ran them (D-119)."""
+    n, t, e = len(route), 0.0, 0.0
+    cap = s.usable_j * s.eta
+    hit_dark = False
+    for i, nominal in enumerate(route):
+        f = {key: v * (1 + rng.uniform(-0.02, 0.02)) if isinstance(v, float) and key != "off" else v for key, v in nominal.items()}
+        k, surf = f["k"], f["s"]
+        mu = _mu(s, surf) * (1 + rng.normal(0.0, 0.03))
+        duty = 1.0 if probe else ctl["dark" if k == "dark" else "speed"]
+        approach = 1.0 if probe else ctl.get("approach", 1.0)
+        what, fail, ep = f"stopped at feature {i + 1}/{n}, {_desc(nominal)}", None, None
+        if k in MM.EDGES:
+            ep, fail = _drive(s, k, f, mu * s.edge, approach), _edge(s, f, mu * s.edge, approach)
+        elif k == "gap":
+            margin, sig = (f["w"] - s.width) / 2, s.drift * (0.3 + 0.7 * duty)
+            err = (0.0 if probe else ctl["line"] - nominal["off"]) + rng.normal(0.0, sig)
+            ep = _drive(s, "gap", f | {"off": -err}, mu, duty)
+            if not ep.ok and margin <= 0:
+                fail = ("chassis_wider_than_gap", f"the robot is {s.width:.1f} cm wide overall; the opening is {f['w']:.1f} cm, and it "
+                        f"drove into the jambs: {ep.detail}", 0.0)
+            elif not ep.ok:
+                fail = ("gap_margin_below_drift" if margin < 2 * s.drift * 0.405 else "clipped_gap_edge",
+                        f"{margin:.2f} cm to spare per side; it came {err:+.2f} cm off centre (steering error sigma {sig:.2f} cm at duty "
+                        f"{duty:.2f}) and met the jamb: {ep.detail}", 0.5 * ep.progress)
+        elif k == "ramp":
+            ep = _drive(s, "ramp", f, mu, duty)
+            what2 = f"the {f['deg']:.1f} deg {surf} ramp (mu {mu:.2f}) at duty {duty:.2f}: {ep.detail}"
+            if ep.why == "tipped":
+                fail = ("tipped_over", f"tipped over on {what2}", 0.5 * ep.progress)
+            elif ep.why in ("stuck_stalled", "slow"):
+                fail = ("stalled_at_low_duty" if duty < 0.999 else "motor_torque_short_on_ramp", f"the drive stalled on {what2}", 0.5 * ep.progress)
+            elif not ep.ok:
+                fail = ("slips_on_ramp", f"its contacts slipped on {what2}", 0.5 * ep.progress)
+        elif k == "sand":
+            ep = _drive(s, "sand", f, mu, duty)
+            if not ep.ok:
+                fail = ("tipped_over" if ep.why == "tipped" else "sinks_in_sand",
+                        f"it runs {100 * ep.sink:.2f} cm deep on {s.area:.0f} cm2 of contact and {ep.detail}", 0.5 * ep.progress)
+        elif k == "low":
+            ep = _drive(s, "low", f, mu, duty)
+            if not ep.ok:
+                fail = ("too_tall_for_clearance" if ep.why in ("wall", "tipped") else "stalled_at_low_duty",
+                        f"the robot is {s.height:.1f} cm tall; the overhang is {f['clear']:.1f} cm; {ep.detail}", 0.5 * ep.progress)
+        elif k == "dark":
+            hit_dark = True
+            tries = (1.0, 0.6, 0.35, 0.2, 0.1) if probe else (duty,)  # a probe finds the speed the body can go at
+            for dd in tries:
+                ep = _drive(s, "dark", f, mu, dd)
+                if ep.ok:
+                    break
+            if not ep.ok:
+                fail = (("collided_in_dark" if ep.why == "wall" else "tipped_over" if ep.why == "tipped" else "sensing_range_short"),
+                        f"with {s.sense:.2f} m of sensing at duty {duty:.2f}, {ep.detail}", 0.5 * ep.progress)
+        else:  # plain ground, driven its whole length
+            ep = _drive(s, "floor", f | {"cap": cap}, mu, duty)
+            if not ep.ok and ep.why != "drained":
+                fail = ("stalled_at_low_duty" if duty < 0.999 else "motor_torque_short", f"at duty {duty:.2f} it cannot move on {surf}: {ep.detail}", 0.0)
+        if fail is not None and not (probe and fail[0] in CONTROL_LEVEL):
+            return False, (i + fail[2]) / n, fail[0], f"{what}: {fail[1]}"
+        spent = ep.work / s.eta + s.p_w * ep.elapsed
+        if ep.why == "drained" or e + spent > s.usable_j:
+            frac = max(0.0, (s.usable_j - e) / max(spent, 1e-6))
+            return False, (i + min(frac, 1.0)) / n, "battery_exhausted" if probe or duty >= 0.999 else "drained_at_chosen_speed", (
+                f"{what}: the {s.wh:.1f} Wh pack ({s.usable_j / 3600:.2f} Wh usable) ran out {100 * min(frac, 1.0):.0f}% of the way, drawing "
+                f"{ep.power / s.eta + s.p_w:.2f} W at {ep.v:.2f} m/s on {surf} at {s.m:.2f} kg")
+        t, e = t + ep.elapsed, e + spent
+    if t > secs:
+        best = t if probe else _best_time(s, route, ctl)
+        mech = ("sensing_range_short" if hit_dark else "too_slow_for_time_limit") if best > secs else "too_slow_at_chosen_speed"
+        return False, 1 - 0.5 / n * (1 - secs / t), mech, f"reached the end in {t:.0f} s ({best:.0f} s at best); {secs:.0f} s allowed"
+    return True, 1.0, "", f"reached in {t:.0f} s of {secs:.0f}, using {e / 3600:.3f} Wh"
+
+
+def _best_time(s: Spec, route: list[dict[str, Any]], ctl: dict[str, float]) -> float:
+    """How long the route takes this body at its best speed, as driven."""
+    got = re.search(r"in (\d+) s", _route(s, route, 1e9, ctl, _Calm(), probe=True)[3])
+    return float(got[1]) if got else math.inf
 
 
 CONTROLS = {  # System 1's controls: range, starting value, the features that call for them

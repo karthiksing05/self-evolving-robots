@@ -397,3 +397,86 @@ def test_a_product_that_gives_no_verdict_stops_the_run(tmp_path):
     w = ProductFeedback(Reach(), [sys.executable, "-c", "import sys; sys.exit('the rig is off')"])
     with pytest.raises(RuntimeError, match="the rig is off"):
         w.solve(w.stock(), w.tasks()[0])
+
+
+def _kit_spec():
+    from sea.worlds.mobile_kit import _spec
+
+    w = make_world("mobile_kit")
+    return w, _spec(w.stock().parts["robot"].mechanism)
+
+
+def test_a_kit_robots_floor_is_driven_and_agrees_with_the_analysis():
+    import sea.worlds.mobile as W
+
+    _, s = _kit_spec()
+    ep = W._drive(s, "floor", {"k": "floor", "s": "grass", "len": 3.0}, W._mu(s, "grass"), 1.0)
+    force = W._crr(s, "grass") * s.m * 9.81
+    assert ep.ok and ep.v == pytest.approx(W._speed(s, 1.0, force), rel=0.02)
+    assert ep.power / ep.v == pytest.approx(force, rel=0.05)
+
+
+def test_soil_sinks_a_wheel_as_winkler_says_and_a_belly_stops_it():
+    import sea.worlds.mobile as W
+
+    _, s = _kit_spec()
+    f = {"k": "sand", "s": "sand", "len": 0.6, "kmod": 2.0}  # firm enough that the belly stays clear of it
+    ep = W._drive(s, "sand", f, W._mu(s, "sand"), 1.0)
+    z = s.m * 9.81 / (s.area * 1e-4) / 1000 / 2.0 / 100  # m
+    assert ep.ok and ep.sink == pytest.approx(z, rel=0.35)
+    soft = W._drive(s, "sand", f | {"kmod": 0.2}, W._mu(s, "sand"), 1.0)
+    assert not soft.ok and soft.sink < s.m * 9.81 / (s.area * 1e-4) / 1000 / 0.2 / 100  # its belly takes the load first
+
+
+def test_a_ceiling_stops_what_is_too_tall_and_lets_past_what_is_not():
+    import sea.worlds.mobile as W
+
+    _, s = _kit_spec()
+    mu = W._mu(s, "wood")
+    assert W._drive(s, "low", {"k": "low", "s": "wood", "clear": s.height + 1.0, "len": 0.5}, mu, 0.6).ok
+    stopped = W._drive(s, "low", {"k": "low", "s": "wood", "clear": s.height - 1.0, "len": 0.5}, mu, 0.6)
+    assert not stopped.ok and stopped.why in ("wall", "tipped")
+
+
+def test_in_the_dark_a_robot_reads_what_is_ahead_from_where_its_sensor_points():
+    from sea.mech import graph as G
+    from sea.mech.world import graph_of
+    from sea.sim.mobile_model import graph_episode
+
+    w, s = _kit_spec()
+    base = graph_of(w.stock())
+
+    def run(*sensors):
+        g = base.model_copy(update={"sensors": sensors})
+        return graph_episode(g.model_dump_json(), "dark", {"len": 2.0, "n": 2}, 0.6, 0.6, 0.0, 0.015, s.kit_kg)
+
+    ahead = (0.7071068, 0.0, 0.7071068, 0.0)  # z onto x
+    pos = (base.bodies[0].parts[0].half[0], 0.0, s.height / 100 * 0.6)
+    blind = run()
+    assert not blind.ok and blind.why == "wall"  # blind, at this speed: it meets one too fast
+    sighted = run(G.RangeFinder(name="sonar", body="robot", pos=pos, quat=ahead, max_m=2.0))
+    assert sighted.ok and sighted.elapsed > 2.0 / s.v_nl  # and sees them, though not when it goes flat out (it overshoots)
+    wrong = run(G.RangeFinder(name="sonar", body="robot", pos=pos, quat=(1.0, 0.0, 0.0, 0.0), max_m=2.0))  # aimed at the ceiling
+    assert not wrong.ok
+
+
+def test_a_long_floor_is_driven_all_the_way_and_the_pack_runs_out_in_it():
+    import sea.worlds.mobile as W
+
+    _, s = _kit_spec()
+    mu = W._mu(s, "wood")
+    ep = W._drive(s, "floor", {"k": "floor", "s": "wood", "len": 20.0}, mu, 1.0)
+    assert ep.ok and ep.elapsed == pytest.approx(20.0 / ep.v, rel=0.05) and ep.work > 0
+    from sea.sim.mobile_model import graph_episode
+
+    drained = graph_episode(s.graph, "floor", {"len": 20.0, "cap": ep.work / 2}, mu, 1.0, 0.0, W._crr(s, "wood"), s.kit_kg)
+    assert not drained.ok and drained.why == "drained"
+
+
+def test_every_kit_failure_a_film_shows_is_driven_not_calculated():
+    from sea.worlds.film import mobile_kit
+
+    w = make_world("mobile_kit")
+    task = next(t for t in w.tasks() if t.id == "sandbox_train0")
+    clip = mobile_kit(w.stock(), task, w.solve(w.stock(), task, 0).controls, 0, size=(320, 210))
+    assert not clip.ok and "sink" in clip.headline.lower() and "not simulated" not in clip.verdict and clip.clipping_mm < 1.5
