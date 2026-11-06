@@ -46,7 +46,7 @@ import re
 import time
 import zlib
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any
 
 import numpy as np
@@ -477,8 +477,9 @@ def _route(s: Spec, route: list[dict[str, Any]], secs: float, ctl: dict[str, flo
         f = {key: v * (1 + rng.uniform(-0.02, 0.02)) if isinstance(v, float) and key != "off" else v for key, v in nominal.items()}
         k, surf = f["k"], f["s"]
         mu = _mu(s, surf) * (1 + rng.normal(0.0, 0.03))
-        duty = 1.0 if probe else ctl["dark" if k == "dark" else "speed"]
-        approach = 1.0 if probe else ctl.get("approach", 1.0)
+        sag = _sag(e, s)
+        duty = (1.0 if probe else ctl["dark" if k == "dark" else "speed"]) * sag
+        approach = (1.0 if probe else ctl.get("approach", 1.0)) * sag
         what, fail, ep = f"stopped at feature {i + 1}/{n}, {_desc(nominal)}", None, None
         if k in MM.EDGES:
             ep, fail = _drive(s, k, f, mu * s.edge, approach), _edge(s, f, mu * s.edge, approach)
@@ -514,7 +515,7 @@ def _route(s: Spec, route: list[dict[str, Any]], secs: float, ctl: dict[str, flo
                         f"the robot is {s.height:.1f} cm tall; the overhang is {f['clear']:.1f} cm; {ep.detail}", 0.5 * ep.progress)
         elif k == "dark":
             hit_dark = True
-            tries = (1.0, 0.6, 0.35, 0.2, 0.1) if probe else (duty,)  # a probe finds the speed the body can go at
+            tries = tuple(sag * x for x in (1.0, 0.6, 0.35, 0.2, 0.1)) if probe else (duty,)  # a probe finds the speed the body can go at
             for dd in tries:
                 ep = _drive(s, "dark", f, mu, dd)
                 if ep.ok:
@@ -523,7 +524,7 @@ def _route(s: Spec, route: list[dict[str, Any]], secs: float, ctl: dict[str, flo
                 fail = (("collided_in_dark" if ep.why == "wall" else "tipped_over" if ep.why == "tipped" else "sensing_range_short"),
                         f"with {s.sense:.2f} m of sensing at duty {duty:.2f}, {ep.detail}", 0.5 * ep.progress)
         else:  # plain ground, driven its whole length
-            ep = _drive(s, "floor", f | {"cap": cap}, mu, duty)
+            ep = _stretches(s, f, mu, duty / sag, cap, e)
             if not ep.ok and ep.why != "drained":
                 fail = ("stalled_at_low_duty" if duty < 0.999 else "motor_torque_short", f"at duty {duty:.2f} it cannot move on {surf}: {ep.detail}", 0.0)
         if fail is not None and not (probe and fail[0] in CONTROL_LEVEL):
@@ -542,12 +543,34 @@ def _route(s: Spec, route: list[dict[str, Any]], secs: float, ctl: dict[str, flo
     return True, 1.0, "", f"reached in {t:.0f} s of {secs:.0f}, using {e / 3600:.3f} Wh"
 
 
+def _sag(spent_j: float, s: Spec) -> float:
+    """What a pack's voltage leaves of the motors' duty, with this spent (D-123): below nominal they get less; above it a
+    driver regulates to nominal."""
+    left = 1.0 - spent_j / max(s.wh * 3600.0, 1e-6)
+    return float(min(np.interp(left, (0.0, 0.15, 0.5), (0.82, 0.93, 1.0)), 1.0))
+
+
+def _stretches(s: Spec, f: dict[str, Any], mu: float, duty: float, cap: float, spent_j: float) -> MM.Episode:
+    """Plain ground: a long way in stretches, the pack's voltage read at each."""
+    length = f.get("len", 0.0)
+    n = min(math.ceil(length / STRETCH_M), 10) if length > STRETCH_M else 1
+    total_t, total_w, ep = 0.0, 0.0, None
+    for _ in range(n):
+        ep = _drive(s, "floor", f | {"cap": max(cap - total_w, 1.0), "len": length / n}, mu, duty * _sag(spent_j, s))
+        total_t, total_w = total_t + ep.elapsed, total_w + ep.work
+        spent_j += ep.work / s.eta + s.p_w * ep.elapsed
+        if not ep.ok:
+            break
+    return replace(ep, elapsed=total_t, work=total_w)
+
+
 def _best_time(s: Spec, route: list[dict[str, Any]], ctl: dict[str, float]) -> float:
     """How long the route takes this body at its best speed, as driven."""
     got = re.search(r"in (\d+) s", _route(s, route, 1e9, ctl, _Calm(), probe=True)[3])
     return float(got[1]) if got else math.inf
 
 
+STRETCH_M = 50.0  # m: a floor longer than this is driven in stretches (D-123)
 CONTROLS = {  # System 1's controls: range, starting value, the features that call for them
     "speed": ((0.15, 1.0), 0.6, {"floor", "gap", "ramp", "sand", "low", "dark", *MM.EDGES}),
     "line": ((-6.0, 6.0), 0.0, {"gap"}), "approach": ((0.1, 1.0), 0.5, set(MM.EDGES)),

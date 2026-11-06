@@ -3367,3 +3367,15 @@ The rod's Euler margin is 3.4 by the reading, 2.3 over D-104's print factor, so 
 **Prediction.** It's far harder. The stock robot, which held 4 groups under 8 seeds, holds at most 2: it can only barely dent the tube. The 16 of 17 talker falls to 6 or fewer, since its servos stall on most postures. A plain test rig seals the tube under a servo's torque, so the task is not made impossible: a lever under about 8 cm, pressing a pad across. About 15 ms per posture. A from-stock campaign may need all 20 iterations or fail to finish, and if it fails no law is loosened: what stopped it is the result.
 
 **Still not simulated.** Walls are placed at the tube's rest length, so a glottis or lip that moves changes the air's length but not where the walls are. No fatigue or heat in a servo held at stall.
+
+## D-123 (judge: world mobile): a printed part grips as plastic, and a pack sags as it empties
+
+**Why.** Terrain's friction takes priority over a part's, so on a kit robot a printed bar or the tub's belly gripped a step with a tyre's mu. An optimiser would find that. And a kit robot's pack held its nominal voltage until the moment it was empty, so a long route never slowed.
+
+**What.** In the simulator a solid that isn't a wheel takes priority over the ground, at mu = min(ground, 0.35), dry plastic on wood or concrete from engineering friction tables (about 0.3 to 0.4). On a route, a pack's voltage follows a discharge curve by the charge left, common to NiMH and Li-ion within a few percent: 0.82 of nominal empty, 0.93 at 15%, 1.0 at 50%. Below nominal the motors get that much less than their duty; above it a driver regulates to nominal, so a fresh pack earns nothing extra. A floor over 50 m is driven in up to ten stretches, the voltage read at each. Catalogue world unchanged.
+
+**Prediction.** The stock robot loses nothing it had: it stands on its wheels. The rocker-bogie keeps its hallway. A body whose wheels are lifted off by its own printed parts gets stuck where before it scrabbled through. Routes near their time limits on small packs get slower by about 5 to 15% late in the route, none earlier.
+
+**Still not simulated.** Each feature starts afresh, not in one continuous scene: a robot's posture and speed don't carry from one to the next. No corridor walls, since the brief states no width. No internal resistance, about 0.1 V at these currents.
+
+**Found.** As predicted: on all 13 train routes the stock robot holds its 6 and the rocker-bogie its 13.

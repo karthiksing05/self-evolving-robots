@@ -225,6 +225,7 @@ OBST = (0.05, 0.08, 0.06)  # m: a corridor obstacle's half length and half width
 SAND_DEPTH = 0.2  # m of soil above the hard floor
 BUMP_V, REACT_S, BACKOFF_S = 0.25, 0.1, 4.0  # a bumper's rated impact speed (m/s), the time to react to a reading, to back off and turn (s)
 CORRIDOR_S = 300.0  # s, a corridor given up on
+PLASTIC_MU = 0.35  # dry plastic on wood or concrete, from engineering friction tables (about 0.3 to 0.4)
 SWERVE = 0.35  # rad off the line at most, going round something: what's ahead stays in the sensor's cone
 BEAM = np.radians([0.0, -7.5, 7.5, -15.0, 15.0])  # an ultrasonic ranger's cone, as an HC-SR04's datasheet gives it
 EDGES = ("step", "trench", "stairs", "bump", "threshold")  # obstacles met at an approach duty, that can throw it back
@@ -536,6 +537,9 @@ def graph_episode(graph_json: str, kind: str, f: dict[str, float], mu: float, du
     goal = past - rear + 0.01
     t_max = min(15.0, 2.0 + 2.5 * (goal - x0) / max(v_ss, 0.1 * v0, 0.03))
     wheel_geoms = {p.name for p in wheels.values()}
+    for i in mine:  # only a wheel has a tyre: anything else meets the ground as what it is (D-123)
+        if m.geom(i).name not in wheel_geoms:
+            m.geom_priority[i], m.geom_friction[i, 0] = 2, min(mu, PLASTIC_MU)
     dofs = [m.jnt_dofadr[j] for j in jid]
     if kind == "floor" and f.get("len", 0.0) > 0:
         _friction(m, dofs, radii, crr, mass)

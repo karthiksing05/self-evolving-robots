@@ -463,3 +463,39 @@ def test_every_kit_failure_a_film_shows_is_driven_not_calculated():
     task = next(t for t in w.tasks() if t.id == "sandbox_train0")
     clip = mobile_kit(w.stock(), task, w.solve(w.stock(), task, 0).controls, 0, size=(320, 210))
     assert not clip.ok and "sink" in clip.headline.lower() and "not simulated" not in clip.verdict and clip.clipping_mm < 1.5
+
+
+def test_a_pack_sags_as_it_empties_and_a_long_floor_slows_with_it():
+    import sea.worlds.mobile as W
+
+    _, s = _kit_spec()
+    full = s.wh * 3600.0
+    assert W._sag(0.0, s) == 1.0 and W._sag(0.5 * full, s) == 1.0 and W._sag(0.85 * full, s) == pytest.approx(0.93) and W._sag(full, s) == pytest.approx(0.82)
+    mu = W._mu(s, "wood")
+    fresh = W._stretches(s, {"k": "floor", "s": "wood", "len": 60.0}, mu, 1.0, 1e9, 0.0)
+    worn = W._stretches(s, {"k": "floor", "s": "wood", "len": 60.0}, mu, 1.0, 1e9, 0.95 * full)
+    assert fresh.ok and worn.ok and worn.elapsed > 1.1 * fresh.elapsed
+
+
+def test_only_a_wheel_has_a_tyre():
+    """A robot lifted off its wheels by a printed skid slides where its tyres would hold: the same push on a ramp."""
+    import mujoco
+
+    from sea.sim.mobile_model import PLASTIC_MU, graph_episode
+
+    _, s = _kit_spec()
+    got = []
+    real = mujoco.MjData
+
+    def spy(m):
+        got.append(m)
+        return real(m)
+
+    mujoco.MjData = spy
+    try:
+        graph_episode(s.graph, "floor", {"len": 0.0}, 0.8, 1.0, 0.0, 0.015, s.kit_kg)
+    finally:
+        mujoco.MjData = real
+    m = got[0]
+    frictions = [m.geom_friction[i, 0] for i in range(m.ngeom) if m.geom_contype[i] == 2 and m.geom_priority[i] == 2]
+    assert frictions and max(frictions) <= PLASTIC_MU
