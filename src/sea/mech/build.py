@@ -9,11 +9,16 @@ gives its carriage the four ways two clamped rods let it move (``sim/jaws.RodSpr
 
 from __future__ import annotations
 
+import hashlib
+import json
 import math
+from collections.abc import Callable
+from typing import Any
 
 import mujoco
 import numpy as np
 
+from sea.evolve.core import BomLine
 from sea.mech.base import Base
 from sea.mech.base import base as _base
 from sea.mech.graph import (
@@ -550,3 +555,16 @@ def _elements(spec: mujoco.MjSpec, g: Graph) -> None:
         spec.add_sensor(name=sn.name, type=mujoco.mjtSensor.mjSENS_TOUCH if box else mujoco.mjtSensor.mjSENS_RANGEFINDER,
                         objtype=mujoco.mjtObj.mjOBJ_SITE, objname=sn.name, cutoff=0.0 if box else sn.max_m,
                         intprm=[0, 0, 0] if box else [1, 0, 0])  # a range finder reports its distance
+
+
+def printed_lines(g: Graph, slot: str, skip: Callable[[Any], bool] = lambda p: False) -> list[BomLine]:
+    """A graph's printed PLA, a line per printed part, each named by its shape: parts with the same ``piece`` print as
+    one, and a part a change leaves alone need not be printed again."""
+    pieces: dict[str, list[Any]] = {}
+    for b in g.bodies:
+        for p in b.parts:
+            if getattr(p, "material", "pla") == "pla" and not skip(p):
+                pieces.setdefault(f"{b.name}/{getattr(p, 'piece', '') or p.name}", []).append(p)
+    return [BomLine(item="print:PLA", qty=round(sum(part_kg(p) * 1000 for p in ps), 2), slot=slot,
+                    piece=f"{k}:{hashlib.sha1(json.dumps([p.model_dump() for p in ps], sort_keys=True).encode()).hexdigest()[:10]}")
+            for k, ps in pieces.items()]

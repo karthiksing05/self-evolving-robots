@@ -1001,11 +1001,11 @@ def _bushing_seats(g, gd, hw, car) -> list[str]:
 def _built_bom(mechanism: str) -> list[BomLine]:
     """A built mechanism's bill of materials, from its parts: printed PLA by volume, rods by length, bought parts,
     two MR63 bearings per pinned joint or loop, two M3 screws per clamp or bracket piece."""
-    from sea.mech.build import part_kg
+    from sea.mech.build import printed_lines
     from sea.mech.graph import Blade, Bought, Cylinder, Graph, RackTeeth
 
     g = Graph.model_validate_json(mechanism)
-    pla, rods, bought, pieces, pins = 0.0, [], {}, set(), 0
+    rods, bought, pieces, pins = [], {}, set(), 0
     guide_item = {f"lm{d}uu": f"lm{d}uu_bearing" for d in (3, 4, 5, 6, 8)}
     for b in g.bodies:
         pins += sum(j.type == "hinge" for j in b.joints) if not b.stock else 0
@@ -1019,12 +1019,11 @@ def _built_bom(mechanism: str) -> list[BomLine]:
                 rods.append((round(2000 * p.radius), 2 * p.half_length))
             elif isinstance(p, Cylinder) and p.role == "roller":
                 bought["mr63_bearing"] = bought.get("mr63_bearing", 0) + 1
-            elif getattr(p, "material", "pla") == "pla":
-                pla += part_kg(p) * 1000
             if getattr(p, "role", "") in ("clamp", "bracket"):
                 pieces.add(getattr(p, "piece", "") or p.name)
     pins += len(g.loops)
-    out = [BomLine(item="print:PLA", qty=round(pla, 1), slot="jaw", note=f"{g.name}: printed parts")]
+    out = printed_lines(g, "jaw", skip=lambda p: isinstance(p, (Blade, RackTeeth, Bought))
+                        or (isinstance(p, Cylinder) and p.role in ("rod", "roller")))
     for d, length in rods:
         mm = 100 if length <= 0.1001 else 150 if length <= 0.1501 else round(length * 1000)
         out.append(BomLine(item=f"steel_rod_{d}x{mm}", qty=1, slot="jaw"))

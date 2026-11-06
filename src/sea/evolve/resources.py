@@ -107,16 +107,25 @@ def check(new: Body, new_bom: Sequence[BomLine], cur: Body, cur_bom: Sequence[Bo
         lines.append(f"{item} x{qty:g}: {avail:g} provided, buy {short:g} at ${float(spec['usd']):g} "
                      f"(${cost:.2f}, {float(spec.get('lead_days', 0)):g} days)")
     changed = {s for s in set(new.parts) | set(cur.parts) if new.parts.get(s) != cur.parts.get(s)}
+    made = {(b.slot, b.item, b.piece) for b in cur_bom if b.piece}
+    remade: dict[tuple[str, str], list[float]] = {}
     for ln in new_bom:
         if not is_fab(ln.item) or ln.slot not in changed:
             continue
-        spec = fab.get(ln.item)
+        row = remade.setdefault((ln.slot, ln.item), [0.0, 0.0])
+        if (ln.slot, ln.item, ln.piece) in made:  # the part in hand is this part
+            row[1] += ln.qty
+        else:
+            row[0] += ln.qty
+    for (slot, item), (qty, kept) in remade.items():
+        spec = fab.get(item)
         if spec is None:
-            errors.append(f"{ln.item}: no machine for it on this bench")
+            errors.append(f"{item}: no machine for it on this bench")
             continue
-        m = ln.qty * float(spec.get("minutes_per_unit", 0.0))
+        m = qty * float(spec.get("minutes_per_unit", 0.0))
         minutes += m
-        lines.append(f"{ln.item} {ln.qty:.1f} {spec.get('unit', '')} for {ln.slot}: {m:.0f} machine minutes")
+        lines.append(f"{item} {qty:.1f} {spec.get('unit', '')} for {slot}: {m:.0f} machine minutes"
+                     + (f" ({kept:.1f} {spec.get('unit', '')} of parts reused)" if kept else ""))
     if usd and spent.usd + usd > float(budget.get("usd", 0.0)) + 1e-9:
         errors.append(f"buying costs ${usd:.2f}; the run has ${float(budget.get('usd', 0.0)) - spent.usd:.2f} left")
     if lead and lead > float(budget.get("lead_days", 0.0)) + 1e-9:

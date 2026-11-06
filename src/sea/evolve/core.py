@@ -44,6 +44,7 @@ class BomLine(_Model):
     qty: float
     slot: str = ""
     note: str = ""
+    piece: str = ""  # names a made part by its shape: a body keeping that piece need not make it again
 
 
 class PartType(_Model):

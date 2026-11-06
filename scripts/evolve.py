@@ -42,7 +42,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--plans", action="store_true", help="operating plans, and operation-or-body labels (D-092)")
     ap.add_argument("--concepts", action="store_true", help="the concept set, functions, comparison, failure modes (D-091)")
     ap.add_argument("--library", action="store_true", help="machine elements, and what kept bodies prove across runs (D-096)")
-    ap.add_argument("--robust", type=int, default=0, help="once train is full, this many more seeds must hold (D-101)")
+    ap.add_argument("--robust", type=int, default=0, help="a second seed judges every body; once train is full, this many more must hold (D-101, D-126)")
     ap.add_argument("--start", type=Path, default=None, help="a run's summary.json: begin from its final body (D-101)")
     ap.add_argument("--out", type=Path, default=None)
     ap.add_argument("--notebook", default=RunConfig.model_fields["notebook"].default, help="the notebook this run reads and writes")

@@ -22,7 +22,7 @@ from sea.evolve.core import Body, BomLine, Instrument, Outcome, Part, PartType, 
 from sea.mech import graph as G
 from sea.mech.base import WORLD
 from sea.mech.build import compile as compile_graph
-from sea.mech.build import part_kg
+from sea.mech.build import printed_lines
 from sea.mech.laws import floating, interference
 from sea.mech.world import SLOT, GraphWorld, graph_of
 from sea.sim import tract_sound as S
@@ -226,9 +226,8 @@ class PhonologyKit(GraphWorld, P.PhonologyWorld):
 
     def bom(self, body: Body) -> list[BomLine]:
         g = graph_of(body)
-        pla = sum(part_kg(p) * 1000 for b in g.bodies for p in b.parts if getattr(p, "material", "pla") == "pla")
-        length = float(self.rig_of(body).areas({})[1][0, : P.NT].sum())
-        return [BomLine(item="print:PLA", qty=round(pla, 1), slot=SLOT), BomLine(item="cast:silicone", qty=round(3.0 * length, 1), slot=SLOT),
+        cast = round(3.0 * float(self.rig_of(body).areas({})[1][0, : P.NT].sum()), 1)  # one bore: its length is its shape
+        return [*printed_lines(g, SLOT), BomLine(item="cast:silicone", qty=cast, slot=SLOT, piece=f"tube:{cast}"),
                 BomLine(item="servo_mg90s", qty=sum(isinstance(a, G.Servo) for a in g.actuators), slot=SLOT)]
 
     def check(self, body: Body) -> list[str]:

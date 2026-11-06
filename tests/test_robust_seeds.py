@@ -70,3 +70,19 @@ def test_without_robust_one_seed_still_ends_the_run(tmp_path):
             proposer=Scripted([]), world=Lucky(), log=lambda m: None)
     assert s["final_body"]["parts"]["stick"]["params"]["length"] == pytest.approx(0.26)
     assert s["final_body"]["id"] == "start"
+
+
+def test_a_second_seed_judges_every_body_from_the_first_iteration(tmp_path):
+    (tmp_path / "from.json").write_text(json.dumps({"final_body": _body(0.26).model_dump()}))
+    run(RunConfig(world="lucky", iterations=0, robust=3, start=str(tmp_path / "from.json")), tmp_path / "run",
+        proposer=Scripted([]), world=Lucky(), log=lambda m: None)
+    row = json.loads((tmp_path / "run" / "iterations.jsonl").read_text().splitlines()[0])
+    assert any("under seed 100" in o["detail"] for o in row["failing"].values())
+    assert not any("under seed 200" in o["detail"] for o in row["failing"].values())
+
+
+def test_the_run_says_what_stopped_it(tmp_path):
+    s = run(RunConfig(world="lucky", iterations=0), tmp_path / "run", proposer=Scripted([]), world=Lucky(), log=lambda m: None)
+    assert s["stopped"]["reason"] == "iterations"
+    assert s["stopped"]["failing"] and all(v["mechanism"] == "too_short" for v in s["stopped"]["failing"].values())
+    assert set(s["stopped"]["left"]) == {"usd", "fab_minutes"}

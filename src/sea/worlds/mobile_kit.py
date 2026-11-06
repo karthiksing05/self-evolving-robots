@@ -19,7 +19,7 @@ import numpy as np
 
 from sea.evolve.core import Body, BomLine, Part, PartType, Task
 from sea.mech import graph as G
-from sea.mech.build import part_kg
+from sea.mech.build import printed_lines
 from sea.mech.laws import floating, interference
 from sea.mech.world import SLOT, GraphWorld, graph_of
 from sea.sim import mobile_model as MM
@@ -197,8 +197,7 @@ class MobileKit(GraphWorld, W.MobileWorld):
         g = graph_of(body)
         motors, _ = _motors(g)
         kind, cells = _pack(g)
-        out = [BomLine(item="print:PLA", qty=round(sum(part_kg(p) * 1000 for p in _parts(g)
-                                                       if not isinstance(p, G.Bought) and getattr(p, "material", "pla") != "stock"), 1), slot=SLOT)]
+        out = printed_lines(g, SLOT, skip=lambda p: isinstance(p, G.Bought))
         if _wheels(g):
             out.append(BomLine(item="tire_oring", qty=len(_wheels(g)), slot=SLOT))
         counts: dict[str, int] = {}

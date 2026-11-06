@@ -55,9 +55,11 @@ from sea.evolve.core import (
 )
 from sea.evolve.llm import Proposer
 from sea.evolve.prompt import SYSTEM, build
-from sea.evolve.resources import ResourceReport, charge, check, cost_idea, idea_text, start
+from sea.evolve.resources import ResourceReport, Spent, charge, check, cost_idea, idea_text, start
 from sea.mech.elements import ELEMENTS
 from sea.propose.llm import PlanBillingError, PlanLimitReached
+
+STOP_LOOKBACK = 5
 
 Arm = Literal["s2", "random", "s1"]
 
@@ -85,7 +87,7 @@ class RunConfig(BaseModel):
     plans: bool = False  # operating plans, and whether the operation or the body failed (D-092)
     library: bool = False  # machine elements in the prompt, and what kept bodies prove, kept across runs (D-096)
     library_dir: str = "library"
-    robust: int = 0  # once every train group holds, this many more seeds must hold too before the run ends (D-101)
+    robust: int = 0  # a second seed judges every body; once all train holds, this many more must hold too (D-101, D-126)
     start: str = ""  # a run's summary.json: begin from its final body rather than stock (D-101)
 
 
@@ -154,6 +156,21 @@ class Evaluator:
             if not o.success:
                 return o if s == self.seed else o.model_copy(update={"detail": f"under seed {s}: {o.detail}"})
         return self.cache[(body.key(), task.id, self.seeds[0])]
+
+
+def _stopped(last: dict[str, Any], rows: Sequence[dict[str, Any]], manifest: dict[str, Any], spent: Spent) -> dict[str, Any]:
+    """What ended the run, measured: each group still failing and its last reading, what its last iterations' proposals
+    came to, and what was left to spend (D-126)."""
+    failing = {tid: {"mechanism": o["mechanism"], "detail": o["detail"][:400]} for tid, o in last["failing"].items()}
+    came_to: dict[str, int] = {}
+    for row in rows[-STOP_LOOKBACK:]:
+        for e in row.get("trials", []):
+            words = str(e.get("result", "no result")).split(":")[0]
+            came_to[words] = came_to.get(words, 0) + 1
+    b = manifest.get("budget", {})
+    return {"reason": last["stop"], "failing": failing, f"last_{STOP_LOOKBACK}_iterations": came_to,
+            "left": {"usd": round(float(b.get("usd", 0.0)) - spent.usd, 2),
+                     "fab_minutes": round(float(b.get("fab_minutes", 0.0)) - spent.fab_minutes, 1)}}
 
 
 def held_groups(tasks: Sequence[Task], outcomes: dict[str, Outcome]) -> set[str]:
@@ -379,6 +396,8 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
     if proposer is None and cfg.arm == "random":
         proposer = RandomProposer(world, cfg.seed)
     ev = Evaluator(world, cfg.world, cfg.workers, cfg.seed)
+    if cfg.robust:  # a pass on one seed may be the search's luck, and luck should neither keep a body nor refuse one
+        ev.seeds = [cfg.seed, cfg.seed + 100]
     body = world.stock()
     if cfg.start:  # the id is the run's own: the trials below number theirs from b000 (D-101)
         body = Body.model_validate(json.loads(Path(cfg.start).read_text())["final_body"]).model_copy(update={"id": "start"})
@@ -508,12 +527,14 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                 return
 
     records = (out / "iterations.jsonl").open("w")
+    records_so_far: list[dict[str, Any]] = []
+    stopped: dict[str, Any] = {}
     try:
         for it in range(cfg.iterations + 1):
             t0 = time.time()
             outcomes = ev.solve(body, train)
             held = held_groups(train, outcomes)
-            if cfg.robust and len(ev.seeds) == 1 and len(held) == len({t.group for t in train}):
+            if cfg.robust and len(ev.seeds) < cfg.robust + 1 and len(held) == len({t.group for t in train}):
                 ev.seeds = [cfg.seed + 100 * k for k in range(cfg.robust + 1)]
                 log(f"[{cfg.world}/{cfg.arm}] every train group holds: now judging under seeds {ev.seeds}")
                 outcomes = ev.solve(body, train)
@@ -530,6 +551,7 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
             done = len(held) == len({t.group for t in train})
             if done or it == cfg.iterations or proposer is None:
                 rec["stop"] = "all groups held" if done else ("no proposer" if proposer is None else "iterations")
+                stopped = _stopped(rec, records_so_far, manifest, spent)
                 records.write(json.dumps(rec) + "\n")
                 break
             if isinstance(proposer, RandomProposer):
@@ -727,6 +749,7 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
             rec.update(trials=[{k: v for k, v in e.items() if k != "outcomes"} | {"outcomes": e.get("outcomes", {})}
                                for e in trials], accepted=accepted, spent=spent.model_dump(),
                        seconds=round(time.time() - t0, 1))
+            records_so_far.append(rec)
             records.write(json.dumps(rec) + "\n")
             records.flush()
         final_test = ev.solve(body, test) if test else {}
@@ -743,7 +766,7 @@ def run(cfg: RunConfig, out: Path, proposer: Proposer | None = None, world: Worl
                  "stock_held": sorted(held_groups(test, stock_test)) if test else [],
                  "final_tasks": sum(o.success for o in final_test.values()),
                  "stock_tasks": sum(o.success for o in stock_test.values()), "n": len(test)},
-        "spent": spent.model_dump(), "ideas": ideas, "sim_s": round(ev.sim_s, 1), "attempts": ev.attempts,
+        "stopped": stopped, "spent": spent.model_dump(), "ideas": ideas, "sim_s": round(ev.sim_s, 1), "attempts": ev.attempts,
         "proposals": _proposal_stats(history),
         "frontier": [{k: (v.describe() if k == "body" else v) for k, v in f.items()} for f in frontier.values()],
         "wall_s": round(time.time() - t_start, 1),

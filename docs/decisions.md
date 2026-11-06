@@ -3393,3 +3393,21 @@ The rod's Euler margin is 3.4 by the reading, 2.3 over D-104's print factor, so 
 **Still not simulated.** A tooth's stress, above. A print's layers: the material is isotropic, with a flat print's measured strength. Stress reads at the root by extrapolation along the part, not at a fillet nobody modelled. A bushing's rating is its maker's, and is compared with a simulated load, which is what a rating is for. The servo shaft's side load is read but judged against nothing: no rating is published (D-106).
 
 **Found.** Slender parts as predicted, except one 14 mm crank at 8% over beam theory. A 10 mm block bends 54% more than beam theory and buckles at 0.35 of Euler. `wide_rod` keeps all of it: 21 of 21 train and test, 84 of 84 tasks, at seed 0; it does not reach its limits by these few percent. The stock mobile robot isn't affected.
+
+## D-125 (result: world phonology_kit; judge: every graph): the talker's run from stock, and a change pays only for the parts it remakes
+
+**Result.** `runs/evolve/camp2_phonology_kit_s0`, the framework-goal command from stock under the simulated tube and air, unattended for 4.7 hours. System 2 made a tube with six servos and levers, and took stock's 2 of 17 groups to 14 on train at the run's seed and 13 of 17 on test. Rechecked on seeds 7000 to 7007, 9 of 17 groups hold on train and test under every seed: aa ae ah eh ih k p t uh. It held iy and uw on most seeds, and ka and ta on some. `er`, `s` and `sh` never held on train and test. It does not meet the goal. D-122's prediction said it might not finish.
+
+**Why this changes the judge.** From iteration 15 on, System 2 wrote that it could not try another body: 100 machine minutes were left, and any change was priced as a full reprint and re-cast of 168 minutes, however small. Its last six iterations held few trials for that reason. A bill that charges a whole robot for one new plate is wrong: a part already in hand is not made again. Three kept changes spent 500 of the 600 minutes.
+
+**What.** A made part's line in a bill now names its shape (`BomLine.piece`). Graph bills list a printed part per line, with parts sharing a `piece` as one, and a talker's tube is named by its length, since it has one bore. `resources.check` charges only the lines whose shape the current body doesn't already have. A line naming no shape is made again, as before, so catalogue worlds price as they did. The 600 minutes stay.
+
+**Prediction.** Changes to one plate or lever cost tens of minutes, so a run tries more bodies to the end. Printed mass and verdicts don't change. Refusals for machine time become rare.
+
+## D-126 (policy: every world): a second seed judges every body, and a run says what stopped it
+
+**Why.** Run at one seed, the ratchet read the search's luck as the body's ability. In the talker's run, `ao` was gained at seed 0, which spent 168 minutes on a body that holds `ao` on 1 of 8 train seeds. And `ka` and `ta`, which hold on 5 and 6 of 8, were "lost" by trial after trial from iteration 2 to 13, refusing bodies for what was mostly a search that failed that time. The run's 14 became 9 under recheck. And a run that ended said only "iterations", which criterion 7 of `docs/framework-goal.md` says is not an answer.
+
+**What.** With `--robust`, every body is judged under two seeds from the first iteration: a group holds when it holds under both, and a failure names the seed. Once all of train holds, the further seeds come in as before. Nothing about the seeds' tasks or the bar changes. At the end, `summary.json` has `stopped`: the reason, each failing task's last reading, what the last 5 iterations' proposals came to, and what was left to spend.
+
+**Prediction.** A group the search finds half the time counts as not held until the search or the body makes it reliable, so curves start lower and rise more honestly, and a run's own count sits closer to its recheck. Sim time per trial about doubles, while the proposer's time doesn't. System 2 sees `not_found_by_search` and can answer with an operating plan or a body that is easier to operate.
