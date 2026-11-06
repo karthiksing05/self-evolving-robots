@@ -23,18 +23,26 @@ from sea.mech import graph as G
 from sea.mech.base import WORLD
 from sea.mech.build import compile as compile_graph
 from sea.mech.build import part_kg
-from sea.mech.laws import _close, floating, interference, overlapping, unjoined_solids
+from sea.mech.laws import floating, interference
 from sea.mech.world import SLOT, GraphWorld, graph_of
+from sea.sim import tract_sound as S
+from sea.sim.soft_tract import SLEW, WALL, SoftTract
+from sea.sim.soft_tract import E as WALL_E
 from sea.worlds import phonology as P
 
 CM = 0.01
-BLOCKED_CM2 = 0.01  # what a posture that cannot exist reads as (D-116)
+HOLD = 0.85  # of lung pressure, behind a stop's seal: 0.05 cm2 holds about 0.89 (D-121)
+GLIDE_S = 0.05  # s: an opening slower than this is heard as a glide (Liberman et al. 1956)
+REACHED = 0.15  # of each section's area: a tract within this of the vowel's has reached it
 SERVO_NM = 0.216  # an MG90S at 4.8 V: 2.2 kg cm, its datasheet's stall
 Y, X = (0.0, 1.0, 0.0), (1.0, 0.0, 0.0)
 ALONG_X = (0.7071068, 0.0, 0.7071068, 0.0)  # a round part's axis along x
 RULES = [
     f"The robot has {P.CHANNELS} servo channels.  A Servo is an MG90S ({SERVO_NM:g} N m) on a hinge with a range; a sliding "
-    "motion comes through a loop.  The cast's bore is 1.2 cm in radius and the lip ring's 1.45.",
+    "motion comes through a loop.  It turns at most 60 degrees in 0.1 s and pushes with at most that torque.",
+    f"The cast's bore is 1.2 cm in radius and the lip ring's 1.45.  Its wall is silicone of E = {WALL_E / 1000:g} kPa and "
+    f"{WALL * 1000:g} mm: solids press it, it presses back, and it closes when it meets its far side.  Air is what remains "
+    "inside it, and sound is air stepped in time.",
 ]
 
 
@@ -80,58 +88,21 @@ def _model(g: G.Graph) -> tuple[mujoco.MjModel, int]:
     return m, m.geom("bore_probe").id
 
 
-class _Tract:
-    """A graph's area function."""
+class _Air:
+    """A kit robot's air, stepped in time (D-121)."""
 
-    def __init__(self, g: G.Graph):
-        self.g = g
-        self.m, self.probe = _model(g)
-        self.d = mujoco.MjData(self.m)
-        self.servos = [(a.name, self.m.jnt_qposadr[self.m.joint(a.joint).id]) for a in g.actuators if isinstance(a, G.Servo)]
-        moved = {a.joint for a in g.actuators}
-        self.free = sorted({self.m.joint(j.name).id for lp in g.loops for b in g.bodies if b.name in (lp.a, lp.b)
-                            for j in b.joints if j.name not in moved})
-        self.solids = [i for i in range(self.m.ngeom) if self.m.geom_contype[i] == 2]
-        self.glottis, self.lip_end = self.m.body("glottis").id, self.m.body("lip_end").id
-        self.unjoined = unjoined_solids(g, self.m)
+    @staticmethod
+    def formants(areas: np.ndarray, lens: np.ndarray) -> np.ndarray:
+        return S.formants(areas, lens)
 
-    def _bore(self, x: float, cap: float) -> float:
-        """The bore at ``x`` m along the axis, cm: from the axis to the nearest solid, up to ``cap``."""
-        d = self.d
-        d.geom_xpos[self.probe] = (x, 0.0, 0.0)
-        reach = cap * CM
-        for g in self.solids:
-            if abs(d.geom_xpos[g][1]) - self.m.geom_rbound[g] > reach or abs(d.geom_xpos[g][0] - x) - self.m.geom_rbound[g] > reach:
-                continue
-            reach = min(reach, mujoco.mj_geomDistance(self.m, d, self.probe, g, reach + 1e-3, None))
-        return max(reach, 0.0) / CM
-
-    def __call__(self, ctl: dict[str, np.ndarray]) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-        n = next(iter(ctl.values())).shape[0] if ctl else 1
-        areas, lens, dist = np.zeros((n, P.NT + 2)), np.zeros((n, P.NT + 2)), np.zeros((n, P.NT + 2))
-        m, d = self.m, self.d
-        for i in range(n):
-            d.qpos[:] = m.qpos0
-            for name, adr in self.servos:
-                if name in ctl:
-                    d.qpos[adr] = ctl[name][i]
-            _close(m, d, self.free)
-            mujoco.mj_kinematics(m, d)
-            if overlapping(m, d, self.unjoined):  # no such posture: a tract shut everywhere, which no sound accepts (D-116)
-                areas[i], lens[i] = BLOCKED_CM2, 1.0
-                continue
-            length, lip = d.xpos[self.glottis][0] / CM, max(-d.xpos[self.lip_end][0] / CM, 0.1)
-            at = np.concatenate([(1.0 - (np.arange(P.NT) + 0.5) / P.NT) * length, -np.array([lip / 4, 3 * lip / 4])])
-            caps = [P.BORE] * P.NT + [P.RING] * 2
-            areas[i] = [np.pi * self._bore(float(x) * CM, c) ** 2 for x, c in zip(at, caps, strict=True)]
-            lens[i] = [length / P.NT] * P.NT + [lip / 2] * 2
-            dist[i] = at
-        return areas, lens, dist
+    @staticmethod
+    def hiss(areas: np.ndarray, lens: np.ndarray) -> np.ndarray:
+        return S.hiss(S.Tube(areas, lens))
 
 
-@lru_cache(maxsize=32)
-def _tract(graph_json: str) -> _Tract:
-    return _Tract(G.Graph.model_validate_json(graph_json))
+@lru_cache(maxsize=8)
+def _tract(graph_json: str) -> SoftTract:
+    return SoftTract(G.Graph.model_validate_json(graph_json))
 
 
 class PhonologyKit(GraphWorld, P.PhonologyWorld):
@@ -140,13 +111,15 @@ class PhonologyKit(GraphWorld, P.PhonologyWorld):
                    "by a reed at the glottis and squeezed by whatever a graph puts around it.  It must produce English vowels, "
                    "stops, fricatives and syllables.")
     frame = ("A robot is a graph (lengths in metres; x along the tube from the teeth at 0 toward the glottis, z up from its "
-             "axis).  The tube has no solid: it runs to the body 'glottis', and the lips from the teeth to the body 'lip_end'.  "
-             "Its bore at each section is the distance from the axis to the nearest solid.")
+             "axis).  The tube runs to the body 'glottis', and the lips from the teeth to the body 'lip_end'.  It is soft: it "
+             "lies around the axis, and a solid moves its wall as far as a servo's torque can push it.  A posture is a command "
+             "to the servos; what is judged is where everything came to rest.")
     modules = {"talker": (_talker, {"length_cm": (10.0, 20.0), "place_cm": (3.0, 10.0)})}
     starts = 3
 
     def __init__(self) -> None:
         P.PhonologyWorld.__init__(self)
+        self._stalled: dict[str, float] = {}
 
     def catalogue(self) -> list[PartType]:
         return []
@@ -159,7 +132,65 @@ class PhonologyKit(GraphWorld, P.PhonologyWorld):
         ranges = {j.name: j.range for b in g.bodies for j in b.joints}
         controls = {a.name: ranges[a.joint] for a in g.actuators if isinstance(a, G.Servo)}
         return P.Rig(length=0.0, controls=controls, servos=len(controls), lips="graph",
-                     areas=_tract(body.parts[SLOT].mechanism))
+                     areas=_tract(body.parts[SLOT].mechanism), sound=_Air)
+
+    def tasks(self) -> list[Task]:
+        def felt(t: Task) -> Task:
+            kind = t.data["kind"]
+            if kind == "stop":
+                return t.model_copy(update={"facts": f"{t.facts}, and holding at least {HOLD:.0%} of the lungs' pressure behind it"})
+            if kind == "syllable":
+                head = t.facts.split(", with no servo")[0]
+                return t.model_copy(update={"facts": f"{head}, the tract opening to the vowel's shape within {1000 * GLIDE_S:.0f} ms "
+                                                     "of the seal breaking, as driven (slower, it is heard as a glide, not a stop)"})
+            return t
+        return [felt(t) for t in super().tasks()]
+
+    def babble(self, body: Body) -> P.Babble:
+        new = body.key() not in self._babble
+        bab = super().babble(body)
+        if new:
+            st = _tract(body.parts[SLOT].mechanism)
+            st(dict(zip(bab.keys, bab.x.T, strict=True)))
+            self._stalled[body.key()] = float(np.mean(st.load >= 0.99 * SERVO_NM))
+        return bab
+
+    def _felt(self, r: P.Rig, x: dict[str, np.ndarray], d: dict, e: float) -> tuple[float, str]:
+        """What the mechanism and the air did, measured: a stall is said, and a seal or a channel is blown through."""
+        st = r.areas
+        areas, lens, _ = st(x)
+        note = ""
+        if st.load[0] >= 0.99 * SERVO_NM and st.short[0] > np.radians(1.0):
+            note = f"; a servo stalls at {SERVO_NM:g} N m, {np.degrees(st.short[0]):.0f} degrees short of its command"
+        if e > 1.0 or d["kind"] == "vowel":  # no need: it has already failed, or nothing is blown through a vowel
+            return 0.0, note
+        air = S.blow(S.Tube(areas, lens), seconds=0.03)
+        if d["kind"] == "stop":
+            held = float(air["behind"][0]) / S.PS
+            return HOLD / max(held, 1e-6), f"{note}; it holds {100 * held:.0f}% of the lungs' pressure behind it"
+        re = float(air["re"][0])
+        return S.RE_C / max(re, 1e-6), f"{note}; {air['flow'][0]:.0f} cm3/s through it, Reynolds {re:.0f}"
+
+    def _timed(self, r: P.Rig, body: Body, closure: dict[str, np.ndarray], vowel: dict[str, np.ndarray], e: float) -> tuple[float, str]:
+        """The whole syllable, driven, with air flowing, once both its postures pass.  Before that, what the servos' speed
+        allows is a guide for the search and no verdict."""
+        names, a0 = self.angles(r, body, closure)
+        turn = float(np.abs(self.angles(r, body, vowel)[1][0] - a0[0]).max(initial=0.0))
+        if e > 1.0:
+            return turn / (GLIDE_S * SLEW), f"the servos alone would take {1000 * turn / SLEW:.0f} ms between them"
+        st, frame = r.areas, 0.005
+        frames, lens = st.transition({k: float(v[0]) for k, v in closure.items()}, {k: float(v[0]) for k, v in vowel.items()}, frame=frame)
+        end = st({k: v for k, v in vowel.items()})[0][0]
+        broke = np.nonzero(frames.min(1) > P.A_CLOSE)[0]
+        if not broke.size:
+            return 2.0, "the seal never breaks"
+        off = np.abs(frames - end) > np.maximum(REACHED * end, 0.05)
+        last = np.nonzero(off.any(1))[0]
+        opens = (float(last[-1] + 1) - float(broke[0])) * frame if last.size else 0.0
+        air = S.speak(frames, lens, frame)
+        burst = float(np.abs(air["lips"]).max())
+        return max(opens, 0.0) / GLIDE_S, (f"from the seal breaking, the tract takes {1000 * max(opens, 0.0):.0f} ms to reach the vowel "
+                                           f"(at most {1000 * GLIDE_S:.0f}), the air bursting to {burst:.0f} cm3/s")
 
     def angles(self, r: P.Rig, body: Body, ctl: dict[str, np.ndarray]) -> tuple[list[str], np.ndarray]:
         names = sorted(r.controls)
@@ -184,7 +215,8 @@ class PhonologyKit(GraphWorld, P.PhonologyWorld):
                   for j in b.joints]
         return (f"over {len(bab.x)} sampled postures: F1 {lo[0]:.0f}-{hi[0]:.0f}, F2 {lo[1]:.0f}-{hi[1]:.0f}, F3 {lo[2]:.0f}-{hi[2]:.0f} Hz; "
                 f"narrowest area {np.min(bab.clo[:, 0]):.2f} cm2, at {np.min(bab.clo[:, 1]):.1f}..{np.max(bab.clo[:, 1]):.1f} cm behind "
-                f"the teeth; {sum(isinstance(a, G.Servo) for a in g.actuators)} of {P.CHANNELS} servos; joints: " + (", ".join(joints) or "none"))
+                f"the teeth; {sum(isinstance(a, G.Servo) for a in g.actuators)} of {P.CHANNELS} servos, stalled on "
+                f"{100 * self._stalled.get(body.key(), 0.0):.0f}% of those postures; joints: " + (", ".join(joints) or "none"))
 
     def brief_rules(self) -> list[str]:
         return list(RULES)
@@ -207,6 +239,7 @@ class PhonologyKit(GraphWorld, P.PhonologyWorld):
         return [mk(name=f"{n}_{e}", unit="Hz", doc=f"the {'lowest' if e == 'lo' else 'highest'} {n.upper()} over the body's map")
                 for n in ("f1", "f2", "f3") for e in ("lo", "hi")] + [
             mk(name="narrowest_cm2", unit="cm2", doc="the smallest area over the body's map"),
+            mk(name="stalled_share", unit="", doc="the share of the body's map on which a servo holds at its stall torque"),
             mk(name="servos", unit="", doc="servo channels it uses")]
 
     def read(self, body: Body, name: str, args: dict[str, Any], task: Task | None = None) -> float:
@@ -215,6 +248,8 @@ class PhonologyKit(GraphWorld, P.PhonologyWorld):
             return float(len(bab.keys))
         if name == "narrowest_cm2":
             return float(np.min(bab.clo[:, 0]))
+        if name == "stalled_share":
+            return self._stalled[body.key()]
         if name[:2] in ("f1", "f2", "f3") and name[3:] in ("lo", "hi"):
             col = bab.f[:, int(name[1]) - 1]
             return float(np.nanmin(col) if name[3:] == "lo" else np.nanmax(col))

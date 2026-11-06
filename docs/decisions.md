@@ -3347,3 +3347,23 @@ The rod's Euler margin is 3.4 by the reading, 2.3 over D-104's print factor, so 
 ## D-120 (policy): the talking robot's campaign is stopped
 
 `runs/evolve/camp_phonology_kit_s0` was at 16 of 17 after 10 iterations, stuck on `er`, when the user asked to simulate everything. Its judge is about to change, so it can't count; it was stopped to spare the calls, and its body kept as a test case. It isn't a result.
+
+## D-121 (judge: world phonology_kit): a kit talker's sound is simulated in time
+
+**Why.** The user asked to simulate everything. A kit talker's formants were a frequency-domain solution, its hiss a resonance formula, a stop an area threshold, and a syllable's timing a servo-speed formula.
+
+**What.** `sim/tract_sound.py` steps air pressure and flow along the tract: cells of compliance and faces of inertance, each from the integral of area or of 1/area, so a narrowing shorter than a cell keeps its effect, and each posture's cells its own length, so its tube keeps its own length. Radiation at the lips, implicit. Lungs behind an open glottis give flow; a jet loses what Borda-Carnot and Poiseuille say; above the critical Reynolds number a noise source sits at its exit (Flanagan and Cherry 1969). Formants come from the lips' response to a flow pulse. A hiss peaks where the lips' response to a pressure pulse at the jet's exit peaks, which is white noise's expected spectrum. A stop must hold lung pressure behind its seal, measured. A syllable is driven whole, with air flowing while the walls move, and the opening is timed from the moving tract, not from a servo's angle.
+
+**Prediction, written before it is wired in.** Against the transfer function it replaces, as a check: formants within 3% on tubes and constrictions (2.4% worst in the draft); a hiss within 10% of the front-cavity formula; a seal holds over 90% of lung pressure and 0.05 cm2 about that. The catalogue world keeps its formulas, as the comparison.
+
+**Still not simulated.** One-dimensional air: no cross-modes, so nothing above about 6 kHz is trustworthy. The reed: formants come from a pulse, standing for the reed's closing, not from a reed oscillating against the air. Wall motion doesn't couple back into the sound.
+
+## D-122 (judge: world phonology_kit): the cast tube is a thing the robot presses on
+
+**Why.** A kit talker's bore was the distance from the axis to the nearest solid, as a circle. So a pad 2.5 mm below the axis read as a tube nearly shut, though in truth about 3 of its 4.5 cm2 stay open; nothing pushed back, so a servo had no job but to be at an angle; and two parts could not be blocked except by a rule. All 16 of the last campaign's sounds rest on that.
+
+**What.** `sim/soft_tract.py` puts the tube in MuJoCo: thirteen sections of eight wall segments, each free across the axis, sprung to its place by the ring's bending (Roark, F/d = E I / (0.149 R^3)), and tied to its neighbours by the wall's shear. Silicone Shore 00-30, E = 70 kPa, wall 2 mm, from a soft casting silicone's datasheet range, chosen before any robot was judged under it. Segments meet each other and every solid. A posture is a command: the servos slew from rest at their datasheet speed with their datasheet torque (60 degrees in 0.1 s, 0.216 N m), held by a position loop, and the area function is read from where the walls came to rest, over 0.15 s of settling (formants converge to 0.2%). Air is what's inside the wall, by the polygon of its inner surface, with rays from its centre for anything standing inside it. Solids meet each other, so a posture that cannot exist simply is not reached; `BLOCKED_CM2` goes.
+
+**Prediction.** It's far harder. The stock robot, which held 4 groups under 8 seeds, holds at most 2: it can only barely dent the tube. The 16 of 17 talker falls to 6 or fewer, since its servos stall on most postures. A plain test rig seals the tube under a servo's torque, so the task is not made impossible: a lever under about 8 cm, pressing a pad across. About 15 ms per posture. A from-stock campaign may need all 20 iterations or fail to finish, and if it fails no law is loosened: what stopped it is the result.
+
+**Still not simulated.** Walls are placed at the tube's rest length, so a glottis or lip that moves changes the air's length but not where the walls are. No fatigue or heat in a servo held at stall.

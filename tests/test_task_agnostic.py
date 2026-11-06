@@ -328,23 +328,6 @@ def test_a_part_placed_off_its_body_and_a_motor_with_no_case_are_refused():
     assert any("has no case" in e for e in w.check(body_of(bare)))
 
 
-def test_a_posture_where_unjoined_parts_overlap_says_nothing():
-    from sea.mech import graph as G
-    from sea.mech.world import graph_of
-    from sea.worlds.phonology_kit import BLOCKED_CM2, _Tract
-
-    base = graph_of(make_world("phonology_kit").stock())
-
-    def block(name):
-        return G.Body(name=name, parent="frame", joints=(G.Joint(name=f"{name}_q", type="hinge", axis=(0.0, 1.0, 0.0), range=(0.0, 0.0)),),
-                      parts=(G.Box(name=f"{name}_box", pos=(0.0, 0.0, 0.001 if name == "plate" else 0.0), half=(0.002, 0.002, 0.002)),))
-
-    clear = _Tract(base)({"arm": np.zeros(1)})[0]
-    assert not (clear == BLOCKED_CM2).all()
-    both = base.model_copy(update={"bodies": (*base.bodies, block("flap"), block("plate")), "excludes": (*base.excludes, ("flap", "plate"))})
-    assert (_Tract(both)({"arm": np.zeros(1)})[0] == BLOCKED_CM2).all()
-
-
 def test_another_worlds_notes_are_few_and_the_most_credited():
     from sea.evolve.research import Note, text
 

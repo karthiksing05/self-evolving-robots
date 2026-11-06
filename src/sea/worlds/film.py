@@ -872,7 +872,7 @@ def _formants(task: Task, f: np.ndarray, w: int, h: int = 64) -> np.ndarray:
 
 
 def phonology(body: Body, task: Task, controls: dict[str, float], seed: int = 0, size: tuple[int, int] = (860, 300),
-              rig: Any = None, model: Any = None) -> Clip:
+              rig: Any = None, model: Any = None, world: Any = None) -> Clip:
     """The body at the recorded posture, heard and seen: the tube's shape as the sound plays (for a stop, the
     glide into the closure and out, frame by frame with the sound), a vowel's resonances against its target,
     and the CAD of the body in a corner.  A posture's verdict draws on no seed; ``seed`` keeps the signature
@@ -892,21 +892,21 @@ def phonology(body: Body, task: Task, controls: dict[str, float], seed: int = 0,
     f, clo = P.acoustics(r, arr)
     first = task.data["stop"] if kind == "syllable" else task.data
     peak = P.noise_peak(r, arr) if kind == "fricative" else None
-    ok = float(P.PhonologyWorld._errors(first, f, clo, P.clash(r, arr)[0], peak)[0]) <= 1.0
-    said = P.PhonologyWorld._said(first, f[0], clo[0], None if peak is None else float(peak[0]))
+    world = world or P.PhonologyWorld()
+    e = float(world._errors(first, f, clo, P.clash(r, arr)[0], peak)[0])
+    felt, note = world._felt(r, arr, first, e)
+    ok = max(e, felt) <= 1.0
+    said = world._said(first, f[0], clo[0], None if peak is None else float(peak[0])) + note
     vowel, release = None, None
     if kind == "syllable":  # the vowel it opens into, and how long its servos take to get there
         vowel = posture("v.")
         varr = {k: np.array([v]) for k, v in vowel.items()}
         fv, cv = P.acoustics(r, varr)
-        ok = ok and float(P.PhonologyWorld._errors(task.data["vowel"], fv, cv, P.clash(r, varr)[0])[0]) <= 1.0
-        names, a0 = linkages.servo_angles(r, body.parts, arr)
-        a1 = linkages.servo_angles(r, body.parts, varr)[1]
-        turn = float(np.abs(a1 - a0).max(initial=0.0))
-        ok = bool(ok and turn <= P.TURN)
-        release = turn / linkages.SERVO_SPEED
-        said = (f"closure: {said}; vowel: {P.PhonologyWorld._said(task.data['vowel'], fv[0], cv[0])}; the servos "
-                f"take {1000 * release:.0f} ms between them")
+        ok = ok and float(world._errors(task.data["vowel"], fv, cv, P.clash(r, varr)[0])[0]) <= 1.0
+        timed, how = world._timed(r, body, arr, varr, 0.0 if ok else 2.0)
+        ok = bool(ok and timed <= 1.0)
+        release = timed * P.TURN / linkages.SERVO_SPEED
+        said = f"closure: {said}; vowel: {world._said(task.data['vowel'], fv[0], cv[0])}; {how}"
     w, h = size
     model = model if model is not None else C.phonology(body, ctl)
     tw = w - 640
@@ -1238,7 +1238,8 @@ def phonology_kit(body: Body, task: Task, controls: dict[str, float], seed: int 
     from sea.evolve.loop import make_world
     from sea.worlds.graph_cad import graph
 
-    return phonology(body, task, controls, seed, size, rig=make_world("phonology_kit").rig_of(body), model=graph(body))
+    w = make_world("phonology_kit")
+    return phonology(body, task, controls, seed, size, rig=w.rig_of(body), model=graph(body), world=w)
 
 
 FILM: dict[str, Callable[..., Clip]] = {"gripper": gripper, "gripper_dense": gripper, "mobile": mobile,

@@ -65,7 +65,8 @@ COMPONENTS: dict[str, tuple[str, tuple[str, ...]]] = {
     # each world's tasks, physics and parts catalogue: the ruler for runs in that world (D-042)
     "world_gripper": ("judge", ("src/sea/worlds/gripper.py",)),
     "world_mobile": ("judge", ("src/sea/worlds/mobile.py", "src/sea/worlds/mobile_kit.py", "src/sea/sim/mobile_model.py")),
-    "world_phonology": ("judge", ("src/sea/worlds/phonology.py", "src/sea/worlds/phonology_kit.py", "src/sea/worlds/linkages.py")),
+    "world_phonology": ("judge", ("src/sea/worlds/phonology.py", "src/sea/worlds/phonology_kit.py", "src/sea/worlds/linkages.py",
+                                 "src/sea/sim/tract_sound.py", "src/sea/sim/soft_tract.py")),
     "world_me2110": ("judge", ("src/sea/worlds/me2110.py", "src/sea/sim/me2110_model.py")),
     "world_me2110_kit": ("judge", ("src/sea/worlds/me2110_kit.py", "src/sea/sim/kit_match.py")),
     # the mechanism laws a body must keep before any trial (D-059): geometry on the real part meshes

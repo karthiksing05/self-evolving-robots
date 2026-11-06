@@ -125,6 +125,7 @@ class Rig:
     servos: int = 0
     opposed: bool = False  # the tip blade presses from the palate, the body pad from the floor (a tip tongue)
     areas: Any = None  # a robot built from a graph: its own area function (D-112)
+    sound: Any = None  # and its own air: ``formants`` and ``hiss`` of an area function (D-121)
 
     def lip_range(self) -> tuple[float, float, float, float]:
         """Smallest and largest lip opening (cm2), shortest and longest lip tube (cm)."""
@@ -215,6 +216,8 @@ def noise_peak(r: Rig, ctl: dict[str, np.ndarray]) -> np.ndarray:
     at that point and radiating at the lips (Stevens 1998: the noise source sits at the constriction's exit).  The
     sections behind the constriction take no part.  nan where nothing lies in front of it."""
     areas, lens, _ = tract(r, ctl)
+    if r.sound is not None:
+        return r.sound.hiss(areas, lens)
     i = np.argmin(areas, 1)
     front = np.where(np.arange(areas.shape[1])[None, :] > i[:, None], lens, 0.0)
     return formants(np.maximum(areas, 0.08), front, 1, FREQ_HI)[:, 0]
@@ -223,7 +226,7 @@ def noise_peak(r: Rig, ctl: dict[str, np.ndarray]) -> np.ndarray:
 def acoustics(r: Rig, ctl: dict[str, np.ndarray]) -> tuple[np.ndarray, np.ndarray]:
     """Formants (B, 3), and the narrowest point (B, 3): its area, where it is, and the airway beyond it."""
     areas, lens, dist = tract(r, ctl)
-    f = formants(np.maximum(areas, 0.08), lens)
+    f = r.sound.formants(areas, lens) if r.sound is not None else formants(np.maximum(areas, 0.08), lens)
     i = np.argmin(areas, 1)
     rows = np.arange(areas.shape[0])
     where = dist[rows, i]
@@ -569,7 +572,7 @@ class PhonologyWorld:
         def attempt(ctl: dict[str, float], s: int) -> Outcome:
             t0 = time.perf_counter()
             rng = np.random.default_rng([task.data["noise"], s])
-            es, said, angles = [], [], []
+            es, said, postures = [], [], []
             for p, d in sides:
                 x = {k: np.array([np.clip(ctl[p + k] + rng.normal(0.0, NOISE * (hi - lo)), lo, hi)])
                      for k, (lo, hi) in r.controls.items()}
@@ -578,19 +581,18 @@ class PhonologyWorld:
                 peak = noise_peak(r, x) if d["kind"] == "fricative" else None
                 es.append(float(self._errors(d, f, clo, over, peak)[0]))
                 said.append(self._said(d, f[0], clo[0], None if peak is None else float(peak[0])))
+                felt, note = self._felt(r, x, d, es[-1])
+                es[-1] = max(es[-1], felt)
+                said[-1] += note
                 if over[0] > CLASH:
                     said[-1] += (f"; the tip blade presses {20 * over[0]:.1f} mm into the tongue pad {at[0]:.1f} cm "
                                  "behind the teeth: no posture the parts can take")
-                if len(sides) > 1:
-                    angles.append(self.angles(r, body, x))
+                postures.append(x)
             detail = said[0]
-            if angles:
-                names, (a0, a1) = angles[0][0], (angles[0][1][0], angles[1][1][0])
-                k = int(np.argmax(np.abs(a1 - a0))) if names else 0
-                turn = float(np.abs(a1 - a0)[k]) if names else 0.0
-                es.append(turn / TURN)
-                detail = (f"closure: {said[0]}; vowel: {said[1]}; the {names[k] if names else 'valves'} turns "
-                          f"{np.degrees(turn):.0f} degrees between them (at most {np.degrees(TURN):.0f})")
+            if len(sides) > 1:
+                timed, how = self._timed(r, body, postures[0], postures[1], max(es))
+                es.append(timed)
+                detail = f"closure: {said[0]}; vowel: {said[1]}; {how}"
             e = max(es)
             return Outcome(task=task.id, success=e <= 1.0, score=1.0 / (1.0 + e), detail=detail,
                            sim_s=time.perf_counter() - t0)
@@ -613,6 +615,20 @@ class PhonologyWorld:
             return out
         mech, why = self._diagnose(body, task, out)
         return out.model_copy(update={"mechanism": mech, "detail": f"{out.detail}; {why}"})
+
+    def _felt(self, r: Rig, x: dict[str, np.ndarray], d: dict, e: float) -> tuple[float, str]:
+        """Anything more a world measures of a posture, in the units of ``_errors``, and what to say of it."""
+        return 0.0, ""
+
+    def _timed(self, r: Rig, body: Body, closure: dict[str, np.ndarray], vowel: dict[str, np.ndarray], e: float) -> tuple[float, str]:
+        """How fast a syllable opens, where 1 is as slow as it may, and what to say of it."""
+        names, a0 = self.angles(r, body, closure)
+        a1 = self.angles(r, body, vowel)[1]
+        a0, a1 = a0[0], a1[0]
+        k = int(np.argmax(np.abs(a1 - a0))) if names else 0
+        turn = float(np.abs(a1 - a0)[k]) if names else 0.0
+        return turn / TURN, (f"the {names[k] if names else 'valves'} turns {np.degrees(turn):.0f} degrees between them "
+                             f"(at most {np.degrees(TURN):.0f})")
 
     @staticmethod
     def _said(task: Task | dict, f: np.ndarray, clo: np.ndarray, peak: float | None = None) -> str:
