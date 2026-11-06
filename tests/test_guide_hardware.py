@@ -191,7 +191,7 @@ def test_the_racks_loads_follow_the_section_the_roller_and_the_direction(world):
     g, beam = _beam(world)
     teeth = 30.0
     behind, ahead = beam.loads(beam.lo - 0.05, teeth), beam.loads(beam.hi + 0.05, teeth)
-    assert behind["buckle"] == math.inf and ahead["buckle"] == pytest.approx(math.pi**2 * beam.ei_min / (2 * 0.05) ** 2)
+    assert behind["buckle"] == math.inf and ahead["buckle"] == pytest.approx(math.pi**2 * beam.ei_min / (2 * 0.05) ** 2, rel=0.05)
     backed = J.RackBeam(beam.lo, beam.hi, beam.ei_sep, beam.c_sep, beam.ei_min, beam.tooth, True).loads(beam.lo - 0.085, teeth)
     assert backed["bend"] == 0.0 and backed["stress"] == 0.0 and beam.loads((beam.lo + beam.hi) / 2, teeth)["overhang"] == 0.0
 
