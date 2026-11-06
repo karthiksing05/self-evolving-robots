@@ -60,6 +60,19 @@ def graph(body: Body) -> CadModel:
     return graph_model(graph_of(body))
 
 
+def talker(body: Body) -> CadModel:
+    """A kit talker: its graph, and the silicone tube its parts press on (bore and wall as ``soft_tract`` has them)."""
+    g = graph_of(body)
+    pos = {b.name: b.pos[0] for b in g.bodies}
+    model = graph_model(g)
+    length = (pos["glottis"] - pos["lip_end"]) * 1000.0
+    tube = trimesh.creation.annulus(r_min=12.0, r_max=14.0, height=length, sections=48)
+    tube.apply_transform(trimesh.transformations.rotation_matrix(np.pi / 2, (0.0, 1.0, 0.0)))
+    tube.apply_translation(((pos["glottis"] + pos["lip_end"]) * 500.0, 0.0, 0.0))
+    model.parts.append(CadPart("tube", SLOT, tube, "silicone"))
+    return model
+
+
 def unplaced(g: G.Graph) -> list[str]:
     """What the graph carries with nothing to draw: bought parts, by item."""
     return [p.item for b in g.bodies for p in b.parts if isinstance(p, G.Bought)]

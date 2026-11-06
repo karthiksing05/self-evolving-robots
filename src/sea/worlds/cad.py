@@ -218,4 +218,4 @@ def phonology(body: Body, ctl: dict[str, float] | None = None) -> CadModel:
 
 CAD: dict[str, Callable[..., CadModel]] = {"gripper": gripper, "gripper_dense": gripper, "mobile": mobile,
                                               "phonology": phonology, "mobile_kit": graph_cad.graph,
-                                              "phonology_kit": graph_cad.graph}
+                                              "phonology_kit": graph_cad.talker}

@@ -35,15 +35,30 @@ HOLD = 0.85  # of lung pressure, behind a stop's seal: 0.05 cm2 holds about 0.89
 GLIDE_S = 0.05  # s: an opening slower than this is heard as a glide (Liberman et al. 1956)
 REACHED = 0.15  # of each section's area: a tract within this of the vowel's has reached it
 SERVO_NM = 0.216  # an MG90S at 4.8 V: 2.2 kg cm, its datasheet's stall
+CASE_MM = (22.8, 12.2, 28.5)  # an MG90S's case, its datasheet's; the shaft runs along the longest side
+CASE_G = 13.4
+SHAFT_OFF_MM = (7.0, 2.0)  # how far off the case's centre its shaft may lie, along its long and its short side
+HORN = 0.01  # m: from the case's end to the body its horn turns
 Y, X = (0.0, 1.0, 0.0), (1.0, 0.0, 0.0)
 ALONG_X = (0.7071068, 0.0, 0.7071068, 0.0)  # a round part's axis along x
 RULES = [
     f"The robot has {P.CHANNELS} servo channels.  A Servo is an MG90S ({SERVO_NM:g} N m) on a hinge with a range; a sliding "
     "motion comes through a loop.  It turns at most 60 degrees in 0.1 s and pushes with at most that torque.",
+    f"A Servo is a solid: a material='stock' Box of {CASE_MM[0]:g} x {CASE_MM[1]:g} x {CASE_MM[2]:g} mm and {CASE_G:g} g on the "
+    f"body that carries its hinge, its {CASE_MM[2]:g} mm side along the hinge's axis, that axis passing through it, and its "
+    f"end within {HORN * 100:g} cm of the hinged body's origin, which the horn reaches.  Cases may not pass through each other or "
+    "through anything fastened to them.",
     f"The cast's bore is 1.2 cm in radius and the lip ring's 1.45.  Its wall is silicone of E = {WALL_E / 1000:g} kPa and "
     f"{WALL * 1000:g} mm: solids press it, it presses back, and it closes when it meets its far side.  Air is what remains "
     "inside it, and sound is air stepped in time.",
 ]
+
+
+def _case(name: str, pos: tuple[float, float, float], along: str) -> G.Box:
+    """An MG90S's case with its shaft along axis ``along`` of the body it is on."""
+    long, short, tall = (x / 2000 for x in CASE_MM)
+    half = {"x": (tall, short, long), "y": (long, tall, short), "z": (long, short, tall)}[along]
+    return G.Box(name=name, pos=pos, half=half, material="stock", kg=CASE_G / 1000)
 
 
 def _talker(p: dict[str, float]) -> G.Graph:
@@ -55,13 +70,17 @@ def _talker(p: dict[str, float]) -> G.Graph:
     post = G.Box(name="arm_post", pos=(shoulder[0], 0.0, (shoulder[2] - 0.157) / 2),
                  half=(0.005, 0.005, abs(shoulder[2] + 0.157) / 2 + 0.002))
     lip_post = G.Box(name="lip_post", pos=(-0.005, -0.02, -0.085), half=(0.003, 0.003, 0.072))
+    tall = CASE_MM[2] / 2000
+    arm_case = _case("arm_case", (shoulder[0], -0.005 - tall, shoulder[2]), "y")
+    jaw_case = _case("jaw_case", (-0.008 - tall, -0.02, -0.013), "x")
+    lever_case = _case("lever_case", (0.0, -0.003 - tall, arm), "y")
     bodies = (
-        G.Body(name="frame", parent="world", parts=(plate, post, lip_post)),
+        G.Body(name="frame", parent="world", parts=(plate, post, lip_post, arm_case, jaw_case)),
         G.Body(name="glottis", parent="frame", pos=(ln, 0.0, 0.0)),
         G.Body(name="lip_end", parent="frame", pos=(-1.0 * CM, 0.0, 0.0)),
         G.Body(name="arm", parent="frame", pos=shoulder,
                joints=(G.Joint(name="arm_q", type="hinge", axis=Y, range=(-0.29, 0.29)),),
-               parts=(G.Box(name="arm_bar", pos=(0.0, 0.0, arm / 2), half=(0.003, 0.003, arm / 2)),)),
+               parts=(G.Box(name="arm_bar", pos=(0.0, 0.0, arm / 2), half=(0.003, 0.003, arm / 2)), lever_case)),
         G.Body(name="lever", parent="arm", pos=(0.0, 0.0, arm),
                joints=(G.Joint(name="lever_q", type="hinge", axis=Y, range=(0.0, 1.57)),),
                parts=(G.Box(name="lever_bar", pos=(0.0, 0.0, lift / 2), half=(0.002, 0.002, lift / 2)),
@@ -255,6 +274,39 @@ class PhonologyKit(GraphWorld, P.PhonologyWorld):
         raise ValueError(f"no instrument {name!r}")
 
 
+def _caseless(g: G.Graph, m: mujoco.MjModel, d: mujoco.MjData, servos: Sequence[G.Servo]) -> list[str]:
+    """A servo is a solid on what carries its hinge, the size and mass it is, its shaft on the hinge's axis, and it shares
+    no space with what is fastened to it (D-127)."""
+    want = np.sort(np.array(CASE_MM) / 2000)
+    cases = {p.name: p for b in g.bodies for p in b.parts if isinstance(p, G.Box) and p.material == "stock"
+             and np.allclose(np.sort(p.half), want, atol=1e-4) and abs((p.kg or 0.0) - CASE_G / 1000) < 1e-6}
+    out, used = [], set()
+    for a in servos:
+        j = m.joint(a.joint).id
+        for name in cases:
+            i = m.geom(name).id
+            if name in used or m.geom_bodyid[i] != m.body_parentid[m.jnt_bodyid[j]]:
+                continue
+            axis, off = d.geom_xmat[i].reshape(3, 3).T @ d.xaxis[j], d.geom_xmat[i].reshape(3, 3).T @ (d.xanchor[j] - d.geom_xpos[i])
+            half = m.geom_size[i][:3]
+            tall, long, short = np.argmax(half), *np.argsort(half)[[1, 0]]
+            if (abs(abs(axis[tall]) - 1.0) < 1e-3 and abs(off[long]) <= SHAFT_OFF_MM[0] / 1000 and abs(off[short]) <= SHAFT_OFF_MM[1] / 1000
+                    and abs(off[tall]) <= half[tall] + HORN):
+                used.add(name)
+                break
+        else:
+            out.append(f"{a.name} has no case on {a.joint}'s axis on what carries it: a stock Box of {CASE_MM[0]:g} x {CASE_MM[1]:g} x "
+                       f"{CASE_MM[2]:g} mm and {CASE_G:g} g, its {CASE_MM[2]:g} mm side along the axis, within {HORN * 100:g} cm of the hinged body")
+    for name in sorted(used):
+        i = m.geom(name).id
+        for x in range(m.ngeom):
+            if x != i and m.geom_contype[x] == 2 and m.geom_bodyid[x] == m.geom_bodyid[i] and mujoco.mj_geomDistance(m, d, i, x, 0.01, None) < -0.0005:
+                other = m.geom(x).name
+                if other not in used or name < other:
+                    out.append(f"{name} passes through {other}, on the same body")
+    return out
+
+
 @lru_cache(maxsize=64)
 def _laws(graph_json: str) -> tuple[str, ...]:
     g = G.Graph.model_validate_json(graph_json)
@@ -281,4 +333,4 @@ def _laws(graph_json: str) -> tuple[str, ...]:
         return (f"it cannot be built: {str(exc)[:300]}",)
     d = mujoco.MjData(m)
     mujoco.mj_kinematics(m, d)
-    return (*floating(g, m, d), *interference(g, m, (), (CM, "cm"), 0.002))
+    return (*floating(g, m, d), *_caseless(g, m, d, servos), *interference(g, m, (), (CM, "cm"), 0.002))

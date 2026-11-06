@@ -3411,3 +3411,14 @@ The rod's Euler margin is 3.4 by the reading, 2.3 over D-104's print factor, so 
 **What.** With `--robust`, every body is judged under two seeds from the first iteration: a group holds when it holds under both, and a failure names the seed. Once all of train holds, the further seeds come in as before. Nothing about the seeds' tasks or the bar changes. At the end, `summary.json` has `stopped`: the reason, each failing task's last reading, what the last 5 iterations' proposals came to, and what was left to spend.
 
 **Prediction.** A group the search finds half the time counts as not held until the search or the body makes it reliable, so curves start lower and rise more honestly, and a run's own count sits closer to its recheck. Sim time per trial about doubles, while the proposer's time doesn't. System 2 sees `not_found_by_search` and can answer with an operating plan or a body that is easier to operate.
+
+## D-127 (judge: world phonology_kit): a talker's servo is a solid, and its tube is drawn
+
+**Why.** The render of the talker's run showed six plates and no servo: they had a speed and a torque and no size. The rule that every part is a real mechanism already holds on the mobile robot's motors (D-115). The final body puts hinges 8 mm apart, and an MG90S is 12 mm by 23 mm by 28.5 mm long, so it may not be buildable as drawn. The tube wasn't drawn at all.
+
+**What.** A kit talker's law: each servo has a stock Box of the datasheet's size and 13.4 g on what carries its hinge, its long side along the axis, the axis through it within the shaft's offset, within 1 cm of the hinged body's origin. Cases may not pass through each other or anything fastened to them, and they are solids to everything else, the tube's wall included. The stock robot gets cases. The kit's rules state this. The CAD draws the tube.
+
+**Prediction.** Stock stays at 2 of 17: its cases sit clear of what moves. The run's final body is refused, since its hinges in one line can't hold six cases of 28.5 mm. A layout that holds is possible, with cases staggered around the tube: a test rig with six cases will show this and how many sounds it keeps. The talker's next run has a harder problem, and may hold fewer than 9.
+
+
+**Found.** As predicted: stock holds 2 of 17 and the run's final body is refused for its missing cases. A test rig with six cases on alternate sides of the tube passes the laws and holds 6 of 17 at seed 0, all three stops among them, with `iy` a hair off the vowel floor and F2 misses of 14 to 30% on the back vowels.
