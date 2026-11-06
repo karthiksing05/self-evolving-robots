@@ -3422,3 +3422,13 @@ The rod's Euler margin is 3.4 by the reading, 2.3 over D-104's print factor, so 
 
 
 **Found.** As predicted: stock holds 2 of 17 and the run's final body is refused for its missing cases. A test rig with six cases on alternate sides of the tube passes the laws and holds 6 of 17 at seed 0, all three stops among them, with `iy` a hair off the vowel floor and F2 misses of 14 to 30% on the back vowels.
+
+## D-128 (result: world mobile_kit): the first task to meet the goal
+
+**Result.** `runs/evolve/camp3_mobile_kit_s0`, the framework-goal command from stock on f55885c, with nobody between iterations. Stock holds 6 of 13 routes. The run stopped itself at iteration 6 of 20 with `stopped.reason` "all groups held". Rechecked on seeds 7000 to 7007, all 13 hold on train and test under every seed, 39 of 39 tasks each; stock holds 6. It meets all seven criteria of `docs/framework-goal.md` on this task. Six System 2 calls, 21 searches and fetches, $2.50 of $60 and 468.6 of 600 machine minutes. It took 12.7 hours by the clock and about 2 awake: the laptop slept through most of one iteration.
+
+**The body.** A six-wheel chassis with a 30 cm tub and six gearmotors. Its middle wheels ride on pivoting trailing arms, and its four AA cells sit 4 cm rearward. An earlier run on an older judge reached 13 of 13 with a rocker-bogie, so more than one mechanism does this task.
+
+**Against the predictions.** D-125: no proposal was refused for machine time, and two kept changes cost 99 and 0 machine minutes, where the talker paid 168 for any. D-126: the run's own 13 equals its recheck's 13, where the talker's 14 fell to 9. The last gain shows the further seeds at work: the long chassis held every route under seeds 0 and 100, so seeds up to 400 came in, the patio failed under 400, and moving the cells held it under all five. The curve did not start lower, as D-126 had predicted: stock was 6 under one seed or two.
+
+**What this does not show.** One campaign from one run seed, in simulation. Features restart independently along a route, corridors have no walls and the pack has no internal resistance, so nothing here says the robot would pass on a real floor. The mobile judge stays frozen while the gripper and the talker run; a later change to it voids this result.
