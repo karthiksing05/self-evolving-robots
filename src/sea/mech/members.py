@@ -1,7 +1,7 @@
 """Printed members under a mechanism's own loads, for any graph on any robot (D-103, D-109).
 
 A loop's pin force passes through what spans it: each such member is judged at that force, held ``HOLD_STEPS`` steps,
-in stress and, pushed, against its Euler load over ``PRINT_FACTOR``.  Only printed PLA has sourced values here.  A
+in stress and, pushed, against its buckling load over ``PRINT_FACTOR``, both solved on the part (D-124).  Only printed PLA has sourced values here.  A
 plywood or steel part is not read: no citable modulus for the plywood has been found, and steel is far from these loads.
 """
 
@@ -13,6 +13,8 @@ from dataclasses import dataclass
 
 import mujoco
 import numpy as np
+
+from sea.sim import solid_fe
 
 HOLD_STEPS = 10  # a lift or load counts once it lasts 20 ms, as the force limit's does: not an impact's spike
 
@@ -48,11 +50,14 @@ class Member:
         """With ``force`` on the pin and the unit ``axis`` from the body's origin to it: the stress (Pa), and the load
         along one plate in compression (N) with the load it buckles at (N)."""
         along = float(force @ axis)
+        depth = 2 * self.c  # the section these numbers describe, as a rectangle: deep in the direction it bends
+        wide = 12 * self.i_bend / depth**3
         if self.kind == "crank":
             across = float(np.linalg.norm(force - along * axis))
-            return across * (self.length - self.root) * self.c / self.i_bend, 0.0, math.inf
+            return across * solid_fe.bend(self.length - self.root, wide, depth)[0], 0.0, math.inf
         per = along / self.plates
-        return abs(per) / self.area, max(-per, 0.0), math.pi**2 * PLA_E_PA * self.i_min / self.length**2
+        weak = math.sqrt(12 * self.i_min / self.area)  # the rectangle of this area and weak axis
+        return abs(per) / self.area, max(-per, 0.0), solid_fe.buckle(self.length, self.area / weak, weak)
 
 
 class PrintedMembers:

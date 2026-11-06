@@ -27,6 +27,7 @@ from sea.mech.members import (  # noqa: F401
     Member,
     PrintedMembers,
 )
+from sea.sim import solid_fe
 
 MM = 1e-3
 PLA_KG_M3 = 1240.0
@@ -313,20 +314,33 @@ class RackBeam:
     def overhang(self, x_mesh: float) -> float:
         return max(self.lo - x_mesh, x_mesh - self.hi, 0.0)
 
+    def area_hint(self, depth: float) -> float:
+        """The section's area, as the rectangle of its separating bending: its width by its depth."""
+        return 12 * (self.ei_sep / PLA_E_PA) / depth**2
+
     def loads(self, x_mesh: float, teeth_n: float) -> dict[str, float]:
         """At the point on the rack under the gear (``x_mesh``, zero-travel gripper x) with this force on its teeth: the
         bend off the gear (m), the bending and tooth stress (Pa) and the load it buckles at (N, inf when in tension)."""
         n = self.overhang(x_mesh)
         sep = teeth_n * math.tan(PRESSURE_ANGLE)
+        def beam(length: float, ei: float, c: float) -> tuple[float, float]:  # solved on the part, as a rectangle of this section (D-124)
+            depth = 2 * c
+            return solid_fe.bend_near(length, 12 * (ei / PLA_E_PA) / depth**3, depth)
+
         if self.backed:  # the roller holds the rack at the mesh, as far as its arm does
-            bend = sep * self.back_l**3 / (3 * self.back_ei)
-            stress = sep * self.back_l * self.back_c * PLA_E_PA / self.back_ei
+            per = beam(self.back_l, self.back_ei, self.back_c) if self.back_l > 0 and math.isfinite(self.back_ei) else (0.0, 0.0)
         else:
-            bend = sep * n**3 / (3 * self.ei_sep)
-            stress = sep * n * self.c_sep * PLA_E_PA / self.ei_sep
+            per = beam(n, self.ei_sep, self.c_sep)
+        stress, bend = sep * per[0], sep * per[1]
         k = 1.0 if self.backed else 2.0
         # closing pulls the rack rearward: behind its support it is in tension, ahead of it in compression
-        buckle = math.pi**2 * self.ei_min / (k * n) ** 2 if x_mesh > self.hi and n > 0 else math.inf
+        if x_mesh > self.hi and n > 0:
+            depth = 2 * self.c_sep
+            area = self.area_hint(depth)
+            weak = math.sqrt(12 * (self.ei_min / PLA_E_PA) / area)
+            buckle = solid_fe.buckle_near(k * n, area / weak, weak)
+        else:
+            buckle = math.inf
         return {"overhang": n, "bend": bend, "stress": stress, "tooth": teeth_n * self.tooth, "buckle": buckle}
 
 

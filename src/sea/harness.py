@@ -32,7 +32,7 @@ COMPONENTS: dict[str, tuple[str, tuple[str, ...]]] = {
     "acceptance": ("judge", ("src/sea/spec/posture.py",)),
     "build": ("judge", ("src/sea/design/build.py",)),
     # mech/ is every mechanism as a graph of parts and the one builder that compiles it (D-078)
-    "physics": ("world", ("src/sea/sim/build_model.py", "src/sea/sim/controls.py", "src/sea/sim/jaws.py",
+    "physics": ("world", ("src/sea/sim/build_model.py", "src/sea/sim/controls.py", "src/sea/sim/jaws.py", "src/sea/sim/solid_fe.py",
                          "src/sea/sim/shoe.py", "src/sea/mech/graph.py", "src/sea/mech/build.py",
                          "src/sea/mech/seed/gripper.py", "src/sea/mech/kinematics.py",
                          "src/sea/mech/patch.py", "src/sea/mech/base.py", "src/sea/mech/runtime.py",

@@ -3379,3 +3379,17 @@ The rod's Euler margin is 3.4 by the reading, 2.3 over D-104's print factor, so 
 **Still not simulated.** Each feature starts afresh, not in one continuous scene: a robot's posture and speed don't carry from one to the next. No corridor walls, since the brief states no width. No internal resistance, about 0.1 V at these currents.
 
 **Found.** As predicted: on all 13 train routes the stock robot holds its 6 and the rocker-bogie its 13.
+
+## D-124 (judge: every graph with printed members; world: gripper, mobile): a printed part's stress is solved, not looked up
+
+**Why.** The user asked to simulate everything. A printed member's force was simulated at every step, but what that force did to it was beam theory: M c / I, F / A, Euler's load, Lewis's form factor. Those hold for slender bars. System 2 builds stubby ones.
+
+**What.** `sim/solid_fe.py` is three-dimensional linear elasticity on the part: 20-node bricks, isotropic PLA (E as before, Poisson 0.35), clamped at its root. Its response to a unit load is solved once per shape, and since the material is linear, scaled by the force the simulator reads each step. Buckling is the generalised eigenproblem of the elastic and geometric stiffness. Beam theory stays as a test's check.
+
+**Prediction.** For a member over 10 times as long as it is deep: stress and bend within 3% of beam theory, buckling within 5% of Euler. For a stubby one: more bend, from shear, and a lower buckling load. `wide_rod` keeps most of its 21: its members were judged near their limits only at the far pivot, so a change of a few percent could cost it a group or none. No allowable moves.
+
+**Tried and not adopted.** A tooth as a tapered prism does not converge: 0.85, 0.98 and 1.15 of Lewis as the mesh refines on a parallel tooth, and 0.57 to 0.65 tapered. A clamped corner with no fillet is a singularity, and modelling the fillet is a mesh this solver doesn't have. Lewis comes from practice. Taking the lower number would have loosened a law on a value that isn't converged, so teeth stay on Lewis, calculated.
+
+**Still not simulated.** A tooth's stress, above. A print's layers: the material is isotropic, with a flat print's measured strength. Stress reads at the root by extrapolation along the part, not at a fillet nobody modelled. A bushing's rating is its maker's, and is compared with a simulated load, which is what a rating is for. The servo shaft's side load is read but judged against nothing: no rating is published (D-106).
+
+**Found.** Slender parts as predicted, except one 14 mm crank at 8% over beam theory. A 10 mm block bends 54% more than beam theory and buckles at 0.35 of Euler. `wide_rod` keeps all of it: 21 of 21 train and test, 84 of 84 tasks, at seed 0; it does not reach its limits by these few percent. The stock mobile robot isn't affected.

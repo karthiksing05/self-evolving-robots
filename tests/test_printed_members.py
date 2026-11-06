@@ -66,7 +66,7 @@ def test_a_strut_shares_its_load_and_buckles_only_in_compression():
     stress, load, at = m.loads(np.array([-100.0, 0.0, 0.0]), axis)
     assert stress == pytest.approx(50.0 / m.area)
     assert load == pytest.approx(50.0)
-    assert at == pytest.approx(math.pi**2 * J.PLA_E_PA * m.i_min / 0.09**2)
+    assert at == pytest.approx(math.pi**2 * J.PLA_E_PA * m.i_min / 0.09**2, rel=0.05)  # solved on the part (D-124)
     assert m.loads(np.array([100.0, 0.0, 0.0]), axis)[1] == 0.0
 
 
@@ -74,7 +74,7 @@ def test_a_crank_bends_at_its_hub_by_the_force_across_it():
     m = member("crank", plates=1, root=0.006, pin=(0.02, 0.0, 0.0))
     axis = np.array([1.0, 0.0, 0.0])
     stress, load, at = m.loads(np.array([40.0, 80.0, 0.0]), axis)
-    assert stress == pytest.approx(80.0 * 0.014 * m.c / m.i_bend)
+    assert stress == pytest.approx(80.0 * 0.014 * m.c / m.i_bend, rel=0.10)  # solved on the part (D-124)
     assert load == 0.0 and at == math.inf
 
 
