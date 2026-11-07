@@ -3467,3 +3467,18 @@ So a verdict on /ka/ and /ʃ/ depends on which 600 postures the body's content h
 **The gripper.** Its one miss in D-129 passes with 4 times the attempts: 343 against 119, with no posture map involved. One replay, which fits a search that missed a grip and does not prove it.
 
 **What this does not show.** One campaign from one run seed, in simulation. The replays use the failing cases only, so they say nothing about whether a change would lose tasks that pass now. No judge moved.
+
+## D-131 (skill: talker and gripper; judge's report: talker): a failure counts after three looks, and a syllable's label reads the pair
+
+**Why.** D-130 found verdicts on /ʃ/, /ʊ/ and /ka/ that depend on which postures the map drew, and the gripper's one miss passing with more attempts. D-102 and D-108 already hold that a failure isn't the mechanism's until the mechanism has been used other ways. Nine starts on one map, 2400 postures, and pools wider than 40 were each tried on the failing cases, and none was better across all three sounds. A denser map costs 105 s per body against 26 s, and /ka/ did worse on it.
+
+**What.** A failure gets `LOOKS` = 3 in all, and a look that passes ends it. The first look is exactly today's. On the talker, each further look draws a fresh map of 600 postures and searches from its starts. On the gripper, each further look doubles the attempts: 2 then 4 times. A pass still needs its two confirmations under other noise, and every law and test is unchanged. A syllable's `_diagnose` now asks whether the map holds a closure and a vowel that pass together within the servos' turn, not just the vowel. The mobile robot stays as it is: nothing in it failed, D-130 measured nothing there, and changing it would void its result.
+
+**Prediction.** Made before running any of this, on the final bodies of D-129 and D-130, whose recheck can be repeated without System 2:
+- No group held today is lost at any seed, since the first look is unchanged.
+- Gripper: 21 of 21 on seeds 7000 to 7007, if the replay of D-129 wasn't luck.
+- Talker: at least 12 of 17. /ʃ/ should hold on all eight, /ʊ/ on most, and /ka/ on more than its 4. /ɔ/ /u/ /ɝ/ /ta/ stay out on this body.
+- /ta/ reads as out of reach rather than `not_found_by_search`.
+- A talker run costs up to 2.5 times as much, since most of its time goes on failing tasks, so 14 hours at worst. The gripper stays under an hour.
+
+**The risk this takes.** More looks at a marginal task will sometimes pass by luck, and three confirmed noise draws can't rule that out. Every recheck seed runs its own search, so a sound that passes only by luck should show up as missing on some seed. If the eight seeds show /ka/ still flickering, it is reported as it stands.

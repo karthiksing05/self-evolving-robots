@@ -21,6 +21,7 @@ from sea.evolve.core import Body, Outcome
 Run = Callable[[dict[str, float], int], Outcome]
 WAYS = 3  # starts spread over the control space, after the first and any the plan names
 OTHER_SEED = 7919
+LOOKS = 3  # how many times a world's System 1 looks before a failure counts, the first being its ordinary search (D-131)
 
 
 def planned(body: Body, space: dict[str, tuple[float, float]], start: dict[str, float], m: int) -> tuple[dict[str, float], int]:

@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import numpy as np
 import pytest
 
 from sea.evolve.core import Part
 from sea.mech import graph as G
 from sea.mech.world import SLOT
 from sea.worlds import graph_cad
+from sea.worlds import phonology as P
 from sea.worlds.phonology_kit import CASE_MM, PhonologyKit, _case, _laws
 
 ARM = 0.05
@@ -68,3 +70,33 @@ def test_the_cad_draws_the_tube_and_the_cases():
     assert sum(p.material == "servo" for p in parts) == 6
     tube = next(p for p in parts if p.name == "tube")
     assert tube.material == "silicone" and tube.mesh.extents[0] == pytest.approx(145.0, abs=0.5)
+
+
+def test_a_later_draw_is_another_sample_and_leaves_the_first_alone():
+    world, body = PhonologyKit(), PhonologyKit().stock()
+    first = world.babble(body).x.copy()
+    assert not np.array_equal(world.babble(body, 1).x, first)
+    assert np.array_equal(world.babble(body).x, first)
+    assert np.array_equal(PhonologyKit().babble(body).x, first)
+
+
+def test_a_look_follows_only_a_failure(monkeypatch):
+    """Three looks at a task System 1 fails cost more than one; the first look's verdict and attempts are today's."""
+    world = PhonologyKit()
+    body = world.stock()
+    tasks = {t.id: t for t in world.tasks()}
+    fails, passes = tasks["iy_train0"], tasks["ae_train0"]
+    three = world.solve(body, fails), world.solve(body, passes)
+    monkeypatch.setattr(P, "LOOKS", 1)
+    one = world.solve(body, fails), world.solve(body, passes)
+    assert not three[0].success and not one[0].success and three[0].attempts > one[0].attempts
+    assert three[1].success and one[1].success and three[1].attempts == one[1].attempts
+
+
+def test_a_syllable_the_map_cannot_pair_is_out_of_reach_not_a_search_failure():
+    world = PhonologyKit()
+    body = world.stock()
+    task = next(t for t in world.tasks() if t.id == "ka_train0")
+    out = world.solve(body, task)
+    assert not out.success and out.mechanism == "syllable_out_of_reach"
+    assert "pass together" in out.detail

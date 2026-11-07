@@ -165,9 +165,9 @@ class PhonologyKit(GraphWorld, P.PhonologyWorld):
             return t
         return [felt(t) for t in super().tasks()]
 
-    def babble(self, body: Body) -> P.Babble:
-        new = body.key() not in self._babble
-        bab = super().babble(body)
+    def babble(self, body: Body, draw: int = 0) -> P.Babble:
+        new = draw == 0 and body.key() not in self._babble
+        bab = super().babble(body, draw)
         if new:
             st = _tract(body.parts[SLOT].mechanism)
             st(dict(zip(bab.keys, bab.x.T, strict=True)))
@@ -219,6 +219,15 @@ class PhonologyKit(GraphWorld, P.PhonologyWorld):
     def _diagnose(self, body: Body, task: Task, out: Outcome) -> tuple[str, str]:
         """What it reached against what the sound asks: the body's map, nearest posture first."""
         bab = self.babble(body)
+        if task.data["kind"] == "syllable":  # a syllable asks for a pair, so its vowel alone doesn't say the search is at fault
+            pairs, pair_e = self._pairs(bab, self._sides(task))
+            if pair_e.min() > 1.0:
+                a, b = pairs[int(np.argmin(pair_e))]
+                closure, vowel = (d for _, d in self._sides(task))
+                return "syllable_out_of_reach", (f"no closure and vowel among the {len(bab.x)} sampled postures pass together within "
+                                                 f"{np.degrees(P.TURN):.0f} degrees of servo travel; the nearest pair is "
+                                                 f"{np.degrees(np.abs(bab.angles[a] - bab.angles[b]).max(initial=0.0)):.0f} degrees apart, closure: "
+                                                 f"{self._said(closure, bab.f[a], bab.clo[a])}; vowel: {self._said(vowel, bab.f[b], bab.clo[b])}")
         d = task.data if task.data["kind"] != "syllable" else task.data["vowel"]
         e = self._errors(d, bab.f, bab.clo, bab.clash, bab.peak)
         i = int(np.argmin(e))

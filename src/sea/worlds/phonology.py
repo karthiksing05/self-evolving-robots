@@ -49,7 +49,7 @@ from typing import Any
 import numpy as np
 
 from sea.evolve.core import Body, BomLine, Outcome, Param, Part, PartType, Task
-from sea.evolve.search import local_search, planned, ways_of
+from sea.evolve.search import LOOKS, local_search, planned, ways_of
 from sea.worlds import linkages
 
 # ---------------------------------------------------------------- acoustics
@@ -505,12 +505,14 @@ class PhonologyWorld:
 
 
     # -------------------------------------------------- System 1
-    def babble(self, body: Body) -> Babble:
-        key = body.key()
+    def babble(self, body: Body, draw: int = 0) -> Babble:
+        """The body's map; a later ``draw`` is another sample of the same postures (D-131)."""
+        key = body.key() if draw == 0 else f"{body.key()}:{draw}"
         if key not in self._babble:
             r = self.rig_of(body)
             keys = sorted(r.controls)
-            rng = np.random.default_rng(int(hashlib.sha256(key.encode()).hexdigest()[:8], 16))
+            digest = int(hashlib.sha256(body.key().encode()).hexdigest()[:8], 16)
+            rng = np.random.default_rng(digest if draw == 0 else [digest, draw])
             u = rng.beta(0.5, 0.5, (self.n_babble, len(keys)))  # dense near each servo's end stops
             lo = np.array([r.controls[k][0] for k in keys])
             hi = np.array([r.controls[k][1] for k in keys])
@@ -541,17 +543,22 @@ class PhonologyWorld:
         d = task.data
         return [("c.", d["stop"]), ("v.", d["vowel"])] if d["kind"] == "syllable" else [("", d)]
 
+    def _pairs(self, bab: Babble, sides: list[tuple[str, dict]]) -> tuple[list[tuple[int, int]], np.ndarray]:
+        """The 40 nearest closures paired with the 40 nearest vowels, timed by the servos between them: each pair's error."""
+        errs = [self._errors(d, bab.f, bab.clo, bab.clash, bab.peak) for _, d in sides]
+        ci, vi = np.argsort(errs[0])[:40], np.argsort(errs[1])[:40]
+        turn = np.abs(bab.angles[ci][:, None, :] - bab.angles[vi][None, :, :]).max(2, initial=0.0)
+        e = np.maximum(np.maximum(errs[0][ci][:, None], errs[1][vi][None, :]), turn / TURN).ravel()
+        return [(a, b) for a in ci for b in vi], e
+
     def _starts(self, r: Rig, bab: Babble, sides: list[tuple[str, dict]]) -> list[dict[str, float]]:
         """The nearest postures (for a syllable, pairs) in the body's map, each start 15% of the range apart."""
         span = np.array([hi - lo for lo, hi in (r.controls[k] for k in bab.keys)])
-        errs = [self._errors(d, bab.f, bab.clo, bab.clash, bab.peak) for _, d in sides]
         if len(sides) == 1:
-            cands, order = [bab.x[i][None] for i in range(len(bab.x))], np.argsort(errs[0])
-        else:  # pair the 40 nearest closures with the 40 nearest vowels, timed by the servos between them
-            ci, vi = np.argsort(errs[0])[:40], np.argsort(errs[1])[:40]
-            turn = np.abs(bab.angles[ci][:, None, :] - bab.angles[vi][None, :, :]).max(2, initial=0.0)
-            e = np.maximum(np.maximum(errs[0][ci][:, None], errs[1][vi][None, :]), turn / TURN).ravel()
-            pairs = [(a, b) for a in ci for b in vi]
+            errs = self._errors(sides[0][1], bab.f, bab.clo, bab.clash, bab.peak)
+            cands, order = [bab.x[i][None] for i in range(len(bab.x))], np.argsort(errs)
+        else:
+            pairs, e = self._pairs(bab, sides)
             cands, order = [np.stack([bab.x[a], bab.x[b]]) for a, b in pairs], np.argsort(e)
         picks: list[np.ndarray] = []
         for i in order:
@@ -566,7 +573,7 @@ class PhonologyWorld:
     def solve(self, body: Body, task: Task, seed: int = 0) -> Outcome:
         """System 1: ``local_search`` from the nearest postures in the body's map, up to ``starts`` of them.  A syllable
         searches its closure and its vowel together."""
-        r, bab, sides = self.rig_of(body), self.babble(body), self._sides(task)
+        r, sides = self.rig_of(body), self._sides(task)
         space = {p + k: rng for p, _ in sides for k, rng in r.controls.items()}
 
         def attempt(ctl: dict[str, float], s: int) -> Outcome:
@@ -598,16 +605,21 @@ class PhonologyWorld:
                            sim_s=time.perf_counter() - t0)
 
         out, attempts, sim_s = None, 0, 0.0
-        # its ways are the map's postures, the plan's ahead of them; each searches with its own samples
-        starts = self._starts(r, bab, sides)
-        plan_start, m = planned(body, space, starts[0], 32)
-        for j, start in enumerate([plan_start, *ways_of(body, space), *starts[1:]]):
-            o = local_search(attempt, space, {**starts[0], **start}, m=m, confirm=2, seed=seed + 7919 * j, step=0.1, shrink=0.9,
-                             other=0)
-            attempts, sim_s = attempts + o.attempts, sim_s + o.sim_s
-            if out is None or o.success or o.score > out.score:
-                out = o
-            if o.success:
+        # its ways are the map's postures, the plan's ahead of them; each searches with its own samples.  After a failure,
+        # the same again from another draw of the map, which is all that changes a verdict the draw decided (D-131)
+        j = 0
+        for draw in range(LOOKS):
+            starts = self._starts(r, self.babble(body, draw), sides)
+            plan_start, m = planned(body, space, starts[0], 32)
+            for start in [plan_start, *ways_of(body, space), *starts[1:]] if draw == 0 else starts:
+                o = local_search(attempt, space, {**starts[0], **start}, m=m, confirm=2, seed=seed + 7919 * j, step=0.1,
+                                 shrink=0.9, other=0)
+                j, attempts, sim_s = j + 1, attempts + o.attempts, sim_s + o.sim_s
+                if out is None or o.success or o.score > out.score:
+                    out = o
+                if o.success:
+                    break
+            if out is not None and out.success:
                 break
         assert out is not None
         out = out.model_copy(update={"attempts": attempts, "sim_s": round(sim_s, 3)})

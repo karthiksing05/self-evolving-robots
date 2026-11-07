@@ -35,6 +35,7 @@ import yaml
 from sea.contracts import ARM_JOINTS, ArmSpec, Design, FingerSpec, HardLimits, PanelSpec, SensorSuite
 from sea.design import fingers as F
 from sea.evolve.core import Body, BomLine, Outcome, Param, Part, PartType, Task
+from sea.evolve.search import LOOKS
 from sea.sim import jaws as J
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -809,11 +810,16 @@ class GripperWorld:
         if body.plan is not None:
             cfg.m *= body.plan.search
         panel = PanelSpec.model_validate(task.data["panel"])
-        run = run_panel(panel, cfg)[0]
-        trace = run.trace
-        verdict = run.result.verdict
-        n = attempts(run)
-        sim_s = (trace.sim_seconds * n) if trace is not None else 0.0
+        n, sim_s = 0, 0.0
+        for _ in range(LOOKS):  # a failure counts after longer looks, each twice the last (D-131)
+            run = run_panel(panel, cfg)[0]
+            trace = run.trace
+            verdict = run.result.verdict
+            n += attempts(run)
+            sim_s += (trace.sim_seconds * attempts(run)) if trace is not None else 0.0
+            if verdict == "pass":
+                break
+            cfg.m *= 2
         if verdict == "pass":
             return Outcome(task=task.id, success=True, score=1.0, mechanism="held", detail="held",
                            controls=_flat(run.params), attempts=n, sim_s=round(sim_s, 2), ways=run.ways)

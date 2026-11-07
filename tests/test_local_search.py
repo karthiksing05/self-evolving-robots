@@ -262,3 +262,25 @@ def test_real_sim_pass_needs_no_search():
 
     out = LS.run_system1(sim, PRESS, c.id, _cfg(), judge, m=2, max_param_delta=0.3, seed=0, panel_id=panel.id)
     assert out.result.verdict == "pass" and out.trials == 0
+
+
+def test_gripper_looks_again_after_a_failure_with_twice_the_attempts(monkeypatch):
+    """D-131: a failure counts after longer looks, and a pass on a look ends them."""
+    import types
+
+    from sea.sim import env
+    from sea.worlds.gripper import GripperWorld
+
+    world = GripperWorld()
+    seen = []
+
+    def fake(panel, cfg):
+        seen.append(cfg.m)
+        verdict = "pass" if len(seen) == 3 else "stuck"
+        return [types.SimpleNamespace(trace=None, params={}, ways=1, program="", result=types.SimpleNamespace(verdict=verdict))]
+
+    monkeypatch.setattr(env, "run_panel", fake)
+    monkeypatch.setattr(env, "attempts", lambda run: 10)
+    out = world.solve(world.stock(), world.tasks()[0])
+    assert out.success and out.attempts == 30
+    assert seen == [seen[0], 2 * seen[0], 4 * seen[0]]
