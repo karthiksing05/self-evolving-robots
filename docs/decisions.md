@@ -3482,3 +3482,23 @@ So a verdict on /ka/ and /ʃ/ depends on which 600 postures the body's content h
 - A talker run costs up to 2.5 times as much, since most of its time goes on failing tasks, so 14 hours at worst. The gripper stays under an hour.
 
 **The risk this takes.** More looks at a marginal task will sometimes pass by luck, and three confirmed noise draws can't rule that out. Every recheck seed runs its own search, so a sound that passes only by luck should show up as missing on some seed. If the eight seeds show /ka/ still flickering, it is reported as it stands.
+
+**Found.** Rechecks of the same final bodies on seeds 7000 to 7007, frozen at b03dee1, with no System 2 call:
+
+| Prediction | Result |
+|---|---|
+| No held group lost at any seed | Held: all ten from D-130 stayed on every seed |
+| Gripper 21 of 21 | Held: 21 of 21, 84 of 84 tasks on every seed. The recheck took 3 minutes |
+| Talker at least 12 of 17 | Held at exactly 12: the ten, plus /ʃ/ and /ʊ/ on all eight seeds |
+| /ka/ on more than its 4 seeds | Held: 7 of 8. It misses a test task on seed 7007, so it is not counted, and that is the flicker the risk above named |
+| /ɔ/ /u/ /ɝ/ /ta/ stay out | Held |
+| /ta/ reads as out of reach | **Failed.** It read `not_found_by_search` |
+| A talker run costs up to 2.5 times | Not measured yet. The recheck took 42 minutes |
+
+Why /ta/ read wrong: the new label asked only whether a pair passes standing still, and the map holds one (error 0.88 of 1). Driven with air flowing, that pair takes 70 ms to reach the vowel against a limit of 50. So the label now also drives every pair that passes standing still, stopping at the first that passes, and says `syllable_out_of_reach` with the measurement if none does. Every /ta/ task on the talker now reads that way. The change is to a label and no verdict moves, so the table's verdicts stand; it does change what System 2 reads, so it belongs before the repeat runs. Its near-miss remains: System 1's best /ta/ scores 0.499 against the 0.5 a pass needs, so "out of reach" means out of reach of the 600 sampled postures and System 1's search, not a proof.
+
+Two tests of the catalogue world broke, and each stated something the first look happened to produce:
+- The gold body now holds /ka/ on the test split, at 29 degrees of the rail servo, under the same laws and confirmations. D-072's comment that /ɑ/ moved up 3% is out of reach "from either closure" was wrong for the velar one; it holds only for the tip's. The test now expects all but /ta/.
+- One of the 16 stock corners labels /ɝ/ `f1_floor_too_high` rather than `f3_floor_too_high`. Its closest posture has F1 and F3 tied, at 6.88 and 6.85 windows off, so both are true. The test now accepts either. This loosens the test, and the other 15 corners still read F3.
+
+These are the existing bodies rechecked, not runs. Under criterion 3 the gripper and the talker repeat from stock under this commit. The mobile robot's result stands, as D-127's did: its code path is unchanged by this decision.

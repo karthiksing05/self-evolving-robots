@@ -114,9 +114,9 @@ def test_a_gold_body_holds_every_group_within_budget(world):
     assert res.ok and 0 < res.usd <= world.manifest()["budget"]["usd"]
     groups = {t.group for t in world.tasks()}
     assert _held(world, gold) == groups
-    # other noise, targets moved 3%; the syllables sit at the servos' 30 degree edge, and the /ɑ/ moved up 3% takes
-    # more than that from either closure (D-072)
-    assert _held(world, gold, "test") == groups - set(SYLLABLES)
+    # other noise, targets moved 3%; the syllables sit at the servos' 30 degree edge.  The /ɑ/ moved up 3% takes more than
+    # that from the tip's closure, and the rail's 29 degrees to it can take a later look to find (D-072, D-131)
+    assert _held(world, gold, "test") == groups - {"ta"}
 
 
 def test_no_params_only_body_holds_everything(world):
@@ -130,7 +130,8 @@ def test_no_params_only_body_holds_everything(world):
         outs = {t.group: world.solve(body, t) for t in tasks}
         assert not any(o.success for o in outs.values()), body.describe()
         assert outs["p"].mechanism == "no_closure_at_lips" and outs["t"].mechanism == "no_closure_at_alveolar"
-        assert outs["er"].mechanism == "f3_floor_too_high"
+        # F3 on all but one corner, where the closest posture has F1 and F3 tied at 6.9 windows off (D-131)
+        assert outs["er"].mechanism in ("f3_floor_too_high", "f1_floor_too_high")
     # ... but parameters are the cheaper rung where they suffice: a full cam stroke seals the velum
     stroke = apply(stock, [Edit(slot="tongue", params={"stroke": 1.3})], cat, "stroke")
     assert _held(world, stroke) - _held(world, stock) == {"k", "ka", "sh"}  # a deeper cam seals the velum

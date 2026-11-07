@@ -5,7 +5,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from sea.evolve.core import Part
+from sea.evolve.core import Outcome, Part
 from sea.mech import graph as G
 from sea.mech.world import SLOT
 from sea.worlds import graph_cad
@@ -100,3 +100,16 @@ def test_a_syllable_the_map_cannot_pair_is_out_of_reach_not_a_search_failure():
     out = world.solve(body, task)
     assert not out.success and out.mechanism == "syllable_out_of_reach"
     assert "pass together" in out.detail
+
+
+def test_a_pair_that_only_passes_standing_still_is_out_of_reach_not_a_search_failure(monkeypatch):
+    world = PhonologyKit()
+    body = world.stock()
+    task = next(t for t in world.tasks() if t.id == "ka_train0")
+    out = Outcome(task=task.id, success=False, score=0.5, detail="")
+    monkeypatch.setattr(world, "_pairs", lambda bab, sides: ([(0, 1), (2, 3)], np.array([0.9, 0.5])))
+    monkeypatch.setattr(world, "_timed", lambda *a: (1.4, "the tract takes 70 ms to reach the vowel"))
+    mech, why = world._diagnose(body, task, out)
+    assert mech == "syllable_out_of_reach" and "70 ms" in why and "none of the 2" in why
+    monkeypatch.setattr(world, "_timed", lambda *a: (0.9, "the tract takes 45 ms to reach the vowel"))
+    assert world._diagnose(body, task, out)[0] != "syllable_out_of_reach"

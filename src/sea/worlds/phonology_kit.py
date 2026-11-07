@@ -228,6 +228,15 @@ class PhonologyKit(GraphWorld, P.PhonologyWorld):
                                                  f"{np.degrees(P.TURN):.0f} degrees of servo travel; the nearest pair is "
                                                  f"{np.degrees(np.abs(bab.angles[a] - bab.angles[b]).max(initial=0.0)):.0f} degrees apart, closure: "
                                                  f"{self._said(closure, bab.f[a], bab.clo[a])}; vowel: {self._said(vowel, bab.f[b], bab.clo[b])}")
+            r, driven = self.rig_of(body), []  # a pair that passes standing still has yet to open in time
+            for i in np.argsort(pair_e)[: int((pair_e <= 1.0).sum())]:
+                closed, opened = ({k: np.array([v]) for k, v in zip(bab.keys, bab.x[n], strict=True)} for n in pairs[int(i)])
+                driven.append(self._timed(r, body, closed, opened, 0.0))
+                if driven[-1][0] <= 1.0:
+                    break
+            if driven[-1][0] > 1.0:
+                return "syllable_out_of_reach", (f"none of the {len(driven)} closure and vowel pairs that pass standing still, among the "
+                                                 f"{len(bab.x)} sampled postures, passes when driven with air flowing; the nearest: {min(driven)[1]}")
         d = task.data if task.data["kind"] != "syllable" else task.data["vowel"]
         e = self._errors(d, bab.f, bab.clo, bab.clash, bab.peak)
         i = int(np.argmin(e))
