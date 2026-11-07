@@ -3442,3 +3442,28 @@ The rod's Euler margin is 3.4 by the reading, 2.3 over D-104's print factor, so 
 **What is not changed.** The criterion stays as written and the result stays 20 of 21. No judge, seed or search budget moved to reach it. Searching longer is a skill change a later decision could make; it would need its own prediction, and every task's run repeated under it. The two runs are not two samples of the body: the same body under the same seeds gives the same verdict.
 
 **What this leaves open.** Pads alone reached 19 of 21 at best in earlier campaigns, and needed a chain of runs and a new jaw to pass. This run did it in one step under the current judge. Which judge or search change made the difference has not been measured, so nothing here says `wide_rod` was unnecessary, and the servo shaft's side load is still unjudged for either body.
+
+## D-130 (result: world phonology_kit): the talker holds 10 of 17, and part of what stopped it is System 1's map
+
+**Result.** `runs/evolve/camp3_phonology_kit_s0`, the framework-goal command from stock on 2fd5d41, run seed 0, nobody between iterations. Stock holds 2 of 17. The run reached 13 at its own seeds by iteration 4 and kept nothing in the 16 iterations after, stopping on `iterations` at 20 of 20: 5.6 hours, 20 System 2 calls, 18 research calls, 189 of 600 machine minutes and $0 of $40. Rechecked on seeds 7000 to 7007, 10 hold on train and test under every seed: /ɑ/ /æ/ /ʌ/ /ɛ/ /ɪ/ /i/ /k/ /p/ /s/ /t/. /ka/, /ʃ/ and /ʊ/ hold on train under every seed and miss on some held-out tasks. /ɔ/ /u/ /ɝ/ /ta/ hold under none. It does not meet the goal.
+
+**The body.** The stock tube, lengthened to 15.65 cm, with a roller tongue on an arm and lever, a lip pad on a lever, and a tip flap behind the teeth: four MG90S servos in cases on three posts, which the laws of D-127 pass.
+
+**Against the predictions.** D-127 said the harder problem might hold fewer than 9; it held 10, against 9 for the void run. D-126 said a run's own count would sit closer to its recheck: 13 and 10, where the void run had 14 and 9. That is closer and still not close. D-125: machine time did not stop this run. Criterion 7 is met in that `stopped` names and measures each failure, but one label misleads, as below.
+
+**What stopped it.** Eight of the trials after iteration 4 gained /u/ or /ɔ/ and lost something else, usually /ka/, /s/ or /ʃ/, so the ratchet rejected them. The losses looked like chance, so I replayed the recheck's failures on the final body, from the frozen commit, without changing any code.
+
+| Failure replayed | Normal search, same map | 4 times the search, same map | Normal search, 5 other 600-posture maps | Normal search, 4 other 2400-posture maps |
+|---|---|---|---|---|
+| /ʃ/ (2 cases) | fails | 1 of 2 | 8 of 10 | 8 of 8 |
+| /ʊ/ (2 cases) | fails | 2 of 2 | 4 of 10 | 8 of 8 |
+| /ka/ (2 cases) | fails | 0 of 2 | 7 of 10 | 2 of 8 |
+| /ta/ (1 case) | fails | 0 of 1 | 0 of 5 | 0 of 4 |
+
+So a verdict on /ka/ and /ʃ/ depends on which 600 postures the body's content hash happens to draw. `Body.key()` seeds the map, and any edit, even a plan's, redraws it. The physics, the body and the noise are the same in each column of a row. Some of the losses that rejected those eight trials may therefore not be the edit's doing; how many has not been measured. The counts are small and the /ka/ row goes the wrong way on the denser map, which is not yet explained. /ta/ fails on every map and looks like the body's own limit.
+
+**A label that misleads.** A syllable's `_diagnose` asks only whether the map holds its vowel. So /ta/ reads `not_found_by_search` in all 24 recheck failures, when no search here found it. That tells System 2 the operator is at fault when the evidence points to the body.
+
+**The gripper.** Its one miss in D-129 passes with 4 times the attempts: 343 against 119, with no posture map involved. One replay, which fits a search that missed a grip and does not prove it.
+
+**What this does not show.** One campaign from one run seed, in simulation. The replays use the failing cases only, so they say nothing about whether a change would lose tasks that pass now. No judge moved.
