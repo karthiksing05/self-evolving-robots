@@ -3502,3 +3502,12 @@ Two tests of the catalogue world broke, and each stated something the first look
 - One of the 16 stock corners labels /ɝ/ `f1_floor_too_high` rather than `f3_floor_too_high`. Its closest posture has F1 and F3 tied, at 6.88 and 6.85 windows off, so both are true. The test now accepts either. This loosens the test, and the other 15 corners still read F3.
 
 These are the existing bodies rechecked, not runs. Under criterion 3 the gripper and the talker repeat from stock under this commit. The mobile robot's result stands, as D-127's did: its code path is unchanged by this decision.
+
+## D-132 (result: worlds gripper and phonology_kit): the two tasks repeated from stock under three looks
+
+**Why.** Criterion 3 of `docs/framework-goal.md`: D-131 changed the harness for these two tasks, so their runs are repeated from stock with an empty notebook and library. The rechecks in D-131 reused bodies from before the change, and those bodies say nothing about what a run reaches now. The commands are the ones in that file, frozen at 7d45e6e, gripper first and then the talker.
+
+**Prediction.** Made before either run:
+- Gripper (`camp2_gripper_s0`): meets the goal, 21 of 21 on seeds 7000 to 7007, in under an hour. Its two earlier runs found one body and missed by one task that more attempts now catch. The doubt is that System 2 is a fresh sample, so it may take a different path.
+- Talker (`camp4_phonology_kit_s0`): at least 12 of 17, not 17, and it stops on `iterations`. /ta/ now reads as out of reach, so System 2 should change the body for it rather than leave it to the search, and I expect at least one proposal aimed at it. Up to 14 hours.
+- If the talker falls short, the stated reason names what stopped it with measurements, as criterion 7 asks.
