@@ -3511,3 +3511,19 @@ These are the existing bodies rechecked, not runs. Under criterion 3 the gripper
 - Gripper (`camp2_gripper_s0`): meets the goal, 21 of 21 on seeds 7000 to 7007, in under an hour. Its two earlier runs found one body and missed by one task that more attempts now catch. The doubt is that System 2 is a fresh sample, so it may take a different path.
 - Talker (`camp4_phonology_kit_s0`): at least 12 of 17, not 17, and it stops on `iterations`. /ta/ now reads as out of reach, so System 2 should change the body for it rather than leave it to the search, and I expect at least one proposal aimed at it. Up to 14 hours.
 - If the talker falls short, the stated reason names what stopped it with measurements, as criterion 7 asks.
+
+**Found.** Both runs ran from stock on 7d45e6e with nobody between iterations. Neither meets the goal.
+
+| Prediction | Result |
+|---|---|
+| Gripper meets the goal, 21 of 21 | **Failed: 20 of 21.** It went from stock 17/21 to 21/21 at its own seeds by iteration 3 and stopped itself on "all groups held". On the recheck, `potted_meat_can` misses: test task `rte001` reads `force_limit` on all eight seeds, and train task `rva000` also misses on 7006. System 2 found 22° pads with 0.5 mm TPU, where D-129's two runs found 40° pads with 1 mm |
+| Gripper under an hour | Held: the run took 58 min, and its recheck took 26 |
+| Talker at least 12 of 17, not 17 | **Failed: 11 of 17.** It went from stock 2/17 to 15/17 at its own seeds in its first proposal, a 'four_ridge_tract', and kept nothing over the next 19 iterations (54 proposals) |
+| Stops on `iterations` | Held |
+| At least one proposal aimed at /ta/ | Held. System 2 aimed at /ta/ in most iterations, measuring its seal, F1 and opening time each time. Each change that moved /ta/ lost /ka/, /ʃ/, /u/ or /ɔ/, which sat at their windows' edges |
+| Up to 14 hours | Held: 13.0 h, $8 of $40 |
+| Says why it stopped, with measurements | Held: `iy` vowel out of reach (F 240/2000 Hz against 270/2290), `ta` syllable out of reach |
+
+The talker's recheck lost /ɔ/ on the test split at every seed (vowel out of reach), /ka/ on test at all eight (`not_found_by_search` or out of reach), /u/ on four seeds and /ʃ/ on one. It held /ɔ/ /u/ /ʃ/ /ka/ on its own train tasks.
+
+**What both runs share.** In each, the misses that decide the result are held-out test tasks failing at every seed, not one seed's luck: the gripper's `rte001` and the talker's /ɔ/ test tasks. Training passes them only at the edge: the talker's /ɔ/ and /u/ train passes sit at F2 +10% on a 10% window. A body accepted at the edge of every train window has nothing left for a test target moved 3%. The loop counts a group as held, or not, and nothing in it rewards margin. That is D-133's question, and no criterion changes.
