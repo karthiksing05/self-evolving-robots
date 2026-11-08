@@ -3526,4 +3526,8 @@ These are the existing bodies rechecked, not runs. Under criterion 3 the gripper
 
 The talker's recheck lost /ɔ/ on the test split at every seed (vowel out of reach), /ka/ on test at all eight (`not_found_by_search` or out of reach), /u/ on four seeds and /ʃ/ on one. It held /ɔ/ /u/ /ʃ/ /ka/ on its own train tasks.
 
-**What both runs share.** In each, the misses that decide the result are held-out test tasks failing at every seed, not one seed's luck: the gripper's `rte001` and the talker's /ɔ/ test tasks. Training passes them only at the edge: the talker's /ɔ/ and /u/ train passes sit at F2 +10% on a 10% window. A body accepted at the edge of every train window has nothing left for a test target moved 3%. The loop counts a group as held, or not, and nothing in it rewards margin. That is D-133's question, and no criterion changes.
+**What both runs share, measured afterwards on the final bodies at seed 7000.** In each, the misses that decide the result are held-out test tasks failing at every seed, not one seed's luck. The causes differ:
+- The talker's passes all sit at the edge: errors of 0.98 to 0.99 on a limit of 1 for /ɑ/ and /ɔ/, and 0.83 to 0.88 for /u/ and /ʃ/. That figure is partly the search's doing, since System 1 stops at the first posture that passes. The map's nearest posture to /ɔ/'s failing test target is itself at -10% F1 and +11% F2, so for /ɔ/ the edge is the body's.
+- The gripper's train tasks pass outright, so margin is not its problem. On `rte001`, a test pose, a pad comes down 21 N on the can's top, 42 mm above its centre, and the force limit stops the attempt. That is a closing path that misses the can in one pose, which train never showed.
+
+Nothing in the loop rewards margin, and nothing shows System 2 how close a pass was. That is D-133's question, and no criterion changes.
